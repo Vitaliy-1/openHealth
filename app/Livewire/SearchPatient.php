@@ -16,11 +16,12 @@ class SearchPatient extends Component
     public string $ipn = '';
     public string $phone = '';
     public string $birthCertificate = '';
-    public ?array $patients = null;
+    public ? array $patients = null;
 
     /**
      * Search for patient in eHealth
      */
+
     public function search(): void
     {
         $response = Http::acceptJson()

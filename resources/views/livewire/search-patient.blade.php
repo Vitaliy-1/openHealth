@@ -70,13 +70,12 @@
         </div>
 
     <div class="mt-6 flex items-center justify-end gap-x-6">
-        <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Пошук</button>
+        <button type="submit" class="btn-blue">Пошук</button>
     </div>
 
     <div wire:loading wire:target="search" class="bg-white rounded-md border shadow px-6 py-3">
         <span class="text-gray-700 font-semibold">Шукаємо пацієнта в ЕСОЗ ...</span>
     </div>
-
     @if(!empty($patients))
             <div class="overflow-y-scroll shadow sm:rounded-lg">
                 <table class="table-auto w-full shadow border border-gray-200 dark:border-gray-700 sm:rounded-lg bg-white">

@@ -10,17 +10,28 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
         <!-- Scripts -->
+        @vite(['resources/css/style.css', 'resources/js/index.js'])
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <!-- Styles -->
         @livewireStyles
     </head>
     <body>
-        <div class="font-sans text-gray-900 dark:text-gray-100 antialiased">
-            {{ $slot }}
+    <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 antialiased">
+        <div class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div class="flex flex-wrap items-center">
+                {{ $slot }}
+
+            </div>
         </div>
+        <!-- ====== Forms Section Start -->
+
+        <!-- ====== Forms Section End -->
+    </div>
+
+
 
         @livewireScripts
     </body>

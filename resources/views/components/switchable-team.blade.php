@@ -6,7 +6,6 @@
 
     <!-- Hidden Team ID -->
     <input type="hidden" name="team_id" value="{{ $team->id }}">
-
     <x-dynamic-component :component="$component" href="#" x-on:click.prevent="$root.submit();">
         <div class="flex items-center">
             @if (Auth::user()->isCurrentTeam($team))
