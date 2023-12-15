@@ -2,24 +2,34 @@
 
 namespace App\Livewire\Registration;
 
+use AllowDynamicProperties;
+use App\Helpers\JsonHelper;
 use App\Models\Person;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\Attributes\Validate;
+
 use Illuminate\Support\Facades\Validator;
-class CreateNewLegalEntities extends Component
+ class CreateNewLegalEntities extends Component
 {
 
 
     public array $form = [
         'edrpou' => '',
-        'owner'=>[
+        'type'=>'PRIMARY_CARE',
+        'email'=> '',
+        'website'=>'',
+        'phones'=> [
+            [ 'type' => '', 'phone'=> ''],
+        ],
+        'owner'=> [
             'email' => '',
             'last_name' => '',
             'first_name ' => '',
             'second_name' => '',
             'gender' => '',
             'birth_date' => '',
-            'invalid_tax_id' => '',
+            'invalid_tax_id' => false,
             'tax_id' => '',
             'position' => '',
             'documents' => [],
@@ -27,33 +37,86 @@ class CreateNewLegalEntities extends Component
                 [ 'type' => '', 'phone'=> ''],
             ],
         ],
-
-
+        'residence_address'=>[
+            'type'=>'RESIDENCE',
+            'country'=>'UA',
+            'area'=>'',
+            'region'=>'',
+            'settlement'=>'',
+            'settlement_type'=>'',
+            'settlement_id'=> ''
+        ],
+        'accreditation'=>[
+            'category'=>'',
+            'issued_date'=>'',
+            'expiry_date'=>'',
+            'order_no'=>'',
+            'order_date'=>'',
+        ],
+        'license'=> [
+            'type'=>'MSP',
+            'issued_by'=>'',
+            'issued_at'=>'',
+            'active_from_date'=>'',
+            'order_no'=>'',
+            'license_number'=>'',
+            'expiry_date'=>'',
+            'what_licensed'=>''
+        ]
     ];
 
+    public int $totalSteps = 7;
 
-    public int $totalSteps = 4;
-
-    public int $currentStep = 1;
-
+    public int $currentStep;
+    public array $dictionaries;
 
     public function mount(){
         $this->currentStep = 1;
+
+
+        $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', [
+                'PHONE_TYPE',
+                'LICENSE_TYPE'
+            ]
+        );
     }
 
-    public function addRowPhones()
+    public function addRowPhones(&$phonesArray)
     {
-        $this->form['owner']['phones'][] = ['type' => '', 'phone' => ''];
+        $phonesArray[] = ['type' => '', 'phone' => ''];
     }
 
-    public function removeRowPhones($key)
+    public function addRowPhonesForOwner()
     {
-        unset($this->form['owner']['phones'][$key]) ;
+        $this->addRowPhones($this->form['owner']['phones']);
     }
+
+    public function addRowPhonesForGeneral()
+    {
+        $this->addRowPhones($this->form['phones']);
+    }
+
+    public function removePhonesForOwner($key)
+    {
+        if (isset($this->form['owner']['phones'][$key])) {
+            unset($this->form['owner']['phones'][$key]);
+        }
+    }
+
+    public function removePhonesForGeneral($key)
+    {
+        if (isset($this->form['phones'][$key])) {
+            unset($this->form['phones'][$key]);
+        }
+    }
+
     public function increaseStep(){
+
         $this->resetErrorBag();
         $this->validateData();
+
         $this->currentStep++;
+
         if($this->currentStep > $this->totalSteps){
             $this->currentStep = $this->totalSteps;
         }
@@ -66,6 +129,7 @@ class CreateNewLegalEntities extends Component
             $this->currentStep = 1;
         }
     }
+
     public function validateData(){
 
         if($this->currentStep == 1){
@@ -79,26 +143,37 @@ class CreateNewLegalEntities extends Component
                 'form.owner.first_name' => 'required|min:3',
                 'form.owner.gender' => 'required|string',
                 'form.owner.birth_date' => 'required|date',
-                'form.owner.invalid_tax_id' => 'required|boolean',
-                'form.owner.tax_id' => 'exclude_if:form.invalid_tax_id,false|required|string',
-                'form.owner.documents.type' => 'exclude_if:form.invalid_tax_id,false|required|string',
-                'form.owner.documents.number' => 'exclude_if:form.invalid_tax_id,false|required|string',
-                'form.owner.documents.issued_at' => 'exclude_if:form.invalid_tax_id,false|required|string',
+                'form.owner.tax_id' => 'exclude_if:form.owner.invalid_tax_id,true|required|string',
+                'form.owner.documents.type' => 'exclude_if:form.owner.invalid_tax_id,true|required|string',
+                'form.owner.documents.number' => 'exclude_if:form.owner.invalid_tax_id,true|required|string',
+                'form.owner.documents.issued_at' => 'exclude_if:form.owner.invalid_tax_id,true|required|string',
                 'form.owner.phones.*.phone' => 'required|string:digits:13',
                 'form.owner.phones.*.type' => 'required|string',
                 'form.owner.email' => 'required|email',
                 'form.owner.position' => 'required|string',
             ]);
-
-
         }
         elseif($this->currentStep == 3){
             $this->validate([
-
+                'form.email' => 'required|email',
+                'form.phones.*.phone' => 'required|string:digits:13',
+                'form.phones.*.type' => 'required|string',
             ]);
         }
         elseif($this->currentStep == 4){
             $this->validate([
+                'form.residence_address.region'=> 'required|string|min:3',
+                'form.residence_address.area' => 'required|string|min:3',
+                'form.residence_address.settlement' => 'required|string|min:3',
+                'form.residence_address.settlement_type' => 'required|string|min:3',
+            ]);
+        }
+
+
+        elseif($this->currentStep == 6){
+            $this->validate([
+                'form.license.issued_by'=> 'required|string|min:3',
+                'form.license.issued_date'=> 'required|date|min:3',
             ]);
         }
     }
@@ -107,8 +182,12 @@ class CreateNewLegalEntities extends Component
         ///Create/Update Legal Entity V2
     }
 
+
+
     public function render()
     {
+
+
         return view('livewire.registration.create-new-legal-entities');
     }
 }
