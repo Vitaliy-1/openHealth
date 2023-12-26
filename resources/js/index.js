@@ -3,7 +3,9 @@
 import "../css/style.css";
 
 import Alpine from "alpinejs";
-import persist from '@alpinejs/persist'
+import persist from '@alpinejs/persist';
+import mask from '@alpinejs/mask';
+
 import flatpickr from "flatpickr";
 import chart01 from "./components/chart-01";
 import chart02 from "./components/chart-02";
@@ -14,6 +16,7 @@ import map01 from "./components/map-01";
 Alpine.plugin(persist)
 window.Alpine = Alpine;
 Alpine.start();
+Alpine.plugin(mask)
 
 // Init flatpickr
 flatpickr(".datepicker", {

@@ -63,11 +63,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
 
     /**
-     * @return HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function person(){
-        return $this->hasOne(Person::class);
+        return $this->belongsTo(Person::class);
     }
-
 
 }

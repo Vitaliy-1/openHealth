@@ -7,25 +7,28 @@
         <x-slot name="form">
             <div class="p-6.5">
                 @if ($currentStep == 1)
-                    @include('livewire.registration.steep._steep_one')
+                    @include('livewire.registration.step._step_edrpou')
                 @endif
                 @if ($currentStep == 2)
-                    @include('livewire.registration.steep._steep_two')
+                    @include('livewire.registration.step._step_owner')
                 @endif
                 @if ($currentStep == 3)
-                    @include('livewire.registration.steep._steep_three')
+                    @include('livewire.registration.step._step_contact')
                 @endif
                 @if ($currentStep == 4)
-                    @include('livewire.registration.steep._steep_four')
+                    @include('livewire.registration.step._step_residence_address')
                 @endif
                 @if ($currentStep == 5)
-                    @include('livewire.registration.steep._steep_five')
+                    @include('livewire.registration.step._step_accreditation')
                 @endif
                 @if ($currentStep == 6)
-                    @include('livewire.registration.steep._steep_six')
+                    @include('livewire.registration.step._step_license')
                 @endif
                 @if ($currentStep == 7)
-                    @include('livewire.registration.steep._steep_seven')
+                    @include('livewire.registration.step._step_additional_information')
+                @endif
+                @if ($currentStep == 8)
+                    @include('livewire.registration.step._step_public_offer')
                 @endif
                 <div class="mb-4.5 flex flex-col gap-6 xl:flex-row justify-between	items-center ">
                     <div class="xl:w-1/4">
@@ -37,7 +40,11 @@
                     </div>
                     <div class="xl:w-1/4">
                         <x-button class="btn-primary" wire:click="increaseStep()">
-                            {{__('Далі')}}
+                            @if($currentStep == $totalSteps)
+                            {{__('Зарееструвати заклад')}}
+                               @else
+                               {{__('Далі')}}
+                            @endif
                         </x-button>
                     </div>
                 </div>

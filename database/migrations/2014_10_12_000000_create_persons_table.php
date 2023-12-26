@@ -13,28 +13,29 @@ return new class extends Migration
     {
         Schema::create('persons', function (Blueprint $table) {
             $table->id();
+            $table->uuid('persons_uuid')->nullable();
             $table->string('last_name');
             $table->string('first_name');
             $table->string('second_name')->nullable();
             $table->date('birth_date');
-            $table->string('birth_country');
-            $table->string('birth_settlement');
+            $table->string('birth_country')->nullable();
+            $table->string('birth_settlement')->nullable();
             $table->string('gender');
             $table->string('email')->nullable();
             $table->string('tax_id')->nullable();
             $table->boolean('invalid_tax_id')->nullable();
             $table->date('death_date')->nullable();
-            $table->boolean('is_active');
+            $table->boolean('is_active')->default(false);
             $table->jsonb('documents');
-            $table->jsonb('addresses');
+            $table->jsonb('addresses')->nullable();
             $table->jsonb('phones')->nullable();
             $table->string('secret')->nullable();
             $table->jsonb('emergency_contact');
             $table->jsonb('confidant_person')->nullable();
-            $table->boolean('patient_signed');
-            $table->boolean('process_disclosure_data_consent');
-            $table->jsonb('authentication_methods');
-            $table->string('preferred_way_communication');
+            $table->boolean('patient_signed')->default(false);
+            $table->boolean('process_disclosure_data_consent')->default(false);
+            $table->jsonb('authentication_methods')->nullable();
+            $table->string('preferred_way_communication')->nullable();
             $table->timestamps();
         });
 
