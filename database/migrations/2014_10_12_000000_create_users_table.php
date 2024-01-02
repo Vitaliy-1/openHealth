@@ -13,15 +13,22 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();
             $table->string('profile_photo_path', 2048)->nullable();
+            $table->string('tax_id')->nullable()->unique();
+            $table->jsonb('settings')->nullable();
+            $table->jsonb('priv_settings')->nullable();
+            $table->boolean('is_blocked')->nullable();
+            $table->string('block_reason')->nullable();
+            $table->foreignId('person_id')->nullable();
+            $table->foreign('person_id')->references('id')->on('persons')->onDelete('set null');
             $table->timestamps();
         });
+
     }
 
     /**

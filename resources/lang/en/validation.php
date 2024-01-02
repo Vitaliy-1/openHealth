@@ -13,18 +13,18 @@ return [
     |
     */
 
-    'accepted' => 'Поле :attribute має бути прийнятим.',
-    'accepted_if' => 'Поле :attribute має бути прийнятим, коли :other дорівнює :value.',
-    'active_url' => 'Поле :attribute має бути валідною URL адресою.',
-    'after' => 'Поле :attribute має бути датою після :date.',
-    'after_or_equal' => 'Поле :attribute має бути датою після або дорівнювати :date.',
-    'alpha' => 'Поле :attribute має містити тільки букви.',
-    'alpha_dash' => 'Поле :attribute має містити тільки букви, цифри, тире та нижнє підкреслення.',
-    'alpha_num' => 'Поле :attribute має містити тільки букви та цифри.',
-    'array' => 'Поле :attribute має бути масивом.',
-    'ascii' => 'Поле :attribute має містити лише однобайтові буквено-цифрові знаки та символи.',
-    'before' => 'Поле :attribute має бути датою до :date.',
-    'before_or_equal' => 'Поле :attribute має бути датою до чи дорівнювати :date.',
+    'accepted' => 'The :attribute field must be accepted.',
+    'accepted_if' => 'The :attribute field must be accepted when :other is :value.',
+    'active_url' => 'The :attribute field must be a valid URL.',
+    'after' => 'The :attribute field must be a date after :date.',
+    'after_or_equal' => 'The :attribute field must be a date after or equal to :date.',
+    'alpha' => 'The :attribute field must only contain letters.',
+    'alpha_dash' => 'The :attribute field must only contain letters, numbers, dashes, and underscores.',
+    'alpha_num' => 'The :attribute field must only contain letters and numbers.',
+    'array' => 'The :attribute field must be an array.',
+    'ascii' => 'The :attribute field must only contain single-byte alphanumeric characters and symbols.',
+    'before' => 'The :attribute field must be a date before :date.',
+    'before_or_equal' => 'The :attribute field must be a date before or equal to :date.',
     'between' => [
         'array' => 'The :attribute field must have between :min and :max items.',
         'file' => 'The :attribute field must be between :min and :max kilobytes.',
@@ -180,6 +180,10 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'form'=> [
+            'edrpou'=>'EDRPOU'
+        ],
+    ],
 
 ];

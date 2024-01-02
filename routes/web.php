@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Registration\CreateNewLegalEntities;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\SearchPatient;
 
@@ -23,9 +24,10 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-
+    Route::get('/dashboard/legal-entities/create', CreateNewLegalEntities::class)->name('create.legalEntities');
     Route::get('/dashboard/search/patient', SearchPatient::class);
 });
