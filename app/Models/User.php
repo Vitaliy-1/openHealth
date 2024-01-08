@@ -63,10 +63,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\belongsTo
      */
     public function person(){
-        return $this->belongsTo(Person::class);
+        return $this->belongsTo(Person::class,'user_id', 'id');
     }
 
 }

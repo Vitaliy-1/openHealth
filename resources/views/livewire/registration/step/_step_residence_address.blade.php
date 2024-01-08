@@ -12,14 +12,11 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.select class="default-input" wire:model="legal_entities.residence_address.area"
-                            type="text" id="residence_address_area">
-                <x-slot name="option">
-                    <option value="">Вибрати</option>
-                    <option value="Київська">Київська</option>
-                </x-slot>
-            </x-forms.select>
-        </x-slot> @error('legal_entities.residence_address.area')
+                <x-forms.input class="default-input"
+                               wire:model="legal_entities.residence_address.area" type="text"
+                               id="residence_address_settlement_type"/>
+        </x-slot>
+        @error('legal_entities.residence_address.area')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -35,13 +32,9 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.select class="default-input" wire:model="legal_entities.residence_address.region"
-                            type="text" id="residence_address_region">
-                <x-slot name="option">
-                    <option value="">Вибрати</option>
-                    <option value="Київська">Київ</option>
-                </x-slot>
-            </x-forms.select>
+            <x-forms.input class="default-input" wire:model="legal_entities.residence_address.region"
+                            type="text" id="residence_address_region" />
+
         </x-slot>
         @error('legal_entities.residence_address.region')
         <x-slot name="error">
@@ -62,16 +55,24 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.select class="default-input"
-                            wire:model="legal_entities.residence_address.settlement_type" type="text"
-                            id="residence_address_settlement_type">
+
+            <x-forms.select
+                class="default-input"
+                wire:model="legal_entities.residence_address.settlement_type" type="text"
+                id="residence_address_settlement_type"
+            >
                 <x-slot name="option">
-                    <option value="">Вибрати</option>
-                    <option value="Місто">Місто</option>
-                    <option value="Село">Село</option>
+                    <option value="">{{__('forms.select')}}</option>
+                    @isset($dictionaries['SETTLEMENT_TYPE'])
+                        @foreach($dictionaries['SETTLEMENT_TYPE'] as $k=>$type)
+                            <option  {{ isset($legal_entities->residence_address['settlement_type']) == $k ? 'selected': ''}} value="{{$k}}">{{$type}}</option>
+                        @endforeach
+                    @endif
                 </x-slot>
             </x-forms.select>
         </x-slot>
+
+
         @error('legal_entities.residence_address.settlement_type')
         <x-slot name="error">
             <x-forms.error>
@@ -89,14 +90,10 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.select class="default-input" wire:model="legal_entities.residence_address.settlement"
-                            type="text" id="residence_address_settlement">
-                <x-slot name="option">
-                    <option value="">Вибрати</option>
-                    <option value="Київська">Київ</option>
-                </x-slot>
-            </x-forms.select>
-        </x-slot> @error('legal_entities.residence_address.settlement')
+            <x-forms.input class="default-input" wire:model="legal_entities.residence_address.settlement"
+                            type="text" id="residence_address_settlement" />
+        </x-slot>
+        @error('legal_entities.residence_address.settlement')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}

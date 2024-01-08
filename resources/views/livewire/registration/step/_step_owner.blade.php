@@ -107,8 +107,18 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entities.owner.position" type="text"
-                           id="owner_position" />
+            <x-forms.select
+                class="default-input" wire:model="legal_entities.owner.position" type="text"
+                id="owner_position"
+            >
+                <x-slot name="option">
+                    <option>{{__('forms.select_position')}}</option>
+                    @foreach($this->dictionaries['POSITION'] as $k=>$position)
+                        <option value="{{$k}}">{{$position}}</option>
+                    @endforeach
+                </x-slot>
+            </x-forms.select>
+
         </x-slot>
         @error('legal_entities.owner.position')
         <x-slot name="error">
@@ -223,7 +233,7 @@
             @enderror
         </x-forms.form-group>
     </div>
-        <div x-show="show" class="mb-4.5 flex flex-col gap-0 gap-6 ">
+    <div x-show="show" class="mb-4.5 flex flex-col gap-0 gap-6 ">
             <x-forms.form-group class="xl:w-1/2">
                 <x-slot name="label">
                     <x-forms.label class="default-label" for="tax_id">
@@ -242,7 +252,7 @@
                 @enderror
             </x-forms.form-group>
         </div>
-        <div x-show="!show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
+    <div x-show="!show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
             <x-forms.form-group class="xl:w-1/2">
                 <x-slot name="label">
                     <x-forms.label for="documents_type" class="default-label">
@@ -287,7 +297,7 @@
                 @enderror
             </x-forms.form-group>
         </div>
-        <div x-show="!show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
+    <div x-show="!show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
             <x-forms.form-group class="xl:w-1/2">
                 <x-slot name="label">
                     <x-forms.label for="documents_issued_by" class="default-label">
@@ -329,3 +339,4 @@
 
         </div>
 </div>
+

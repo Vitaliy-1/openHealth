@@ -8,7 +8,8 @@ use Livewire\Form;
 
 class LegalEntitiesForms extends Form
 {
-    #[Validate('required|integer|digits:8')]
+
+    #[Validate('required|integer|digits:10')]
     public string $edrpou = '';
 
     #[Validate([
@@ -29,7 +30,7 @@ class LegalEntitiesForms extends Form
     public ?array $owner= ['no_tax_id' => false];
 
     #[Validate([
-        'contact.phones.*.phone' => 'required|string:digits:13',
+        'contact.phones.*.number' => 'required|string:digits:13',
         'contact.phones.*.type' => 'required|string',
         'contact.email' => 'required|email',
     ])]
@@ -57,27 +58,29 @@ class LegalEntitiesForms extends Form
         'license.order_no' => 'required|string',
     ])]
     public ?array $license = [];
+
     public ?array $additional_information = [];
 
-
     #[Validate([
-        'public_offer.consent' => 'required|on',
-        'public_offer.digital_signature' => 'required|file||max:2048'
+//        'public_offer.consent' => 'required|on',
+//        'public_offer.digital_signature' => 'required|file|max:2048'
     ])]
     public array $public_offer = [];
+
     /**
      * @throws ValidationException
      */
-    public function getRulesForEdrpou(): void
+    public function rulesForEdrpou(): array
     {
-        $this->validate($this->rulesForModel('edrpou')->toArray());
-        //TODO: request api data for edrpou
+
+       return $this->validate($this->rulesForModel('edrpou')->toArray());
+
     }
 
     /**
      * @throws ValidationException
      */
-    public function getRulesForOwner(): void
+    public function rulesForOwner(): void
     {
         $this->validate($this->rulesForModel('owner')->toArray());
     }
@@ -85,7 +88,7 @@ class LegalEntitiesForms extends Form
     /**
      * @throws ValidationException
      */
-    public function getRulesForContact(): void
+    public function rulesForContact(): void
     {
         $this->validate($this->rulesForModel('contact')->toArray());
     }
@@ -93,7 +96,7 @@ class LegalEntitiesForms extends Form
     /**
      * @throws ValidationException
      */
-    public function getRulesForAddress(): void
+    public function rulesForAddress(): void
     {
         $this->validate($this->rulesForModel('residence_address')->toArray());
     }
@@ -101,7 +104,7 @@ class LegalEntitiesForms extends Form
     /**
      * @throws ValidationException
      */
-    public function getRulesForLicense()
+    public function rulesForLicense()
     {
         $this->validate($this->rulesForModel('license')->toArray());
     }
@@ -109,8 +112,9 @@ class LegalEntitiesForms extends Form
     /**
      * @throws ValidationException
      */
-    public function getRulesForPublicOffer(): void
+    public function rulesForPublicOffer(): void
     {
         $this->validate($this->rulesForModel('public_offer')->toArray());
     }
+
 }

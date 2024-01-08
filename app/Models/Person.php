@@ -44,8 +44,9 @@ class Person extends Model
     ];
 
 
-    public function user(){
-        return $this->hasOne(User::class);
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
 

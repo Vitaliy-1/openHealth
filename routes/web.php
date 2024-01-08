@@ -1,8 +1,8 @@
 <?php
 
-use App\Livewire\Registration\CreateNewLegalEntities;
-use Illuminate\Support\Facades\Route;
+use app\Livewire\Registration\CreateNewLegalEntities;
 use App\Livewire\SearchPatient;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------

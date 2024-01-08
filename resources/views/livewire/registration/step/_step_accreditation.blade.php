@@ -11,13 +11,13 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.select class="default-input" wire:model="form.accreditation.category"
+            <x-forms.select class="default-input" wire:model="legal_entities.accreditation.category"
                             type="text" id="accreditation_category">
                 <x-slot name="option">
                     <option value="">{{__('forms.select')}}</option>
-                    @isset($directories['ACCREDITATION_CATEGORY'])
-                        @foreach($directories['ACCREDITATION_CATEGORY'] as $k=>$speciality)
-                            <option value="{{$k}}">{{$speciality}}</option>
+                    @isset($dictionaries['ACCREDITATION_CATEGORY'])
+                        @foreach($dictionaries['ACCREDITATION_CATEGORY'] as $k=>$category)
+                            <option {{isset($legal_entities->accreditation['category'] ) == $k ? 'selected': ''}} value="{{$k}}">{{$category}}</option>
                         @endforeach
                     @endif
                 </x-slot>
@@ -32,7 +32,7 @@
                            </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="form.accreditation.order_no"
+            <x-forms.input class="default-input" wire:model="legal_entities.accreditation.order_no"
                            type="text" id="accreditation_order_no"/>
         </x-slot>
     </x-forms.form-group>
@@ -47,7 +47,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="form.accreditation.issued_date"
+            <x-forms.input class="default-input" wire:model="legal_entities.accreditation.issued_date"
                            type="date" id="accreditation_issued_date"/>
         </x-slot>
     </x-forms.form-group>
@@ -59,7 +59,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="form.accreditation.expiry_date"
+            <x-forms.input class="default-input" wire:model="legal_entities.accreditation.expiry_date"
                            type="date" id="accreditation_expiry_date"/>
         </x-slot>
     </x-forms.form-group>
@@ -74,7 +74,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="form.accreditation.order_date"
+            <x-forms.input class="default-input" wire:model="legal_entities.accreditation.order_date"
                            type="date" id="accreditation_order_date"/>
         </x-slot>
     </x-forms.form-group>

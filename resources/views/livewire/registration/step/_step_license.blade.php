@@ -32,9 +32,8 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.input class="default-input" wire:model="legal_entities.license.license_number"
-                           type="number" id="license_license_number"/>
+                           type="text" id="license_license_number"/>
         </x-slot>
-
     </x-forms.form-group>
 </div>
 <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -76,7 +75,6 @@
         </x-slot>
         @enderror
     </x-forms.form-group>
-
 </div>
 <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
     <x-forms.form-group class="xl:w-1/2">

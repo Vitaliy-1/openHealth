@@ -11,13 +11,13 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="additional_information.receiver_funds_coder"
+            <x-forms.input class="default-input" wire:model="legal_entities.additional_information.receiver_funds_code"
                            type="text" id="additional_information_receiver_funds_coder"/>
         </x-slot>
     </x-forms.form-group>
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
-            <x-forms.label class="default-label" for="additional_information_beneficiary"
+            <x-forms.label class="default-label" for="legal_entities..additional_information_beneficiary"
                            name="label">
                 {{__('forms.receiver_funds_code')}}
 
@@ -25,7 +25,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="additional_information.beneficiary"
+            <x-forms.input class="default-input" wire:model="legal_entities.additional_information.beneficiary"
                            type="text" id="additional_information_beneficiary"/>
         </x-slot>
     </x-forms.form-group>
@@ -40,7 +40,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="additional_information.archive.date"
+            <x-forms.input class="default-input" wire:model="legal_entities.additional_information.archive.date"
                            type="date" id="additional_information_archive_date"/>
         </x-slot>
     </x-forms.form-group>
@@ -52,7 +52,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="additional_information.archive.place"
+            <x-forms.input class="default-input" wire:model="legal_entities.additional_information.archive.place"
                            type="text" id="additional_information_archive_place"/>
         </x-slot>
     </x-forms.form-group>

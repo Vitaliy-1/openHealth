@@ -30,7 +30,7 @@
 
     <x-forms.form-group class="flex items-center mb-4 flex-row-reverse	justify-end	">
         <x-slot name="input">
-            <x-forms.input wire:model="form.public_offer.consent" value="true" type="checkbox"
+            <x-forms.input wire:model="legal_entities.public_offer.consent" value="true" type="checkbox"
                            id="public_offer_consent" name="gender"/>
         </x-slot>
         <x-slot name="label">
@@ -39,11 +39,11 @@
                 <a href="#">{{__('forms.agree')}}</a>
             </x-forms.label>
         </x-slot>
-{{--        @error("legal_entities.public_offer.consent")--}}
-{{--        <x-forms.error>--}}
-{{--            {{$message}}--}}
-{{--        </x-forms.error>--}}
-{{--        @enderror--}}
+        @error("legal_entities.public_offer.consent")
+        <x-forms.error>
+            {{$message}}
+        </x-forms.error>
+        @enderror
     </x-forms.form-group>
 
 </div>

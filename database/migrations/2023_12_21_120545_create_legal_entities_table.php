@@ -13,29 +13,28 @@ return new class extends Migration
     {
         Schema::create('legal_entities', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('short_name');
+            $table->uuid('legal_entities_uuid');
+            $table->string('name')->nullable();
+            $table->string('short_name')->nullable();
             $table->string('public_name');
-            $table->string('status');
-            $table->string('type');
-            $table->string('owner_property_type');
-            $table->string('legal_form');
+            $table->string('type')->nullable();
+            $table->string('owner_property_type')->nullable();
+            $table->string('legal_form')->nullable();
             $table->string('edrpou');
-            $table->jsonb('kveds');
+            $table->jsonb('kveds')->nullable();
             $table->jsonb('addresses');
             $table->jsonb('phones');
             $table->string('email');
-            $table->boolean('is_active');
-            $table->boolean('mis_verified');
-            $table->boolean('nhs_verified');
+            $table->boolean('is_active')->default(false);
+            $table->string('mis_verified')->nullable();
+            $table->boolean('nhs_verified')->default(false);
             $table->string('website')->nullable();
-            $table->string('beneficiary');
+            $table->string('beneficiary')->nullable();
             $table->string('receiver_funds_code');
-            $table->jsonb('archive');
-            $table->timestamps();
-            $table->uuid('inserted_by');
-            $table->uuid('updated_by');
+            $table->jsonb('archive')->nullable();
+            $table->jsonb('license')->nullable();
             $table->index('email');
+            $table->timestamps();
         });
     }
 
