@@ -19,7 +19,6 @@
         <x-slot name="label">
             <x-forms.label class="default-label" for="legal_entities..additional_information_beneficiary"
                            name="label">
-                {{__('forms.receiver_funds_code')}}
 
                 {{__('forms.beneficiary')}}
             </x-forms.label>

@@ -33,6 +33,30 @@ class LegalEntitiesFormBuilder
         ];
     }
 
+    public static function saveBuilderPerson($data){
+
+        return  [
+            'last_name' => $data['last_name'] ?? '',
+            'first_name' => $data['first_name'] ?? '',
+
+            'second_name' => $data['second_name'] ?? '',
+            'birth_date' => $data['birth_date'] ?? '',
+            'gender' => $data['gender'] ?? '',
+            'email' => $data['email'] ?? '',
+            'phones' => $data['phones'] ?? '',
+            'tax_id' => $data['tax_id'] ?? '',
+            'invalid_tax_id' => $data['invalid_tax_id'] ?? false,
+            'is_active' => $data['is_active'] ?? false,
+            'documents' => $data['documents'] ?? [],
+        ];
+    }
+
+    public static function saveBuilderEmployee($data){
+
+        return  [
+            'position' => $data['position'] ?? '',
+        ];
+    }
     public static function getBuilderContact($data)
     {
         return [

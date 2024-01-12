@@ -181,9 +181,9 @@
                         </div>
                         <div class="w-1/2">
                             <x-forms.input  x-mask="38099 999 99 99" class="default-input"
-                                           wire:model="legal_entities.owner.phones.{{$key}}.phone" type="text"
+                                           wire:model="legal_entities.owner.phones.{{$key}}.number" type="text"
                                            placeholder="{{__('+ 3(80)00 000 00 00 ')}}"/>
-                            @error("legal_entities.owner.phones.{$key}.phone")
+                            @error("legal_entities.owner.phones.{$key}.number")
                             <x-forms.error>
                                 {{ $message }}
                             </x-forms.error>
@@ -210,12 +210,13 @@
     <div class="mb-4.5 flex flex-col gap-0 gap-6 ">
         <x-forms.form-group class="flex items-center  flex-row-reverse	justify-end	">
             <x-slot name="input">
+
+
                 <x-forms.input x-bind:checked="show"
                                @change="show = !show"
                                wire:model="legal_entities.owner.no_tax_id"
                                type="checkbox"
-                               value="{{$legal_entities->owner['no_tax_id']}}"
-                               checked
+                               x-bind:value="show"
                                id="owner_no_tax_id"/>
             </x-slot>
             <x-slot name="label">
@@ -241,7 +242,8 @@
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">
-                    <x-forms.input class="default-input" checked wire:model="legal_entities.owner.tax_id" type="text" id="tax_id" name="tax_id"/>
+                    <x-forms.input                                maxlength="10"
+                                                                  class="default-input" checked wire:model="legal_entities.owner.tax_id" type="text" id="tax_id" name="tax_id"/>
                 </x-slot>
                 @error('legal_entities.owner.tax_id')
                 <x-slot name="error">
@@ -264,7 +266,6 @@
                                     class="default-select">
                         <x-slot name="option">
                             <option>{{__('Обрати тип')}}</option>
-
                             <option value="PASPORT">{{__('Паспорт')}}</option>
                         </x-slot>
                     </x-forms.select>
@@ -286,7 +287,7 @@
                 <x-slot name="input">
                     <x-forms.input class="default-input" wire:model="legal_entities.owner.documents.number"
                                    type="text" id="documents_number"
-                                   placeholder="{{__('Cерія/номер документа')}}"/>
+                                  />
                 </x-slot>
                 @error('legal_entities.owner.documents.number')
                 <x-slot name="error">

@@ -41,9 +41,9 @@ class LegalEntities extends Model
         'licenses' => 'array',
     ];
 
-    public function employees(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function employee(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Employee::class);
+        return $this->hasMany(Employee::class,'legal_entity_id','id');
     }
 
     public static function saveOrUpdate(array $condition,array $attributes): object

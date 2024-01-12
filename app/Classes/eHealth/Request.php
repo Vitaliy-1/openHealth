@@ -18,9 +18,7 @@ class Request extends Configuration
 
         $response = Http::acceptJson()
             ->{$method}(self::makeApiUrl($url), $params);
-
         if ($response->successful()) {
-
             return json_decode($response->body(), true)['data'] ?? [];
         }
 

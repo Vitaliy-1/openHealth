@@ -9,7 +9,7 @@ use Livewire\Form;
 class LegalEntitiesForms extends Form
 {
 
-    #[Validate('required|integer|digits:10')]
+    #[Validate('required|integer|digits:8')]
     public string $edrpou = '';
 
     #[Validate([
@@ -18,16 +18,16 @@ class LegalEntitiesForms extends Form
         'owner.gender' => 'required|string',
         'owner.birth_date' => 'required|date',
         'owner.no_tax_id' => 'boolean',
-        'owner.tax_id' => 'exclude_if:owner.no_tax_id,false|required|string',
+        'owner.tax_id' => 'exclude_if:owner.no_tax_id,false|required|integer|digits:10',
         'owner.documents.type' => 'exclude_if:owner.no_tax_id,true|required|string',
         'owner.documents.number' => 'exclude_if:owner.no_tax_id,true|required|string',
-        'owner.phones.*.phone' => 'required|string:digits:13',
+        'owner.phones.*.number' => 'required|string:digits:13',
         'owner.phones.*.type' => 'required|string',
         'owner.email' => 'required|email',
         'owner.position' => 'required|string',
     ])]
 
-    public ?array $owner= ['no_tax_id' => false];
+    public ?array $owner= ['no_tax_id' => true];
 
     #[Validate([
         'contact.phones.*.number' => 'required|string:digits:13',
@@ -41,6 +41,8 @@ class LegalEntitiesForms extends Form
         'residence_address.region' => 'required|string|min:3',
         'residence_address.area' => 'required|string|min:3',
         'residence_address.settlement' => 'required|string|min:3',
+        'residence_address.street' => 'required|string|min:3',
+        'residence_address.building' => 'required|string|min:3',
         'residence_address.settlement_type' => 'required|string|min:3',
     ])]
     public ?array $residence_address = [];
@@ -57,6 +59,8 @@ class LegalEntitiesForms extends Form
         'license.active_from_date' => 'required|date|min:3',
         'license.order_no' => 'required|string',
     ])]
+
+    
     public ?array $license = [];
 
     public ?array $additional_information = [];
@@ -65,6 +69,7 @@ class LegalEntitiesForms extends Form
 //        'public_offer.consent' => 'required|on',
 //        'public_offer.digital_signature' => 'required|file|max:2048'
     ])]
+
     public array $public_offer = [];
 
     /**

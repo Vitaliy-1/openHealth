@@ -18,7 +18,6 @@ class LegalEntitiesRequestApi extends Component
     public function createOrUpdate($data)
     {
         ///signed_content_encoding == base64_encode , signed_legal_entity_request
-
         $legalEntitiesApi = (new LegalEntitiesApi())->createOrUpdateLegalEntities($data);
 
         return !empty($legalEntitiesApi[0]) ? $legalEntitiesApi[0] : [];

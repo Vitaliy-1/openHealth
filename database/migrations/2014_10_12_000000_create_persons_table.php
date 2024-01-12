@@ -30,7 +30,7 @@ return new class extends Migration
             $table->jsonb('addresses')->nullable();
             $table->jsonb('phones')->nullable();
             $table->string('secret')->nullable();
-            $table->jsonb('emergency_contact');
+            $table->jsonb('emergency_contact')->nullable();
             $table->jsonb('confidant_person')->nullable();
             $table->boolean('patient_signed')->default(false);
             $table->boolean('process_disclosure_data_consent')->default(false);

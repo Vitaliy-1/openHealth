@@ -10,7 +10,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" value="{{$edrpou ?? ''}}" wire:model="legal_entities.edrpou" type="text" id="edrpou"
+            <x-forms.input maxlength="8" class="default-input" value="{{$edrpou ?? ''}}" wire:model="legal_entities.edrpou" type="text" id="edrpou"
                           />
         </x-slot>
         @error('legal_entities.edrpou')
