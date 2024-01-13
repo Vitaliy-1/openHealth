@@ -8,6 +8,7 @@ use App\Livewire\Registration\Forms\LegalEntitiesFormBuilder;
 use App\Livewire\Registration\Forms\LegalEntitiesForms;
 use App\Livewire\Registration\Forms\LegalEntitiesRequestApi;
 use App\Models\Employee;
+use App\Models\Koatuu\KoatuuLevel1;
 use App\Models\LegalEntities;
 use App\Models\Person;
 use Illuminate\Support\Facades\Auth;
@@ -32,17 +33,16 @@ class CreateNewLegalEntities extends Component
 
     public ?array $formBuilder;
 
-    public ?array $koatuu_level1;
+    public ?object $koatuu_level1;
 
-    public ?array $koatuu_level2;
+    public ?object $koatuu_level2;
 
-    public ?array $koatuu_level3;
+    public ?object $koatuu_level3;
     public function mount()
     {
         $this->getPhones();
 
-        $this->koatuu_level1 = DB::table('koatuu_level1')->get()
-            ->toArray();
+        $this->koatuu_level1 = KoatuuLevel1::all();
 
         $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', [
             'PHONE_TYPE',
@@ -238,9 +238,10 @@ class CreateNewLegalEntities extends Component
         $this->legal_entities->$property[$key] = $value;
     }
 
+
     public function searchKoatuuLevel2()
     {
-        $area_id = $this->legal_entities->residence_address['area'] ?? '';
+        $area = $this->legal_entities->residence_address['area'] ?? '';
 
         $region = $this->legal_entities->residence_address['region'] ?? '';
 
@@ -248,13 +249,14 @@ class CreateNewLegalEntities extends Component
             return;
         }
 
-        $this->koatuu_level2 = DB::table('koatuu_level2')
-            ->where('koatuu_level1_id',$area_id)
+        $this->koatuu_level2 = $this->koatuu_level1
+            ->where('name',$area)
+            ->first()
+            ->koatuu_level2()
             ->where('name', 'ilike', '%' . $region. '%')
-            ->take(5)->get()->toArray();
+            ->take(5)->get();
 
     }
-
     public function searchKoatuuLevel3()
     {
         $area_id = $this->legal_entities->residence_address['area'] ?? '';
@@ -267,11 +269,11 @@ class CreateNewLegalEntities extends Component
             return false;
         }
 
-        $this->koatuu_level3 = DB::table('koatuu_level3')
-            ->where('koatuu_level1_id',$area_id)
-            ->where('koatuu_level2_id',$region)
+        $this->koatuu_level3 = $this->koatuu_level2
+            ->find($region)
+            ->koatuu_level3()
             ->where('name', 'ilike', '%' . $settlement. '%')
-            ->take(5)->get()->toArray();
+            ->take(5)->get();
     }
 
 

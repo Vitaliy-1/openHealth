@@ -41,8 +41,8 @@ class LegalEntitiesForms extends Form
         'residence_address.region' => 'required|string|min:3',
         'residence_address.area' => 'required|string|min:3',
         'residence_address.settlement' => 'required|string|min:3',
-        'residence_address.street' => 'required|string|min:3',
-        'residence_address.building' => 'required|string|min:3',
+        'residence_address.street' => 'required|string',
+        'residence_address.building' => 'required|string',
         'residence_address.settlement_type' => 'required|string|min:3',
     ])]
     public ?array $residence_address = [];
@@ -60,7 +60,7 @@ class LegalEntitiesForms extends Form
         'license.order_no' => 'required|string',
     ])]
 
-    
+
     public ?array $license = [];
 
     public ?array $additional_information = [];

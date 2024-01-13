@@ -13,14 +13,15 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-                <x-forms.select @change=" area = $event.target.value"  class="default-input"
-                               wire:model="legal_entities.residence_address.area" type="text"
-                               id="residence_address_area">
+                <x-forms.select @change=" area = $event.target.value"
+                                class="default-input"
+                                wire:model="legal_entities.residence_address.area" type="text"
+                                id="residence_address_area">
                     <x-slot name="option">
                         <option value="">{{__('forms.select')}}</option>
                         @if($koatuu_level1)
                             @foreach($koatuu_level1 as $lvl1)
-                                <option value="{{$lvl1->id}}">{{$lvl1->name}}</option>
+                                <option {{ isset($legal_entities->residence_address['area']) && stripos($lvl1->name, $legal_entities->residence_address['area'])  ? 'selected' : '' }} value="{{ $lvl1->name }}">{{ $lvl1->name }}</option>
                             @endforeach
                         @endif
                     </x-slot>
@@ -197,6 +198,13 @@
                 wire:model="legal_entities.residence_address.street" type="text"
                 id="residence_address_street"/>
         </x-slot>
+        @error('legal_entities.residence_address.street')
+        <x-slot name="error">
+            <x-forms.error>
+                {{$message}}
+            </x-forms.error>
+        </x-slot>
+        @enderror
     </x-forms.form-group>
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
@@ -210,6 +218,13 @@
                            wire:model="legal_entities.residence_address.building"
                            type="text" id="residence_address_building"/>
         </x-slot>
+        @error('legal_entities.residence_address.building')
+        <x-slot name="error">
+            <x-forms.error>
+                {{$message}}
+            </x-forms.error>
+        </x-slot>
+        @enderror
     </x-forms.form-group>
 </div>
 <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">

@@ -242,7 +242,7 @@
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">
-                    <x-forms.input                                maxlength="10"
+                    <x-forms.input                             maxlength="10"
                                                                   class="default-input" checked wire:model="legal_entities.owner.tax_id" type="text" id="tax_id" name="tax_id"/>
                 </x-slot>
                 @error('legal_entities.owner.tax_id')
