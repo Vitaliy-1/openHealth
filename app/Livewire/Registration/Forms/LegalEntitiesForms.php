@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Registration\Forms;
 
+use App\Models\LegalEntity;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -23,7 +24,7 @@ class LegalEntitiesForms extends Form
         'owner.documents.number' => 'exclude_if:owner.no_tax_id,true|required|string',
         'owner.phones.*.number' => 'required|string:digits:13',
         'owner.phones.*.type' => 'required|string',
-        'owner.email' => 'required|email',
+        'owner.email' => 'required|email|',
         'owner.position' => 'required|string',
     ])]
 
@@ -120,6 +121,24 @@ class LegalEntitiesForms extends Form
     public function rulesForPublicOffer(): void
     {
         $this->validate($this->rulesForModel('public_offer')->toArray());
+    }
+
+    public function fillData(LegalEntity $legalEntity)
+    {
+
+        $this->edrpou = $legalEntity->edrpou ?? '';
+        $this->contact['email'] = $legalEntity->email ?? '';
+        $this->contact['website'] = $legalEntity->website ?? '';
+        $this->contact['phones'] = $legalEntity->phones ?? [];
+        $this->residence_address = $legalEntity->addresses ?? [];
+        $this->accreditation = $legalEntity->accreditation ?? [];
+        $this->license = $legalEntity->license ?? [];
+        $this->additional_information['archive']['date'] = $legalEntity->archive['data'] ?? "";
+        $this->additional_information['archive']['place'] = $legalEntity->archive['place'] ?? [];
+
+        $this->additional_information['receiver_funds_code'] = $legalEntity->receiver_funds_code ?? "";
+        $this->additional_information['beneficiary'] = $legalEntity->beneficiary ?? "";
+
     }
 
 }

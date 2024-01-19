@@ -22,6 +22,7 @@ return [
     'agree'=>'Я погоджуюсь з умовами',
     'digital_signature'=>'Цифровий підпис',
     'select_position'=>'Обрати посаду',
+    'accreditation_show' => 'Переглянути акредитацію',
     //Form fields
     'edrpou'=>'ЄДРПОУ',
     'first_name' => 'Ім’я',

@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Controllers\AjaxController;
-use app\Livewire\Registration\CreateNewLegalEntities;
+use App\Livewire\Registration\CreateNewLegalEntities;
 use App\Livewire\SearchPatient;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +33,5 @@ Route::middleware([
 
     Route::get('/dashboard/search/patient', SearchPatient::class);
 
-    Route::post('/ajax-handler', [AjaxController::class, 'handleRequest']);
 
 });
