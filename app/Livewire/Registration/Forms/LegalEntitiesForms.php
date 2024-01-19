@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Registration\Forms;
 
-use App\Models\LegalEntity;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -24,7 +23,7 @@ class LegalEntitiesForms extends Form
         'owner.documents.number' => 'exclude_if:owner.no_tax_id,true|required|string',
         'owner.phones.*.number' => 'required|string:digits:13',
         'owner.phones.*.type' => 'required|string',
-        'owner.email' => 'required|email|',
+        'owner.email' => 'required|email',
         'owner.position' => 'required|string',
     ])]
 
@@ -78,7 +77,9 @@ class LegalEntitiesForms extends Form
      */
     public function rulesForEdrpou(): array
     {
+
        return $this->validate($this->rulesForModel('edrpou')->toArray());
+
     }
 
     /**

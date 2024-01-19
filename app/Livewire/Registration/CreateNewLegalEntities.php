@@ -20,7 +20,7 @@ class CreateNewLegalEntities extends Component
 
     public LegalEntitiesForms $legal_entity_form;
 
-    public LegalEntity $legalEntity;
+    public LegalEntitiesForms $legalEntity;
 
     public Person $person;
 
@@ -89,6 +89,7 @@ class CreateNewLegalEntities extends Component
         ]);
 
         $this->getPhones();
+
     }
 
     public function addRowPhone(): array
@@ -96,7 +97,7 @@ class CreateNewLegalEntities extends Component
         return $this->phones[] = ['type' => '', 'number' => ''];
     }
 
-    public function removePhone($key): void
+    public function removePhone($key)
     {
         if (isset($this->phones[$key])) {
             unset($this->phones[$key]);
@@ -228,6 +229,7 @@ class CreateNewLegalEntities extends Component
         if (isset($this->legalEntity->phones) && !empty($this->legalEntity->phones) ) {
             $this->phones = $this->legalEntity->phones;
         }
+
     }
 
     public function stepContact(): void
