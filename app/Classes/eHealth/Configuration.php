@@ -12,6 +12,10 @@ class Configuration
 
     public  static string  $ApiVersion = 'v2';
 
+    public function setApiVersion($version): void
+    {
+        self::$ApiVersion = $version;
+    }
 
     public function setApiUrl($url): void
     {

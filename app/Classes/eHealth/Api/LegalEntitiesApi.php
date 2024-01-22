@@ -7,6 +7,7 @@ use App\Classes\eHealth\Request;
 class LegalEntitiesApi
 {
 
+
     private string $getV2 = '/legal_entities';
 
     public function getLegalEntities($params = []): array
