@@ -15,7 +15,6 @@ use Livewire\Component;
 
 class CreateNewLegalEntities extends Component
 {
-
     public LegalEntitiesForms $legal_entity_form;
 
     public LegalEntity $legalEntity;
@@ -31,16 +30,19 @@ class CreateNewLegalEntities extends Component
     public array $dictionaries;
 
     public ?array $phones = [];
+
     public ?object $koatuu_level1;
+
     public ?object $koatuu_level2;
 
     public ?object $koatuu_level3;
-    public function mount(Employee $employee, LegalEntity $legalEntity, Person $person)
+
+    public function mount(Employee $employee, LegalEntity $legalEntity, Person $person): void
     {
-
-        //Get legal entity by Auth user
-//        Auth::user()->person->employee->legalEntity;
-
+        /**
+         * Legal Entity associated with the form
+         * To get Legal Entity from a user, use: Auth::user()->person->employee->legalEntity;
+         */
         $this->legalEntity = $legalEntity;
 
         $this->person = $person;
@@ -60,7 +62,6 @@ class CreateNewLegalEntities extends Component
         ]);
 
         $this->getPhones();
-
     }
 
     public function addRowPhone(): array
@@ -68,16 +69,15 @@ class CreateNewLegalEntities extends Component
         return $this->phones[] = ['type' => '', 'number' => ''];
     }
 
-    public function removePhone($key)
+    public function removePhone($key): void
     {
         if (isset($this->phones[$key])) {
             unset($this->phones[$key]);
         }
     }
 
-    public function increaseStep()
+    public function increaseStep(): void
     {
-
         $this->resetErrorBag();
 
         $this->validateData();
@@ -89,7 +89,7 @@ class CreateNewLegalEntities extends Component
         }
     }
 
-    public function decreaseStep()
+    public function decreaseStep(): void
     {
         $this->resetErrorBag();
         $this->currentStep--;
@@ -115,7 +115,6 @@ class CreateNewLegalEntities extends Component
         };
     }
 
-
     public function register()
     {
         $this->stepPublicOffer();
@@ -128,10 +127,7 @@ class CreateNewLegalEntities extends Component
         }
     }
 
-
-
-
-    public function saveLegalEntity($data)
+    public function saveLegalEntity($data): void
     {
         $this->legalEntity = LegalEntity::firstOrNew(['uuid' => $data['id'] ?? '']);
 
@@ -145,10 +141,9 @@ class CreateNewLegalEntities extends Component
         $this->legalEntity->fill($data);
         $this->legalEntity->save();
         $this->legal_entity_form->fillData($this->legalEntity);
-
     }
 
-    private function updatePersonAndEmployee($person, $personData)
+    private function updatePersonAndEmployee($person, $personData): void
     {
         $person->update($personData);
         if ($person->employee) {
@@ -158,23 +153,21 @@ class CreateNewLegalEntities extends Component
         }
     }
 
-    private function createPersonAndEmployee($user, $personData)
+    private function createPersonAndEmployee($user, $personData): void
     {
         $person = Person::create($personData);
         $user->person()->associate($person)->save();
         $this->createEmployee($person, $personData);
     }
 
-    private function createEmployee($person, $personData)
+    private function createEmployee($person, $personData): void
     {
         $employee = $this->legalEntity->employee()->create($personData);
         $employee->person()->associate($person)->save();
     }
 
-
     public function stepEdrpou(): array|object
     {
-
         $this->legal_entity_form->rulesForEdrpou();
 
         $data = (new LegalEntitiesRequestApi())->get($this->legal_entity_form->edrpou);
@@ -190,7 +183,6 @@ class CreateNewLegalEntities extends Component
 
     public function stepOwner(): void
     {
-
         $this->legal_entity_form->rulesForOwner();
         //Get user
         $user = Auth::user();
@@ -205,7 +197,6 @@ class CreateNewLegalEntities extends Component
             }
         });
 
-
         if (isset($this->legalEntity->phones) && !empty($this->legalEntity->phones) ) {
             $this->phones = $this->legalEntity->phones;
         }
@@ -213,7 +204,6 @@ class CreateNewLegalEntities extends Component
 
     public function stepContact(): void
     {
-
         $this->legal_entity_form->rulesForContact();
         $this->legalEntity->update(
             [
@@ -228,16 +218,12 @@ class CreateNewLegalEntities extends Component
     public function stepAccreditation(): void
     {
         $this->legalEntity->update(['accreditation'=>$this->legal_entity_form->accreditation ?? '']);
-
-
     }
 
     public function stepAddress(): void
     {
         $this->legal_entity_form->rulesForAddress();
         $this->legalEntity->update(['address'=>$this->legal_entity_form->residence_address ?? '']);
-
-
     }
 
     public function stepLicense(): void
@@ -245,12 +231,10 @@ class CreateNewLegalEntities extends Component
         $this->legal_entity_form->rulesForLicense();
 
         $this->legalEntity->update(['license'=>$this->legal_entity_form->license ?? '']);
-        dd($this->legal_entity_form);
-        }
+    }
 
-    public function stepAdditionalInformation()
+    public function stepAdditionalInformation(): void
     {
-
         $this->legalEntity->update([
             'archive'=>$this->legal_entity_form->additional_information ?? '',
             'beneficiary'=>$this->legal_entity_form->additional_information['beneficiary'] ?? '',
@@ -268,7 +252,7 @@ class CreateNewLegalEntities extends Component
         $this->legal_entity_form->$property[$key] = $value;
     }
 
-    public function searchKoatuuLevel2()
+    public function searchKoatuuLevel2(): void
     {
         $area = $this->legal_entity_form->residence_address['area'] ?? '';
 
@@ -284,8 +268,8 @@ class CreateNewLegalEntities extends Component
             ->koatuu_level2()
             ->where('name', 'ilike', '%' . $region. '%')
             ->take(5)->get();
-
     }
+
     public function searchKoatuuLevel3()
     {
         $area_id = $this->legal_entity_form->residence_address['area'] ?? '';
@@ -309,5 +293,4 @@ class CreateNewLegalEntities extends Component
     {
         return view('livewire.registration.create-new-legal-entities');
     }
-
 }

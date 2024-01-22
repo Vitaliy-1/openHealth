@@ -61,9 +61,7 @@
                             fill="currentFill"/>
                     </svg>
                 </div>
-
             </div>
-
         </x-slot>
     </x-forms.forms-section>
 </div>

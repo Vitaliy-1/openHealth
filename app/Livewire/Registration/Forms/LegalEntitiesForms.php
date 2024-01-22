@@ -78,9 +78,7 @@ class LegalEntitiesForms extends Form
      */
     public function rulesForEdrpou(): array
     {
-
        return $this->validate($this->rulesForModel('edrpou')->toArray());
-
     }
 
     /**
@@ -125,7 +123,6 @@ class LegalEntitiesForms extends Form
 
     public function fillData(LegalEntity $legalEntity)
     {
-
         $this->edrpou = $legalEntity->edrpou ?? '';
         $this->contact['email'] = $legalEntity->email ?? '';
         $this->contact['website'] = $legalEntity->website ?? '';
@@ -138,7 +135,6 @@ class LegalEntitiesForms extends Form
 
         $this->additional_information['receiver_funds_code'] = $legalEntity->receiver_funds_code ?? "";
         $this->additional_information['beneficiary'] = $legalEntity->beneficiary ?? "";
-
     }
 
 }
