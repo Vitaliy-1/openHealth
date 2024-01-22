@@ -12,7 +12,7 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.select readonly disabled class="default-input"
-                            wire:model="legal_entities.license.category"
+                            wire:model="legal_entity_form.license.category"
                             type="text" id="license_category">
                 <x-slot name="option">
                     @foreach($dictionaries['LICENSE_TYPE'] as $k =>$license_type)
@@ -31,10 +31,9 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entities.license.license_number"
-                           type="number" id="license_license_number"/>
+            <x-forms.input class="default-input" wire:model="legal_entity_form.license.license_number"
+                           type="text" id="license_license_number"/>
         </x-slot>
-
     </x-forms.form-group>
 </div>
 <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -46,10 +45,10 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entities.license.issued_by"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.license.issued_by"
                            type="text" id="license_issued_by"/>
         </x-slot>
-        @error('legal_entities.license.issued_by')
+        @error('legal_entity_form.license.issued_by')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -65,10 +64,10 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entities.license.issued_date"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.license.issued_date"
                            type="date" id="license_issued_date"/>
         </x-slot>
-        @error('legal_entities.license.issued_date')
+        @error('legal_entity_form.license.issued_date')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -76,7 +75,6 @@
         </x-slot>
         @enderror
     </x-forms.form-group>
-
 </div>
 <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
     <x-forms.form-group class="xl:w-1/2">
@@ -87,10 +85,10 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entities.license.active_from_date"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.license.active_from_date"
                            type="date" id="license_active_from_date"/>
         </x-slot>
-        @error('legal_entities.license.active_from_date')
+        @error('legal_entity_form.license.active_from_date')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -106,7 +104,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entities.license.expiry_date"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.license.expiry_date"
                            type="date" id="license_expiry_date"/>
         </x-slot>
     </x-forms.form-group>
@@ -121,7 +119,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entities.license.what_licensed"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.license.what_licensed"
                            type="text" id="license_what_licensed"/>
         </x-slot>
     </x-forms.form-group>
@@ -133,10 +131,10 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entities.license.order_no"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.license.order_no"
                            type="text" id="license_order_no"/>
         </x-slot>
-        @error('legal_entities.license.order_no')
+        @error('legal_entity_form.license.order_no')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}

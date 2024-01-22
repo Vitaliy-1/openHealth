@@ -1,8 +1,8 @@
 <?php
 
 use App\Livewire\Registration\CreateNewLegalEntities;
-use Illuminate\Support\Facades\Route;
 use App\Livewire\SearchPatient;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +28,10 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
     Route::get('/dashboard/legal-entities/create', CreateNewLegalEntities::class)->name('create.legalEntities');
+
     Route::get('/dashboard/search/patient', SearchPatient::class);
+
+
 });

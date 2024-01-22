@@ -13,29 +13,29 @@ return new class extends Migration
     {
         Schema::create('legal_entities', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('short_name');
-            $table->string('public_name');
-            $table->string('status');
-            $table->string('type');
-            $table->string('owner_property_type');
-            $table->string('legal_form');
+            $table->uuid('uuid');
+            $table->json('addresses');
+            $table->json('archive')->nullable();
+            $table->string('beneficiary')->nullable();
             $table->string('edrpou');
-            $table->jsonb('kveds');
-            $table->jsonb('addresses');
-            $table->jsonb('phones');
             $table->string('email');
             $table->boolean('is_active');
-            $table->boolean('mis_verified');
-            $table->boolean('nhs_verified');
+            $table->string('kveds');
+            $table->string('legal_form');
+            $table->boolean('mis_verified')->nullable();
+            $table->string('name');
+            $table->boolean('nhs_verified')->nullable();
+            $table->string('owner_property_type');
+            $table->json('phones');
+            $table->string('public_name');
+            $table->json('license')->nullable();
+            $table->json('accreditation')->nullable();
+            $table->string('receiver_funds_code')->nullable();
+            $table->string('short_name');
+            $table->string('status');
+            $table->string('type');
             $table->string('website')->nullable();
-            $table->string('beneficiary');
-            $table->string('receiver_funds_code');
-            $table->jsonb('archive');
             $table->timestamps();
-            $table->uuid('inserted_by');
-            $table->uuid('updated_by');
-            $table->index('email');
         });
     }
 

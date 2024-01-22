@@ -144,7 +144,7 @@ return [
     'attributes' => [
         'edrpou' => 'ЄДРПОУ',
         'email' => 'E-mail',
-        'contact.phones.*.phone'=> 'Телефон',
+        'contact.phones.*.number'=> 'Телефон',
         'contact.phones.*.type'=> 'Тип Номера',
         'contact.email' => 'E-mail',
         'owner' => [

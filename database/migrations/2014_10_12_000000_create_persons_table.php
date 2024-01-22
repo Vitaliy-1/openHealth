@@ -13,29 +13,24 @@ return new class extends Migration
     {
         Schema::create('persons', function (Blueprint $table) {
             $table->id();
-            $table->uuid('persons_uuid')->nullable();
+            $table->uuid('uuid')->nullable();
             $table->string('last_name');
             $table->string('first_name');
             $table->string('second_name')->nullable();
+            $table->string('email');
             $table->date('birth_date');
-            $table->string('birth_country')->nullable();
-            $table->string('birth_settlement')->nullable();
             $table->string('gender');
-            $table->string('email')->nullable();
-            $table->string('tax_id')->nullable();
-            $table->boolean('invalid_tax_id')->nullable();
-            $table->date('death_date')->nullable();
-            $table->boolean('is_active')->default(false);
-            $table->jsonb('documents');
-            $table->jsonb('addresses')->nullable();
-            $table->jsonb('phones')->nullable();
-            $table->string('secret')->nullable();
-            $table->jsonb('emergency_contact');
-            $table->jsonb('confidant_person')->nullable();
-            $table->boolean('patient_signed')->default(false);
-            $table->boolean('process_disclosure_data_consent')->default(false);
-            $table->jsonb('authentication_methods')->nullable();
-            $table->string('preferred_way_communication')->nullable();
+            $table->string('tax_id');
+            $table->boolean('no_tax_id')->nullable();
+            $table->json('documents');
+            $table->json('phones');
+            $table->json('educations')->nullable();
+            $table->json('qualifications')->nullable();
+            $table->json('specialities')->nullable();
+            $table->json('science_degree')->nullable();
+            $table->text('about_myself')->nullable();
+            $table->string('working_experience')->nullable();
+            $table->string('declaration_limit')->nullable();
             $table->timestamps();
         });
 

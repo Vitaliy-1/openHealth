@@ -31,7 +31,8 @@ class Person extends Model
         'secret',
         'process_disclosure_data_consent',
         'preferred_way_communication',
-        'authentication_methods'
+        'authentication_methods',
+        'uuid',
     ];
 
     protected $casts = [
@@ -44,9 +45,22 @@ class Person extends Model
     ];
 
 
-    public function user(){
+    protected $attributes = [
+        'documents' => '{}',
+        'tax_id' => '',
+
+    ];
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\hasOne
+    {
         return $this->hasOne(User::class);
     }
+
+    public function employee(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Employee::class);
+    }
+
 
 
 

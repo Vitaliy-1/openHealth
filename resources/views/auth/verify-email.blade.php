@@ -19,7 +19,7 @@
 
                 <div>
                     <x-button type="submit" class="button-primary">
-                        {{ __('Відправити лист з підтвердженнямl') }}
+                        {{ __('Повторно надіслати лист') }}
                     </x-button>
                 </div>
             </form>
