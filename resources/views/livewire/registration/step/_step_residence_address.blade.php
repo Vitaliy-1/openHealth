@@ -3,7 +3,7 @@
     <h3>  {{  __('Крок :currentSteep з :totalSteps', ['currentSteep' => $currentStep,'totalSteps' => $totalSteps]) }}</h3>
 
 </x-slot>
-<div  x-data="{ lvl: 0 , area: '{{ $legal_entities->residence_address['area']?? '' }}', region:'{{ $legal_entities->residence_address['region']?? '' }}',settlement_type: '{{ $legal_entities->residence_address['settlement_type']?? '' }}', settlement: '{{ $legal_entities->residence_address['settlement']?? '' }}' }">
+<div  x-data="{ lvl: 0 , area: '{{ $legal_entity_form->residence_address['area']?? '' }}', region:'{{ $legal_entity_form->residence_address['region']?? '' }}',settlement_type: '{{ $legal_entity_form->residence_address['settlement_type']?? '' }}', settlement: '{{ $legal_entity_form->residence_address['settlement']?? '' }}' }">
 <div  class="mb-4.5 flex flex-col gap-6 xl:flex-row">
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
@@ -15,19 +15,19 @@
         <x-slot name="input">
                 <x-forms.select @change=" area = $event.target.value"
                                 class="default-input"
-                                wire:model="legal_entities.residence_address.area" type="text"
+                                wire:model="legal_entity_form.residence_address.area" type="text"
                                 id="residence_address_area">
                     <x-slot name="option">
                         <option value="">{{__('forms.select')}}</option>
                         @if($koatuu_level1)
                             @foreach($koatuu_level1 as $lvl1)
-                                <option {{ isset($legal_entities->residence_address['area']) && stripos($lvl1->name, $legal_entities->residence_address['area'])  ? 'selected' : '' }} value="{{ $lvl1->name }}">{{ $lvl1->name }}</option>
+                                <option {{ isset($legal_entity_form->residence_address['area']) && stripos($lvl1->name, $legal_entity_form->residence_address['area'])  ? 'selected' : '' }} value="{{ $lvl1->name }}">{{ $lvl1->name }}</option>
                             @endforeach
                         @endif
                     </x-slot>
                 </x-forms.select>
         </x-slot>
-        @error('legal_entities.residence_address.area')
+        @error('legal_entity_form.residence_address.area')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -45,7 +45,7 @@
         <x-slot  name="input">
             <div  x-on:mouseleave="timeout = setTimeout(() => { open = false }, 300)">
             <x-forms.input
-                            wire:model="legal_entities.residence_address.region"
+                            wire:model="legal_entity_form.residence_address.region"
                             x-bind:value="region"
 
                             x-bind:disabled="area == '' ;"
@@ -84,7 +84,7 @@
             </div>
             </div>
         </x-slot>
-        @error('legal_entities.residence_address.region')
+        @error('legal_entity_form.residence_address.region')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -106,20 +106,20 @@
                 x-bind:disabled="area === ''"
                 class="default-input"
                 @change=" settlement_type = $event.target.value"
-                wire:model="legal_entities.residence_address.settlement_type"
+                wire:model="legal_entity_form.residence_address.settlement_type"
                 id="residence_address_settlement_type"
             >
                 <x-slot name="option">
                     <option value="">{{__('forms.select')}}</option>
                     @isset($dictionaries['SETTLEMENT_TYPE'])
                         @foreach($dictionaries['SETTLEMENT_TYPE'] as $k=>$type)
-                            <option  {{ isset($legal_entities->residence_address['settlement_type']) == $k ? 'selected': ''}} value="{{$k}}">{{$type}}</option>
+                            <option  {{ isset($legal_entity_form->residence_address['settlement_type']) == $k ? 'selected': ''}} value="{{$k}}">{{$type}}</option>
                         @endforeach
                     @endif
                 </x-slot>
             </x-forms.select>
         </x-slot>
-        @error('legal_entities.residence_address.settlement_type')
+        @error('legal_entity_form.residence_address.settlement_type')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -143,7 +143,7 @@
                                 class="default-input"
                                 x-bind:value="settlement"
                                 autocomplete="off"
-                                wire:model="legal_entities.residence_address.settlement"
+                                wire:model="legal_entity_form.residence_address.settlement"
                                 type="text" id="residence_address_settlement"/>
                 <div x-show="open"  wire:target="searchKoatuuLevel3">
                     <div  class="z-10 max-h-96 overflow-auto w-full	 absolute  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
@@ -174,7 +174,7 @@
                 </div>
             </div>
         </x-slot>
-        @error('legal_entities.residence_address.settlement')
+        @error('legal_entity_form.residence_address.settlement')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -195,10 +195,10 @@
             <x-forms.input
                 class="default-input"
                 x-bind:disabled="settlement == ''"
-                wire:model="legal_entities.residence_address.street" type="text"
+                wire:model="legal_entity_form.residence_address.street" type="text"
                 id="residence_address_street"/>
         </x-slot>
-        @error('legal_entities.residence_address.street')
+        @error('legal_entity_form.residence_address.street')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -215,10 +215,10 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.input class="default-input"  x-bind:disabled="settlement === ''"
-                           wire:model="legal_entities.residence_address.building"
+                           wire:model="legal_entity_form.residence_address.building"
                            type="text" id="residence_address_building"/>
         </x-slot>
-        @error('legal_entities.residence_address.building')
+        @error('legal_entity_form.residence_address.building')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -237,7 +237,7 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.input                 x-bind:disabled="settlement == ''"
-                                           class="default-input" wire:model="legal_entities.residence_address.apartment"
+                                           class="default-input" wire:model="legal_entity_form.residence_address.apartment"
                            type="text" id="residence_address_settlement_apartment"/>
         </x-slot>
     </x-forms.form-group>
@@ -251,7 +251,7 @@
         <x-slot name="input">
             <x-forms.input x-mask="99999"
                            x-bind:disabled="settlement == ''"
-                           class="default-input" wire:model="legal_entities.residence_address.zip"
+                           class="default-input" wire:model="legal_entity_form.residence_address.zip"
                            type="text" id="residence_address_settlement_zip"/>
         </x-slot>
     </x-forms.form-group>

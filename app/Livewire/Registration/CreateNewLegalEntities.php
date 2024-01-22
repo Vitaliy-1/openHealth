@@ -1,15 +1,12 @@
 <?php
 
 namespace App\Livewire\Registration;
-
 use App\Helpers\JsonHelper;
-use App\Http\Controllers\Ajax\AjaxController;
-use App\Livewire\Registration\Forms\LegalEntitiesFormBuilder;
 use App\Livewire\Registration\Forms\LegalEntitiesForms;
 use App\Livewire\Registration\Forms\LegalEntitiesRequestApi;
 use App\Models\Employee;
 use App\Models\Koatuu\KoatuuLevel1;
-use App\Models\LegalEntities;
+use App\Models\LegalEntity;
 use App\Models\Person;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,9 +16,13 @@ use Livewire\Component;
 class CreateNewLegalEntities extends Component
 {
 
-    public LegalEntitiesForms $legal_entities;
+    public LegalEntitiesForms $legal_entity_form;
 
-    public object $legal_entity_owner;
+    public LegalEntity $legalEntity;
+
+    public Person $person;
+
+    public Employee $employee;
 
     public int $totalSteps = 8;
 
@@ -30,17 +31,21 @@ class CreateNewLegalEntities extends Component
     public array $dictionaries;
 
     public ?array $phones = [];
-
-    public ?array $formBuilder;
-
     public ?object $koatuu_level1;
-
     public ?object $koatuu_level2;
 
     public ?object $koatuu_level3;
-    public function mount()
+    public function mount(Employee $employee, LegalEntity $legalEntity, Person $person)
     {
-        $this->getPhones();
+
+        //Get legal entity by Auth user
+//        Auth::user()->person->employee->legalEntity;
+
+        $this->legalEntity = $legalEntity;
+
+        $this->person = $person;
+
+        $this->employee = $employee;
 
         $this->koatuu_level1 = KoatuuLevel1::all();
 
@@ -53,6 +58,9 @@ class CreateNewLegalEntities extends Component
             'SPECIALITY_LEVEL',
             'ACCREDITATION_CATEGORY'
         ]);
+
+        $this->getPhones();
+
     }
 
     public function addRowPhone(): array
@@ -71,7 +79,9 @@ class CreateNewLegalEntities extends Component
     {
 
         $this->resetErrorBag();
+
         $this->validateData();
+
         $this->currentStep++;
 
         if ($this->currentStep > $this->totalSteps) {
@@ -109,7 +119,6 @@ class CreateNewLegalEntities extends Component
     public function register()
     {
         $this->stepPublicOffer();
-        dd($this->legal_entities);
     }
 
     public function getPhones()
@@ -119,131 +128,151 @@ class CreateNewLegalEntities extends Component
         }
     }
 
+
+
+
+    public function saveLegalEntity($data)
+    {
+        $this->legalEntity = LegalEntity::firstOrNew(['uuid' => $data['id'] ?? '']);
+
+        $this->legalEntity->setAttribute('uuid', $data['id'] ?? '');
+        $this->legalEntity->setAttribute('addresses',$data['residence_address'] ?? []);
+        $this->legalEntity->setAttribute('kveds', $data['edr']['kveds'] ?? []);
+        $this->legalEntity->setAttribute('legal_form', $data['edr']['legal_form'] ?? '');
+        $this->legalEntity->setAttribute('name', $data['edr']['name'] ?? '');
+        $this->legalEntity->setAttribute('short_name', $data['edr']['short_name'] ?? '');
+        $this->legalEntity->setAttribute('public_name', $data['edr']['public_name'] ?? '');
+        $this->legalEntity->fill($data);
+        $this->legalEntity->save();
+        $this->legal_entity_form->fillData($this->legalEntity);
+
+    }
+
+    private function updatePersonAndEmployee($person, $personData)
+    {
+        $person->update($personData);
+        if ($person->employee) {
+            $person->employee->update($personData);
+        } else {
+            $this->createEmployee($person, $personData);
+        }
+    }
+
+    private function createPersonAndEmployee($user, $personData)
+    {
+        $person = Person::create($personData);
+        $user->person()->associate($person)->save();
+        $this->createEmployee($person, $personData);
+    }
+
+    private function createEmployee($person, $personData)
+    {
+        $employee = $this->legalEntity->employee()->create($personData);
+        $employee->person()->associate($person)->save();
+    }
+
+
     public function stepEdrpou(): array|object
     {
 
-        $this->legal_entities->rulesForEdrpou();
+        $this->legal_entity_form->rulesForEdrpou();
 
-        //Get legal entity data builder
-        $this->formBuilder = ( new LegalEntitiesRequestApi())->get($this->legal_entities->edrpou);
+        $data = (new LegalEntitiesRequestApi())->get($this->legal_entity_form->edrpou);
 
-        //Builder Save legal entity
-        $data = LegalEntitiesFormBuilder::saveBuilderLegalEntity($this->formBuilder);
-
-
-
-//        dd($this->legal_entities->residence_address);
-        //Create new legal entity
-        if ($data) {
-            return $this->legal_entity_owner = LegalEntities::saveOrUpdate(
-                ['legal_entities_uuid' => $data['legal_entities_uuid']],
-                $data
-            );
+        if (empty($data)) {
+            return [];
         }
+
+        $this->saveLegalEntity($data);
+
         return [];
     }
 
     public function stepOwner(): void
     {
 
-        $this->legal_entities->rulesForOwner();
-
-
+        $this->legal_entity_form->rulesForOwner();
         //Get user
         $user = Auth::user();
-
         //Get person data builder
-        $personData = LegalEntitiesFormBuilder::saveBuilderPerson($this->legal_entities->owner);
+        $personData = $this->legal_entity_form->owner;
 
-        //Update person and employee
-        if ($user->person){
+        DB::transaction(function () use ($personData, $user) {
+            if ($user->person) {
+                $this->updatePersonAndEmployee($user->person, $personData);
+            } else {
+                $this->createPersonAndEmployee($user, $personData);
+            }
+        });
 
-            //Update person
-            $person = tap($user->person)->update($personData);
-            //Update employee
-            $person->employee->update($this->legal_entities->owner);
+
+        if (isset($this->legalEntity->phones) && !empty($this->legalEntity->phones) ) {
+            $this->phones = $this->legalEntity->phones;
         }
-        //Create new person and employee
-        else{
-            DB::transaction(function () use ($personData, $user) {
-                // Step 1: Create a new person
-                $person = Person::create($personData);
-
-                // Step 2: Associate the person with the user
-                $user->person()->associate($person);
-
-                $user->save();
-                // Step 3: Create a new employee
-                $employee = new Employee($personData);
-
-                // Step 4: Associate the employee with the legal entity
-                $this->legal_entity_owner->employee()->save($employee);
-
-                // Step 5: Associate the person with the employee
-                $employee->person()->associate($person);
-
-                $employee->save();
-            });
-        }
-
-        $this->legal_entities->contact = LegalEntitiesFormBuilder::getBuilderContact($this->formBuilder);
-
-
-        if (isset($this->formBuilder['phones']) && !empty($this->formBuilder['phones']) ) {
-            $this->phones = $this->formBuilder['phones'];
-        }
-
     }
 
     public function stepContact(): void
     {
-        $this->legal_entities->rulesForContact();
 
-        $this->legal_entities->residence_address = LegalEntitiesFormBuilder::getBuilderRegionAddress($this->formBuilder);
+        $this->legal_entity_form->rulesForContact();
+        $this->legalEntity->update(
+            [
+                'email'=>$this->legal_entity_form->contact['email'] ?? '',
+                'website'=>$this->legal_entity_form->contact['website'] ?? '',
+                'phones'=>$this->legal_entity_form->contact['phones'] ?? '',
+            ]);
+
 
     }
 
     public function stepAccreditation(): void
     {
-        $this->legal_entities->license = LegalEntitiesFormBuilder::getBuilderLicense($this->formBuilder);
+        $this->legalEntity->update(['accreditation'=>$this->legal_entity_form->accreditation ?? '']);
+
+
     }
 
     public function stepAddress(): void
     {
-        $this->legal_entities->rulesForAddress();
+        $this->legal_entity_form->rulesForAddress();
+        $this->legalEntity->update(['address'=>$this->legal_entity_form->residence_address ?? '']);
 
-        $this->legal_entities->accreditation = LegalEntitiesFormBuilder::getBuilderAccreditation($this->formBuilder);
+
     }
 
     public function stepLicense(): void
     {
-        $this->legal_entities->rulesForLicense();
+        $this->legal_entity_form->rulesForLicense();
 
-        $this->legal_entities->additional_information = LegalEntitiesFormBuilder::getBuilderAdditionalInformation($this->formBuilder);
-
-    }
+        $this->legalEntity->update(['license'=>$this->legal_entity_form->license ?? '']);
+        dd($this->legal_entity_form);
+        }
 
     public function stepAdditionalInformation()
     {
 
+        $this->legalEntity->update([
+            'archive'=>$this->legal_entity_form->additional_information ?? '',
+            'beneficiary'=>$this->legal_entity_form->additional_information['beneficiary'] ?? '',
+            'receiver_funds_code'=>$this->legal_entity_form->additional_information['receiver_funds_code'] ?? '',
+        ]);
     }
 
     public function stepPublicOffer(): void
     {
-        $this->legal_entities->rulesForPublicOffer();
+        $this->legal_entity_form->rulesForPublicOffer();
     }
 
     public function setField($property,$key, $value)
     {
-        $this->legal_entities->$property[$key] = $value;
+        $this->legal_entity_form->$property[$key] = $value;
     }
-
 
     public function searchKoatuuLevel2()
     {
-        $area = $this->legal_entities->residence_address['area'] ?? '';
+        $area = $this->legal_entity_form->residence_address['area'] ?? '';
 
-        $region = $this->legal_entities->residence_address['region'] ?? '';
+        $region = $this->legal_entity_form->residence_address['region'] ?? '';
 
         if (empty($area) && strlen($region) <= 1) {
             return;
@@ -259,11 +288,11 @@ class CreateNewLegalEntities extends Component
     }
     public function searchKoatuuLevel3()
     {
-        $area_id = $this->legal_entities->residence_address['area'] ?? '';
+        $area_id = $this->legal_entity_form->residence_address['area'] ?? '';
 
-        $region = $this->legal_entities->residence_address['region'] ?? '';
+        $region = $this->legal_entity_form->residence_address['region'] ?? '';
 
-        $settlement = $this->legal_entities->residence_address['settlement'] ?? '';
+        $settlement = $this->legal_entity_form->residence_address['settlement'] ?? '';
 
         if (empty($area) && empty($area_id) && strlen($settlement) <= 1) {
             return false;
@@ -275,7 +304,6 @@ class CreateNewLegalEntities extends Component
             ->where('name', 'ilike', '%' . $settlement. '%')
             ->take(5)->get();
     }
-
 
     public function render()
     {

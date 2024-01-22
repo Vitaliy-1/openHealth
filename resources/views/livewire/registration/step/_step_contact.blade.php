@@ -11,10 +11,10 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.input class="default-input" value="{{$legalEntitiesRequest['email'] ?? ''}}"
-                           wire:model="legal_entities.contact.email" type="text" id="owner_email"
+                           wire:model="legal_entity_form.contact.email" type="text" id="owner_email"
             />
         </x-slot>
-        @error('legal_entities.contact.email')
+        @error('legal_entity_form.contact.email')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -30,7 +30,7 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.input value="{{$legalEntitiesRequest['website'] ?? ''}}" class="default-input"
-                           wire:model="legal_entities.contact.website" type="text"
+                           wire:model="legal_entity_form.contact.website" type="text"
                            id="owner_website"/>
         </x-slot>
     </x-forms.form-group>
@@ -47,7 +47,7 @@
                 <x-slot name="label">
                     <div class="flex-row flex gap-6 items-center">
                         <div class="w-1/4">
-                            <x-forms.select wire:model.defer="legal_entities.contact.phones.{{$key}}.type"
+                            <x-forms.select wire:model.defer="legal_entity_form.contact.phones.{{$key}}.type"
                                             class="default-select">
                                 <x-slot name="option">
                                     <option>{{__('forms.typeMobile')}}</option>
@@ -57,7 +57,7 @@
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>
-                            @error("legal_entities.contact.phones.{$key}.type")
+                            @error("legal_entity_form.contact.phones.{$key}.type")
                             <x-forms.error>
                                 {{$message}}
                             </x-forms.error>
@@ -67,9 +67,9 @@
                             <x-forms.input value="{{$phone['number'] ?? ''}}"
                                            class="default-input"
                                            x-mask="+380999999999"
-                                           wire:model="legal_entities.contact.phones.{{$key}}.number" type="text"
+                                           wire:model="legal_entity_form.contact.phones.{{$key}}.number" type="text"
                                           />
-                            @error("legal_entities.contact.phones.{$key}.number")
+                            @error("legal_entity_form.contact.phones.{$key}.number")
                             <x-forms.error>
                                 {{ $message }}
                             </x-forms.error>

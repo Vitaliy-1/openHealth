@@ -13,27 +13,28 @@ return new class extends Migration
     {
         Schema::create('legal_entities', function (Blueprint $table) {
             $table->id();
-            $table->uuid('legal_entities_uuid');
-            $table->string('name')->nullable();
-            $table->string('short_name')->nullable();
-            $table->string('public_name');
-            $table->string('type')->nullable();
-            $table->string('owner_property_type')->nullable();
-            $table->string('legal_form')->nullable();
-            $table->string('edrpou');
-            $table->jsonb('kveds')->nullable();
-            $table->jsonb('addresses');
-            $table->jsonb('phones');
-            $table->string('email');
-            $table->boolean('is_active')->default(false);
-            $table->string('mis_verified')->nullable();
-            $table->boolean('nhs_verified')->default(false);
-            $table->string('website')->nullable();
+            $table->uuid('uuid');
+            $table->json('addresses');
+            $table->json('archive')->nullable();
             $table->string('beneficiary')->nullable();
-            $table->string('receiver_funds_code');
-            $table->jsonb('archive')->nullable();
-            $table->jsonb('license')->nullable();
-            $table->index('email');
+            $table->string('edrpou');
+            $table->string('email');
+            $table->boolean('is_active');
+            $table->string('kveds');
+            $table->string('legal_form');
+            $table->boolean('mis_verified')->nullable();
+            $table->string('name');
+            $table->boolean('nhs_verified')->nullable();
+            $table->string('owner_property_type');
+            $table->json('phones');
+            $table->string('public_name');
+            $table->json('license')->nullable();
+            $table->json('accreditation')->nullable();
+            $table->string('receiver_funds_code')->nullable();
+            $table->string('short_name');
+            $table->string('status');
+            $table->string('type');
+            $table->string('website')->nullable();
             $table->timestamps();
         });
     }
