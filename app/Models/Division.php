@@ -23,19 +23,31 @@ class Division extends Model
         'is_active',
         'legal_entity_id',
         'status',
+        'healthcare_services'
     ];
 
     protected $casts = [
-        'location' => 'geometry',
+        'location' => 'json',
         'addresses' => 'json',
+        'healthcare_services' => 'json',
         'phones' => 'json',
         'working_hours' => 'json',
         'is_active' => 'boolean',
     ];
 
+    public $attributes = [
+        'is_active' => false,
+        'mountaint_group' => false,
+    ];
+
     public function legalEntity()
     {
-        return $this->belongsTo(LegalEntity::class);
+        return $this->hasOne(LegalEntity::class);
+    }
+
+    public function healthcare_service()
+    {
+        return $this->hasMany(HealthcareService::class);
     }
 
 

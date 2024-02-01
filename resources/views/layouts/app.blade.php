@@ -11,13 +11,13 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+        @livewireStyles
+        @livewireScripts
         <!-- Scripts -->
         @vite(['resources/css/style.css', 'resources/js/index.js'])
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        <!-- Styles -->
-        @livewireStyles
     </head>
 
 

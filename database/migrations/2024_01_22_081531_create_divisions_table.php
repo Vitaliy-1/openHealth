@@ -13,19 +13,20 @@ return new class extends Migration
     {
         Schema::create('divisions', function (Blueprint $table) {
                 $table->id();
-                $table->uuid('uuid');
+                $table->uuid('uuid')->nullable();
                 $table->string('external_id')->nullable();
                 $table->string('name');
                 $table->string('type')->nullable();
                 $table->boolean('mountaint_group');
-                $table->geometry('location');
+                $table->jsonb('location');
                 $table->jsonb('addresses');
                 $table->jsonb('phones');
                 $table->string('email');
                 $table->jsonb('working_hours')->nullable();
                 $table->boolean('is_active')->nullable();
-                $table->uuid('legal_entity_id');
-                $table->enum('status', [''])->default('0');
+                $table->foreignId('legal_entity_id');
+                $table->foreign('legal_entity_id')->references('id')->on('legal_entities');
+                $table->integer('status')->default('0');
                 $table->timestamps();
         });
     }

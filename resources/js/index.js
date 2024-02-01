@@ -2,7 +2,7 @@
 // import "flatpickr/dist/flatpickr.min.css";
 import "../css/style.css";
 
-import Alpine from "alpinejs";
+import focus from '@alpinejs/focus'
 import persist from '@alpinejs/persist';
 import mask from '@alpinejs/mask';
 
@@ -13,10 +13,10 @@ import chart03 from "./components/chart-03";
 import chart04 from "./components/chart-04";
 import map01 from "./components/map-01";
 
-Alpine.plugin(persist)
-window.Alpine = Alpine;
-Alpine.start();
+// Alpine.plugin(persist)
+
 Alpine.plugin(mask)
+Alpine.plugin(focus)
 
 // Init flatpickr
 flatpickr(".datepicker", {

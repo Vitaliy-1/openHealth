@@ -2,9 +2,9 @@
 
 <table {{ $attributes->merge(['class' => 'w-full table-auto']) }}>
     <thead>
-    <tr>
-        @foreach ($headers as $key => $header)
-            <th class="bg-gray-2 text-left dark:bg-meta-4">{{ $header }}</th>
+    <tr class="bg-gray-2 text-left dark:bg-meta-4">
+        @foreach ($headers->attributes['list'] as $key => $header)
+            <th class="py-4 px-4 font-medium text-black dark:text-white">{{ $header }}</th>
         @endforeach
     </tr>
     </thead>

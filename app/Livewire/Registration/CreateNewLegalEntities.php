@@ -212,7 +212,11 @@ class CreateNewLegalEntities extends Component
             $this->legalEntity = (new LegalEntity())->fill(['edrpou' => $this->legal_entity_form->edrpou]) :
             $this->saveLegalEntityFromExistingData($data);
 
-        Cache::put($this->entityCacheKey, $this->legalEntity, now()->addDays(90));
+        if (empty($data)) {
+            return [];
+        }
+
+        $this->saveLegalEntity($data);
 
         return [];
     }
