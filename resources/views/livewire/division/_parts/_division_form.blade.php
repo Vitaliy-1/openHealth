@@ -10,249 +10,254 @@
 
         <x-forms.forms-section-modal  submit="{{$mode}}">
             <x-slot name="form">
-                <div class="flex mb-4 gap-6">
-                    <div class="xl:w-1/2 gap-6 ">
-                        <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                            <x-forms.form-group >
-                                <x-slot name="label">
-                                    <x-forms.label for="name" class="default-label">
-                                        {{__('forms.full_name_division')}}
-                                    </x-forms.label>
-                                </x-slot>
-                                <x-slot name="input">
-                                    <x-forms.input class="default-input"
-                                                   wire:model="division.name" type="text"
-                                                   id="name"/>
-                                </x-slot>
-                                @error('division.name')
-                                <x-slot name="error">
-                                    <x-forms.error>
-                                        {{$message}}
-                                    </x-forms.error>
-                                </x-slot>
-                                @enderror
-                            </x-forms.form-group>
-                            <x-forms.form-group >
-                                <x-slot name="label">
-                                    <x-forms.label for="email" class="default-label">
-                                        {{__('forms.email')}}
-                                    </x-forms.label>
-                                </x-slot>
-                                <x-slot name="input">
-                                    <x-forms.input class="default-input"
-                                                   wire:model="division.email" type="text"
-                                                   id="email"/>
-                                </x-slot>
-                                @error('division.email')
-                                <x-slot name="error">
-                                    <x-forms.error>
-                                        {{$message}}
-                                    </x-forms.error>
-                                </x-slot>
-                                @enderror
-                            </x-forms.form-group>
-                        </div>
-                        <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                            <x-forms.form-group >
-                                <x-slot name="label">
-                                    <x-forms.label for="type" class="default-label">
-                                        {{__('forms.type')}}*
-                                    </x-forms.label>
-                                </x-slot>
-                                <x-slot name="input">
-                                    <x-forms.select
-                                        class="default-input" wire:model="division.type" type="text"
-                                        id="type"
-                                    >
-                                        <x-slot name="option">
-                                            <option>{{__('forms.type')}}</option>
-                                            @foreach($this->dictionaries['DIVISION_TYPE'] as $k=>$position)
-                                                <option value="{{$k}}">{{$position}}</option>
-                                            @endforeach
-                                        </x-slot>
-                                    </x-forms.select>
-
-                                </x-slot>
-                                @error('division.type')
-                                <x-slot name="error">
-                                    <x-forms.error>
-                                        {{$message}}
-                                    </x-forms.error>
-                                </x-slot>
-                                @enderror
-                            </x-forms.form-group>
-                            <x-forms.form-group >
-                                <x-slot name="label">
-                                    <x-forms.label for="email" class="default-label">
-                                        {{__('forms.external_id')}}
-                                    </x-forms.label>
-                                </x-slot>
-                                <x-slot name="input">
-                                    <x-forms.input class="default-input"
-                                                   wire:model="division.external_id" type="text"
-                                                   id="email"/>
-                                </x-slot>
-                                @error('division.external_id')
-                                <x-slot name="error">
-                                    <x-forms.error>
-                                        {{$message}}
-                                    </x-forms.error>
-                                </x-slot>
-                                @enderror
-                            </x-forms.form-group>
-                        </div>
-                        <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                            <x-forms.form-group>
-                                <x-slot name="label">
-                                    <x-forms.label for="type_phone" class="default-label">
-
-                                        {{__('forms.typeMobile')}}
-                                    </x-forms.label>
-                                </x-slot>
-                                <x-slot name="input">
-                                    <x-forms.select wire:model.defer="division.phones.type"
-                                                    class="default-select">
-                                        <x-slot name="option">
-                                            <option>{{__('forms.typeMobile')}}</option>
-                                            @foreach($this->dictionaries['PHONE_TYPE'] as $k=>$phone_type)
-                                                <option
-                                                    {{ isset ($phone['type']) === $phone_type ? 'selected': ''}} value="{{$k}}">{{$phone_type}}</option>
-                                            @endforeach
-                                        </x-slot>
-                                    </x-forms.select>
-                                    @error("division.phones.type")
-                                    <x-forms.error>
-                                        {{$message}}
-                                    </x-forms.error>
+                <div class="mb-4">
+                    <div class=" grid grid-cols-2 gap-6 ">
+                        <div class="">
+                            <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                                <x-forms.form-group >
+                                    <x-slot name="label">
+                                        <x-forms.label for="name" class="default-label">
+                                            {{__('forms.full_name_division')}}
+                                        </x-forms.label>
+                                    </x-slot>
+                                    <x-slot name="input">
+                                        <x-forms.input class="default-input"
+                                                       wire:model="division.name" type="text"
+                                                       id="name"/>
+                                    </x-slot>
+                                    @error('division.name')
+                                    <x-slot name="error">
+                                        <x-forms.error>
+                                            {{$message}}
+                                        </x-forms.error>
+                                    </x-slot>
                                     @enderror
-                                </x-slot>
-
-                            </x-forms.form-group>
-                            <x-forms.form-group>
-                                <x-slot name="label">
-                                    <x-forms.label for="phone" class="default-label">
-
-                                        {{__('forms.phone')}}
-                                    </x-forms.label>
-                                </x-slot>
-                                <x-slot name="input">
-
-                                    <x-forms.input
-                                        id="phone"
-                                        class="default-input"
-                                        x-mask="+380999999999"
-                                        wire:model="division.phones.number" type="text"
-                                    />
-
-                                    @error("division.phones.number")
-                                    <x-forms.error>
-                                        {{ $message }}
-                                    </x-forms.error>
+                                </x-forms.form-group>
+                                <x-forms.form-group >
+                                    <x-slot name="label">
+                                        <x-forms.label for="email" class="default-label">
+                                            {{__('forms.email')}}
+                                        </x-forms.label>
+                                    </x-slot>
+                                    <x-slot name="input">
+                                        <x-forms.input class="default-input"
+                                                       wire:model="division.email" type="text"
+                                                       id="email"/>
+                                    </x-slot>
+                                    @error('division.email')
+                                    <x-slot name="error">
+                                        <x-forms.error>
+                                            {{$message}}
+                                        </x-forms.error>
+                                    </x-slot>
                                     @enderror
-                                </x-slot>
-                            </x-forms.form-group>
-
-                        </div>
-
-                    </div>
-                    <div class="xl:w-1/2 gap-6 ">
-                        <h3 class="text-lg font-bold dark:text-white">
-                            {{__('forms.addresses_division')}}
-                        </h3>
-                        <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                            <x-forms.form-group>
-                                <x-slot name="label">
-                                    <x-forms.label for="phone" class="default-label">
-                                        {{__('forms.longitude')}} *
-                                    </x-forms.label>
-                                </x-slot>
-                                <x-slot name="input">
-                                    <x-forms.input
-                                        id="phone"
-                                        class="default-input"
-                                        x-mask="99.999999"
-                                        wire:model="division.location.longitude" type="text"
-                                    />
-                                    @error("division.location.longitude")
-                                    <x-forms.error>
-                                        {{ $message }}
-                                    </x-forms.error>
-                                    @enderror
-                                </x-slot>
-                            </x-forms.form-group>
-                            <x-forms.form-group>
-                                <x-slot name="label">
-                                    <x-forms.label for="phone" class="default-label">
-                                        {{__('forms.latitude')}} *
-                                    </x-forms.label>
-                                </x-slot>
-                                <x-slot name="input">
-                                    <x-forms.input
-                                        id="phone"
-                                        class="default-input"
-                                        x-mask="99.999999"
-                                        wire:model="division.location.latitude" type="text"
-                                    />
-
-                                    @error("division.location.latitude")
-                                    <x-forms.error>
-                                        {{ $message }}
-                                    </x-forms.error>
-                                    @enderror
-                                </x-slot>
-                            </x-forms.form-group>
-                        </div>
-                        <livewire:components.koatuu-search :addresses="$addresses" />
-                    </div>
-                </div>
-                <div class="xl:w-1/3">
-                    <h3 class="text-lg  mb-6 font-bold dark:text-white">{{__('Графік роботи')}}</h3>
-                    @if($working_hours)
-                        @foreach($working_hours as $key=>$working_hour)
-                            <div >
-                                <label class="text-lg w-full text-black-2 mb-2 ">{{$working_hour}}</label>
-                                <div class=" flex mb-6 flex-col  gap-1 xl:flex-row align-centr" x-data="{ {{$key}}: false }">
-                                    <x-forms.form-group class="w-1/4" >
-                                        <x-slot name="label">
-                                            <x-forms.label  class="default-label">
-                                                {{__('forms.does_not_work')}}
-                                            </x-forms.label>
-                                        </x-slot>
-                                        <x-slot name="input">
-                                            <x-forms.input
-                                                class=""
-                                                @change="{{$key}} = !{{$key}};console.log({{$key}})"
-                                                type="checkbox"
-                                            />
-                                        </x-slot>
-                                    </x-forms.form-group>
-                                    <x-forms.form-group x-show="!{{$key}}" class="w-1/4">
-                                        <x-slot name="label">
-                                            <x-forms.label  class="default-label">
-                                                {{__('forms.opened_by')}}
-                                            </x-forms.label>
-                                        </x-slot>
-                                        <x-slot name="input">
-                                            <x-forms.input class="default-input"
-                                                           wire:model="division.working_hours.{{$key}}.0" type="time"
-                                            />
-                                        </x-slot>
-                                    </x-forms.form-group>
-                                    <x-forms.form-group x-show="!{{$key}}" class="w-1/4" >
-                                        <x-slot name="label">
-                                            <x-forms.label  class="default-label">
-                                                {{__('forms.closed_by')}}
-                                            </x-forms.label>
-                                        </x-slot>
-                                        <x-slot name="input">
-                                            <x-forms.input class="default-input"
-                                                           wire:model="division.working_hours.{{$key}}.1" type="time"
-                                                           id="email"/>
-                                        </x-slot>
-                                    </x-forms.form-group>
-                                </div>
+                                </x-forms.form-group>
                             </div>
-                        @endforeach
+                            <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                                <x-forms.form-group >
+                                    <x-slot name="label">
+                                        <x-forms.label for="type" class="default-label">
+                                            {{__('forms.type')}}*
+                                        </x-forms.label>
+                                    </x-slot>
+                                    <x-slot name="input">
+                                        <x-forms.select
+                                            class="default-input" wire:model="division.type" type="text"
+                                            id="type"
+                                        >
+                                            <x-slot name="option">
+                                                <option>{{__('forms.type')}}</option>
+                                                @foreach($this->dictionaries['DIVISION_TYPE'] as $k=>$position)
+                                                    <option value="{{$k}}">{{$position}}</option>
+                                                @endforeach
+                                            </x-slot>
+                                        </x-forms.select>
+
+                                    </x-slot>
+                                    @error('division.type')
+                                    <x-slot name="error">
+                                        <x-forms.error>
+                                            {{$message}}
+                                        </x-forms.error>
+                                    </x-slot>
+                                    @enderror
+                                </x-forms.form-group>
+                                <x-forms.form-group >
+                                    <x-slot name="label">
+                                        <x-forms.label for="email" class="default-label">
+                                            {{__('forms.external_id')}}
+                                        </x-forms.label>
+                                    </x-slot>
+                                    <x-slot name="input">
+                                        <x-forms.input class="default-input"
+                                                       wire:model="division.external_id" type="text"
+                                                       id="email"/>
+                                    </x-slot>
+                                    @error('division.external_id')
+                                    <x-slot name="error">
+                                        <x-forms.error>
+                                            {{$message}}
+                                        </x-forms.error>
+                                    </x-slot>
+                                    @enderror
+                                </x-forms.form-group>
+                            </div>
+                            <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                                <x-forms.form-group>
+                                    <x-slot name="label">
+                                        <x-forms.label for="type_phone" class="default-label">
+
+                                            {{__('forms.typeMobile')}}
+                                        </x-forms.label>
+                                    </x-slot>
+                                    <x-slot name="input">
+                                        <x-forms.select wire:model.defer="division.phones.type"
+                                                        class="default-select">
+                                            <x-slot name="option">
+                                                <option>{{__('forms.typeMobile')}}</option>
+                                                @foreach($this->dictionaries['PHONE_TYPE'] as $k=>$phone_type)
+                                                    <option
+                                                        {{ isset ($phone['type']) === $phone_type ? 'selected': ''}} value="{{$k}}">{{$phone_type}}</option>
+                                                @endforeach
+                                            </x-slot>
+                                        </x-forms.select>
+                                        @error("division.phones.type")
+                                        <x-forms.error>
+                                            {{$message}}
+                                        </x-forms.error>
+                                        @enderror
+                                    </x-slot>
+
+                                </x-forms.form-group>
+                                <x-forms.form-group>
+                                    <x-slot name="label">
+                                        <x-forms.label for="phone" class="default-label">
+
+                                            {{__('forms.phone')}}
+                                        </x-forms.label>
+                                    </x-slot>
+                                    <x-slot name="input">
+
+                                        <x-forms.input
+                                            id="phone"
+                                            class="default-input"
+                                            x-mask="+380999999999"
+                                            wire:model="division.phones.number" type="text"
+                                        />
+
+                                        @error("division.phones.number")
+                                        <x-forms.error>
+                                            {{ $message }}
+                                        </x-forms.error>
+                                        @enderror
+                                    </x-slot>
+                                </x-forms.form-group>
+
+                            </div>
+                        </div>
+                        <div class="">
+
+                            <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                                <x-forms.form-group>
+                                    <x-slot name="label">
+                                        <x-forms.label for="phone" class="default-label">
+                                            {{__('forms.longitude')}} *
+                                        </x-forms.label>
+                                    </x-slot>
+                                    <x-slot name="input">
+                                        <x-forms.input
+                                            id="phone"
+                                            class="default-input"
+                                            x-mask="99.999999"
+                                            wire:model="division.location.longitude" type="text"
+                                        />
+                                        @error("division.location.longitude")
+                                        <x-forms.error>
+                                            {{ $message }}
+                                        </x-forms.error>
+                                        @enderror
+                                    </x-slot>
+                                </x-forms.form-group>
+                                <x-forms.form-group>
+                                    <x-slot name="label">
+                                        <x-forms.label for="phone" class="default-label">
+                                            {{__('forms.latitude')}} *
+                                        </x-forms.label>
+                                    </x-slot>
+                                    <x-slot name="input">
+                                        <x-forms.input
+                                            id="phone"
+                                            class="default-input"
+                                            x-mask="99.999999"
+                                            wire:model="division.location.latitude" type="text"
+                                        />
+
+                                        @error("division.location.latitude")
+                                        <x-forms.error>
+                                            {{ $message }}
+                                        </x-forms.error>
+                                        @enderror
+                                    </x-slot>
+                                </x-forms.form-group>
+                            </div>
+                            <livewire:components.koatuu-search :addresses="$addresses" />
+                        </div>
+                    </div>
+
+                </div>
+                <div x-data="{ working: false }" class="mb-4">
+                    <h3 class="text-lg  mb-6 font-bold dark:text-white">{{__('Графік роботи')}}
+                        <button class="flex text-sm text-primary" type="button" @click.prevent="working = !working" x-text="working ? 'Закрити' : 'Відкрити'">Відкрити</button>
+                    </h3>
+                    @if($working_hours)
+                        <div x-show="working" class="grid grid-cols-2 gap-6 w-full">
+                            @foreach($working_hours as $key=>$working_hour)
+                                <div class="col-6" >
+                                    <label class="text-lg w-full text-black-2 mb-2 ">{{$working_hour}}</label>
+                                    <div class=" flex mb-6 flex-col  gap-1 xl:flex-row align-centr" x-data="{ {{$key}}: false }">
+                                        <x-forms.form-group class="w-1/4" >
+                                            <x-slot name="label">
+                                                <x-forms.label  class="default-label">
+                                                    {{__('forms.does_not_work')}}
+                                                </x-forms.label>
+                                            </x-slot>
+                                            <x-slot name="input">
+                                                <x-forms.input
+                                                    class=""
+                                                    @change="{{$key}} = !{{$key}};console.log({{$key}})"
+                                                    type="checkbox"
+                                                />
+                                            </x-slot>
+                                        </x-forms.form-group>
+                                        <x-forms.form-group x-show="!{{$key}}" class="w-1/4">
+                                            <x-slot name="label">
+                                                <x-forms.label  class="default-label">
+                                                    {{__('forms.opened_by')}}
+                                                </x-forms.label>
+                                            </x-slot>
+                                            <x-slot name="input">
+                                                <x-forms.input class="default-input"
+                                                               wire:model="division.working_hours.{{$key}}.0" type="time"
+                                                />
+                                            </x-slot>
+                                        </x-forms.form-group>
+                                        <x-forms.form-group x-show="!{{$key}}" class="w-1/4" >
+                                            <x-slot name="label">
+                                                <x-forms.label  class="default-label">
+                                                    {{__('forms.closed_by')}}
+                                                </x-forms.label>
+                                            </x-slot>
+                                            <x-slot name="input">
+                                                <x-forms.input class="default-input"
+                                                               wire:model="division.working_hours.{{$key}}.1" type="time"
+                                                               id="email"/>
+                                            </x-slot>
+                                        </x-forms.form-group>
+                                    </div>
+                                </div>
+                            @endforeach
+
+                        </div>
                     @endif
 
                 </div>

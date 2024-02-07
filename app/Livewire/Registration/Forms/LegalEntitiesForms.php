@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Registration\Forms;
 
+use App\Models\LegalEntity;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;

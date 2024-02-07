@@ -4,15 +4,13 @@ namespace App\Livewire\Division;
 
 use App\Classes\eHealth\Api\DivisionApi;
 use App\Helpers\JsonHelper;
+use App\Livewire\Division\Api\DivisionRequestApi;
 use App\Models\Division;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class DivisionForm extends Component
 {
-
-
-
     #[Validate([
         'division.name' => 'required|min:6|max:255',
         'division.type' => 'required',
@@ -21,13 +19,11 @@ class DivisionForm extends Component
         'division.phones.type' => 'required',
         'division.location.latitude' => 'required',
         'division.location.longitude' => 'required',
-
     ])]
     public  ?array   $division = [];
     public ?object $divisions ;
 
     public ?array $dictionaries;
-
     public ?array $working_hours = [
         'mon' => 'Понеділок',
         'tue' => 'Вівторок',
@@ -39,7 +35,6 @@ class DivisionForm extends Component
    ];
 
     public  ?array $tableHeaders = [];
-
     public bool $showModal = false;
 
     public ?array $addresses = [];
@@ -51,21 +46,14 @@ class DivisionForm extends Component
 
     public function mount( )
     {
-
         $this->tableHeaders();
-
         $this->getLegalEntity();
-
         $this->getDivisions();
-
-
-
         $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', [
             'PHONE_TYPE',
             'SETTLEMENT_TYPE',
             'DIVISION_TYPE',
         ]);
-
     }
 
     public function getLegalEntity()
@@ -98,21 +86,21 @@ class DivisionForm extends Component
        ];
     }
 
-
     public function create()
     {
        $this->division = [];
        $this->addresses = [];
-
-        $this->openModal();
+       $this->openModal();
     }
 
     public function store()
     {
         $this->resetErrorBag();
         $this->validate();
+        $result = (new DivisionRequestApi())->createDivisionRequest($this->division);
         $division = new Division();
         $division->fill($this->division);
+        $division->setAttribute('uuid',$result['id']);
         $this->legalEntity->division()->save($division);
         $this->closeModal();
         $this->getDivisions();
@@ -154,24 +142,17 @@ class DivisionForm extends Component
         );
         return (new DivisionApi())->getDivisions() ?? [];
     }
-
     public function getDivisions(): object
     {
       return $this->divisions = Division::all();
     }
-
     public function updateFieldAddresses($data)
     {
         $this->division['addresses'][$data['field']] = $data['value'];
-
     }
-
     public function render()
     {
         return view('livewire.division.division-form');
     }
-
-
-
 
 }

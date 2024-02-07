@@ -29,6 +29,10 @@ class HealthcareService extends Model
         'not_available' => 'json',
     ];
 
+    protected  $attributes = [
+        'status' => false,
+    ];
+
     public function division()
     {
         return $this->belongsTo(Division::class);

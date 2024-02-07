@@ -41,4 +41,9 @@ class Request extends Configuration
     {
         return self::sendRequest('put', $url, $params);
     }
+
+    public static function patch(string $url, array $params = []): array
+    {
+        return self::sendRequest('patch', $url, $params);
+    }
 }

@@ -9,7 +9,11 @@
     </tr>
     </thead>
     <tbody>
-        {{ $tbody }}
+    {{ $tbody }}
     </tbody>
-
+    @isset($footer)
+        <tfoot>
+            {{ $footer }}
+        </tfoot>
+    @endif
 </table>

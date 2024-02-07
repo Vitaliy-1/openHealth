@@ -147,6 +147,8 @@ return [
         'contact.phones.*.number'=> 'Телефон',
         'contact.phones.*.type'=> 'Тип Номера',
         'contact.email' => 'E-mail',
+        '*.type'=> 'Тип спеціальності',
+        'type'=> 'Тип спеціальності',
         'owner' => [
             'first_name' => 'Ім’я',
             'last_name' => 'Прізвище',
@@ -175,7 +177,31 @@ return [
             'apartment' => 'Квартира',
             'zip_code' => 'Поштовий індекс',
         ],
-//
+        'location'=>[
+            'latitude' => 'Широта',
+            'longitude' => 'Довгота',
+        ],
+        'division' => [
+            'name' => 'Назва',
+            'type' => 'Тип',
+            'email' => 'E-mail',
+            'phones.number' => 'Телефон',
+            'phones.type' => 'Тип Номера',
+            'location.latitude' => 'Широта',
+            'location.longitude' => 'Довгота',
+        ],
+        'division.phones.*.number'=> 'Телефон',
+        'division.phones.*.type'=> 'Тип Номера',
+        'division.location.latitude' => 'Широта',
+        'division.location.longitude' => 'Довгота',
+        'healthcare_service' => [
+            'category' => 'Категорія',
+            'conditions' => 'Умови надання',
+            'speciality_type' => 'Тип спеціальності',
+            'status' => 'Статус',
+            'type' => 'Тип спеціальності',
+            'providing_condition' => 'Умови надання послуг',
+        ],
         'license' => [
             'license_type' => 'Тип',
             'issued_by' => 'Орган яким виданий документ',

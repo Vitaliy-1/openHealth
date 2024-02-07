@@ -37,6 +37,9 @@ return [
     'comment'=>'Коментар',
     'days_of_week'=>'Дні тижня',
     'providing_conditions'=>'Умови надання послуг',
+    'all_day'=>'Цілий день',
+    'available_start_time'=>'Час початку',
+    'available_end_time'=>'Час закінчення',
     //Form fields
     'edrpou'=>'ЄДРПОУ',
     'first_name' => 'Ім’я',
