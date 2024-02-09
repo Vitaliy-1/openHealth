@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Cache;
 
 class CreateNewLegalEntities extends Component
 {
+    const CACHE_PREFIX = 'register_legal_entity_form';
+
     public LegalEntitiesForms $legal_entity_form;
 
     public LegalEntity $legalEntity;
@@ -43,9 +45,12 @@ class CreateNewLegalEntities extends Component
      */
     protected string $entityCacheKey;
 
+    protected string $ownerCacheKey;
+
     public function boot(): void
     {
-        $this->entityCacheKey = Auth::user()->id . '-' . LegalEntity::class;
+        $this->entityCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->id . '-' . LegalEntity::class;
+        $this->ownerCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->id . '-' . Employee::class;
     }
 
     public function mount(Employee $employee, LegalEntity $legalEntity, Person $person): void
@@ -206,6 +211,8 @@ class CreateNewLegalEntities extends Component
             $this->legalEntity = (new LegalEntity())->fill(['edrpou' => $this->legal_entity_form->edrpou]) :
             $this->saveLegalEntityFromExistingData($data);
 
+        Cache::put($this->entityCacheKey, $this->legalEntity, now()->addDays(90));
+
         return [];
     }
 
@@ -216,14 +223,7 @@ class CreateNewLegalEntities extends Component
         $user = Auth::user();
         //Get person data builder
         $personData = $this->legal_entity_form->owner;
-
-        DB::transaction(function () use ($personData, $user) {
-            if ($user->person) {
-                $this->updatePersonAndEmployee($user->person, $personData);
-            } else {
-                $this->createPersonAndEmployee($user, $personData);
-            }
-        });
+        Cache::put($this->ownerCacheKey, $personData, now()->days(90));
 
         if (isset($this->legalEntity->phones) && !empty($this->legalEntity->phones) ) {
             $this->phones = $this->legalEntity->phones;
@@ -313,11 +313,6 @@ class CreateNewLegalEntities extends Component
             ->koatuu_level3()
             ->where('name', 'ilike', '%' . $settlement. '%')
             ->take(5)->get();
-    }
-
-    public function dehydrateLegalEntity()
-    {
-        Cache::put($this->entityCacheKey, $this->legalEntity, now()->addDays(90));
     }
 
     public function render()
