@@ -4,42 +4,38 @@ namespace App\Livewire\Division\Api;
 
 use App\Classes\eHealth\Api\DivisionApi;
 
-class DivisionRequestApi
+class DivisionRequestApi extends DivisionApi
 {
 
-    public function getDivisionRequest($params = []):array
+
+    public function __construct()
     {
-        return (new DivisionApi())->_get($params);
+        parent::__construct();
     }
 
-    public  function createDivisionRequest($data):array
+    public static  function getDivisionRequest($params = []):array
     {
-        return (new DivisionApi())->_create($data);
+        return self::_get($params);
     }
 
-
-    public function updateDivisionRequest($id, $data):array
+    public static function createDivisionRequest($data):array
     {
-        $division = (new DivisionApi())->_update($id, $data);
-        dd($division);
-        return $division;
+        return self::_create($data);
     }
 
-    public function deactiveDivisionRequest($id):array
+    public static function updateDivisionRequest($id, $data):array
     {
-        $division = (new DivisionApi())->_deactive($id);
-        dd($division);
-        return $division;
+        return self::_update($id, $data);
     }
 
-    public function activateDivisionRequest($id):array
+    public static function deactivateDivisionRequest($id):array
     {
-        $division = (new DivisionApi())->_activate($id);
-        dd($division);
-        return $division;
+        return self::_deactivate($id);
     }
 
-
-
+    public static function activateDivisionRequest($id):array
+    {
+        return self::_activate($id);
+    }
 
 }

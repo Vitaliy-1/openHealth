@@ -23,10 +23,11 @@ return new class extends Migration
                 $table->jsonb('phones');
                 $table->string('email');
                 $table->jsonb('working_hours')->nullable();
-                $table->boolean('is_active')->nullable();
+                $table->boolean('is_active')->default(false);
+                $table->uuid('legal_entity_uuid')->nullable();
                 $table->foreignId('legal_entity_id');
                 $table->foreign('legal_entity_id')->references('id')->on('legal_entities');
-                $table->integer('status')->default('0');
+                $table->string('status')->nullable();
                 $table->timestamps();
         });
     }

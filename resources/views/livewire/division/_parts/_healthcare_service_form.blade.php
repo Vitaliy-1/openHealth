@@ -118,7 +118,7 @@
                                 @enderror
                             </x-slot>
                         </x-forms.form-group>
-                        <x-forms.form-group class="" >
+                        <x-forms.form-group class="col-span-2" >
                             <x-slot name="label">
                                 <x-forms.label for="comment" class="default-label">
                                     {{__('forms.comment')}}
@@ -126,8 +126,8 @@
                             </x-slot>
                             <x-slot name="input">
                                 <x-forms.textarea
+                                    row="15"
                                     id="comment"
-                                    row
                                     class="default-textarea"
                                     wire:model="healthcare_service.comment" type="text"
                                 >
@@ -142,13 +142,12 @@
                     </div>
                 </div>
                 <div class="mb-4 mt-4 ">
-                    <h3 class="text-xl font-bold dark:text-white">{{__('Час Доступності')}}</h3>
-                        @if(isset($healthcare_service['available_time']) && !empty($healthcare_service['available_time']) )
+                    <h3 class="text-sm font-bold dark:text-white mb-5">{{__('Час Доступності')}}</h3>
+                   @if(isset($healthcare_service['available_time']) && !empty($healthcare_service['available_time']) )
                             @foreach($healthcare_service['available_time'] as $k=>$a_time)
                             <input type="hidden"  wire:model="healthcare_service.available_time.{{$k}}.days_of_week">
-                            <h3 class="text-[18px] mt-4 mb-4">{{get_day_value($k)}}</h3>
-                            <div class="grid grid-cols-4 gap-4">
-
+                            <h3 class="text-[14px] mt-4 mb-4">{{get_day_value($k)}}</h3>
+                            <div class="grid grid-cols-4 gap-4 mb-5">
                             <x-forms.form-group class="col-span-1">
                                 <x-slot name="label">
                                     <x-forms.label for="all_day" class="default-label">
@@ -212,6 +211,65 @@
                     <button class=" flex text-sm text-primary" type="button" wire:click="addAvailableTime({{ max(0, count($available_time) - 1) }})"> Додати Час</button>
                     @endif
                 </div>
+                <div class="mb-4 mt-4 ">
+                    <h3 class="text-sm font-bold dark:text-white mb-5">{{__('Час Не Доступності')}}</h3>
+                    @if(isset($healthcare_service['not_available']) && !empty($healthcare_service['not_available']) )
+                        @foreach($healthcare_service['not_available'] as $k=>$not_time)
+                            <div class="grid grid-cols-2 gap-6 mb-5">
+
+                                <x-forms.form-group>
+                                    <x-slot name="label">
+                                        <x-forms.label for="during_start-{{$k}}" class="default-label">
+                                            {{__('forms.not_available_start')}}
+                                        </x-forms.label>
+                                    </x-slot>
+                                    <x-slot name="input">
+                                        <x-forms.input
+                                            id="during_start-{{$k}}"
+                                            class="default-input"
+                                            wire:model="healthcare_service.available_time.{{$k}}.during.start" type="date"
+                                        />
+                                    </x-slot>
+                                </x-forms.form-group>
+                                <x-forms.form-group>
+                                    <x-slot name="label">
+                                        <x-forms.label for="during_end-{{$k}}" class="default-label">
+                                            {{__('forms.not_available_end')}}
+                                        </x-forms.label>
+                                    </x-slot>
+                                    <x-slot name="input">
+                                        <x-forms.input
+                                            id="during_end-{{$k}}"
+                                            class="default-input"
+                                            wire:model="healthcare_service.available_time.{{$k}}.during.end" type="date"
+                                        />
+                                    </x-slot>                                </x-forms.form-group>
+                                <div class="btn flex items-center	 h-full">
+                                    <button type="button" class="flex text-sm text-primary" wire:click="removeAvailableTime({{$k}})">
+                                        {{__('Видалити ')}}
+                                    </button>
+                                </div>
+                                <x-forms.form-group class="col-span-6">
+                                    <x-slot name="label">
+                                        <x-forms.label for="description_{{$k}}" class="default-label">
+                                            {{__('forms.description')}}
+                                        </x-forms.label>
+                                    </x-slot>
+                                    <x-slot name="input">
+                                        <x-forms.textarea
+                                            wire:model="healthcare_service.not_available.{{$k}}.description"
+                                            id="description_{{$k}}" class="default-input" type="text">
+                                        </x-forms.textarea>
+                                    </x-slot>
+                                </x-forms.form-group>
+
+                            </div>
+
+                        @endforeach
+                    @endif
+                        <button class=" flex text-sm text-primary" type="button" wire:click="addNotAvailableTime"> Додати Час</button>
+                </div>
+
                 <div class="mt-6.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
                     <div class="xl:w-1/4 text-left">
                         <x-secondary-button wire:click="closeModal()">

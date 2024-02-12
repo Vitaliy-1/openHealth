@@ -15,9 +15,9 @@ class Request extends Configuration
 
     protected static function sendRequest(string $method, string $url, array $params = []): array
     {
-
         $response = Http::acceptJson()
             ->{$method}(self::makeApiUrl($url), $params);
+
         if ($response->successful()) {
             return json_decode($response->body(), true)['data'] ?? [];
         }

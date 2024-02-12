@@ -1,20 +1,17 @@
-<x-dialog-modal   maxWidth="3xl" class="w-3 h-full" wire:model.live="showModal">
+<x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model.live="showModal">
 
     <x-slot name="title">
         {{__('Додати місце надання послуг')}}
     </x-slot>
     <x-slot name="content">
-        @php
-            $mode = $mode === 'edit' ? 'update' : 'store';
-        @endphp
 
-        <x-forms.forms-section-modal  submit="{{$mode}}">
+        <x-forms.forms-section-modal submit="{{$mode === 'edit' ? 'update' : 'store'}}">
             <x-slot name="form">
                 <div class="mb-4">
-                    <div class=" grid grid-cols-2 gap-6 ">
-                        <div class="">
-                            <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                                <x-forms.form-group >
+                    <div class="grid grid-cols-2 gap-6 ">
+                        <div>
+                        <div class="grid grid-cols-2 gap-6">
+                                <x-forms.form-group>
                                     <x-slot name="label">
                                         <x-forms.label for="name" class="default-label">
                                             {{__('forms.full_name_division')}}
@@ -33,7 +30,7 @@
                                     </x-slot>
                                     @enderror
                                 </x-forms.form-group>
-                                <x-forms.form-group >
+                                <x-forms.form-group>
                                     <x-slot name="label">
                                         <x-forms.label for="email" class="default-label">
                                             {{__('forms.email')}}
@@ -52,9 +49,7 @@
                                     </x-slot>
                                     @enderror
                                 </x-forms.form-group>
-                            </div>
-                            <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
-                                <x-forms.form-group >
+                                <x-forms.form-group>
                                     <x-slot name="label">
                                         <x-forms.label for="type" class="default-label">
                                             {{__('forms.type')}}*
@@ -82,7 +77,7 @@
                                     </x-slot>
                                     @enderror
                                 </x-forms.form-group>
-                                <x-forms.form-group >
+                                <x-forms.form-group>
                                     <x-slot name="label">
                                         <x-forms.label for="email" class="default-label">
                                             {{__('forms.external_id')}}
@@ -101,8 +96,6 @@
                                     </x-slot>
                                     @enderror
                                 </x-forms.form-group>
-                            </div>
-                            <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
                                 <x-forms.form-group>
                                     <x-slot name="label">
                                         <x-forms.label for="type_phone" class="default-label">
@@ -152,16 +145,14 @@
                                         @enderror
                                     </x-slot>
                                 </x-forms.form-group>
-
-                            </div>
                         </div>
-                        <div class="">
-
-                            <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                        </div>
+                        <div  class="grid grid-cols-1 gap-6">
+                            <div class="grid grid-cols-2 gap-6">
                                 <x-forms.form-group>
                                     <x-slot name="label">
                                         <x-forms.label for="phone" class="default-label">
-                                            {{__('forms.longitude')}} *
+                                            {{__('forms.longitude')}}
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name="input">
@@ -181,7 +172,7 @@
                                 <x-forms.form-group>
                                     <x-slot name="label">
                                         <x-forms.label for="phone" class="default-label">
-                                            {{__('forms.latitude')}} *
+                                            {{__('forms.latitude')}}
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name="input">
@@ -191,7 +182,6 @@
                                             x-mask="99.999999"
                                             wire:model="division.location.latitude" type="text"
                                         />
-
                                         @error("division.location.latitude")
                                         <x-forms.error>
                                             {{ $message }}
@@ -199,57 +189,67 @@
                                         @enderror
                                     </x-slot>
                                 </x-forms.form-group>
+
                             </div>
-                            <livewire:components.koatuu-search :addresses="$addresses" />
+                            @if($mode == 'edit')
+                            <livewire:components.koatuu-search :addresses="$division['addresses'] ?? []" :class="'grid grid-cols-2 gap-6'" />
+                            @endif
                         </div>
                     </div>
 
                 </div>
                 <div x-data="{ working: false }" class="mb-4">
                     <h3 class="text-lg  mb-6 font-bold dark:text-white">{{__('Графік роботи')}}
-                        <button class="flex text-sm text-primary" type="button" @click.prevent="working = !working" x-text="working ? 'Закрити' : 'Відкрити'">Відкрити</button>
+                        <button class="flex text-sm text-primary" type="button" @click.prevent="working = !working"
+                                x-text="working ? 'Закрити' : 'Відкрити'">Відкрити
+                        </button>
                     </h3>
                     @if($working_hours)
                         <div x-show="working" class="grid grid-cols-2 gap-6 w-full">
                             @foreach($working_hours as $key=>$working_hour)
-                                <div class="col-6" >
+                                <div
+                                    x-data="{show_work: {{isset($division['working_hour'][$key]['not_working']) ?? true ? 'true':'false'}}}"
+                                    class="col-6">
                                     <label class="text-lg w-full text-black-2 mb-2 ">{{$working_hour}}</label>
-                                    <div class=" flex mb-6 flex-col  gap-1 xl:flex-row align-centr" x-data="{ {{$key}}: false }">
-                                        <x-forms.form-group class="w-1/4" >
+                                    <div class=" flex mb-6 flex-col  gap-1 xl:flex-row align-center"
+                                         x-data="{ {{$key}}: false }">
+                                        <x-forms.form-group class="w-1/4">
                                             <x-slot name="label">
-                                                <x-forms.label  class="default-label">
+                                                <x-forms.label class="default-label">
                                                     {{__('forms.does_not_work')}}
                                                 </x-forms.label>
                                             </x-slot>
                                             <x-slot name="input">
                                                 <x-forms.input
-                                                    class=""
-                                                    @change="{{$key}} = !{{$key}};console.log({{$key}})"
+                                                    wire:model="division.working_hours.{{$key}}.not_working"
+                                                    wire:click="notWorking('{{$key}}');show_work = !show_work;"
                                                     type="checkbox"
                                                 />
                                             </x-slot>
                                         </x-forms.form-group>
-                                        <x-forms.form-group x-show="!{{$key}}" class="w-1/4">
+                                        <x-forms.form-group x-show="!show_work" class="w-1/4">
                                             <x-slot name="label">
-                                                <x-forms.label  class="default-label">
+                                                <x-forms.label class="default-label">
                                                     {{__('forms.opened_by')}}
                                                 </x-forms.label>
                                             </x-slot>
                                             <x-slot name="input">
                                                 <x-forms.input class="default-input"
-                                                               wire:model="division.working_hours.{{$key}}.0" type="time"
+                                                               wire:model="division.working_hours.{{$key}}.0"
+                                                               type="time"
                                                 />
                                             </x-slot>
                                         </x-forms.form-group>
-                                        <x-forms.form-group x-show="!{{$key}}" class="w-1/4" >
+                                        <x-forms.form-group x-show="!show_work" class="w-1/4">
                                             <x-slot name="label">
-                                                <x-forms.label  class="default-label">
+                                                <x-forms.label class="default-label">
                                                     {{__('forms.closed_by')}}
                                                 </x-forms.label>
                                             </x-slot>
                                             <x-slot name="input">
                                                 <x-forms.input class="default-input"
-                                                               wire:model="division.working_hours.{{$key}}.1" type="time"
+                                                               wire:model="division.working_hours.{{$key}}.1"
+                                                               type="time"
                                                                id="email"/>
                                             </x-slot>
                                         </x-forms.form-group>
@@ -259,7 +259,6 @@
 
                         </div>
                     @endif
-
                 </div>
                 <div class="mb-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
                     <div class="xl:w-1/4 text-left">
@@ -267,9 +266,8 @@
                             {{__('Закрити ')}}
                         </x-secondary-button>
                     </div>
-
                     <div class="xl:w-1/4 text-right">
-                        <x-button type="submit" class="btn-primary" >
+                        <x-button type="submit" class="btn-primary">
                             {{__('Створити ')}}
                         </x-button>
                     </div>

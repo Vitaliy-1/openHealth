@@ -38,6 +38,9 @@ class Division extends Model
     public $attributes = [
         'is_active' => false,
         'mountaint_group' => false,
+        'addresses' => '[]',
+        'location' => '[]',
+        'working_hours' =>  '[]',
     ];
 
     public function legalEntity()
@@ -45,7 +48,7 @@ class Division extends Model
         return $this->hasOne(LegalEntity::class);
     }
 
-    public function healthcare_service()
+    public function healthcareService()
     {
         return $this->hasMany(HealthcareService::class);
     }
