@@ -20,7 +20,7 @@ class CreateNewLegalEntities extends Component
 
     public LegalEntitiesForms $legal_entity_form;
 
-    public LegalEntitiesForms $legalEntity;
+    public LegalEntity $legalEntity;
 
     public Person $person;
 
