@@ -51,7 +51,6 @@ class LegalEntity extends Model
         'owner_property_type' => '',
     ];
 
-
     public function employee(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Employee::class,'legal_entity_id','id');
@@ -67,5 +66,9 @@ class LegalEntity extends Model
     }
 
 
+    public function division(): \Illuminate\Database\Eloquent\Relations\hasMany
+    {
+        return $this->hasMany(Division::class);
+    }
 
 }

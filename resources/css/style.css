@@ -165,7 +165,9 @@ span.flatpickr-weekday,
 .btn-primary{
     @apply w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 font-medium text-white transition hover:bg-opacity-90
 }
-
+.btn-green{
+    @apply inline-flex items-center justify-center rounded-md bg-meta-3 py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10
+}
 .input-danger  input{
     @apply border-danger
 }
@@ -180,6 +182,11 @@ span.flatpickr-weekday,
 .input-file{
     @apply w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary
 }
+
+.default-textarea{
+    @apply w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary
+}
+
 
 @layer base {
     input[type="number"]::-webkit-inner-spin-button,

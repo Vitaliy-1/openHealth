@@ -89,6 +89,7 @@ class CreateNewLegalEntities extends Component
         ]);
 
         $this->getPhones();
+
     }
 
     public function addRowPhone(): array
@@ -96,7 +97,7 @@ class CreateNewLegalEntities extends Component
         return $this->phones[] = ['type' => '', 'number' => ''];
     }
 
-    public function removePhone($key): void
+    public function removePhone($key)
     {
         if (isset($this->phones[$key])) {
             unset($this->phones[$key]);
@@ -211,7 +212,11 @@ class CreateNewLegalEntities extends Component
             $this->legalEntity = (new LegalEntity())->fill(['edrpou' => $this->legal_entity_form->edrpou]) :
             $this->saveLegalEntityFromExistingData($data);
 
-        Cache::put($this->entityCacheKey, $this->legalEntity, now()->addDays(90));
+        if (empty($data)) {
+            return [];
+        }
+
+        $this->saveLegalEntity($data);
 
         return [];
     }
@@ -228,6 +233,7 @@ class CreateNewLegalEntities extends Component
         if (isset($this->legalEntity->phones) && !empty($this->legalEntity->phones) ) {
             $this->phones = $this->legalEntity->phones;
         }
+
     }
 
     public function stepContact(): void
