@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Livewire\Registration;
+
 use App\Helpers\JsonHelper;
 use App\Livewire\Registration\Forms\LegalEntitiesForms;
 use App\Livewire\Registration\Forms\LegalEntitiesRequestApi;
@@ -26,6 +27,7 @@ class CreateNewLegalEntities extends Component
 
     public Employee $employee;
 
+
     public int $totalSteps = 8;
 
     public int $currentStep = 1;
@@ -34,49 +36,30 @@ class CreateNewLegalEntities extends Component
 
     public ?array $phones = [];
 
-    public ?object $koatuu_level1;
-
-    public ?object $koatuu_level2;
-
-    public ?object $koatuu_level3;
-
     /**
      * @var string The Cache ID to store Legal Entity being filled by the current user
      */
     protected string $entityCacheKey;
-
+    protected ?array $entityCache;
     protected string $ownerCacheKey;
+    protected ?array $ownerCache;
+
+    protected $listeners = ['addressDataFetched'];
+
+    protected string $edrpouKey = '54323454';
+
+    public ?array $addresses = [];
 
     public function boot(): void
     {
-        $this->entityCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->id . '-' . LegalEntity::class;
-        $this->ownerCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->id . '-' . Employee::class;
+        $this->entityCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . LegalEntity::class;
+        $this->ownerCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . Employee::class;
     }
 
-    public function mount(Employee $employee, LegalEntity $legalEntity, Person $person): void
+    public function mount(): void
     {
-        /**
-         * Legal Entity associated with the form
-         * To get Legal Entity from a user, use: Auth::user()->person->employee->legalEntity;
-         */
 
-         // Search Legal entity in the cache by user ID
-        if (Cache::has($this->entityCacheKey)) {
-            $this->legalEntity = Cache::get($this->entityCacheKey);
-            // Prefill form data as it already exists
-            $this->legal_entity_form->fillData($this->legalEntity);
-            if (!empty($this->legalEntity->edrpou)) {
-                $this->currentStep = 2;
-            }
-        } else {
-            $this->legalEntity = $legalEntity;
-        }
-
-        $this->person = $person;
-
-        $this->employee = $employee;
-
-        $this->koatuu_level1 = KoatuuLevel1::all();
+        $this->getLegalEntity();
 
         $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', [
             'PHONE_TYPE',
@@ -89,6 +72,35 @@ class CreateNewLegalEntities extends Component
         ]);
 
         $this->getPhones();
+
+    }
+
+    public function getLegalEntity(): void
+    {
+        //Check if the user has a legal entity
+        if (\auth()->user()->legalEntity) {
+            // Get Legal Entity from the user
+            $user = \auth()->user();
+            $this->legalEntity = $user->legalEntity;
+        } // Search Legal entity in the cache by user ID
+        elseif (Cache::has($this->entityCacheKey)) {
+            $this->legalEntity = Cache::get($this->entityCacheKey);
+            $this->legal_entity_form->fill($this->legalEntity->toArray());
+        } else {
+            // Create a new Legal Entity
+            $this->legalEntity = new LegalEntity();
+        }
+        // Search Legal entity in the cache by user ID
+        if (Cache::has($this->ownerCacheKey)) {
+            $this->legal_entity_form->owner = Cache::get($this->ownerCacheKey);
+        }
+
+        foreach ($this->legal_entity_form as $index => $field) {
+            if (empty($this->legal_entity_form->{$index})) {
+                $this->currentStep++;
+                return;
+            }
+        }
 
     }
 
@@ -107,14 +119,15 @@ class CreateNewLegalEntities extends Component
     public function increaseStep(): void
     {
         $this->resetErrorBag();
-
         $this->validateData();
-
         $this->currentStep++;
+        $this->putLegalEntityInCache();
 
         if ($this->currentStep > $this->totalSteps) {
             $this->currentStep = $this->totalSteps;
         }
+
+
     }
 
     public function decreaseStep(): void
@@ -155,170 +168,148 @@ class CreateNewLegalEntities extends Component
         }
     }
 
-    public function saveLegalEntityFromExistingData(array $data): void
+    public function saveLegalEntityFromExistingData($data): void
     {
         $normalizedData = [];
-        foreach ($data as $key => $value) {
-            switch ($key) {
-                case 'id':
-                    $normalizedData['uuid'] = $value;
-                    break;
-                case 'residence_address':
-                    $normalizedData['addresses'] = $value;
-                    break;
-                case 'edr':
-                    foreach ($data['edr'] as $edrKey => $edrValue) {
-                        $normalizedData[$edrKey] = $edrValue;
-                    }
-                    break;
-                default:
-                    $normalizedData[$key] = $value;
-                    break;
+        if (!empty($data)) {
+            foreach ($data as $key => $value) {
+                switch ($key) {
+                    case 'id':
+                        $normalizedData['uuid'] = $value;
+                        break;
+                    case 'residence_address':
+                        $normalizedData['addresses'] = $value;
+                        break;
+                    case 'edr':
+                        foreach ($data['edr'] as $edrKey => $edrValue) {
+                            $normalizedData[$edrKey] = $edrValue;
+                        }
+                        break;
+                    default:
+                        $normalizedData[$key] = $value;
+                        break;
+                }
+            }
+            $this->legalEntity = (new LegalEntity())->fill($normalizedData);
+            $this->legal_entity_form->fillData($this->legalEntity);
+            $this->legalEntity->save();
+        }
+    }
+
+    public function putLegalEntityInCache(): void
+    {
+        // Fill the Legal Entity with the form data
+        $this->legalEntity->fill($this->legal_entity_form->toArray());
+        // Check if the Legal Entity has changed cache
+        if (!Cache::has($this->entityCacheKey) || $this->checkChanges()) {
+            Cache::put($this->entityCacheKey, $this->legalEntity, now()->days(90));
+        }
+    }
+
+    public function checkChanges(): bool
+    {
+        if (Cache::has($this->entityCacheKey)) {
+            // If the Legal Entity has not changed, return false
+            if (empty(array_diff_assoc($this->legalEntity->getAttributes(),
+                Cache::get($this->entityCacheKey)->getAttributes()))) {
+                return false; // If
             }
         }
-        $this->legalEntity = (new LegalEntity())->fill($normalizedData);
-        $this->legal_entity_form->fillData($this->legalEntity);
+        return true; // Return true if the Legal Entity has changed
     }
 
-    private function updatePersonAndEmployee($person, $personData): void
+    public function saveLegalEntity(): void
     {
-        $person->update($personData);
-        if ($person->employee) {
-            $person->employee->update($personData);
-        } else {
-            $this->createEmployee($person, $personData);
-        }
+        $this->legalEntity->save();
     }
-
-    private function createPersonAndEmployee($user, $personData): void
-    {
-        $person = Person::create($personData);
-        $user->person()->associate($person)->save();
-        $this->createEmployee($person, $personData);
-    }
-
-    private function createEmployee($person, $personData): void
-    {
-        $employee = $this->legalEntity->employee()->create($personData);
-        $employee->person()->associate($person)->save();
-    }
-
-    public function stepEdrpou(): array
+    // Step  1
+    public function stepEdrpou(): void
     {
         $this->legal_entity_form->rulesForEdrpou();
-
         $data = (new LegalEntitiesRequestApi())->get($this->legal_entity_form->edrpou);
-        empty($data) ?
-            $this->legalEntity = (new LegalEntity())->fill(['edrpou' => $this->legal_entity_form->edrpou]) :
+        if ($this->edrpouKey == $this->legal_entity_form->edrpou && !empty($data)) {
             $this->saveLegalEntityFromExistingData($data);
-
-        if (empty($data)) {
-            return [];
+        } else {
+            $this->putLegalEntityInCache();
         }
-
-        $this->saveLegalEntity($data);
-
-        return [];
     }
 
+    // Step  2
     public function stepOwner(): void
     {
         $this->legal_entity_form->rulesForOwner();
-        //Get user
-        $user = Auth::user();
-        //Get person data builder
+
         $personData = $this->legal_entity_form->owner;
+
         Cache::put($this->ownerCacheKey, $personData, now()->days(90));
 
-        if (isset($this->legalEntity->phones) && !empty($this->legalEntity->phones) ) {
+        if (isset($this->legalEntity->phones) && !empty($this->legalEntity->phones)) {
             $this->phones = $this->legalEntity->phones;
         }
 
     }
 
+    // Step  3
     public function stepContact(): void
     {
         $this->legal_entity_form->rulesForContact();
-        $this->legalEntity->update(
-            [
-                'email'=>$this->legal_entity_form->contact['email'] ?? '',
-                'website'=>$this->legal_entity_form->contact['website'] ?? '',
-                'phones'=>$this->legal_entity_form->contact['phones'] ?? '',
-            ]);
+    }
+    // Step  4
+    public function stepAddress(): bool
+    {
+        $this->fetchDataFromAddressesComponent();
+        return true;
     }
 
+    // Step  5
     public function stepAccreditation(): void
     {
-        $this->legalEntity->update(['accreditation'=>$this->legal_entity_form->accreditation ?? '']);
+
+        $this->legalEntity->update(['accreditation' => $this->legal_entity_form->accreditation ?? '']);
     }
 
-    public function stepAddress(): void
-    {
-        $this->legal_entity_form->rulesForAddress();
-        $this->legalEntity->update(['address'=>$this->legal_entity_form->residence_address ?? '']);
-    }
-
+    // Step  6
     public function stepLicense(): void
     {
         $this->legal_entity_form->rulesForLicense();
 
-        $this->legalEntity->update(['license'=>$this->legal_entity_form->license ?? '']);
+        $this->legalEntity->update(['license' => $this->legal_entity_form->license ?? '']);
     }
 
+    // Step  7
     public function stepAdditionalInformation(): void
     {
         $this->legalEntity->update([
-            'archive'=>$this->legal_entity_form->additional_information ?? '',
-            'beneficiary'=>$this->legal_entity_form->additional_information['beneficiary'] ?? '',
-            'receiver_funds_code'=>$this->legal_entity_form->additional_information['receiver_funds_code'] ?? '',
+            'archive' => $this->legal_entity_form->additional_information ?? '',
+            'beneficiary' => $this->legal_entity_form->additional_information['beneficiary'] ?? '',
+            'receiver_funds_code' => $this->legal_entity_form->additional_information['receiver_funds_code'] ?? '',
         ]);
     }
 
+    //Final Step
     public function stepPublicOffer(): void
     {
         $this->legal_entity_form->rulesForPublicOffer();
     }
 
-    public function setField($property,$key, $value)
+    public function setField($property, $key, $value)
     {
         $this->legal_entity_form->$property[$key] = $value;
     }
 
-    public function searchKoatuuLevel2(): void
+    public function setAddressesFields()
     {
-        $area = $this->legal_entity_form->residence_address['area'] ?? '';
-
-        $region = $this->legal_entity_form->residence_address['region'] ?? '';
-
-        if (empty($area) && strlen($region) <= 1) {
-            return;
-        }
-
-        $this->koatuu_level2 = $this->koatuu_level1
-            ->where('name',$area)
-            ->first()
-            ->koatuu_level2()
-            ->where('name', 'ilike', '%' . $region. '%')
-            ->take(5)->get();
+        $this->dispatch('setAddressesFields', $this->legal_entity_form->addresses ?? []);
     }
 
-    public function searchKoatuuLevel3()
+    public function fetchDataFromAddressesComponent()
     {
-        $area_id = $this->legal_entity_form->residence_address['area'] ?? '';
+        $this->dispatch('fetchAddressData');
+    }
 
-        $region = $this->legal_entity_form->residence_address['region'] ?? '';
-
-        $settlement = $this->legal_entity_form->residence_address['settlement'] ?? '';
-
-        if (empty($area) && empty($area_id) && strlen($settlement) <= 1) {
-            return false;
-        }
-
-        $this->koatuu_level3 = $this->koatuu_level2
-            ->find($region)
-            ->koatuu_level3()
-            ->where('name', 'ilike', '%' . $settlement. '%')
-            ->take(5)->get();
+    public function addressDataFetched($addressData): void
+    {
+        $this->addresses = $addressData;
     }
 
     public function render()
