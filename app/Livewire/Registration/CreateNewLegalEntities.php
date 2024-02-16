@@ -40,15 +40,56 @@ class CreateNewLegalEntities extends Component
      * @var string The Cache ID to store Legal Entity being filled by the current user
      */
     protected string $entityCacheKey;
-    protected ?array $entityCache;
     protected string $ownerCacheKey;
-    protected ?array $ownerCache;
 
     protected $listeners = ['addressDataFetched'];
-
     protected string $edrpouKey = '54323454';
 
     public ?array $addresses = [];
+
+    public array $steps = [
+        'edrpou' => [
+            'title' => 'ЄДРПОУ',
+            'step' => 1,
+            'property' => 'edrpou',
+        ],
+        'owner' => [
+            'title' => 'Власник',
+            'step' => 2,
+            'property' => 'owner',
+        ],
+        'phones' => [
+            'title' => 'Контакти',
+            'step' => 3,
+            'property'=> 'phones',
+        ],
+        'addresses' => [
+            'title' => 'Адреси',
+            'step' => 4,
+            'property' => 'addresses',
+        ],
+        'accreditation' => [
+            'title' => 'Акредитація',
+            'step' => 5,
+            'property' => 'accreditation'
+        ],
+        'license' => [
+            'title' => 'Ліцензії',
+            'step' => 6,
+            'property' => 'license'
+
+        ],
+        'beneficiary' => [
+            'title' => 'Додаткова інформація',
+            'step' => 7,
+            'property' => 'license'
+        ],
+        'public_offer' => [
+            'title' => 'Завершити реєстрацію',
+            'step' => 8,
+            'property' => 'license'
+        ],
+    ];
 
     public function boot(): void
     {
@@ -77,17 +118,14 @@ class CreateNewLegalEntities extends Component
 
     public function getLegalEntity(): void
     {
-        //Check if the user has a legal entity
-        if (\auth()->user()->legalEntity) {
-            // Get Legal Entity from the user
-            $user = \auth()->user();
-            $this->legalEntity = $user->legalEntity;
-        } // Search Legal entity in the cache by user ID
-        elseif (Cache::has($this->entityCacheKey)) {
+
+         // Search Legal entity in the cache by user ID
+        if (Cache::has($this->entityCacheKey)) {
             $this->legalEntity = Cache::get($this->entityCacheKey);
             $this->legal_entity_form->fill($this->legalEntity->toArray());
+
         } else {
-            // Create a new Legal Entity
+            // new Legal Entity clas
             $this->legalEntity = new LegalEntity();
         }
         // Search Legal entity in the cache by user ID
@@ -95,12 +133,7 @@ class CreateNewLegalEntities extends Component
             $this->legal_entity_form->owner = Cache::get($this->ownerCacheKey);
         }
 
-        foreach ($this->legal_entity_form as $index => $field) {
-            if (empty($this->legal_entity_form->{$index})) {
-                $this->currentStep++;
-                return;
-            }
-        }
+        $this->stepFields();
 
     }
 
@@ -122,14 +155,30 @@ class CreateNewLegalEntities extends Component
         $this->validateData();
         $this->currentStep++;
         $this->putLegalEntityInCache();
-
         if ($this->currentStep > $this->totalSteps) {
             $this->currentStep = $this->totalSteps;
         }
 
-
     }
 
+    public function stepFields(): void
+    {
+        foreach ($this->steps as $field => $step) {
+            if (empty($this->legal_entity_form->{$field})) {
+                $this->currentStep = $step['step'];
+                break;
+            }
+        }
+    }
+
+    public function changeStep(int $step, string $property): void
+    {
+        if (empty($this->legal_entity_form->{$property})){
+            return;
+        }
+        $this->currentStep = $step;
+
+    }
     public function decreaseStep(): void
     {
         $this->resetErrorBag();
@@ -190,9 +239,10 @@ class CreateNewLegalEntities extends Component
                         break;
                 }
             }
-            $this->legalEntity = (new LegalEntity())->fill($normalizedData);
-            $this->legal_entity_form->fillData($this->legalEntity);
-            $this->legalEntity->save();
+
+            $this->legal_entity_form->fill($normalizedData);
+
+            $this->putLegalEntityInCache();
         }
     }
 
@@ -212,21 +262,45 @@ class CreateNewLegalEntities extends Component
             // If the Legal Entity has not changed, return false
             if (empty(array_diff_assoc($this->legalEntity->getAttributes(),
                 Cache::get($this->entityCacheKey)->getAttributes()))) {
+
                 return false; // If
             }
         }
         return true; // Return true if the Legal Entity has changed
     }
 
+    public function checkOwnerChanges(): bool
+    {
+        if (Cache::has($this->ownerCacheKey)) {
+            // If the Legal Entity has not changed, return false
+            if (empty(array_diff_assoc($this->legal_entity_form->owner,
+                Cache::get($this->ownerCacheKey)))) {
+                return false; // If
+            }
+        }
+        return true; // Return true if the Legal Entity has changed
+    }
+    public function checkEdrpouChange(){
+         if (Cache::has($this->entityCacheKey)
+             && $this->legal_entity_form->edrpou != Cache::get($this->entityCacheKey)->edrpou)
+             Cache::forget($this->entityCacheKey);
+             Cache::forget($this->ownerCacheKey);
+    }
+
     public function saveLegalEntity(): void
     {
         $this->legalEntity->save();
     }
-    // Step  1
+
+    // #Step  1 Request to Ehealth API
     public function stepEdrpou(): void
     {
         $this->legal_entity_form->rulesForEdrpou();
+
+        $this->checkEdrpouChange();
+
         $data = (new LegalEntitiesRequestApi())->get($this->legal_entity_form->edrpou);
+
         if ($this->edrpouKey == $this->legal_entity_form->edrpou && !empty($data)) {
             $this->saveLegalEntityFromExistingData($data);
         } else {
@@ -234,14 +308,17 @@ class CreateNewLegalEntities extends Component
         }
     }
 
-    // Step  2
+    // Step  2 Create Owner
     public function stepOwner(): void
     {
+
         $this->legal_entity_form->rulesForOwner();
 
         $personData = $this->legal_entity_form->owner;
 
-        Cache::put($this->ownerCacheKey, $personData, now()->days(90));
+        if ($this->checkOwnerChanges() && !Cache::has($this->ownerCacheKey)) {
+            Cache::put($this->ownerCacheKey, $personData, now()->days(90));
+        }
 
         if (isset($this->legalEntity->phones) && !empty($this->legalEntity->phones)) {
             $this->phones = $this->legalEntity->phones;
@@ -249,41 +326,40 @@ class CreateNewLegalEntities extends Component
 
     }
 
-    // Step  3
+    // Step  3 Create/Update Contact[Phones, Email,beneficiary,receiver_funds_code]
+
     public function stepContact(): void
     {
         $this->legal_entity_form->rulesForContact();
+
+
     }
-    // Step  4
+
+    // Step  4 Create/Update Address
     public function stepAddress(): bool
     {
         $this->fetchDataFromAddressesComponent();
+
         return true;
     }
 
-    // Step  5
+    // Step  5 Create/Update Accreditation
     public function stepAccreditation(): void
     {
 
-        $this->legalEntity->update(['accreditation' => $this->legal_entity_form->accreditation ?? '']);
     }
 
-    // Step  6
+    // Step  6 Create/Update License
     public function stepLicense(): void
     {
         $this->legal_entity_form->rulesForLicense();
 
-        $this->legalEntity->update(['license' => $this->legal_entity_form->license ?? '']);
     }
 
-    // Step  7
+    // Step  7 Create/Update Additional Information
     public function stepAdditionalInformation(): void
     {
-        $this->legalEntity->update([
-            'archive' => $this->legal_entity_form->additional_information ?? '',
-            'beneficiary' => $this->legal_entity_form->additional_information['beneficiary'] ?? '',
-            'receiver_funds_code' => $this->legal_entity_form->additional_information['receiver_funds_code'] ?? '',
-        ]);
+
     }
 
     //Final Step

@@ -10,7 +10,7 @@ use Livewire\Form;
 class LegalEntitiesForms extends Form
 {
 
-    #[Validate('required|integer|digits:8')]
+    #[Validate('required|integer|digits_between:8,10')]
     public string $edrpou = '';
 
     #[Validate([
@@ -19,16 +19,16 @@ class LegalEntitiesForms extends Form
         'owner.gender' => 'required|string',
         'owner.birth_date' => 'required|date',
         'owner.no_tax_id' => 'boolean',
-        'owner.tax_id' => 'exclude_if:owner.no_tax_id,false|required|integer|digits:10',
-        'owner.documents.type' => 'exclude_if:owner.no_tax_id,true|required|string',
-        'owner.documents.number' => 'exclude_if:owner.no_tax_id,true|required|string',
+        'owner.tax_id' => 'exclude_if:owner.no_tax_id,true|required|integer|digits:10',
+        'owner.documents.type' => 'exclude_if:owner.no_tax_id,false|required|string',
+        'owner.documents.number' => 'exclude_if:owner.no_tax_id,false|required|string',
         'owner.phones.*.number' => 'required|string:digits:13',
         'owner.phones.*.type' => 'required|string',
         'owner.email' => 'required|email',
         'owner.position' => 'required|string'
     ])]
 
-    public ?array $owner = ['no_tax_id' => true];
+    public ?array $owner = [];
 
     #[Validate([
         'phones.*.number' => 'required|string:digits:13',
@@ -68,10 +68,12 @@ class LegalEntitiesForms extends Form
         'license.order_no' => 'required|string',
     ])]
 
-
     public ?array $license = [];
 
-    public ?array $additional_information = [];
+    public ?array $archive = [];
+    public ?string $receiver_funds_code = '';
+
+    public ?string $beneficiary = '';
 
     #[Validate([
 //        'public_offer.consent' => 'required|on',
@@ -79,7 +81,7 @@ class LegalEntitiesForms extends Form
     ])]
 
     public array $public_offer = [];
-    /**
+        /**
      * @var array|mixed
      */
 
@@ -136,19 +138,5 @@ class LegalEntitiesForms extends Form
         $this->validate($this->rulesForModel('public_offer')->toArray());
     }
 
-    public function fillData(LegalEntity $legalEntity)
-    {
-        $this->edrpou = $legalEntity->edrpou ?? '';
-        $this->email = $legalEntity->email ?? '';
-        $this->website = $legalEntity->website ?? '';
-        $this->phones = $legalEntity->phones ?? [];
-        $this->addresses = $legalEntity->addresses ?? [];
-        $this->accreditation = $legalEntity->accreditation ?? [];
-        $this->license = $legalEntity->license ?? [];
-        $this->additional_information['archive']['date'] = $legalEntity->archive['data'] ?? "";
-        $this->additional_information['archive']['place'] = $legalEntity->archive['place'] ?? [];
-        $this->additional_information['receiver_funds_code'] = $legalEntity->receiver_funds_code ?? "";
-        $this->additional_information['beneficiary'] = $legalEntity->beneficiary ?? "";
-    }
 
 }

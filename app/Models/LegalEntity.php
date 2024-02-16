@@ -37,9 +37,9 @@ class LegalEntity extends Model
     ];
 
     protected $casts = [
-        'addresses' => 'array',
+        'addresses' => 'json',
         'phones' => 'array',
-        'archive' => 'array',
+        'archive' => 'json',
         'kveds' => 'array',
         'license' => 'array',
         'accreditation'=>'array',
