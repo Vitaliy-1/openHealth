@@ -11,7 +11,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.additional_information.receiver_funds_code"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.receiver_funds_code"
                            type="text" id="additional_information_receiver_funds_coder"/>
         </x-slot>
     </x-forms.form-group>
@@ -24,12 +24,13 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.additional_information.beneficiary"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.beneficiary"
                            type="text" id="additional_information_beneficiary"/>
         </x-slot>
     </x-forms.form-group>
 
 </div>
+
 <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
@@ -39,7 +40,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.additional_information.archive.date"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.archive.0.date"
                            type="date" id="additional_information_archive_date"/>
         </x-slot>
     </x-forms.form-group>
@@ -51,7 +52,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.additional_information.archive.place"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.archive.0.place"
                            type="text" id="additional_information_archive_place"/>
         </x-slot>
     </x-forms.form-group>

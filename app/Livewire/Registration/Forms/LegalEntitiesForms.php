@@ -10,7 +10,7 @@ use Livewire\Form;
 class LegalEntitiesForms extends Form
 {
 
-    #[Validate('required|integer|digits:8')]
+    #[Validate('required|integer|digits_between:8,10')]
     public string $edrpou = '';
 
     #[Validate([
@@ -19,34 +19,41 @@ class LegalEntitiesForms extends Form
         'owner.gender' => 'required|string',
         'owner.birth_date' => 'required|date',
         'owner.no_tax_id' => 'boolean',
-        'owner.tax_id' => 'exclude_if:owner.no_tax_id,false|required|integer|digits:10',
-        'owner.documents.type' => 'exclude_if:owner.no_tax_id,true|required|string',
-        'owner.documents.number' => 'exclude_if:owner.no_tax_id,true|required|string',
+        'owner.tax_id' => 'exclude_if:owner.no_tax_id,true|required|integer|digits:10',
+        'owner.documents.type' => 'exclude_if:owner.no_tax_id,false|required|string',
+        'owner.documents.number' => 'exclude_if:owner.no_tax_id,false|required|string',
         'owner.phones.*.number' => 'required|string:digits:13',
         'owner.phones.*.type' => 'required|string',
         'owner.email' => 'required|email',
-        'owner.position' => 'required|string',
+        'owner.position' => 'required|string'
     ])]
 
-    public ?array $owner= ['no_tax_id' => true];
-
-    #[Validate([
-        'contact.phones.*.number' => 'required|string:digits:13',
-        'contact.phones.*.type' => 'required|string',
-        'contact.email' => 'required|email',
-    ])]
-    public ?array $contact = [];
+    public ?array $owner = [];
 
     #[Validate([
-//        'residence_address.country' => 'required|string|min:3',//TODO: validate country? default UA
-        'residence_address.region' => 'required|string|min:3',
-        'residence_address.area' => 'required|string|min:3',
-        'residence_address.settlement' => 'required|string|min:3',
-        'residence_address.street' => 'required|string',
-        'residence_address.building' => 'required|string',
-        'residence_address.settlement_type' => 'required|string|min:3',
+        'phones.*.number' => 'required|string:digits:13',
+        'phones.*.type' => 'required|string'
     ])]
-    public ?array $residence_address = [];
+
+    public ?array $phones = [];
+
+    public string $website = '';
+
+    #[Validate('required|email')]
+    public string $email = '';
+
+
+//    #[Validate([
+////      'residence_address.country' => 'required|string|min:3',//TODO: validate country? default UA
+//        'residence_address.region' => 'required|string|min:3',
+//        'residence_address.area' => 'required|string|min:3',
+//        'residence_address.settlement' => 'required|string|min:3',
+//        'residence_address.street' => 'required|string',
+//        'residence_address.building' => 'required|string',
+//        'residence_address.settlement_type' => 'required|string|min:3',
+//    ])]
+
+    public ?array $addresses = [];
 
     //TODO: validate acrreditation.category ?
 
@@ -61,10 +68,12 @@ class LegalEntitiesForms extends Form
         'license.order_no' => 'required|string',
     ])]
 
-
     public ?array $license = [];
 
-    public ?array $additional_information = [];
+    public ?array $archive = [];
+    public ?string $receiver_funds_code = '';
+
+    public ?string $beneficiary = '';
 
     #[Validate([
 //        'public_offer.consent' => 'required|on',
@@ -72,6 +81,9 @@ class LegalEntitiesForms extends Form
     ])]
 
     public array $public_offer = [];
+        /**
+     * @var array|mixed
+     */
 
     /**
      * @throws ValidationException
@@ -96,16 +108,19 @@ class LegalEntitiesForms extends Form
      */
     public function rulesForContact(): void
     {
-        $this->validate($this->rulesForModel('contact')->toArray());
+        $this->validate($this->rulesForModel('email')->toArray());
+        $this->validate($this->rulesForModel('phones')->toArray());
+
+
     }
 
     /**
      * @throws ValidationException
-     */
-    public function rulesForAddress(): void
-    {
-        $this->validate($this->rulesForModel('residence_address')->toArray());
-    }
+//     */
+//    public function rulesForAddress(): void
+//    {
+//        $this->validate($this->rulesForModel('residence_address')->toArray());
+//    }
 
     /**
      * @throws ValidationException
@@ -123,20 +138,5 @@ class LegalEntitiesForms extends Form
         $this->validate($this->rulesForModel('public_offer')->toArray());
     }
 
-    public function fillData(LegalEntity $legalEntity)
-    {
-        $this->edrpou = $legalEntity->edrpou ?? '';
-        $this->contact['email'] = $legalEntity->email ?? '';
-        $this->contact['website'] = $legalEntity->website ?? '';
-        $this->contact['phones'] = $legalEntity->phones ?? [];
-        $this->residence_address = $legalEntity->addresses ?? [];
-        $this->accreditation = $legalEntity->accreditation ?? [];
-        $this->license = $legalEntity->license ?? [];
-        $this->additional_information['archive']['date'] = $legalEntity->archive['data'] ?? "";
-        $this->additional_information['archive']['place'] = $legalEntity->archive['place'] ?? [];
-
-        $this->additional_information['receiver_funds_code'] = $legalEntity->receiver_funds_code ?? "";
-        $this->additional_information['beneficiary'] = $legalEntity->beneficiary ?? "";
-    }
 
 }

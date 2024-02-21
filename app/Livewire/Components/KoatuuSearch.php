@@ -128,8 +128,6 @@ class KoatuuSearch extends Component
 
     }
 
-
-
     public function searchKoatuuLevel2()
     {
         if (empty($this->area) && strlen($this->region) <= 3) {

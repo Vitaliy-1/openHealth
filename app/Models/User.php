@@ -61,14 +61,18 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_photo_url',
     ];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\belongsTo
      */
-    public function person(){
+    public function person(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
         return $this->belongsTo(Person::class);
     }
 
+    public function legalEntity(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(LegalEntity::class);
+    }
 
 
 }

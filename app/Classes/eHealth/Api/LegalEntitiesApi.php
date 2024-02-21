@@ -8,7 +8,7 @@ class LegalEntitiesApi
 {
 
 
-    private string $getV2 = '/legal_entities';
+    private string $getV2 = '/v2/legal_entities';
 
     public function getLegalEntities($params = []): array
     {

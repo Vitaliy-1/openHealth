@@ -206,23 +206,20 @@
     <a wire:click="addRowPhone" class="text-primary m-t-5"
        href="#">{{__('forms.addPhone')}}</a>
 </div>
-<div x-data="{ show: true }">
+<div x-data="{ show: false }">
     <div class="mb-4.5 flex flex-col gap-0 gap-6 ">
         <x-forms.form-group class="flex items-center  flex-row-reverse	justify-end	">
             <x-slot name="input">
-
-
                 <x-forms.input x-bind:checked="show"
                                @change="show = !show"
                                wire:model="legal_entity_form.owner.no_tax_id"
                                type="checkbox"
-                               x-bind:value="show"
                                id="owner_no_tax_id"/>
             </x-slot>
             <x-slot name="label">
                 <x-forms.label for="owner_no_tax_id"
                                class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                    {{__('forms.RNOCPP')}}
+                    {{__('forms.other_documents')}}
                 </x-forms.label>
             </x-slot>
             @error('legal_entity_form.owner.no_tax_id')
@@ -234,7 +231,7 @@
             @enderror
         </x-forms.form-group>
     </div>
-    <div x-show="show" class="mb-4.5 flex flex-col gap-0 gap-6 ">
+    <div x-show="!show" class="mb-4.5 flex flex-col gap-0 gap-6 ">
             <x-forms.form-group class="xl:w-1/2">
                 <x-slot name="label">
                     <x-forms.label class="default-label" for="tax_id">
@@ -254,7 +251,7 @@
                 @enderror
             </x-forms.form-group>
         </div>
-    <div x-show="!show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
+    <div x-show="show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
             <x-forms.form-group class="xl:w-1/2">
                 <x-slot name="label">
                     <x-forms.label for="documents_type" class="default-label">
@@ -298,7 +295,7 @@
                 @enderror
             </x-forms.form-group>
         </div>
-    <div x-show="!show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
+    <div x-show="show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
             <x-forms.form-group class="xl:w-1/2">
                 <x-slot name="label">
                     <x-forms.label for="documents_issued_by" class="default-label">
