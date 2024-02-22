@@ -3,7 +3,8 @@
 use App\Livewire\Division\Division;
 use App\Livewire\Division\DivisionForm;
 use App\Livewire\Division\HealthcareServiceForm;
-use App\Livewire\Registration\CreateNewLegalEntities;
+use App\Livewire\LegalEntity\CreateNewLegalEntities;
+use App\Livewire\LegalEntity\EditLegalEntity;
 use App\Livewire\SearchPatient;
 use Illuminate\Support\Facades\Route;
 
@@ -32,9 +33,19 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
+
     Route::get('/dashboard/legal-entities/create', CreateNewLegalEntities::class)->name('create.legalEntities');
-    Route::get('/dashboard/division', DivisionForm::class)->name('division.index');
-    Route::get('/dashboard/search/patient', SearchPatient::class);
-    Route::get('/dashboard/division/{division}/healthcare-service', HealthcareServiceForm::class)->name('healthcare_service.index');
+
+    Route::group(['middleware' => ['role:Owner']], function () {
+        Route::prefix('legal-entities')->group(function () {
+            Route::get('/edit', EditLegalEntity::class)->name('edit.legalEntities');
+        });
+        Route::prefix('division')->group(function () {
+            Route::get('/', DivisionForm::class)->name('division.index');
+            Route::get('/{division}/healthcare-service', HealthcareServiceForm::class)->name('healthcare_service.index');
+        });
+        Route::get('/search/patient', [SearchPatient::class, 'index']);
+
+    });
 
 });

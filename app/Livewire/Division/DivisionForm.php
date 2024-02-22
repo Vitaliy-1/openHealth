@@ -59,9 +59,7 @@ class DivisionForm extends Component
 
     public function getLegalEntity()
     {
-        $this->legalEntity = optional(auth()->user()->person->employee, function ($employee) {
-            return $this->legalEntity = $employee->legalEntity;
-        });
+        $this->legalEntity =auth()->user()->legalEntity;
     }
 
     public function openModal()

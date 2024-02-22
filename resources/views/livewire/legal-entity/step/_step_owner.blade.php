@@ -35,7 +35,7 @@
         @error('legal_entity_form.owner.first_name')
         <x-slot name="error">
             <x-forms.error>
-                {{ __('validation.required', ['attribute' => __('attributes.first_name')]) }}
+                {{$message}}
             </x-forms.error>
         </x-slot>
         @enderror

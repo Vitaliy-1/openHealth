@@ -191,9 +191,7 @@
                                 </x-forms.form-group>
 
                             </div>
-                            @if($mode == 'edit')
                             <livewire:components.koatuu-search :addresses="$division['addresses'] ?? []" :class="'grid grid-cols-2 gap-6'" />
-                            @endif
                         </div>
                     </div>
 
