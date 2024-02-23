@@ -13,7 +13,7 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input x-bind:checked="show"
+                <x-forms.input x-bind:checked="show_accreditation"
                                @change="show_accreditation = !show_accreditation"
                                type="checkbox"
                                id="accreditation_show"/>

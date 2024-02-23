@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Registration\Forms;
+namespace App\Livewire\LegalEntity\Forms;
 
 use App\Models\LegalEntity;
 use Illuminate\Validation\ValidationException;
@@ -111,7 +111,6 @@ class LegalEntitiesForms extends Form
         $this->validate($this->rulesForModel('email')->toArray());
         $this->validate($this->rulesForModel('phones')->toArray());
 
-
     }
 
     /**
@@ -137,6 +136,7 @@ class LegalEntitiesForms extends Form
     {
         $this->validate($this->rulesForModel('public_offer')->toArray());
     }
+
 
 
 }

@@ -15,6 +15,7 @@ class KoatuuSearch extends Component
         'region' => 'required',
         'settlement' => 'required',
         'settlement_type' => 'required',
+        'street_type' => 'required',
     ])]
 
     public string $area = '';
@@ -114,6 +115,7 @@ class KoatuuSearch extends Component
     public function provideAddressData()
     {
         $this->validate();
+
         $addresses['area'] = $this->area;
         $addresses['region'] = $this->region;
         $addresses['settlement'] = $this->settlement;
@@ -125,7 +127,6 @@ class KoatuuSearch extends Component
         $addresses['zip'] = $this->zip;
 
         $this->dispatch('addressDataFetched', $addresses);
-
     }
 
     public function searchKoatuuLevel2()

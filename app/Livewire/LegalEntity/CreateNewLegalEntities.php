@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Livewire\Registration;
+namespace App\Livewire\LegalEntity;
 
 use App\Helpers\JsonHelper;
-use App\Livewire\Registration\Forms\LegalEntitiesForms;
-use App\Livewire\Registration\Forms\LegalEntitiesRequestApi;
+use App\Livewire\LegalEntity\Forms\LegalEntitiesForms;
+use App\Livewire\LegalEntity\Forms\LegalEntitiesRequestApi;
 use App\Models\Employee;
-use App\Models\Koatuu\KoatuuLevel1;
 use App\Models\LegalEntity;
 use App\Models\Person;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Role;
 use Livewire\Component;
 use Illuminate\Support\Facades\Cache;
 
@@ -20,13 +19,11 @@ class CreateNewLegalEntities extends Component
     const CACHE_PREFIX = 'register_legal_entity_form';
 
     public LegalEntitiesForms $legal_entity_form;
-
     public LegalEntity $legalEntity;
 
     public Person $person;
 
     public Employee $employee;
-
 
     public int $totalSteps = 8;
 
@@ -61,7 +58,7 @@ class CreateNewLegalEntities extends Component
         'phones' => [
             'title' => 'Контакти',
             'step' => 3,
-            'property'=> 'phones',
+            'property' => 'phones',
         ],
         'addresses' => [
             'title' => 'Адреси',
@@ -91,10 +88,13 @@ class CreateNewLegalEntities extends Component
         ],
     ];
 
+
+
     public function boot(): void
     {
         $this->entityCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . LegalEntity::class;
         $this->ownerCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . Employee::class;
+
     }
 
     public function mount(): void
@@ -116,14 +116,15 @@ class CreateNewLegalEntities extends Component
 
     }
 
+
     public function getLegalEntity(): void
     {
 
-         // Search Legal entity in the cache by user ID
+        // Search Legal entity in the cache by user ID
         if (Cache::has($this->entityCacheKey)) {
-            $this->legalEntity = Cache::get($this->entityCacheKey);
+            $this->legalEntity = new LegalEntity();
+            $this->legalEntity->fill(Cache::get($this->entityCacheKey)->toArray());
             $this->legal_entity_form->fill($this->legalEntity->toArray());
-
         } else {
             // new Legal Entity clas
             $this->legalEntity = new LegalEntity();
@@ -173,12 +174,13 @@ class CreateNewLegalEntities extends Component
 
     public function changeStep(int $step, string $property): void
     {
-        if (empty($this->legal_entity_form->{$property})){
+        if (empty($this->legal_entity_form->{$property})) {
             return;
         }
         $this->currentStep = $step;
 
     }
+
     public function decreaseStep(): void
     {
         $this->resetErrorBag();
@@ -191,7 +193,7 @@ class CreateNewLegalEntities extends Component
     /**
      * @throws ValidationException
      */
-    public function validateData()
+    public function validateData(): bool|array|null
     {
         return match ($this->currentStep) {
             1 => $this->stepEdrpou(),
@@ -240,17 +242,18 @@ class CreateNewLegalEntities extends Component
                 }
             }
 
+            $this->legalEntity->fill($normalizedData);
             $this->legal_entity_form->fill($normalizedData);
-
-            $this->putLegalEntityInCache();
+            if (!Cache::has($this->entityCacheKey) || $this->checkChanges()) {
+                Cache::put($this->entityCacheKey, $this->legalEntity, now()->days(90));
+            }
         }
     }
 
     public function putLegalEntityInCache(): void
     {
-        // Fill the Legal Entity with the form data
         $this->legalEntity->fill($this->legal_entity_form->toArray());
-        // Check if the Legal Entity has changed cache
+
         if (!Cache::has($this->entityCacheKey) || $this->checkChanges()) {
             Cache::put($this->entityCacheKey, $this->legalEntity, now()->days(90));
         }
@@ -262,7 +265,6 @@ class CreateNewLegalEntities extends Component
             // If the Legal Entity has not changed, return false
             if (empty(array_diff_assoc($this->legalEntity->getAttributes(),
                 Cache::get($this->entityCacheKey)->getAttributes()))) {
-
                 return false; // If
             }
         }
@@ -280,12 +282,17 @@ class CreateNewLegalEntities extends Component
         }
         return true; // Return true if the Legal Entity has changed
     }
-    public function checkEdrpouChange(){
-         if (Cache::has($this->entityCacheKey)
-             && $this->legal_entity_form->edrpou != Cache::get($this->entityCacheKey)->edrpou)
-             Cache::forget($this->entityCacheKey);
-             Cache::forget($this->ownerCacheKey);
-    }
+
+//    public function checkEdrpouChange()
+//    {
+//        if (Cache::has($this->entityCacheKey)
+//            && $this->legal_entity_form->edrpou != Cache::get($this->entityCacheKey)->edrpou)
+//            Cache::forget($this->entityCacheKey);
+//            Cache::forget($this->ownerCacheKey);
+//            $this->legalEntity->fill([]);
+//            $this->legal_entity_form->fill([]);
+//
+//    }
 
     public function saveLegalEntity(): void
     {
@@ -297,9 +304,9 @@ class CreateNewLegalEntities extends Component
     {
         $this->legal_entity_form->rulesForEdrpou();
 
-        $this->checkEdrpouChange();
+//        $this->checkEdrpouChange();
 
-        $data = (new LegalEntitiesRequestApi())->get($this->legal_entity_form->edrpou);
+        $data = LegalEntitiesRequestApi::getLegalEntitie($this->legal_entity_form->edrpou);
 
         if ($this->edrpouKey == $this->legal_entity_form->edrpou && !empty($data)) {
             $this->saveLegalEntityFromExistingData($data);
@@ -331,14 +338,18 @@ class CreateNewLegalEntities extends Component
     public function stepContact(): void
     {
         $this->legal_entity_form->rulesForContact();
-
-
     }
 
     // Step  4 Create/Update Address
     public function stepAddress(): bool
     {
         $this->fetchDataFromAddressesComponent();
+
+        if (empty($this->addresses)) {
+            throw ValidationException::withMessages(['addresses' => 'Адреса обовязкова']);
+        }
+
+        $this->legal_entity_form->addresses = $this->addresses;
 
         return true;
     }
@@ -365,13 +376,27 @@ class CreateNewLegalEntities extends Component
     //Final Step
     public function stepPublicOffer(): void
     {
-        $this->legal_entity_form->rulesForPublicOffer();
+//        $this->legal_entity_form->rulesForPublicOffer();
+        $request = LegalEntitiesRequestApi::_createOrUpdate($this->legal_entity_form->toArray());
+
+        if (!empty($request) ){
+            $this->saveLegalEntityFromExistingData($request);
+            $this->legalEntity->fill($request);
+            $this->legalEntity->save();
+            $user = Auth::user();
+            $user->legalEntity()->associate($this->legalEntity);
+            $user->save();
+            Cache::forget($this->entityCacheKey);
+            Cache::forget($this->ownerCacheKey);
+            $user->assignRole('Owner');
+            $this->redirect('/legal-entities/edit');
+        }
     }
 
-    public function setField($property, $key, $value)
-    {
-        $this->legal_entity_form->$property[$key] = $value;
-    }
+//    public function setField($property, $key, $value)
+//    {
+//        $this->legal_entity_form->$property[$key] = $value;
+//    }
 
     public function setAddressesFields()
     {
@@ -390,6 +415,6 @@ class CreateNewLegalEntities extends Component
 
     public function render()
     {
-        return view('livewire.registration.create-new-legal-entities');
+        return view('livewire.legal-entity.create-new-legal-entities');
     }
 }

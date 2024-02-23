@@ -6,3 +6,6 @@
 <livewire:components.koatuu-search :addresses="$legal_entity_form->addresses ?? []" :class="'grid grid-cols-2 gap-6'" />
 
 </div>
+
+
+
