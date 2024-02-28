@@ -3,6 +3,8 @@
 use App\Livewire\Division\Division;
 use App\Livewire\Division\DivisionForm;
 use App\Livewire\Division\HealthcareServiceForm;
+use App\Livewire\Employee\EmployeeForm;
+use App\Livewire\Employee\EmployeeIndex;
 use App\Livewire\LegalEntity\CreateNewLegalEntities;
 use App\Livewire\LegalEntity\EditLegalEntity;
 use App\Livewire\SearchPatient;
@@ -43,6 +45,12 @@ Route::middleware([
         Route::prefix('division')->group(function () {
             Route::get('/', DivisionForm::class)->name('division.index');
             Route::get('/{division}/healthcare-service', HealthcareServiceForm::class)->name('healthcare_service.index');
+        });
+
+
+        Route::prefix('employee')->group(function () {
+            Route::get('/', EmployeeIndex::class)->name('employee.index');
+            Route::get('/form/{employee?}', EmployeeForm::class)->name('employee.form');
         });
         Route::get('/search/patient', [SearchPatient::class, 'index']);
 

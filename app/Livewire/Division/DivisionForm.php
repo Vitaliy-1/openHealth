@@ -44,7 +44,6 @@ class DivisionForm extends Component
 
     protected $listeners = ['addressDataFetched'];
 
-
     public function mount()
     {
         $this->tableHeaders();
