@@ -40,6 +40,6 @@
         </tbody>
     </table>
     <div class="mb-6 mt-6 flex flex-wrap gap-5 xl:gap-7.5">
-        <a wire:click.prevent="createPasportData('passportData')" class="text-primary" href="">Додати документ</a>
+        <a wire:click.prevent="openModal('passport_data')" class="text-primary" href="">Додати документ</a>
     </div>
 </div>

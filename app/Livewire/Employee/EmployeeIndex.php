@@ -3,19 +3,44 @@
 namespace App\Livewire\Employee;
 
 use App\Models\Employee;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 class EmployeeIndex extends Component
 {
 
+    const CACHE_PREFIX = 'register_employee_form';
+
     public object $employees;
     public array $tableHeaders = [];
+
+    protected string $employeeCacheKey;
+    public int $storeId = 0;
+
+    public int $storeIdLast;
+
+
+    public function boot(Employee $employee): void
+    {
+        $this->employeeCacheKey = self::CACHE_PREFIX . '-'. Auth::user()->legalEntity->uuid;
+    }
 
 
     public function mount()
     {
         $this->tableHeaders();
+        if (Cache::has($this->employeeCacheKey)) {
+            $this->storeId = array_key_last(Cache::get($this->employeeCacheKey));
+            $this->getLastStoreId();
+
+        }
 //        $this->employees =auth()->user()->legalEntity-;
+    }
+
+    public function getLastStoreId()
+    {
+        $this->storeId ++;
     }
 
     public function tableHeaders(): void
@@ -33,8 +58,7 @@ class EmployeeIndex extends Component
     public function create()
     {
 
-
-        return $this->redirect(route('employee.form'));
+        return redirect()->route('employee.form', ['id' => $this->storeId]);
 
     }
 

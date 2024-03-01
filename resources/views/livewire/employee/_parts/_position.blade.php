@@ -1,24 +1,25 @@
 <div class="mb-4">
     <div class="border-b border-stroke  py-4 dark:border-strokedark">
         <h3 class="font-medium text-2xl	  dark:text-white">
-            Спеціальність
+            Посада
         </h3>
     </div>
     <table class="w-full table-auto">
         <thead>
         <tr class="bg-gray-2 text-left dark:bg-meta-4">
             <th class="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
-                Учбовий заклад
+                Посада
             </th>
             <th class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
                 Спеціальність
             </th>
             <th class="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
-                Рівень спеціальності
+                Дата оформлення
             </th>
             <th class="px-4 py-4 font-medium text-black dark:text-white">
-                Статус кваліфікації
+                Дата звільнення
             </th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -39,7 +40,7 @@
         </tbody>
     </table>
     <div class="mb-6 mt-6 flex flex-wrap gap-5 xl:gap-7.5">
-        <a wire:click.prevent="openModal('speciality')" class="text-primary" href="">Додати спеціальність</a>
+        <a wire:click.prevent="openModal('position')" class="text-primary" href="">Додати Посаду</a>
     </div>
 
 </div>

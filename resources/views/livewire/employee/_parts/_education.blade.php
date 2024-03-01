@@ -39,7 +39,7 @@
         </tbody>
     </table>
     <div class="mb-6 mt-6 flex flex-wrap gap-5 xl:gap-7.5">
-        <a wire:click.prevent="createEducation('education')" class="text-primary" href="">Додати освіту</a>
+        <a wire:click.prevent="openModal('education')" class="text-primary" href="">Додати освіту</a>
     </div>
 
 </div>

@@ -2,68 +2,79 @@
 
 namespace App\Livewire\Employee;
 
-use App\Helpers\JsonHelper;
+use App\Livewire\Employee\Forms\EmployeeFormRequest;
+use App\Models\Division;
 use App\Models\Employee;
 use App\Models\LegalEntity;
-use Livewire\Attributes\Validate;
+use App\Traits\FormTrait;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 class EmployeeForm extends Component
 {
-    #[Validate([
-//        'employee.last_name' => 'required|min:3',
-//        'employee.first_name' => 'required|min:3',
-//        'employee.second_name' => 'required|min:3',
-//        'employee.gender' => 'required|string',
-//        'employee.birth_date' => 'required|date',
-//        'employee.no_tax_id' => 'boolean',
-//        'employee.tax_id' => 'exclude_if:employee.no_tax_id,true|required|integer|digits:10',
-//        'employee.documents.type' => 'exclude_if:employee.no_tax_id,false|required|string',
-//        'employee.documents.number' => 'exclude_if:employee.no_tax_id,false|required|string',
-//        'employee.phones.*.number' => 'required|string:digits:13',
-//        'employee.phones.*.type' => 'required|string',
-//        'employee.email' => 'required|email',
-//        'employee.educations.country' => 'required|string',
-//        'employee.educations.city' => 'required|string',
-//        'employee.educations.institution_name' => 'required|string',
-//        'employee.educations.diploma_number' => 'required|string',
-//        'employee.educations.degree' => 'required|string',
-//        'employee.educations.speciality' => 'required|string',
-//        'employee.position' => 'required|string'
-    ])]
+    use FormTrait;
 
 
+    const CACHE_PREFIX = 'register_employee_form';
 
+    public EmployeeFormRequest $employee_request;
 
-    public string $view = 'employee.employee-index';
+    protected string $employeeCacheKey;
 
-    public ?array  $employee = [];
+    public Employee  $employee ;
 
-    public   object $employees;
+    public object $employees;
     public LegalEntity $legalEntity;
-
-    public array $phones = ['type' => '', 'number' => ''];
 
     public string $mode = 'create';
 
-    public ?array $dictionaries = [];
+    public ?array $dictionaries_field = [
+        'PHONE_TYPE',
+        'COUNTRY',
+        'SETTLEMENT_TYPE',
+        'DIVISION_TYPE',
+        'SPECIALITY_LEVEL',
+        'GENDER',
+        'QUALIFICATION_TYPE',
+        'SCIENCE_DEGREE',
+        'SPEC_QUALIFICATION_TYPE',
+        'EMPLOYEE_TYPE',
+        'POSITION',
+    ];
 
-    public string|bool $showModal = false;
+    public \Illuminate\Database\Eloquent\Collection $divisions;
+    public \Illuminate\Database\Eloquent\Collection $healthcareServices;
 
-    public function mount()
+    public array $tableHeaders;
+
+    public function boot(Employee $employee ): void
+    {
+        $this->employee = $employee;
+        $this->employeeCacheKey = self::CACHE_PREFIX . '-'. Auth::user()->legalEntity->uuid;
+    }
+    public function mount(Employee $employee,Request $request)
     {
         $this->tableHeaders();
         $this->getLegalEntity();
-        $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', [
-            'PHONE_TYPE',
-            'COUNTRY',
-            'SETTLEMENT_TYPE',
-            'DIVISION_TYPE',
-            'SPECIALITY_LEVEL',
-            'GENDER',
-            'SPEC_QUALIFICATION_TYPE',
-            'POSITION',
-        ]);
+        $this->getDivisions();
+        $this->getDictionary();
+        if (Cache::has($this->employeeCacheKey)){
+            $employeeData = Cache::get($this->employeeCacheKey, []);
+            if (isset($employeeData[$request->input('id')])) {
+                $this->employee_request->fill(Cache::get($this->employeeCacheKey, [])[$request->input('id')]);
+            }
+        }
+
+
+    }
+
+    public function getHealthcareServices($id)
+    {
+        $this->healthcareServices = Division::find($id)
+            ->healthcareService()
+            ->get();
     }
 
     public function tableHeaders(): void
@@ -84,84 +95,44 @@ class EmployeeForm extends Component
         $this->legalEntity = auth()->user()->legalEntity;
     }
 
+    public function getDivisions()
+    {
+        $this->divisions = $this->legalEntity->division()
+            ->where('status','ACTIVE')
+            ->get();
+    }
+
     public function getEmployees()
     {
-        $this->employees = $this->legalEntity->employee()->get();
-    }
-
-    public function store()
-    {
-        $this->validate();
-
-        $this->closeModal();
-
-        return $this->redirect(route('employee.index'));
-    }
-
-
-    public function createPasportData($modal)
-    {
-        $this->mode = 'create';
-
-        $this->openModal($modal);
-    }
-
-    public function createEducation($modal)
-    {
-
-        $this->openModal($modal);
-
-    }
-
-    public function createSpeciality($modal)
-    {
-        $this->mode = 'create';
-        $this->openModal($modal);
-    }
-    public function edit(Employee $employee)
-    {
-        $this->mode = 'edit';
-        $this->employee = $employee;
-        $this->openModal();
-    }
-
-
-    public function update(Employee $employee)
-    {
-        $this->validate([
-            'employee.name' => 'required',
-            'employee.email' => 'required|email',
-            'employee.position' => 'required',
-        ]);
-
-        $this->employee->save();
-        $this->closeModal();
-    }
-
-    public function openModal($modal)
-    {
-        $this->showModal = $modal;
-        $this->phones = [];
-    }
-
-    public function closeModal()
-    {
-        $this->showModal = false;
-        $this->resetErrorBag();
-        $this->phones = [];
-    }
-
-    public function addRowPhone(): array
-    {
-        return $this->phones[] = ['type' => '', 'number' => ''];
-    }
-
-    public function removePhone($key)
-    {
-        if (isset($this->phones[$key])) {
-            unset($this->phones[$key]);
+        if ($this->legalEntity->employee()->exists()){
+            $this->employees = $this->legalEntity->employee()->get();
+        }
+        if ($this->legalEntity->employee()->doesntExist()){
+            $this->employees = new Employee();
         }
     }
+
+
+    public function updateRow($object){
+
+    }
+
+    public function store($model)
+    {
+        $this->resetErrorBag();
+        $cacheData[] = $this->employee_request->toArray();
+        Cache::put($this->employeeCacheKey, $cacheData, now()->days(90));
+        $this->employee_request->rulesForModelValidate($model);
+
+    }
+
+
+    public function edit(Employee $employee)
+    {
+
+    }
+
+
 
     public function render()
     {

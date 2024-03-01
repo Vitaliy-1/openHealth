@@ -1,24 +1,71 @@
 
 
-<x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model.live="showModal">
+<x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model="showModal">
     <x-slot name="title">
-        {{__('Додати Спеціальність')}}
+        {{__('Підтвердження кваліфікації')}}
     </x-slot>
     <x-slot name="content">
         <x-forms.forms-section-modal submit="{{$mode === 'edit' ? 'update' : 'store'}}">
             <x-slot name="form">
                 <div  class="pt-4 grid grid gap-4 grid-cols-2">
+
                     <x-forms.form-group class="">
                         <x-slot name="label">
-                            <x-forms.label for="degree" class="default-label">
+                            <x-forms.label for="education_country" class="default-label">
+                                {{__('forms.type')}}*
+                            </x-forms.label>
+                        </x-slot>
+                        <x-slot name="input">
+                            <x-forms.select
+                                class="default-input" wire:model="employee_request.qualifications.type" type="text"
+                                id="type"
+                            >
+                                <x-slot name="option">
+                                    <option>{{__('forms.type')}}</option>
+                                    @foreach($this->dictionaries['QUALIFICATION_TYPE'] as $k=>$type)
+                                        <option value="{{$type}}">{{$type}}</option>
+                                    @endforeach
+                                </x-slot>
+                            </x-forms.select>
+
+                        </x-slot>
+                        @error('employee.education.country')
+                        <x-slot name="error">
+                            <x-forms.error>
+                                {{$message}}
+                            </x-forms.error>
+                        </x-slot>
+                        @enderror
+                    </x-forms.form-group>
+                    <x-forms.form-group class="">
+                        <x-slot name="label">
+                            <x-forms.label for="institution_name" class="default-label">
+                                {{__('forms.institution_name')}} *
+                            </x-forms.label>
+                        </x-slot>
+                        <x-slot name="input">
+                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.institution_name" type="text"
+                                           id="institution_name"/>
+                        </x-slot>
+                        @error('employee_request.science_degree.city')
+                        <x-slot name="error">
+                            <x-forms.error>
+                                {{$message}}
+                            </x-forms.error>
+                        </x-slot>
+                        @enderror
+                    </x-forms.form-group>
+                    <x-forms.form-group class="">
+                        <x-slot name="label">
+                            <x-forms.label for="speciality" class="default-label">
                                 {{__('forms.speciality')}} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.specialities.speciality" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.speciality" type="text"
                                            id="speciality"/>
                         </x-slot>
-                        @error('employee.specialities.speciality')
+                        @error('employee_request.qualifications.speciality')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -28,25 +75,15 @@
                     </x-forms.form-group>
                     <x-forms.form-group class="">
                         <x-slot name="label">
-                            <x-forms.label for="specialities_country" class="default-label">
-                                {{__('forms.level_speciality')}}*
+                            <x-forms.label for="issued_date" class="default-label">
+                                {{__('forms.speciality')}} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.select
-                                class="default-input" wire:model="employee.specialities.level" type="text"
-                                id="specialities_country"
-                            >
-                                <x-slot name="option">
-                                    <option>{{__('forms.select_country')}}</option>
-                                    @foreach($this->dictionaries['SPECIALITY_LEVEL'] as $k=>$level)
-                                        <option value="{{$level}}">{{$level}}</option>
-                                    @endforeach
-                                </x-slot>
-                            </x-forms.select>
-
+                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.issued_date" type="date"
+                                           id="issued_date"/>
                         </x-slot>
-                        @error('employee.specialities.country')
+                        @error('employee_request.qualifications.issued_date')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -54,53 +91,6 @@
                         </x-slot>
                         @enderror
                     </x-forms.form-group>
-                    <x-forms.form-group class="">
-                        <x-slot name="label">
-                            <x-forms.label for="specialities_country" class="default-label">
-                                {{__('forms.qualification_type')}}*
-                            </x-forms.label>
-                        </x-slot>
-                        <x-slot name="input">
-                            <x-forms.select
-                                class="default-input" wire:model="employee.specialities.qualification_type" type="text"
-                                id="specialities_country"
-                            >
-                                <x-slot name="option">
-                                    <option>{{__('forms.qualification_type')}}</option>
-                                    @foreach($this->dictionaries['SPEC_QUALIFICATION_TYPE'] as $k=>$qualification_type)
-                                        <option value="{{$qualification_type}}">{{$qualification_type}}</option>
-                                    @endforeach
-                                </x-slot>
-                            </x-forms.select>
-
-                        </x-slot>
-                        @error('employee.specialities.country')
-                        <x-slot name="error">
-                            <x-forms.error>
-                                {{$message}}
-                            </x-forms.error>
-                        </x-slot>
-                        @enderror
-                    </x-forms.form-group>
-                    <x-forms.form-group class="">
-                        <x-slot name="label">
-                            <x-forms.label for="attestation_name" class="default-label">
-                                {{__('forms.attestation_name')}} *
-                            </x-forms.label>
-                        </x-slot>
-                        <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.specialities.attestation_name" type="text"
-                                           id="attestation_name"/>
-                        </x-slot>
-                        @error('employee.specialities.attestation_name')
-                        <x-slot name="error">
-                            <x-forms.error>
-                                {{$message}}
-                            </x-forms.error>
-                        </x-slot>
-                        @enderror
-                    </x-forms.form-group>
-
                     <x-forms.form-group class="">
                         <x-slot name="label">
                             <x-forms.label for="certificate_number" class="default-label">
@@ -108,10 +98,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.specialities.certificate_number" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.certificate_number" type="date"
                                            id="certificate_number"/>
                         </x-slot>
-                        @error('employee.specialities.certificate_number')
+                        @error('employee_request.qualifications.certificate_number')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -121,15 +111,15 @@
                     </x-forms.form-group>
                     <x-forms.form-group class="">
                         <x-slot name="label">
-                            <x-forms.label for="attestation_date" class="default-label">
-                                {{__('forms.attestation_date')}} *
+                            <x-forms.label for="valid_to" class="default-label">
+                                {{__('forms.valid_to')}} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.specialities.attestation_date" type="date"
-                                           id="attestation_name"/>
+                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.valid_to" type="date"
+                                           id="valid_to"/>
                         </x-slot>
-                        @error('employee.specialities.attestation_date')
+                        @error('employee_request.qualifications.valid_to')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -137,18 +127,17 @@
                         </x-slot>
                         @enderror
                     </x-forms.form-group>
-
                     <x-forms.form-group class="">
                         <x-slot name="label">
-                            <x-forms.label for="certificate_number" class="default-label">
-                                {{__('forms.valid_to_date')}}
+                            <x-forms.label for="additional_info" class="default-label">
+                                {{__('forms.additional_info')}} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.specialities.valid_to_date" type="date"
-                                           id="valid_to_date"/>
+                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.additional_info" type="text"
+                                           id="valid_to"/>
                         </x-slot>
-                        @error('employee.specialities.valid_to_date')
+                        @error('employee_request.qualifications.additional_info')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -156,8 +145,6 @@
                         </x-slot>
                         @enderror
                     </x-forms.form-group>
-
-
                 </div>
 
                 <div class="mb-4.5 mt-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
@@ -168,7 +155,7 @@
                     </div>
                     <div class="xl:w-1/4 text-right">
                         <x-button type="submit" class="btn-primary">
-                            {{__('Додати освіту')}}
+                            {{__('Додати підтвердження кваліфікації')}}
                         </x-button>
                     </div>
                 </div>
@@ -187,7 +174,7 @@
         </x-forms.forms-section-modal>
     </x-slot>
 
-
-
-
 </x-dialog-modal>
+
+
+

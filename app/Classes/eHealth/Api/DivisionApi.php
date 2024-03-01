@@ -7,7 +7,7 @@ use App\Classes\eHealth\Request;
 class DivisionApi extends Request
 {
 
-    public const URL = '/divisions';
+    public const URL = 'divisions';
 
     public function __construct()
     {

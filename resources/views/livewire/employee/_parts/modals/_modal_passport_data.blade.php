@@ -5,7 +5,7 @@
         {{__('Додати Документ')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="{{$mode === 'edit' ? 'update' : 'store'}}">
+        <x-forms.forms-section-modal submit="store('passport_data')">
             <x-slot name="form">
                 <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
                     <x-forms.form-group class="xl:w-1/2">
@@ -15,10 +15,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input  class="default-input" wire:model="employee.last_name" type="text"
+                            <x-forms.input  class="default-input" wire:model="employee_request.passport_data.last_name" type="text"
                                             id="last_name" />
                         </x-slot>
-                        @error('employee.last_name')
+                        @error('employee_request.passport_data.last_name')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -33,10 +33,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input  class="default-input" wire:model="employee.first_name" type="text"
+                            <x-forms.input  class="default-input" wire:model="employee_request.passport_data.first_name" type="text"
                                             id="first_name" />
                         </x-slot>
-                        @error('employee.first_name')
+                        @error('employee_request.passport_data.first_name')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -53,10 +53,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input  class="default-input" wire:model="employee.second_name" type="text"
+                            <x-forms.input  class="default-input" wire:model="employee_request.passport_data.second_name" type="text"
                                             id="second_name"/>
                         </x-slot>
-                        @error('employee.second_name')
+                        @error('employee_request.passport_data.second_name')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -71,10 +71,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.birth_date" type="date"
+                            <x-forms.input class="default-input" wire:model="employee_request.passport_data.birth_date" type="date"
                                            id="birth_date"/>
                         </x-slot>
-                        @error('employee.birth_date')
+                        @error('employee_request.passport_data.birth_date')
                         <x-slot name="error">
 
                             <x-forms.error>
@@ -93,10 +93,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.email" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.passport_data.email" type="text"
                                            id="email" placeholder="{{__('E-mail')}}"/>
                         </x-slot>
-                        @error('employee.email')
+                        @error('employee_request.passport_data.email')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -113,7 +113,7 @@
                         @foreach($this->dictionaries['GENDER'] as $k=>$gender)
                             <x-forms.form-group class="flex items-center mb-4 flex-row-reverse	justify-end	">
                                 <x-slot name="input">
-                                    <x-forms.input name="gender" wire:model="employee.gender" type="radio" value="{{$k}}"
+                                    <x-forms.input name="gender" wire:model="employee_request.passport_data.gender" type="radio" value="{{$k}}"
                                                    id="gender_{{$k}}"/>
                                 </x-slot>
                                 <x-slot name="label">
@@ -125,7 +125,7 @@
                             </x-forms.form-group>
                         @endforeach
                     @endisset
-                    @error('employee.gender')
+                    @error('employee_request.passport_data.gender')
                     <x-forms.error>
                         {{$message}}
                     </x-forms.error>
@@ -141,7 +141,7 @@
                                 <x-slot name="label">
                                     <div class="flex-row flex gap-6 items-center">
                                         <div class="w-1/4">
-                                            <x-forms.select wire:model.defer="employee.phones.{{$key}}.type" class="default-select">
+                                            <x-forms.select wire:model.defer="employee_request.passport_data.phones.{{$key}}.type" class="default-select">
                                                 <x-slot name="option">
                                                     <option>{{__('forms.typeMobile')}}</option>
                                                     @foreach($this->dictionaries['PHONE_TYPE'] as $k=>$phone_type)
@@ -149,7 +149,7 @@
                                                     @endforeach
                                                 </x-slot>
                                             </x-forms.select>
-                                            @error("employee.phones.{$key}.type")
+                                            @error("employee_request.passport_data.phones.{$key}.type")
                                             <x-forms.error>
                                                 {{$message}}
                                             </x-forms.error>
@@ -157,9 +157,9 @@
                                         </div>
                                         <div class="w-1/2">
                                             <x-forms.input  x-mask="38099 999 99 99" class="default-input"
-                                                            wire:model="employee.phones.{{$key}}.number" type="text"
+                                                            wire:model="employee_request.passport_data.phones.{{$key}}.number" type="text"
                                                             placeholder="{{__('+ 3(80)00 000 00 00 ')}}"/>
-                                            @error("employee.phones.{$key}.number")
+                                            @error("employee_request.passport_data.phones.{$key}.number")
                                             <x-forms.error>
                                                 {{ $message }}
                                             </x-forms.error>
@@ -188,7 +188,7 @@
                             <x-slot name="input">
                                 <x-forms.input x-bind:checked="show"
                                                @change="show = !show"
-                                               wire:model="employee.no_tax_id"
+                                               wire:model="employee_request.passport_data.no_tax_id"
                                                type="checkbox"
                                                id="no_tax_id"/>
                             </x-slot>
@@ -198,7 +198,7 @@
                                     {{__('forms.other_documents')}}
                                 </x-forms.label>
                             </x-slot>
-                            @error('employee.no_tax_id')
+                            @error('employee_request.passport_data.no_tax_id')
                             <x-slot name="error">
                                 <x-forms.error>
                                     {{$message}}
@@ -216,9 +216,9 @@
                             </x-slot>
                             <x-slot name="input">
                                 <x-forms.input                             maxlength="10"
-                                                                           class="default-input" checked wire:model="employee.tax_id" type="text" id="tax_id" name="tax_id"/>
+                                                                           class="default-input" checked wire:model="employee_request.passport_data.tax_id" type="text" id="tax_id" name="tax_id"/>
                             </x-slot>
-                            @error('employee.tax_id')
+                            @error('employee_request.passport_data.tax_id')
                             <x-slot name="error">
                                 <x-forms.error>
                                     {{$message}}
@@ -235,7 +235,7 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.select id="documents_type" wire:model.defer="employee.documents.type"
+                                <x-forms.select id="documents_type" wire:model.defer="employee_request.passport_data.documents.type"
                                                 class="default-select">
                                     <x-slot name="option">
                                         <option>{{__('Обрати тип')}}</option>
@@ -243,7 +243,7 @@
                                     </x-slot>
                                 </x-forms.select>
                             </x-slot>
-                            @error('employee.documents.type')
+                            @error('employee_request.passport_data.documents.type')
                             <x-slot name="error">
                                 <x-forms.error>
                                     {{$message}}
@@ -258,11 +258,11 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.input class="default-input" wire:model="employee.documents.number"
+                                <x-forms.input class="default-input" wire:model="employee_request.passport_data.documents.number"
                                                type="text" id="documents_number"
                                 />
                             </x-slot>
-                            @error('employee.documents.number')
+                            @error('employee_request.passport_data.documents.number')
                             <x-slot name="error">
                                 <x-forms.error>
                                     {{$message}}
@@ -279,11 +279,11 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.input class="default-input" wire:model="employee.documents.issued_by"
+                                <x-forms.input class="default-input" wire:model="employee_request.passport_data.documents.issued_by"
                                                type="text" id="documents_issued_by"
                                                placeholder="{{__('Орган яким виданий документ')}}"/>
                             </x-slot>
-                            @error('employee.documents.issued_by')
+                            @error('employee_request.passport_data.documents.issued_by')
                             <x-slot name="error">
                                 <x-forms.error>
                                     {{$message}}
@@ -298,11 +298,11 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.input class="default-input" wire:model="employee.documents.issued_at"
+                                <x-forms.input class="default-input" wire:model="employee_request.passport_data.documents.issued_at"
                                                type="date" id="documents_issued_at"
                                                placeholder="{{__('Дата видачі документа')}}"/>
                             </x-slot>
-                            @error('employee.documents.issued_at')
+                            @error('employee_request.passport_data.documents.issued_at')
                             <x-slot name="message">
                                 <x-forms.error>
                                     {{$message}}

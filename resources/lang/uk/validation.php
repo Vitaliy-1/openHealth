@@ -164,6 +164,21 @@ return [
             ],
 
         ],
+        'passport_data' => [
+            'first_name' => 'Ім’я',
+            'last_name' => 'Прізвище',
+            'second_name' => 'По батькові',
+            'birth_date' => 'Дата народження',
+            'email' => 'E-mail',
+            'gender' => 'Стать',
+            'position' => 'Посада керівника НМП',
+            'tax_id' => 'РНОКПП',
+            'documents' => [
+                'type' => 'Тип документа',
+                'number' => 'Cерія/номер документа',
+            ],
+
+        ],
         'owner.phones.*.phone' => 'Телефон',
         'owner.phones.*.type' => 'Тип Номера',
         'country' => 'Країна',
