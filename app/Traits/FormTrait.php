@@ -3,26 +3,27 @@
 namespace App\Traits;
 
 use App\Helpers\JsonHelper;
+use App\Models\Employee;
 
 trait FormTrait
 {
 
     public bool|string $showModal = false;
 
-    public array $phones = ['type' => '', 'number' => ''];
+    public array $phones = [
+        ['type' => '', 'number' => '']
+    ];
 
     public ?array $dictionaries = [];
 
     public function openModal($modal = true): void
     {
         $this->showModal = $modal;
-        $this->phones = [];
     }
 
     public function closeModal(): void
     {
         $this->showModal = false;
-        $this->phones = [];
     }
 
     public function addRowPhone(): array

@@ -5,7 +5,7 @@
         {{__('Додати Спеціальність')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="{{$mode === 'edit' ? 'update' : 'store'}}">
+        <x-forms.forms-section-modal submit="store('specialities')">
             <x-slot name="form">
                 <div  class="pt-4 grid grid gap-4 grid-cols-2">
                     <x-forms.form-group class="">
@@ -15,10 +15,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.specialities.speciality" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.specialities.speciality" type="text"
                                            id="speciality"/>
                         </x-slot>
-                        @error('employee.specialities.speciality')
+                        @error('employee_request.specialities.speciality')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -34,7 +34,7 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select
-                                class="default-input" wire:model="employee.specialities.level" type="text"
+                                class="default-input" wire:model="employee_request.specialities.level" type="text"
                                 id="specialities_country"
                             >
                                 <x-slot name="option">
@@ -46,7 +46,7 @@
                             </x-forms.select>
 
                         </x-slot>
-                        @error('employee.specialities.country')
+                        @error('employee_request.specialities.country')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -62,7 +62,7 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select
-                                class="default-input" wire:model="employee.specialities.qualification_type" type="text"
+                                class="default-input" wire:model="employee_request.specialities.qualification_type" type="text"
                                 id="specialities_country"
                             >
                                 <x-slot name="option">
@@ -74,7 +74,7 @@
                             </x-forms.select>
 
                         </x-slot>
-                        @error('employee.specialities.country')
+                        @error('employee_request.specialities.country')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -89,10 +89,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.specialities.attestation_name" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.specialities.attestation_name" type="text"
                                            id="attestation_name"/>
                         </x-slot>
-                        @error('employee.specialities.attestation_name')
+                        @error('employee_request.specialities.attestation_name')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -108,10 +108,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.specialities.certificate_number" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.specialities.certificate_number" type="text"
                                            id="certificate_number"/>
                         </x-slot>
-                        @error('employee.specialities.certificate_number')
+                        @error('employee_request.specialities.certificate_number')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -126,10 +126,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.specialities.attestation_date" type="date"
+                            <x-forms.input class="default-input" wire:model="employee_request.specialities.attestation_date" type="date"
                                            id="attestation_name"/>
                         </x-slot>
-                        @error('employee.specialities.attestation_date')
+                        @error('employee_request.specialities.attestation_date')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -137,7 +137,6 @@
                         </x-slot>
                         @enderror
                     </x-forms.form-group>
-
                     <x-forms.form-group class="">
                         <x-slot name="label">
                             <x-forms.label for="certificate_number" class="default-label">
@@ -145,10 +144,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.specialities.valid_to_date" type="date"
+                            <x-forms.input class="default-input" wire:model="employee_request.specialities.valid_to_date" type="date"
                                            id="valid_to_date"/>
                         </x-slot>
-                        @error('employee.specialities.valid_to_date')
+                        @error('employee_request.specialities.valid_to_date')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -156,13 +155,11 @@
                         </x-slot>
                         @enderror
                     </x-forms.form-group>
-
-
                 </div>
 
                 <div class="mb-4.5 mt-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
                     <div class="xl:w-1/4 text-left">
-                        <x-secondary-button wire:click="closeModal()">
+                        <x-secondary-button wire:click="closeModalModel()">
                             {{__('Закрити ')}}
                         </x-secondary-button>
                     </div>
@@ -186,8 +183,4 @@
             </x-slot>
         </x-forms.forms-section-modal>
     </x-slot>
-
-
-
-
 </x-dialog-modal>

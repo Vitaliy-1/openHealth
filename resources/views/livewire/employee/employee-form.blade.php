@@ -11,10 +11,12 @@
 
     <div class="flex bg-white  p-6 flex-col ">
 
-                @include('livewire.employee._parts._passport_data')
+
+                @include('livewire.employee._parts._employee')
+                @include('livewire.employee._parts._documents')
                 @include('livewire.employee._parts._education')
-                @include('livewire.employee._parts._specialty')
-                @include('livewire.employee._parts._position')
+                @include('livewire.employee._parts._specialities')
+                @include('livewire.employee._parts._positions')
                 @include('livewire.employee._parts._role')
                 @include('livewire.employee._parts._science_degree')
                 @include('livewire.employee._parts._qualifications')
@@ -46,12 +48,12 @@
  </div>
     @if($showModal == 'education')
         @include('livewire.employee._parts.modals._modal_education')
-    @elseif($showModal == 'passport_data')
-        @include('livewire.employee._parts.modals._modal_passport_data')
-    @elseif($showModal == 'speciality')
-        @include('livewire.employee._parts.modals._modal_specialty')
-    @elseif($showModal == 'position')
-        @include('livewire.employee._parts.modals._modal_position')
+    @elseif($showModal == 'documents')
+        @include('livewire.employee._parts.modals._modal_documents')
+    @elseif($showModal == 'specialities')
+        @include('livewire.employee._parts.modals._modal_specialities')
+    @elseif($showModal == 'positions')
+        @include('livewire.employee._parts.modals._modal_positions')
     @elseif($showModal == 'role')
         @include('livewire.employee._parts.modals._modal_role')
     @elseif($showModal == 'science_degree')

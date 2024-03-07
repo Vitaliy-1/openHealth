@@ -5,7 +5,7 @@
         {{__('Додати Посаду')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="{{$mode === 'edit' ? 'update' : 'store'}}">
+        <x-forms.forms-section-modal submit="store('positions')">
             <x-slot name="form">
                 <div  class="pt-4 grid grid gap-4 grid-cols-2">
                     <x-forms.form-group class="">
@@ -16,19 +16,19 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select
-                                class="default-input" wire:model="employee.position" type="text"
+                                class="default-input" wire:model="employee_request.positions.position" type="text"
                                 id="position"
                             >
                                 <x-slot name="option">
                                     <option>{{__('forms.position')}}</option>
-                                    @foreach($this->dictionaries['POSITION'] as $k=>$level)
-                                        <option value="{{$level}}">{{$level}}</option>
+                                    @foreach($this->dictionaries['POSITION'] as $k=>$position )
+                                        <option value="{{$k}}">{{$position}}</option>
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>
 
                         </x-slot>
-                        @error('employee.position')
+                        @error('employee_request.positions.position')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -43,10 +43,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.start_date" type="date"
+                            <x-forms.input class="default-input" wire:model="employee_request.positions.start_date" type="date"
                                            id="start_date"/>
                         </x-slot>
-                        @error('employee.start_date')
+                        @error('employee_request.positions.start_date')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -58,7 +58,7 @@
                 </div>
                 <div class="mb-4.5 mt-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
                     <div class="xl:w-1/4 text-left">
-                        <x-secondary-button wire:click="closeModal()">
+                        <x-secondary-button wire:click="closeModalModel()">
                             {{__('Закрити')}}
                         </x-secondary-button>
                     </div>

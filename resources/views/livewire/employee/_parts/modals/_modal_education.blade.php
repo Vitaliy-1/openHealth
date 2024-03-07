@@ -5,7 +5,7 @@
         {{__('Додати Освіту')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="{{$mode === 'edit' ? 'update' : 'store'}}">
+        <x-forms.forms-section-modal submit="store('educations')">
             <x-slot name="form">
                 <div  class="pt-4 grid grid gap-4 grid-cols-2">
                     <x-forms.form-group class="">
@@ -15,10 +15,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.degree" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.educations.degree" type="text"
                                            id="degree"/>
                         </x-slot>
-                        @error('employee.degree')
+                        @error('employee_request.educations.degree')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -33,10 +33,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.institution_name" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.educations.institution_name" type="text"
                                            id="institution_name"/>
                         </x-slot>
-                        @error('employee.institution_name')
+                        @error('employee_request.educations.institution_name')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -51,10 +51,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.speciality" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.educations.speciality" type="text"
                                            id="speciality"/>
                         </x-slot>
-                        @error('employee.speciality')
+                        @error('employee_request.educations.speciality')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -70,7 +70,7 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select
-                                class="default-input" wire:model="legal_entity_form.owner.position" type="text"
+                                class="default-input" wire:model="employee_request.educations.country" type="text"
                                 id="education_country"
                             >
                                 <x-slot name="option">
@@ -82,7 +82,7 @@
                             </x-forms.select>
 
                         </x-slot>
-                        @error('employee.education.country')
+                        @error('employee_request.educations.country')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -97,10 +97,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.city" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.educations.city" type="text"
                                            id="city"/>
                         </x-slot>
-                        @error('employee.city')
+                        @error('employee_request.educations.city')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -115,10 +115,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.diploma_number" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.educations.diploma_number" type="text"
                                            id="diploma_number"/>
                         </x-slot>
-                        @error('employee.diploma_number')
+                        @error('employee_request.educations.diploma_number')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -133,10 +133,10 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee.issued_date" type="date"
+                            <x-forms.input class="default-input" wire:model="employee_request.educations.issued_date" type="date"
                                            id="issued_date"/>
                         </x-slot>
-                        @error('employee.issued_date')
+                        @error('employee_request.educations.issued_date')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -145,10 +145,9 @@
                         @enderror
                     </x-forms.form-group>
                 </div>
-
                 <div class="mb-4.5 mt-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
                     <div class="xl:w-1/4 text-left">
-                        <x-secondary-button wire:click="closeModal()">
+                        <x-secondary-button wire:click="closeModalModel()">
                             {{__('Закрити ')}}
                         </x-secondary-button>
                     </div>

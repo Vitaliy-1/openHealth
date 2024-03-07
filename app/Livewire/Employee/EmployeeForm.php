@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
+use phpDocumentor\Reflection\Types\Integer;
 
 class EmployeeForm extends Component
 {
@@ -48,25 +49,24 @@ class EmployeeForm extends Component
     public \Illuminate\Database\Eloquent\Collection $healthcareServices;
 
     public array $tableHeaders;
+    public string  $request_id;
 
-    public function boot(Employee $employee ): void
+    public function boot( ): void
     {
-        $this->employee = $employee;
+
         $this->employeeCacheKey = self::CACHE_PREFIX . '-'. Auth::user()->legalEntity->uuid;
     }
-    public function mount(Employee $employee,Request $request)
+
+
+    public function mount(Request $request)
     {
         $this->tableHeaders();
         $this->getLegalEntity();
         $this->getDivisions();
         $this->getDictionary();
-        if (Cache::has($this->employeeCacheKey)){
-            $employeeData = Cache::get($this->employeeCacheKey, []);
-            if (isset($employeeData[$request->input('id')])) {
-                $this->employee_request->fill(Cache::get($this->employeeCacheKey, [])[$request->input('id')]);
-            }
-        }
-
+        $this->request_id = $request->input('id');
+        
+        $this->getEmployee();
 
     }
 
@@ -75,6 +75,23 @@ class EmployeeForm extends Component
         $this->healthcareServices = Division::find($id)
             ->healthcareService()
             ->get();
+    }
+
+
+    public function getEmployee(): void
+    {
+        if (Cache::has($this->employeeCacheKey)){
+            $employeeData = Cache::get($this->employeeCacheKey, []);
+            if (isset($employeeData[$this->request_id])) {
+               $this->employee = ( new Employee())->forceFill(Cache::get($this->employeeCacheKey, [])[$this->request_id]);
+
+                $this->employee_request->fill(
+                   [
+                       'employee' => $this->employee->employee,
+                   ]
+               );
+            }
+        }
     }
 
     public function tableHeaders(): void
@@ -102,36 +119,58 @@ class EmployeeForm extends Component
             ->get();
     }
 
-    public function getEmployees()
-    {
-        if ($this->legalEntity->employee()->exists()){
-            $this->employees = $this->legalEntity->employee()->get();
-        }
-        if ($this->legalEntity->employee()->doesntExist()){
-            $this->employees = new Employee();
-        }
-    }
+
 
 
     public function updateRow($object){
 
     }
 
+    public function create($model)
+    {
+        $this->openModal($model);
+        $this->getEmployee();
+    }
+
     public function store($model)
     {
-        $this->resetErrorBag();
-        $cacheData[] = $this->employee_request->toArray();
-        Cache::put($this->employeeCacheKey, $cacheData, now()->days(90));
+
         $this->employee_request->rulesForModelValidate($model);
+        $this->resetErrorBag();
+        $cacheData = [];
+
+        if (Cache::has($this->employeeCacheKey)){
+            $cacheData =  Cache::get($this->employeeCacheKey, []);
+        }
+
+        if ($model == 'employee') {
+            $cacheData[$this->request_id][$model] = $this->employee_request->{$model};
+        } else {
+            $cacheData[$this->request_id][$model][] = $this->employee_request->{$model};
+        }
+
+
+        Cache::put($this->employeeCacheKey, $cacheData, now()->days(90));
+
+        $this->closeModal();
+        $this->dispatch('dataUpdated');
+        $this->getEmployee();
 
     }
 
-
-    public function edit(Employee $employee)
+    public function edit( $k, $model)
     {
-
+        $this->openModal($model);
+        $this->employee_request->{$model} = Cache::get($this->employeeCacheKey, [])[$this->request_id][$model][$k] ;
+        $this->getEmployee();
     }
 
+    public function closeModalModel(): void
+    {
+        $this->closeModal();
+        $this->getEmployee();
+
+    }
 
 
     public function render()

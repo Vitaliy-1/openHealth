@@ -62,6 +62,8 @@
     <!-- ===== Page Wrapper End ===== -->
 
     @stack('modals')
+
+    @stack('scripts')
     </body>
 
 </html>

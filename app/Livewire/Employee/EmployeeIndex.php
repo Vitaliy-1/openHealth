@@ -30,19 +30,26 @@ class EmployeeIndex extends Component
     public function mount()
     {
         $this->tableHeaders();
-        if (Cache::has($this->employeeCacheKey)) {
-            $this->storeId = array_key_last(Cache::get($this->employeeCacheKey));
-            $this->getLastStoreId();
-
-        }
+        $this->getLastStoreId();
+        $this->getEmployees();
 //        $this->employees =auth()->user()->legalEntity-;
     }
 
     public function getLastStoreId()
     {
+        if (Cache::has($this->employeeCacheKey)) {
+            $this->storeId = array_key_last(Cache::get($this->employeeCacheKey));
+        }
         $this->storeId ++;
     }
 
+    public function getEmployees()
+    {
+        if (Cache::has($this->employeeCacheKey)) {
+            Cache::get($this->employeeCacheKey,[]);
+        }
+
+    }
     public function tableHeaders(): void
     {
         $this->tableHeaders = [
