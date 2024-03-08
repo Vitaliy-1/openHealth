@@ -43,13 +43,16 @@ class EmployeeIndex extends Component
         $this->storeId ++;
     }
 
-    public function getEmployees()
+    public function getEmployees(): void
     {
-        if (Cache::has($this->employeeCacheKey)) {
-            Cache::get($this->employeeCacheKey,[]);
-        }
+        if (Cache::has($this->employeeCacheKey)){
+                foreach (Cache::get($this->employeeCacheKey) as $key => $value){
+                    $this->employees = ( new Employee())->forceFill($value, []);
+                }
 
+        }
     }
+
     public function tableHeaders(): void
     {
         $this->tableHeaders = [

@@ -2,10 +2,10 @@
 
 <x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model="showModal">
     <x-slot name="title">
-        {{__('Підтвердження кваліфікації')}}
+        {{__('Кваліфікація')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="{{$mode === 'edit' ? 'update' : 'store'}}">
+        <x-forms.forms-section-modal submit="store('qualifications')">
             <x-slot name="form">
                 <div  class="pt-4 grid grid gap-4 grid-cols-2">
 
@@ -29,7 +29,7 @@
                             </x-forms.select>
 
                         </x-slot>
-                        @error('employee.education.country')
+                        @error('employee_request.qualifications.type')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -47,7 +47,7 @@
                             <x-forms.input class="default-input" wire:model="employee_request.qualifications.institution_name" type="text"
                                            id="institution_name"/>
                         </x-slot>
-                        @error('employee_request.science_degree.city')
+                        @error('employee_request.qualifications.institution_name')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -76,7 +76,7 @@
                     <x-forms.form-group class="">
                         <x-slot name="label">
                             <x-forms.label for="issued_date" class="default-label">
-                                {{__('forms.speciality')}} *
+                                {{__('forms.issued_date')}} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
@@ -98,7 +98,7 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.certificate_number" type="date"
+                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.certificate_number" type="text"
                                            id="certificate_number"/>
                         </x-slot>
                         @error('employee_request.qualifications.certificate_number')
@@ -130,11 +130,11 @@
                     <x-forms.form-group class="">
                         <x-slot name="label">
                             <x-forms.label for="additional_info" class="default-label">
-                                {{__('forms.additional_info')}} *
+                                {{__('forms.additional_info')}}
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.additional_info" type="text"
+                            <x-forms.textarea class="default-input" wire:model="employee_request.qualifications.additional_info" type="text"
                                            id="valid_to"/>
                         </x-slot>
                         @error('employee_request.qualifications.additional_info')
@@ -155,7 +155,7 @@
                     </div>
                     <div class="xl:w-1/4 text-right">
                         <x-button type="submit" class="btn-primary">
-                            {{__('Додати підтвердження кваліфікації')}}
+                            {{__('Додати  кваліфікацію')}}
                         </x-button>
                     </div>
                 </div>

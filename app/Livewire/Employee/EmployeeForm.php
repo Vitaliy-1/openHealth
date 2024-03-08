@@ -31,6 +31,7 @@ class EmployeeForm extends Component
 
     public string $mode = 'create';
 
+    public $sucess = false;
     public ?array $dictionaries_field = [
         'PHONE_TYPE',
         'COUNTRY',
@@ -65,7 +66,7 @@ class EmployeeForm extends Component
         $this->getDivisions();
         $this->getDictionary();
         $this->request_id = $request->input('id');
-        
+
         $this->getEmployee();
 
     }
@@ -153,7 +154,7 @@ class EmployeeForm extends Component
         Cache::put($this->employeeCacheKey, $cacheData, now()->days(90));
 
         $this->closeModal();
-        $this->dispatch('dataUpdated');
+        $this->sucess = true;
         $this->getEmployee();
 
     }
@@ -173,6 +174,20 @@ class EmployeeForm extends Component
     }
 
 
+    public function sendApiRequest($model)
+    {
+
+        if (Cache::has($this->employeeCacheKey)) {
+            $cacheData = Cache::get($this->employeeCacheKey, []);
+        }
+
+        if ($model == 'employee') {
+            $cacheData[$this->request_id][$model] = $this->employee_request->{$model};
+        } else {
+            $cacheData[$this->request_id][$model][] = $this->employee_request->{$model};
+        }
+
+    }
     public function render()
     {
         return view('livewire.employee.employee-form');

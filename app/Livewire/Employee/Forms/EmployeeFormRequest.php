@@ -64,11 +64,27 @@ class EmployeeFormRequest extends Form
 
     public ?array $role = [];
 
-    public ?array  $qualifications = [];
+    #[Validate([
+        'science_degree.country' => 'required|string',
+        'science_degree.city' => 'required|string',
+        'science_degree.degree' => 'required|string',
+        'science_degree.institution_name' => 'required|string',
+        'science_degree.diploma_number' => 'required|string',
+        'science_degree.speciality' => 'required|string',
 
+    ])]
 
     public ?array $science_degree = [];
 
+    #[Validate([
+        'qualifications.type' => 'required|string',
+        'qualifications.institution_name' => 'required|string',
+        'qualifications.speciality' => 'required|string',
+        'qualifications.issued_date' => 'required|date',
+        'qualifications.certificate_number' => 'required|string',
+    ])]
+    
+    public ?array  $qualifications = [];
 
 
     /**

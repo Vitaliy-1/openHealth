@@ -122,4 +122,6 @@ return [
     'start_date_work'=>'Дата початку роботи',
     'division'=>'Підрозділ',
     'select_division' => 'Обрати підрозділ',
+    'valid_to'=>'Дійсний до',
+    'additional_info'=>'Додаткова інформація',
 ];
