@@ -16,12 +16,16 @@ class EmployeeFormRequest extends Form
         'employee.phones.*.number' => 'required|string:digits:13',
         'employee.phones.*.type' => 'required|string',
         'employee.email' => 'required|email',
+        'employee.no_tax_id' => 'boolean',
+        'employee.tax_id' => 'exclude_if:owner.no_tax_id,false|required|integer|digits:10',
+        'employee.documents.type' => 'exclude_if:owner.no_tax_id,true|required|string',
+        'employee.documents.number' => 'exclude_if:owner.no_tax_id,true|required|string',
+        'employee.position' => 'required|string'
     ])]
 
     public ?array $employee = [];
 
     #[Validate([
-
         'documents.type' => 'required|string',
         'documents.number' => 'required|string',
     ])]
@@ -83,7 +87,7 @@ class EmployeeFormRequest extends Form
         'qualifications.issued_date' => 'required|date',
         'qualifications.certificate_number' => 'required|string',
     ])]
-    
+
     public ?array  $qualifications = [];
 
 
@@ -94,6 +98,7 @@ class EmployeeFormRequest extends Form
     {
         return $this->validate($this->rulesForModel($model)->toArray());
     }
+
 
 
 }

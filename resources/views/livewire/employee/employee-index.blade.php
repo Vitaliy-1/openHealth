@@ -14,30 +14,30 @@
         <x-tables.table>
             <x-slot name="headers" :list="$tableHeaders"></x-slot>
             <x-slot name="tbody">
-                @if($employees )
-                    @foreach($employees as $item)
+                @if($employeesCache )
+                    @foreach($employeesCache as $k=>$item)
                         <tr>
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white">{{$item->uuid ?? ''}}</p>
+                                <p class="text-black dark:text-white">{{ ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white">{{$item->name ?? ''}}</p>
+                                <p class="text-black dark:text-white">{{$item->employee['first_name'] ?? ''}}
+                                    {{$item->employee['last_name'] ?? ' '}}
+                                    {{$item->employee['second_name'] ?? ' '}}
+                                </p>
+                            </td>
+
+                            <td class="border-b border-[#eee] py-5 px-4 ">
+                                <p class="text-black dark:text-white">{{$item->employee['phones'][0]['number'] ?? ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white">{{$item->type ?? ''}}</p>
+                                <p class="text-black dark:text-white">{{$item->employee['email']  ?? ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white">{{$item->phones['number'] ?? ''}}</p>
+                                <p class="text-black dark:text-white">{{$item->employee['position'] ?? ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white">{{$item->email ?? ''}}</p>
-                            </td>
-                            <td class="border-b border-[#eee] py-5 px-4 ">
-{{--                                @if($item->status = 'DEACTIVATED')--}}
-{{--                                    <span class="text-meta-1">{{__('Не активний')}}</span>--}}
-{{--                                @else--}}
-{{--                                    <span class="text-meta-3">{{__('Активний')}}</span>--}}
-{{--                                @endif--}}
+                                {{__('Завершить реестрацію')}}
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
                                 <div class="flex justify-center">
@@ -87,10 +87,10 @@
                                             :id="$id('dropdown-button')"
                                             style="display: none;"
                                             class="absolute right-0 mt-2 w-40 rounded-md bg-white shadow-md z-50">
-                                            <a wire:click="edit({{ $item }})" href="#"
-                                               class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">
-                                                {{__('forms.edit')}}
-                                            </a>
+{{--                                            <a wire:click="edit({{ $k }})" href="#"--}}
+{{--                                               class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">--}}
+{{--                                                {{__('forms.edit')}}--}}
+{{--                                            </a>--}}
 {{--                                            @if($item->status == 'ACTIVE')--}}
 {{--                                                <a wire:click="deactivate({{ $item }}); open = !open" href="#"--}}
 {{--                                                   class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">--}}
@@ -103,10 +103,10 @@
 {{--                                                </a>--}}
 {{--                                            @endif--}}
 
-                                            <a href="{{route('healthcare_service.index',$item)}}"
-                                               class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">
-                                                {{__('forms.services')}}
-                                            </a>
+{{--                                            <a href="{{route('healthcare_service.index',$item)}}"--}}
+{{--                                               class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">--}}
+{{--                                                {{__('forms.services')}}--}}
+{{--                                            </a>--}}
                                         </div>
                                     </div>
                                 </div>
@@ -114,6 +114,9 @@
 
                         </tr>
                     @endforeach
+                @endif
+                @if($employees)
+
                 @endif
             </x-slot>
         </x-tables.table>

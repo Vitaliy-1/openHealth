@@ -17,8 +17,7 @@ class EmployeeIndex extends Component
 
     protected string $employeeCacheKey;
     public int $storeId = 0;
-
-    public int $storeIdLast;
+    public \Illuminate\Support\Collection $employeesCache;
 
 
     public function boot(Employee $employee): void
@@ -37,22 +36,25 @@ class EmployeeIndex extends Component
 
     public function getLastStoreId()
     {
-        if (Cache::has($this->employeeCacheKey)) {
+        if (Cache::has($this->employeeCacheKey) && !empty(Cache::get($this->employeeCacheKey))) {
             $this->storeId = array_key_last(Cache::get($this->employeeCacheKey));
         }
         $this->storeId ++;
     }
 
-    public function getEmployees(): void
+    public function getEmployeesCache(): void
     {
-        if (Cache::has($this->employeeCacheKey)){
-                foreach (Cache::get($this->employeeCacheKey) as $key => $value){
-                    $this->employees = ( new Employee())->forceFill($value, []);
-                }
-
+        if (Cache::has($this->employeeCacheKey)) {
+            $this->employeesCache = collect(Cache::get($this->employeeCacheKey))->map(function ($data) {
+                return (new Employee())->forceFill($data);
+            });
         }
     }
 
+    public function getEmployees()
+    {
+        $this->employees = Auth::user()->legalEntity->employee;
+    }
     public function tableHeaders(): void
     {
         $this->tableHeaders = [
