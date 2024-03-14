@@ -3,8 +3,10 @@
 namespace App\Livewire\Employee;
 
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class EmployeeIndex extends Component
@@ -18,6 +20,7 @@ class EmployeeIndex extends Component
     protected string $employeeCacheKey;
     public int $storeId = 0;
     public \Illuminate\Support\Collection $employeesCache;
+
 
 
     public function boot(Employee $employee): void
@@ -51,10 +54,30 @@ class EmployeeIndex extends Component
         }
     }
 
-    public function getEmployees()
+    public function getEmployees($status = ''): void
     {
-        $this->employees = Auth::user()->legalEntity->employee;
+        $this->employees = DB::table('legal_entities')
+            ->join('users', 'legal_entities.id', '=', 'users.legal_entity_id')
+            ->join('employees', 'legal_entities.id', '=', 'employees.legal_entity_id')
+            ->join('persons', 'employees.person_id', '=', 'persons.id')
+            ->where('users.id', Auth::id())
+            ->select(
+                'employees.id as id',
+                'employees.uuid',
+                'employees.start_date',
+                'employees.end_date',
+                'employees.status',
+                DB::raw("CONCAT(persons.first_name, ' ', persons.last_name, ' ', persons.second_name) AS full_name"),
+                'persons.email',
+                'persons.phones',
+
+                'employees.position',
+                'employees.employee_type',
+            )
+            ->get();
+
     }
+
     public function tableHeaders(): void
     {
         $this->tableHeaders = [
@@ -70,8 +93,25 @@ class EmployeeIndex extends Component
     public function create()
     {
 
-        return redirect()->route('employee.form', ['id' => $this->storeId]);
+        return redirect()->route('employee.form', ['store_id' => $this->storeId]);
 
+    }
+
+    public string $selectedOption = 'is_active';
+
+    public function sortEmployees():void
+    {
+        if ($this->selectedOption === 'is_active') {
+            $this->getEmployees();
+            $this->employeesCache = collect();
+        } elseif ($this->selectedOption === 'is_inactive') {
+            $this->employeesCache = collect();
+            $this->employees = collect();
+
+        } elseif ($this->selectedOption === 'is_cache') {
+            $this->getEmployeesCache();
+            $this->employees = collect();
+        }
     }
 
     public function render()

@@ -68,6 +68,7 @@ class EmployeeForm extends Component
 
     public array $tableHeaders;
     public string  $request_id;
+    private mixed $employee_id;
 
     public function boot( ): void
     {
@@ -76,13 +77,23 @@ class EmployeeForm extends Component
     }
 
 
-    public function mount(Request $request)
+
+
+    public function mount(Request $request, $id = null)
     {
-        $this->tableHeaders();
+
+
+
+        $this->setTableHeaders();
         $this->getLegalEntity();
         $this->getDivisions();
         $this->getDictionary();
-        $this->request_id = $request->input('id');
+        if ($request->has('store_id')) {
+            $this->request_id = $request->input('store_id');
+        }
+        if (isset($id)) {
+            $this->employee_id = $id;
+        }
 
         $this->getEmployee();
 
@@ -98,7 +109,7 @@ class EmployeeForm extends Component
 
     public function getEmployee(): void
     {
-        if (Cache::has($this->employeeCacheKey)){
+        if (Cache::has($this->employeeCacheKey) && isset($this->request_id)) {
             $employeeData = Cache::get($this->employeeCacheKey, []);
             if (isset($employeeData[$this->request_id])) {
                $this->employee = ( new Employee())->forceFill(Cache::get($this->employeeCacheKey, [])[$this->request_id]);
@@ -111,12 +122,28 @@ class EmployeeForm extends Component
                }
             }
         }
+
+        if (isset($this->employee_id)) {
+            $employee = Employee::with('person')->find($this->employee_id);
+
+            if (!empty($this->employee->employee)){
+                $this->employee_request->fill(
+                    [
+                        'employee' => $this->employee->employee,
+                    ]
+                );
+            }
+        }
     }
 
-    public function tableHeaders(): void
+    /**
+     * Set the table headers for the E-health table.
+     */
+    public function setTableHeaders(): void
     {
+        // Define the table headers
         $this->tableHeaders = [
-            __('ID E-health '),
+            __('ID E-health'),
             __('ПІБ'),
             __('Телефон'),
             __('Email'),
@@ -254,7 +281,6 @@ class EmployeeForm extends Component
 
         $person->save();
 
-
         return $person;
    }
 
@@ -262,11 +288,13 @@ class EmployeeForm extends Component
         $employee = new Employee();
         $employee->employee_type = $data['employee_type'];
         $employee->is_active = false;
+        $employee->status = $data['status'];
         $employee->start_date = Carbon::now()->format('Y-m-d H:i:s');
         $employee->position = $data['position'];
         $employee->speciality =$data['doctor']['specialities'];
         $employee->legal_entity_id = $this->legalEntity->id;
-         $person->employee()->save($employee);
+        $employee->uuid = $data['id'];
+        $person->employee()->save($employee);
         return $employee;
    }
 
