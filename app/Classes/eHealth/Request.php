@@ -10,6 +10,7 @@ class Request extends Configuration
 
     protected static function makeApiUrl(string $url): string
     {
+
         return self::getApiUrl() . '/api/'. $url;
     }
 

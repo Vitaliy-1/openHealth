@@ -44,7 +44,6 @@ class DivisionForm extends Component
 
     protected $listeners = ['addressDataFetched'];
 
-
     public function mount()
     {
         $this->tableHeaders();
@@ -205,6 +204,7 @@ class DivisionForm extends Component
         $division->setAttribute('legal_entity_uuid', $response['legal_entity_id']);
         $division->setAttribute('external_id', $response['external_id']);
         $division->setAttribute('status', $response['status']);
+
         $this->legalEntity->division()->save($division);
     }
 

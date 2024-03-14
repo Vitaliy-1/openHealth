@@ -26,6 +26,7 @@ class Employee extends Model
     protected $casts = [
         'party' => 'array',
         'doctor' => 'array',
+        'speciality' => 'array',
     ];
 
     protected $attributes = [

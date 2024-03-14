@@ -94,7 +94,6 @@ class CreateNewLegalEntities extends Component
     {
         $this->entityCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . LegalEntity::class;
         $this->ownerCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . Employee::class;
-
     }
 
     public function mount(): void
