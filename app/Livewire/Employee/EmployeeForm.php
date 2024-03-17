@@ -32,7 +32,7 @@ class EmployeeForm extends Component
 
     protected string $employeeCacheKey;
 
-    public Employee  $employee ;
+    public  Employee  $employee ;
 
     public object $employees;
     public LegalEntity $legalEntity;
@@ -42,7 +42,7 @@ class EmployeeForm extends Component
     public array $success = [
         'message' => '',
         'status' => false,
-    ] ;
+    ];
 
     public ?array $error = [
         'message' => '',
@@ -77,13 +77,8 @@ class EmployeeForm extends Component
     }
 
 
-
-
     public function mount(Request $request, $id = null)
     {
-
-
-
         $this->setTableHeaders();
         $this->getLegalEntity();
         $this->getDivisions();
@@ -124,14 +119,23 @@ class EmployeeForm extends Component
         }
 
         if (isset($this->employee_id)) {
-            $employee = Employee::with('person')->find($this->employee_id);
-
-            if (!empty($this->employee->employee)){
+            $this->employee = Employee::find($this->employee_id);
+            $this->employee->educations = $this->employee->doctor['educations'] ?? [];
+            $this->employee->specialities = $this->employee->doctor['specialities'] ?? [];
+            $this->employee->qualifications = $this->employee->doctor['qualifications'] ?? [];
+            $this->employee->science_degree = $this->employee->doctor['science_degree'] ?? [];
+            $this->employee->documents = $this->employee->party['documents'] ?? [];
+            $this->employee->positions = [ [
+                'position' => $this->employee->position,
+                'start_date' => $this->employee->start_date,
+            ]];
+            if (!empty($this->employee)){
                 $this->employee_request->fill(
                     [
-                        'employee' => $this->employee->employee,
+                        'employee' => $this->employee->party,
                     ]
                 );
+
             }
         }
     }
@@ -188,11 +192,12 @@ class EmployeeForm extends Component
             $cacheData[$this->request_id][$model][] = $this->employee_request->{$model};
         }
 
-
         Cache::put($this->employeeCacheKey, $cacheData, now()->days(90));
 
         $this->closeModal();
+
         $this->success['status'] = true;
+
         $this->getEmployee();
 
     }
@@ -228,16 +233,12 @@ class EmployeeForm extends Component
             && $this->employee_request->specialities
             && $this->employee_request->educations) {
 
-            $employeeRequest =  EmployeeRequestApi::createEmployeeRequest($this->legalEntity->uuid,$this->employee_request->toArray());
-            $cache =   Cache::get($this->employeeCacheKey, []);
-
-           unset($cache[$this->request_id]);
-           Cache::put($this->employeeCacheKey, $cache, now()->days(90));
+           $employeeRequest =  EmployeeRequestApi::createEmployeeRequest($this->legalEntity->uuid,$this->employee_request->toArray());
            $person = $this->savePerson($employeeRequest);
            $this->saveUser($employeeRequest['party'],$person);
            $this->saveEmployee($employeeRequest,$person);
 
-
+           $this->forgetCacheIndex();
            return redirect(route('employee.index'));
 
         } else {
@@ -246,57 +247,47 @@ class EmployeeForm extends Component
         }
         $this->getEmployee();
     }
+
+    private function forgetCacheIndex(){
+
+        $cache = Cache::get($this->employeeCacheKey, []);
+        if (isset($cache[$this->request_id])) {
+            unset($cache[$this->request_id]);
+            Cache::put($this->employeeCacheKey, $cache, now()->addDays(90));
+        }
+    }
+
+
+    public function savePerson($data)
+    {
+        return Person::create($data['party']);
+    }
+
+    public function saveUser($party, $person)
+    {
+        return $person->user()->create([
+            'email' => \Illuminate\Support\Str::random(3) . $party['email'],
+            'password' => Hash::make( \Illuminate\Support\Str::random(8)),
+            'legal_entity_id' => $this->legalEntity->id,
+        ]);
+    }
+
+
+    public function saveEmployee($data,$person){
+        $employee = new Employee();
+        $employee->fill($data);
+        $employee->uuid = $data['id'];
+        $employee->division_uuid = $data['division_id'] ?? null;
+        $employee->legal_entity_uuid = $data['legal_entity_id'] ?? null;
+        $employee->legal_entity_id = $this->legalEntity->id;
+        $person->employee()->save($employee);
+        return $employee;
+   }
+
     public function render()
     {
         return view('livewire.employee.employee-form');
     }
-
-    public function saveUser($party,$person)
-    {
-        $user = new User();
-        $user->email = \Illuminate\Support\Str::random(3).$party['email'];
-        $user->password = Hash::make( \Illuminate\Support\Str::random(8));
-        $user->legal_entity_id = $this->legalEntity->id;
-        $person->user()->save($user);
-
-        return $user;
-    }
-
-    public function savePerson($data)
-    {
-        $person = new Person();
-        $person->last_name = $data['party']['last_name'];
-        $person->first_name = $data['party']['first_name'];
-        $person->second_name = $data['party']['second_name'];
-        $person->email = \Illuminate\Support\Str::random(3).$data['party']['email'];
-        $person->phones = $data['party']['phones'];
-        $person->gender = $data['party']['gender'];
-        $person->birth_date = $data['party']['birth_date'];
-        $person->tax_id = '32132132';
-        $person->no_tax_id = $data['party']['no_tax_id'];
-        $person->educations = $data['doctor']['educations'];
-        $person->specialities = $data['doctor']['specialities'];
-        $person->qualifications = $data['doctor']['qualifications'];
-        $person->science_degree = $data['doctor']['science_degree'];
-
-        $person->save();
-
-        return $person;
-   }
-
-     public function saveEmployee($data,$person){
-        $employee = new Employee();
-        $employee->employee_type = $data['employee_type'];
-        $employee->is_active = false;
-        $employee->status = $data['status'];
-        $employee->start_date = Carbon::now()->format('Y-m-d H:i:s');
-        $employee->position = $data['position'];
-        $employee->speciality =$data['doctor']['specialities'];
-        $employee->legal_entity_id = $this->legalEntity->id;
-        $employee->uuid = $data['id'];
-        $person->employee()->save($employee);
-        return $employee;
-   }
 
 
 }

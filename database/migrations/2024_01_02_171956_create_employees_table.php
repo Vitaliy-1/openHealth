@@ -13,23 +13,24 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid')->nullable();
-            $table->foreignId('person_id')->nullable();
+            $table->uuid('uuid');
+            $table->uuid('division_uuid')->nullable();
+            $table->uuid('legal_entity_uuid')->nullable();
             $table->string('position');
-            $table->string('status');
-            $table->string('status_reason')->nullable();
-            $table->string('employee');
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
             $table->string('employee_type');
-            $table->boolean('is_active');
-            $table->timestamp('start_date');
-            $table->timestamp('end_date')->nullable();
+            $table->jsonb('party');
+            $table->jsonb('doctor');
+            $table->date('inserted_at')->nullable();
+            $table->string('status')->nullable();
+            $table->foreignId('person_id');
             $table->foreignId('legal_entity_id');
-//            $table->foreignId('division_id')->nullable();
-            $table->json('speciality')->nullable();
-            $table->timestamps();
+            $table->foreignId('division_id')->nullable();
             $table->foreign('person_id')->references('id')->on('persons')->onDelete('set null');
             $table->foreign('legal_entity_id')->references('id')->on('legal_entities');
-//            $table->foreign('division_id')->references('id')->on('divisions');//Todo: add divisions table
+            $table->foreign('division_id')->references('id')->on('divisions');//Todo: add divisions table
+            $table->timestamps();
 
         });
     }
