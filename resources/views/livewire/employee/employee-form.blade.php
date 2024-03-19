@@ -16,7 +16,7 @@
                 @include('livewire.employee._parts._documents')
                 @include('livewire.employee._parts._education')
                 @include('livewire.employee._parts._specialities')
-                @include('livewire.employee._parts._positions')
+{{--                @include('livewire.employee._parts._positions')--}}
                 @include('livewire.employee._parts._role')
                 @include('livewire.employee._parts._science_degree')
                 @include('livewire.employee._parts._qualifications')
@@ -46,7 +46,7 @@
                 </div>
 
  </div>
-    @if($showModal == 'education')
+    @if($showModal == 'educations')
         @include('livewire.employee._parts.modals._modal_education')
     @elseif($showModal == 'documents')
         @include('livewire.employee._parts.modals._modal_documents')

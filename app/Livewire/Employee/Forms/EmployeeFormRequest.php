@@ -12,15 +12,11 @@ class EmployeeFormRequest extends Form
         'employee.last_name' => 'required|min:3',
         'employee.first_name' => 'required|min:3',
         'employee.gender' => 'required|string',
-        'employee.birth_date' => 'required|date',
+        'employee.birth_date' => 'required|date' ,
         'employee.phones.*.number' => 'required|string:digits:13',
         'employee.phones.*.type' => 'required|string',
         'employee.email' => 'required|email',
-//        'employee.no_tax_id' => 'boolean',
-//        'employee.tax_id' => 'exclude_if:owner.no_tax_id,false|required|integer|digits:10',
-//        'employee.documents.type' => 'exclude_if:owner.no_tax_id,true|required|string',
-//        'employee.documents.number' => 'exclude_if:owner.no_tax_id,true|required|string',
-        'employee.position' => 'required|string'
+        'employee.tax_id' => 'nullable|integer|between:8,10',
     ])]
 
     public ?array $employee = [];

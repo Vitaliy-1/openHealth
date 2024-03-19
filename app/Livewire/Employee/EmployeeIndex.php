@@ -39,9 +39,10 @@ class EmployeeIndex extends Component
 
     public function getLastStoreId()
     {
-        if (Cache::has($this->employeeCacheKey) && !empty(Cache::get($this->employeeCacheKey))) {
+        if (Cache::has($this->employeeCacheKey) && !empty(Cache::get($this->employeeCacheKey)) && is_array(Cache::get($this->employeeCacheKey))) {
             $this->storeId = array_key_last(Cache::get($this->employeeCacheKey));
         }
+
         $this->storeId ++;
     }
 

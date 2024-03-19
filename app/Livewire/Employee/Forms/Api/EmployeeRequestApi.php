@@ -19,10 +19,15 @@ class EmployeeRequestApi extends EmployeeApi
 
     public static function createEmployeeRequestBuilder($uuid,$data):array
     {
+        if (!isset($data['employee']['tax_id'])) {
+            $data['employee']['no_tax_id'] = true;
+        }
+
         $params = [
             'legal_entity_id' => $uuid,
-            'position'=> $data['employee']['position'],
+            'position'=> $data['positions']['position'],
             'division_id'=> $data['role'][0]['division_id'],
+            'start_date'=> Carbon::parse($data['positions']['start_date'])->format('Y-m-d') ?? '',
             'employee_type'=> $data['role'][0]['employee_type'],
             'party'=> $data['employee'],
             'doctor'=> [

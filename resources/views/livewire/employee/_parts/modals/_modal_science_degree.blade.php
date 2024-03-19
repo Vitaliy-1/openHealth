@@ -1,5 +1,3 @@
-
-
 <x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model="showModal">
     <x-slot name="title">
         {{__('Науковий ступінь')}}
@@ -7,7 +5,7 @@
     <x-slot name="content">
         <x-forms.forms-section-modal submit="store('science_degree')">
             <x-slot name="form">
-                <div  class="pt-4 grid grid gap-4 grid-cols-2">
+                <div class="pt-4 grid grid gap-4 grid-cols-2">
                     <x-forms.form-group class="">
                         <x-slot name="label">
                             <x-forms.label for="degree" class="default-label">
@@ -15,7 +13,8 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.science_degree.institution_name" type="text"
+                            <x-forms.input class="default-input"
+                                           wire:model="employee_request.science_degree.institution_name" type="text"
                                            id="institution_name"/>
                         </x-slot>
                         @error('employee_request.science_degree.institution_name')
@@ -33,7 +32,8 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.science_degree.speciality" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.science_degree.speciality"
+                                           type="text"
                                            id="speciality"/>
                         </x-slot>
                         @error('employee_request.science_degree.speciality')
@@ -51,7 +51,8 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.science_degree.diploma_number" type="text"
+                            <x-forms.input class="default-input"
+                                           wire:model="employee_request.science_degree.diploma_number" type="text"
                                            id="speciality"/>
                         </x-slot>
                         @error('employee_request.science_degree.diploma_number')
@@ -69,7 +70,8 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.science_degree.issued_date" type="date"
+                            <x-forms.input class="default-input"
+                                           wire:model="employee_request.science_degree.issued_date" type="date"
                                            id="issued_date"/>
                         </x-slot>
                         @error('employee_request.science_degree.issued_date')
@@ -145,7 +147,8 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.science_degree.city" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.science_degree.city"
+                                           type="text"
                                            id="city"/>
                         </x-slot>
                         @error('employee_request.science_degree.city')

@@ -1,13 +1,11 @@
-
-
 <x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model="showModal">
     <x-slot name="title">
         {{__('Кваліфікація')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="store('qualifications')">
+        <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'qualifications\',' . $key_property . ')' : 'store(\'qualifications\')' !!}">
             <x-slot name="form">
-                <div  class="pt-4 grid grid gap-4 grid-cols-2">
+                <div class="pt-4 grid grid gap-4 grid-cols-2">
 
                     <x-forms.form-group class="">
                         <x-slot name="label">
@@ -44,7 +42,8 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.institution_name" type="text"
+                            <x-forms.input class="default-input"
+                                           wire:model="employee_request.qualifications.institution_name" type="text"
                                            id="institution_name"/>
                         </x-slot>
                         @error('employee_request.qualifications.institution_name')
@@ -62,7 +61,8 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.speciality" type="text"
+                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.speciality"
+                                           type="text"
                                            id="speciality"/>
                         </x-slot>
                         @error('employee_request.qualifications.speciality')
@@ -80,7 +80,8 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.issued_date" type="date"
+                            <x-forms.input class="default-input"
+                                           wire:model="employee_request.qualifications.issued_date" type="date"
                                            id="issued_date"/>
                         </x-slot>
                         @error('employee_request.qualifications.issued_date')
@@ -98,7 +99,8 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.certificate_number" type="text"
+                            <x-forms.input class="default-input"
+                                           wire:model="employee_request.qualifications.certificate_number" type="text"
                                            id="certificate_number"/>
                         </x-slot>
                         @error('employee_request.qualifications.certificate_number')
@@ -116,7 +118,8 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.valid_to" type="date"
+                            <x-forms.input class="default-input" wire:model="employee_request.qualifications.valid_to"
+                                           type="date"
                                            id="valid_to"/>
                         </x-slot>
                         @error('employee_request.qualifications.valid_to')
@@ -134,8 +137,9 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.textarea class="default-input" wire:model="employee_request.qualifications.additional_info" type="text"
-                                           id="valid_to"/>
+                            <x-forms.textarea class="default-input"
+                                              wire:model="employee_request.qualifications.additional_info" type="text"
+                                              id="valid_to"/>
                         </x-slot>
                         @error('employee_request.qualifications.additional_info')
                         <x-slot name="error">

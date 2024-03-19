@@ -86,7 +86,7 @@
     <div class="mb-4.5 flex flex-col  gap-6 xl:flex-row">
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
-                <x-forms.label for="email" id="email" class="default-label">
+                <x-forms.label for="email"  class="default-label">
                     {{__('forms.email')}} *
                 </x-forms.label>
             </x-slot>
@@ -104,25 +104,15 @@
         </x-forms.form-group>
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
-                <x-forms.label for="owner_position" class="default-label">
-                    {{__('forms.position')}}*
+                <x-forms.label class="default-label" for="tax_id">
+                    {{__('forms.number')}} {{__('forms.RNOCPP')}} *
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.select
-                    class="default-input" wire:model="employee_request.employee.position" type="text"
-                    id="owner_position"
-                >
-                    <x-slot name="option">
-                        <option>{{__('forms.select_position')}}</option>
-                        @foreach($this->dictionaries['POSITION'] as $k=>$position)
-                            <option value="{{$k}}">{{$position}}</option>
-                        @endforeach
-                    </x-slot>
-                </x-forms.select>
-
+                <x-forms.input  maxlength="10"
+                                class="default-input" checked wire:model="employee_request.employee.tax_id" type="text" id="tax_id" name="tax_id"/>
             </x-slot>
-            @error('employee_request.employee.position')
+            @error('employee_request.employee.tax_id')
             <x-slot name="error">
                 <x-forms.error>
                     {{$message}}
@@ -132,6 +122,93 @@
         </x-forms.form-group>
 
     </div>
+    <div class="mb-4.5 flex flex-col  gap-6 xl:flex-row">
+        <x-forms.form-group class="">
+            <x-slot name="label">
+                <x-forms.label for="position" class="default-label">
+                    {{__('forms.position')}}*
+                </x-forms.label>
+            </x-slot>
+            <x-slot name="input">
+                <x-forms.select
+                    class="default-input" wire:model="employee_request.employee.position" type="text"
+                    id="position"
+                >
+                    <x-slot name="option">
+                        <option>{{__('forms.position')}}</option>
+                        @foreach($this->dictionaries['POSITION'] as $k=>$position )
+                            <option value="{{$k}}">{{$position}}</option>
+                        @endforeach
+                    </x-slot>
+                </x-forms.select>
+            </x-slot>
+            @error('employee_request.positions.position')
+            <x-slot name="error">
+                <x-forms.error>
+                    {{$message}}
+                </x-forms.error>
+            </x-slot>
+            @enderror
+        </x-forms.form-group>
+        <x-forms.form-group class="">
+            <x-slot name="label">
+                <x-forms.label for="start_date" class="default-label">
+                    {{__('forms.start_date_work')}} *
+                </x-forms.label>
+            </x-slot>
+            <x-slot name="input">
+                <x-forms.input class="default-input" wire:model="employee_request.employee.start_date" type="date"
+                               id="start_date"/>
+            </x-slot>
+            @error('employee_request.positions.start_date')
+            <x-slot name="error">
+                <x-forms.error>
+                    {{$message}}
+                </x-forms.error>
+            </x-slot>
+            @enderror
+        </x-forms.form-group>
+    </div>
+    <div class="mb-4.5 flex flex-col  gap-6 xl:flex-row">
+        <x-forms.form-group class="xl:w-1/2">
+            <x-slot name="label">
+                <x-forms.label for="working_experience"  class="default-label">
+                    {{__('forms.working_experience')}} *
+                </x-forms.label>
+            </x-slot>
+            <x-slot name="input">
+                <x-forms.input class="default-input" wire:model="employee_request.employee.working_experience" type="text"
+                               id="working_experience"/>
+            </x-slot>
+            @error('employee_request.employee.working_experience')
+            <x-slot name="error">
+                <x-forms.error>
+                    {{$message}}
+                </x-forms.error>
+            </x-slot>
+            @enderror
+        </x-forms.form-group>
+        <x-forms.form-group class="xl:w-1/2">
+            <x-slot name="label">
+                <x-forms.label class="default-label" for="about_myself">
+                   {{__('forms.about_myself')}}
+                </x-forms.label>
+            </x-slot>
+            <x-slot name="input">
+                <x-forms.textarea
+                                class="default-input" checked wire:model="employee_request.employee.about_myself" type="text" id="about_myself" name="tax_id"/>
+            </x-slot>
+            @error('employee_request.employee.about_myself')
+            <x-slot name="error">
+                <x-forms.error>
+                    {{$message}}
+                </x-forms.error>
+            </x-slot>
+            @enderror
+        </x-forms.form-group>
+
+    </div>
+
     <div class="mb-4.5 flex flex-col gap-0 ">
         <x-forms.label class="default-label" name="label" >
             {{__('forms.gender')}} *
@@ -209,138 +286,6 @@
            href="#">{{__('forms.addPhone')}}</a>
     </div>
 
-    <div x-data="{ show: false }">
-        <div class="mb-4.5 flex flex-col gap-0 gap-6 ">
-            <x-forms.form-group class="flex items-center  flex-row-reverse	justify-end	">
-                <x-slot name="input">
-                    <x-forms.input x-bind:checked="show"
-                                   @change="show = !show"
-                                   x-bind:value="false"
-                                   wire:model="employee_request.employee.no_tax_id"
-                                   type="checkbox"
-                                   id="no_tax_id"/>
-                </x-slot>
-                <x-slot name="label">
-                    <x-forms.label for="owner_no_tax_id"
-                                   class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                        {{__('forms.other_documents')}}
-                    </x-forms.label>
-                </x-slot>
-                @error('employee_request.employee.no_tax_id')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-        </div>
-        <div x-show="!show" class="mb-4.5 flex flex-col gap-0 gap-6 ">
-            <x-forms.form-group class="xl:w-1/2">
-                <x-slot name="label">
-                    <x-forms.label class="default-label" for="tax_id">
-                        {{__('forms.number')}} {{__('forms.RNOCPP')}}
-                    </x-forms.label>
-                </x-slot>
-                <x-slot name="input">
-                    <x-forms.input  maxlength="10"
-                        class="default-input" checked wire:model="employee_request.employee.tax_id" type="text" id="tax_id" name="tax_id"/>
-                </x-slot>
-                @error('employee_request.employee.tax_id')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-        </div>
-        <div x-show="show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
-            <x-forms.form-group class="xl:w-1/2">
-                <x-slot name="label">
-                    <x-forms.label for="documents_type" class="default-label">
-                        {{__('forms.document_type')}} *
-                    </x-forms.label>
-                </x-slot>
-                <x-slot name="input">
-                    <x-forms.select id="documents_type" wire:model.defer="employee_request.employee.documents.type"
-                                    class="default-select">
-                        <x-slot name="option">
-                            <option>{{__('Обрати тип')}}</option>
-                            <option value="PASPORT">{{__('Паспорт')}}</option>
-                        </x-slot>
-                    </x-forms.select>
-                </x-slot>
-                @error('employee_request.employee.documents.type')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-            <x-forms.form-group class="xl:w-1/2">
-                <x-slot name="label">
-                    <x-forms.label for="documents_number" class="default-label">
-                        {{__('forms.document_number')}} *
-                    </x-forms.label>
-                </x-slot>
-                <x-slot name="input">
-                    <x-forms.input class="default-input" wire:model="employee_request.employee.documents.number"
-                                   type="text" id="documents_number"
-                    />
-                </x-slot>
-                @error('employee_request.employee.documents.number')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-        </div>
-        <div x-show="show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
-            <x-forms.form-group class="xl:w-1/2">
-                <x-slot name="label">
-                    <x-forms.label for="documents_issued_by" class="default-label">
-                        {{__('forms.document_issued_by')}}
-                    </x-forms.label>
-                </x-slot>
-                <x-slot name="input">
-                    <x-forms.input class="default-input" wire:model="employee_request.employee..documents.issued_by"
-                                   type="text" id="documents_issued_by"
-                                   placeholder="{{__('Орган яким виданий документ')}}"/>
-                </x-slot>
-                @error('employee_request.employee.documents.issued_by')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-            <x-forms.form-group class="xl:w-1/2">
-                <x-slot name="label">
-                    <x-forms.label for="owner_documents_issued_at" class="default-label">
-                        {{__('forms.document_issued_at')}}
-                    </x-forms.label>
-                </x-slot>
-                <x-slot name="input">
-                    <x-forms.input class="default-input" wire:model="employee_request.employee.documents.issued_at"
-                                   type="date" id="owner_documents_issued_at"
-                                   placeholder="{{__('Дата видачі документа')}}"/>
-                </x-slot>
-                @error('employee_request.employee.documents.issued_at')
-                <x-slot name="message">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-
-        </div>
-    </div>
 
     <div class="mb-4.5 mt-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
         <div class="xl:w-1/4 text-left">

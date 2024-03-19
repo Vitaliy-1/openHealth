@@ -22,6 +22,7 @@
 
 
     <body
+
         x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
         x-init="
          darkMode = JSON.parse(localStorage.getItem('darkMode'));

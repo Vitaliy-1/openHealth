@@ -124,4 +124,12 @@ return [
     'select_division' => 'Обрати підрозділ',
     'valid_to'=>'Дійсний до',
     'additional_info'=>'Додаткова інформація',
+    'about_myself'=>'Про мене',
+    'working_experience'=>'Досвід роботи',
+    'select_country' => 'Обрати країну',
+    'role' => 'Роль',
+    'qualification_type' => 'Тип кваліфікації',
+    'add_button' => 'Додати',
+    'healthcare_service' => 'Послуга здоров\'я',
+
 ];
