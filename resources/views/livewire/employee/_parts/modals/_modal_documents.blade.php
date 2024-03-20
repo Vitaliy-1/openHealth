@@ -1,9 +1,9 @@
-<x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model.live="showModal">
+<x-dialog-modal wire:after="initializeFlatpickr" maxWidth="3xl" class="w-3 h-full" wire:model.live="showModal">
     <x-slot name="title">
         {{__('Додати Документ')}}
     </x-slot>
     <x-slot name="content">
- 
+
 
         <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'documents\',' . $key_property . ')' : 'store(\'documents\')' !!}">
                         <x-slot name="form">
@@ -78,15 +78,13 @@
                                 </x-forms.form-group>
                                 <x-forms.form-group class="xl:w-1/2">
                                     <x-slot name="label">
-                                        <x-forms.label for="owner_documents_issued_at" class="default-label">
+                                        <x-forms.label for="documents_issued_at" class="default-label">
                                             {{__('forms.document_issued_at')}}
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name="input">
-                                        <x-forms.input class="default-input"
-                                                       wire:model="employee_request.documents.issued_at"
-                                                       type="date" id="owner_documents_issued_at"
-                                                       placeholder="{{__('Дата видачі документа')}}"/>
+                                        <x-forms.datapicker id="document_issued_at"  wire:model="employee_request.documents.issued_at"/>
+
                                     </x-slot>
                                     @error('employee_request.documents.issued_at')
                                     <x-slot name="message">
@@ -129,3 +127,6 @@
 
     </x-slot>
 </x-dialog-modal>
+
+
+

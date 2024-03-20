@@ -16,7 +16,8 @@ class EmployeeFormRequest extends Form
         'employee.phones.*.number' => 'required|string:digits:13',
         'employee.phones.*.type' => 'required|string',
         'employee.email' => 'required|email',
-        'employee.tax_id' => 'nullable|integer|between:8,10',
+        'employee.position' => 'required|string',
+        'employee.tax_id' => 'nullable|integer|digits:8,10',
     ])]
 
     public ?array $employee = [];
@@ -96,6 +97,48 @@ class EmployeeFormRequest extends Form
     }
 
 
+    public function validateBeforeSendApi(): array
+    {
+        if (empty($this->employee)){
+            return [
+                'status'=> true,
+                'message' => __('validation.custom.employee_table'),
+            ];
+        }
+
+        if (!isset($this->employee['tax_id']) && empty($this->documents)){
+            return [
+                'status'=> true,
+                'message' => __('validation.custom.documents_empty'),
+            ];
+        }
+        if (empty($this->role) ){
+            return [
+                'status'=> true,
+                'message' => __('validation.custom.role_table'),
+            ];
+        }
+
+        if (empty($this->educations) ){
+           return [
+               'status'=> true,
+               'message' => __('validation.custom.educations_table'),
+           ];
+       }
+
+        if (empty($this->specialities) ){
+            return [
+                'status'=> true,
+                'message' => __('validation.custom.specialities_table'),
+            ];
+        }
+
+        return [
+            'status'=> false,
+            'message' => '',
+        ];
+
+    }
 
 
 

@@ -23,11 +23,11 @@ class EmployeeRequestApi extends EmployeeApi
             $data['employee']['no_tax_id'] = true;
         }
 
-        $params = [
+        return [
             'legal_entity_id' => $uuid,
-            'position'=> $data['positions']['position'],
+            'position'=> $data['employee']['position'],
             'division_id'=> $data['role'][0]['division_id'],
-            'start_date'=> Carbon::parse($data['positions']['start_date'])->format('Y-m-d') ?? '',
+            'start_date'=> Carbon::parse($data['employee']['start_date'])->format('Y-m-d') ?? '',
             'employee_type'=> $data['role'][0]['employee_type'],
             'party'=> $data['employee'],
             'doctor'=> [
@@ -39,7 +39,6 @@ class EmployeeRequestApi extends EmployeeApi
             'inserted_at'=> Carbon::now()->format('Y-m-d H:i:s'),
         ];
 
-        return $params;
     }
 
 

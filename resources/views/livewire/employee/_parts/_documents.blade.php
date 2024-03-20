@@ -1,4 +1,4 @@
-<div class="mb-4" x-data="{show_document: false}" >
+<div wire:after="initializeFlatpickr" class="mb-4" x-data="{show_document: false}" >
     <div class="border-b border-stroke  py-4 dark:border-strokedark">
         <h3 class="font-medium text-2xl	 text-black dark:text-white">
             Документи

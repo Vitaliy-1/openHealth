@@ -87,6 +87,7 @@ class EmployeeForm extends Component
         if ($request->has('store_id')) {
             $this->request_id = $request->input('store_id');
         }
+
         if (isset($id)) {
             $this->employee_id = $id;
         }
@@ -226,7 +227,7 @@ class EmployeeForm extends Component
         $this->mode = 'edit';
         $cacheData = $this->getCache();
         $this->openModal($model);
-        if (empty($key_property)) {
+        if (empty($key_property) && $key_property !== 0) {
             $this->employee_request->{$model} = $cacheData[$this->request_id][$model];
         }
         else{
@@ -249,8 +250,6 @@ class EmployeeForm extends Component
         return Cache::has($this->employeeCacheKey);
     }
 
-
-
     public function update($model,$key_property)
     {
 
@@ -269,6 +268,7 @@ class EmployeeForm extends Component
         if (!empty($model)) {
             $this->employee_request->{$model} = [];
         }
+
         $this->closeModal();
         $this->getEmployee();
 
@@ -286,24 +286,19 @@ class EmployeeForm extends Component
             $this->employee_request->fill($cacheData[$this->request_id]);
         }
 
-        if ($this->employee_request->employee
-            && $this->employee_request->role
-            && $this->employee_request->positions
-            && $this->employee_request->qualifications
-            && $this->employee_request->science_degree
-            && $this->employee_request->specialities
-            && $this->employee_request->educations) {
+       $error = $this->employee_request->validateBeforeSendApi();
+
+        if (!$error['status']) {
             $employeeRequest = EmployeeRequestApi::createEmployeeRequest($this->legalEntity->uuid, $this->employee_request->toArray());
             $person = $this->savePerson($employeeRequest);
             $this->saveUser($employeeRequest['party'], $person);
             $this->saveEmployee($employeeRequest, $person);
-
             $this->forgetCacheIndex();
             return redirect(route('employee.index'));
 
         } else {
-            $this->error['message'] = 'Заповніть всі поля';
-            $this->error['status'] = true;
+            $this->error['status'] = $error['status'];
+            $this->error['message'] = $error['message'];
         }
         $this->getEmployee();
     }

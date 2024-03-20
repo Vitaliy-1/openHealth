@@ -68,9 +68,12 @@
                     {{__('forms.birth_date')}} *
                 </x-forms.label>
             </x-slot>
+
             <x-slot name="input">
-                <x-forms.input class="default-input" wire:model="employee_request.employee.birth_date" type="date"
-                               id="birth_date"/>
+
+                <x-forms.datapicker id="birth_date" wire:model="employee_request.employee.birth_date"
+
+                               />
             </x-slot>
             @error('employee_request.employee.birth_date')
             <x-slot name="error">
@@ -91,6 +94,7 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
+
                 <x-forms.input class="default-input" wire:model="employee_request.employee.email" type="text"
                                id="email" placeholder="{{__('E-mail')}}"/>
             </x-slot>
@@ -126,7 +130,7 @@
         <x-forms.form-group class="">
             <x-slot name="label">
                 <x-forms.label for="position" class="default-label">
-                    {{__('forms.position')}}*
+                    {{__('forms.position')}} *
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
@@ -142,7 +146,7 @@
                     </x-slot>
                 </x-forms.select>
             </x-slot>
-            @error('employee_request.positions.position')
+            @error('employee_request.employee.position')
             <x-slot name="error">
                 <x-forms.error>
                     {{$message}}
@@ -153,12 +157,13 @@
         <x-forms.form-group class="">
             <x-slot name="label">
                 <x-forms.label for="start_date" class="default-label">
-                    {{__('forms.start_date_work')}} *
+                    {{__('forms.start_date_work')}}
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input class="default-input" wire:model="employee_request.employee.start_date" type="date"
-                               id="start_date"/>
+
+                <x-forms.datapicker id="start_date"  wire:model="employee_request.employee.start_date"
+                               />
             </x-slot>
             @error('employee_request.positions.start_date')
             <x-slot name="error">
@@ -173,7 +178,7 @@
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
                 <x-forms.label for="working_experience"  class="default-label">
-                    {{__('forms.working_experience')}} *
+                    {{__('forms.working_experience')}}
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
@@ -263,6 +268,7 @@
                                 <x-forms.input  x-mask="38099 999 99 99" class="default-input"
                                                 wire:model="employee_request.employee.phones.{{$key}}.number" type="text"
                                                 placeholder="{{__('+ 3(80)00 000 00 00 ')}}"/>
+
                                 @error("employee_request.employee.phones.{$key}.number")
                                 <x-forms.error>
                                     {{ $message }}

@@ -128,6 +128,11 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+     'role_table' => 'Заповніть таблицю Ролі',
+     'documents_empty' => 'Заповніть таблицю Документи Паспорт або Номер РНОКПП',
+     'educations_table' => 'Заповніть таблицю Освіта',
+     'specialities_table' => 'Заповніть таблицю Спеціальності',
+     'employee_table' => 'Заповніть данні Працівника',
     ],
 
     /*
@@ -226,4 +231,5 @@ return [
         ],
     ],
 
+    //
 ];
