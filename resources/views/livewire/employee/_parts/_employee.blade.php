@@ -1,7 +1,7 @@
 <div>
     <div class=" py-4">
         <h3 class="font-medium text-2xl	 text-black dark:text-white">
-            Основна інформація
+            {{__('forms.personal_data')}}
         </h3>
     </div>
     <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -42,8 +42,6 @@
             </x-slot>
             @enderror
         </x-forms.form-group>
-    </div>
-    <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
                 <x-forms.label for="second_name"  class="default-label">
@@ -62,6 +60,9 @@
             </x-slot>
             @enderror
         </x-forms.form-group>
+
+    </div>
+    <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
                 <x-forms.label for="birth_date" class="default-label">
@@ -84,9 +85,6 @@
             </x-slot>
             @enderror
         </x-forms.form-group>
-
-    </div>
-    <div class="mb-4.5 flex flex-col  gap-6 xl:flex-row">
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
                 <x-forms.label for="email"  class="default-label">
@@ -124,7 +122,6 @@
             </x-slot>
             @enderror
         </x-forms.form-group>
-
     </div>
     <div class="mb-4.5 flex flex-col  gap-6 xl:flex-row">
         <x-forms.form-group class="">
@@ -139,7 +136,7 @@
                     id="position"
                 >
                     <x-slot name="option">
-                        <option>{{__('forms.position')}}</option>
+                        <option>{{__('forms.select')}} {{__('forms.position')}}</option>
                         @foreach($this->dictionaries['POSITION'] as $k=>$position )
                             <option value="{{$k}}">{{$position}}</option>
                         @endforeach
@@ -154,6 +151,35 @@
             </x-slot>
             @enderror
         </x-forms.form-group>
+        <x-forms.form-group class="">
+            <x-slot name="label">
+                <x-forms.label for="employee_type" class="default-label">
+                    {{__('forms.role')}}*
+                </x-forms.label>
+            </x-slot>
+            <x-slot name="input">
+                <x-forms.select
+                    class="default-input" wire:model="employee_request.employee.employee_type" type="text"
+                    id="employee_type"
+                >
+                    <x-slot name="option">
+                        <option> {{__('forms.select')}} {{__('forms.role')}}</option>
+                        @foreach($this->dictionaries['EMPLOYEE_TYPE'] as $k=>$employee_type)
+                            <option value="{{$k}}">{{$employee_type}}</option>
+                        @endforeach
+                    </x-slot>
+                </x-forms.select>
+
+            </x-slot>
+            @error('employee_request.employee.employee_type')
+            <x-slot name="error">
+                <x-forms.error>
+                    {{$message}}
+                </x-forms.error>
+            </x-slot>
+            @enderror
+        </x-forms.form-group>
+
         <x-forms.form-group class="">
             <x-slot name="label">
                 <x-forms.label for="start_date" class="default-label">
@@ -175,7 +201,7 @@
         </x-forms.form-group>
     </div>
     <div class="mb-4.5 flex flex-col  gap-6 xl:flex-row">
-        <x-forms.form-group class="xl:w-1/2">
+        <x-forms.form-group class="xl:w-1/4">
             <x-slot name="label">
                 <x-forms.label for="working_experience"  class="default-label">
                     {{__('forms.working_experience')}}
@@ -193,7 +219,7 @@
             </x-slot>
             @enderror
         </x-forms.form-group>
-        <x-forms.form-group class="xl:w-1/2">
+        <x-forms.form-group class="xl:w-1/1">
             <x-slot name="label">
                 <x-forms.label class="default-label" for="about_myself">
                    {{__('forms.about_myself')}}
@@ -211,7 +237,6 @@
             </x-slot>
             @enderror
         </x-forms.form-group>
-
     </div>
 
     <div class="mb-4.5 flex flex-col gap-0 ">
@@ -299,7 +324,7 @@
         </div>
         <div class="xl:w-1/4 text-right">
             <x-button wire:click="store('employee')" type="submit" class="btn-primary d-flex max-w-[150px]">
-                {{__('Зберегти')}}
+                {{__('forms.save')}}
             </x-button>
         </div>
     </div>

@@ -1,6 +1,6 @@
 <x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model="showModal">
     <x-slot name="title">
-        {{__('Кваліфікація')}}
+        {{__('forms.qualification')}}
     </x-slot>
     <x-slot name="content">
         <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'qualifications\',' . $key_property . ')' : 'store(\'qualifications\')' !!}">
@@ -154,12 +154,12 @@
                 <div class="mb-4.5 mt-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
                     <div class="xl:w-1/4 text-left">
                         <x-secondary-button wire:click="closeModalModel()">
-                            {{__('Закрити ')}}
+                            {{__('forms.close')}}
                         </x-secondary-button>
                     </div>
                     <div class="xl:w-1/4 text-right">
                         <x-button type="submit" class="btn-primary">
-                            {{__('Додати  кваліфікацію')}}
+                            {{__('forms.save')}}
                         </x-button>
                     </div>
                 </div>

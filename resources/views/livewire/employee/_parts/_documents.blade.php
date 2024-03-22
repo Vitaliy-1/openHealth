@@ -1,23 +1,23 @@
 <div wire:after="initializeFlatpickr" class="mb-4" x-data="{show_document: false}" >
     <div class="border-b border-stroke  py-4 dark:border-strokedark">
         <h3 class="font-medium text-2xl	 text-black dark:text-white">
-            Документи
+            {{__('forms.documents')}}
         </h3>
     </div>
     <table class="w-full table-auto">
         <thead>
         <tr class="bg-gray-2 text-left dark:bg-meta-4">
             <th class="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
-                Tun документа
+                {{__('forms.document_type')}}
             </th>
             <th class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
-            Серія і номер
+                {{__('forms.serial_and_number')}}
             </th>
             <th class="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
-                Ким виданий
+                {{__('forms.issued_by')}}
             </th>
             <th class="px-4 py-4 font-medium text-black dark:text-white">
-                Дата видачі
+                {{__('forms.issued_at')}}
             </th>
             <th class="px-4 py-4 font-medium text-black dark:text-white">
 
@@ -59,6 +59,6 @@
         </tbody>
     </table>
     <div class="mb-6 mt-6 flex flex-wrap gap-5 xl:gap-7.5">
-        <a wire:click.prevent="create('documents')" class="text-primary" href="">Додати документ</a>
+        <a wire:click.prevent="create('documents')" class="text-primary" href="">{{__('forms.add_document')}}</a>
     </div>
 </div>

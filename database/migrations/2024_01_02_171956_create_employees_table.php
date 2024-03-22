@@ -31,7 +31,6 @@ return new class extends Migration
             $table->foreign('legal_entity_id')->references('id')->on('legal_entities');
             $table->foreign('division_id')->references('id')->on('divisions');//Todo: add divisions table
             $table->timestamps();
-
         });
     }
 

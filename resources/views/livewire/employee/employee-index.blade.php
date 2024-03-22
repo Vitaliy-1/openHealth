@@ -109,6 +109,9 @@
                                                class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">
                                                 {{__('forms.edit')}}
                                             </a>
+
+
+
                                         </div>
                                     </div>
                                 </div>
@@ -194,7 +197,10 @@
                                                                                             {{__('forms.edit')}}
                                                                                         </a>
 
-
+                                            <a wire:click="showModalDismissed({{$employee->id}})"
+                                               class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">
+                                                {{__('forms.dismissed')}}
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -211,6 +217,27 @@
         </x-tables.table>
     </div>
 
+    @if($showModal)
+        <x-alert-modal  name="title">
+            <x-slot name="title">
+                {{__('forms.dismissed')}}
+            </x-slot>
+            <x-slot name="text">
+                {{$dismiss_text}}
+            </x-slot>
+            <x-slot name="button">
+                <div class="justify-between items-center pt-0 space-y-4 sm:flex sm:space-y-0">
+                        <button  wire:click="closeModal" type="button"  class="py-2 px-4 w-full text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 sm:w-auto hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                            {{__('forms.cansel')}}</button>
+                        <button  wire:click="dismissed({{$dismissed_id}})" type="button" class="py-2 bg-primary px-4 w-full text-sm font-medium text-center text-white rounded-lg bg-primary-700 sm:w-auto hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                            {{__('forms.confirm')}}
+                        </button>
+                </div>
+            </x-slot>
+
+        </x-alert-modal>
+
+    @endif
 {{--    @include('livewire.employee._parts._employee_form')--}}
 </div>
 

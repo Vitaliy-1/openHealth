@@ -2,7 +2,7 @@
 
 <x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model="showModal">
     <x-slot name="title">
-        {{__('Додати Освіту')}}
+        {{__('forms.education')}}
     </x-slot>
     <x-slot name="content">
             <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'educations\',' . $key_property . ')' : 'store(\'educations\')' !!}">

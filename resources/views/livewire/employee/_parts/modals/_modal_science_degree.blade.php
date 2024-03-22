@@ -96,7 +96,7 @@
                                 <x-slot name="option">
                                     <option>{{__('forms.degree')}}</option>
                                     @foreach($this->dictionaries['SCIENCE_DEGREE'] as $k=>$science_degree)
-                                        <option value="{{$science_degree}}">{{$science_degree}}</option>
+                                        <option value="{{$k}}">{{$science_degree}}</option>
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>

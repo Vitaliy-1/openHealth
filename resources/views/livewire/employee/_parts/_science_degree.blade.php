@@ -1,26 +1,26 @@
 <div class="mb-4">
     <div class="border-b border-stroke  py-4 dark:border-strokedark">
         <h3 class="font-medium text-2xl	  dark:text-white">
-            Науковий ступінь
+            {{__('forms.science_degree')}}
         </h3>
     </div>
     <table class="w-full table-auto">
         <thead>
         <tr class="bg-gray-2 text-left dark:bg-meta-4">
             <th class="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
-                Ступінь
+                {{ __('forms.degree') }}
             </th>
             <th class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
-                Дата присвоєння
+                {{__('forms.issued_date')}}
             </th>
             <th class="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
-                Назва закладу
+                {{ __('forms.institution_name') }}
             </th>
             <th class="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
-                Спеціальність
+                {{__('forms.speciality')}}
             </th>
             <th class="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
-                Номер диполму
+                {{__('forms.diploma_number')}}
             </th>
             <th class="px-4 py-4 font-medium text-black dark:text-white">
             </th>
@@ -60,7 +60,7 @@
     </table>
     <div class="mb-6 mt-6 flex flex-wrap gap-5 xl:gap-7.5">
         @if(empty($employee->science_degree))
-        <a wire:click.prevent="openModal('science_degree')" class="text-primary" href="">Додати науковий ступінь</a>
+        <a wire:click.prevent="openModal('science_degree')" class="text-primary" href="">{{__('forms.add_science_degree')}}</a>
         @endif
     </div>
 

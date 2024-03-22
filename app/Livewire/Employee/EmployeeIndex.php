@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Employee;
 
+use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
 use App\Models\Employee;
-use App\Models\User;
+use App\Traits\FormTrait;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +14,7 @@ use Livewire\Component;
 class EmployeeIndex extends Component
 {
 
+    use FormTrait;
     const CACHE_PREFIX = 'register_employee_form';
 
     public object $employees;
@@ -20,7 +23,12 @@ class EmployeeIndex extends Component
     protected string $employeeCacheKey;
     public int $storeId = 0;
     public \Illuminate\Support\Collection $employeesCache;
+    public string $dismiss_text;
 
+    public int $dismissed_id;
+    /**
+     * @var false
+     */
 
 
     public function boot(Employee $employee): void
@@ -114,6 +122,36 @@ class EmployeeIndex extends Component
             $this->employees = collect();
         }
     }
+
+    public function dismissed(Employee $employee){
+        $dismissed = EmployeeRequestApi::dismissedEmployeeRequest($employee->uuid);
+
+        if (!empty($dismissed)){
+            $employee->update([
+                'status' => 'DISMISSED',
+                'end_date' => Carbon::now()->format('Y-m-d'),
+            ]);
+        }
+
+        $this->closeModal();
+        $this->getEmployees();
+
+    }
+
+    public function showModalDismissed($id){
+        $employee = Employee::find($id);
+        if ($employee->employee_type === 'DOCTOR') {
+            $this->dismiss_text = __('forms.dismissed_text_doctor');
+        }
+        else{
+            $this->dismiss_text = __('forms.dismissed_textr');
+
+        }
+        $this->dismissed_id = $employee->id;
+
+        $this->openModal();
+    }
+
 
     public function render()
     {

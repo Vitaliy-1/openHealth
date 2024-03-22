@@ -27,12 +27,8 @@ class Employee extends Model
 
     protected $casts = [
         'party' => 'array',
-        'party.birth_date' => 'datestamp',
         'doctor' => 'array',
         'speciality' => 'array',
-    ];
-
-    protected $attributes = [
     ];
 
 

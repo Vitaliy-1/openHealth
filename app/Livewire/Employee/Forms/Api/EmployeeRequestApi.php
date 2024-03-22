@@ -26,20 +26,24 @@ class EmployeeRequestApi extends EmployeeApi
         return [
             'legal_entity_id' => $uuid,
             'position'=> $data['employee']['position'],
-            'division_id'=> $data['role'][0]['division_id'],
             'start_date'=> Carbon::parse($data['employee']['start_date'])->format('Y-m-d') ?? '',
-            'employee_type'=> $data['role'][0]['employee_type'],
+            'employee_type'=> $data['employee']['employee_type'],
             'party'=> $data['employee'],
             'doctor'=> [
-                 'educations'=> $data['educations'],
-                 'specialities'=> $data['specialities'],
-                 'qualifications'=> $data['qualifications'],
-                 'science_degree'=> $data['science_degree'],
+                 'educations'=> $data['educations'] ?? [],
+                 'specialities'=> $data['specialities'] ?? [],
+                 'qualifications'=> $data['qualifications'] ?? [],
+                 'science_degree'=> $data['science_degree'] ?? [],
              ],
             'inserted_at'=> Carbon::now()->format('Y-m-d H:i:s'),
         ];
 
     }
 
+
+    public static function dismissedEmployeeRequest($id):array
+    {
+        return self::_dismissed($id);
+    }
 
 }

@@ -17,7 +17,7 @@
                 @include('livewire.employee._parts._education')
                 @include('livewire.employee._parts._specialities')
 {{--                @include('livewire.employee._parts._positions')--}}
-                @include('livewire.employee._parts._role')
+{{--                @include('livewire.employee._parts._role')--}}
                 @include('livewire.employee._parts._science_degree')
                 @include('livewire.employee._parts._qualifications')
 
@@ -52,10 +52,10 @@
         @include('livewire.employee._parts.modals._modal_documents')
     @elseif($showModal == 'specialities')
         @include('livewire.employee._parts.modals._modal_specialities')
-    @elseif($showModal == 'positions')
-        @include('livewire.employee._parts.modals._modal_positions')
-    @elseif($showModal == 'role')
-        @include('livewire.employee._parts.modals._modal_role')
+{{--    @elseif($showModal == 'positions')--}}
+{{--        @include('livewire.employee._parts.modals._modal_positions')--}}
+{{--    @elseif($showModal == 'role')--}}
+{{--        @include('livewire.employee._parts.modals._modal_role')--}}
     @elseif($showModal == 'science_degree')
         @include('livewire.employee._parts.modals._modal_science_degree')
     @elseif($showModal == 'qualifications')

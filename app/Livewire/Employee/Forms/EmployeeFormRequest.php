@@ -17,7 +17,8 @@ class EmployeeFormRequest extends Form
         'employee.phones.*.type' => 'required|string',
         'employee.email' => 'required|email',
         'employee.position' => 'required|string',
-        'employee.tax_id' => 'nullable|integer|digits:8,10',
+        'employee.tax_id' => 'nullable|min:8|max:10',
+        'employee.employee_type' => 'required|string',
     ])]
 
     public ?array $employee = [];
@@ -112,26 +113,26 @@ class EmployeeFormRequest extends Form
                 'message' => __('validation.custom.documents_empty'),
             ];
         }
-        if (empty($this->role) ){
-            return [
-                'status'=> true,
-                'message' => __('validation.custom.role_table'),
-            ];
-        }
+//        if (empty($this->role) ){
+//            return [
+//                'status'=> true,
+//                'message' => __('validation.custom.role_table'),
+//            ];
+//        }
 
-        if (empty($this->educations) ){
-           return [
-               'status'=> true,
-               'message' => __('validation.custom.educations_table'),
-           ];
-       }
-
-        if (empty($this->specialities) ){
-            return [
-                'status'=> true,
-                'message' => __('validation.custom.specialities_table'),
-            ];
-        }
+//        if (empty($this->educations) ){
+//           return [
+//               'status'=> true,
+//               'message' => __('validation.custom.educations_table'),
+//           ];
+//       }
+//
+//        if (empty($this->specialities) ){
+//            return [
+//                'status'=> true,
+//                'message' => __('validation.custom.specialities_table'),
+//            ];
+//        }
 
         return [
             'status'=> false,
