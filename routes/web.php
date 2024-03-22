@@ -50,7 +50,7 @@ Route::middleware([
 
         Route::prefix('employee')->group(function () {
             Route::get('/', EmployeeIndex::class)->name('employee.index');
-            Route::get('/form/{employee?}', EmployeeForm::class)->name('employee.form');
+            Route::get('/form/{id?}', EmployeeForm::class)->name('employee.form');
         });
         Route::get('/search/patient', [SearchPatient::class, 'index']);
 

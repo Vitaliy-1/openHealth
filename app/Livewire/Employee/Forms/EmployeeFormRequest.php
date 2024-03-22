@@ -12,15 +12,13 @@ class EmployeeFormRequest extends Form
         'employee.last_name' => 'required|min:3',
         'employee.first_name' => 'required|min:3',
         'employee.gender' => 'required|string',
-        'employee.birth_date' => 'required|date',
+        'employee.birth_date' => 'required|date' ,
         'employee.phones.*.number' => 'required|string:digits:13',
         'employee.phones.*.type' => 'required|string',
         'employee.email' => 'required|email',
-        'employee.no_tax_id' => 'boolean',
-        'employee.tax_id' => 'exclude_if:owner.no_tax_id,false|required|integer|digits:10',
-        'employee.documents.type' => 'exclude_if:owner.no_tax_id,true|required|string',
-        'employee.documents.number' => 'exclude_if:owner.no_tax_id,true|required|string',
-        'employee.position' => 'required|string'
+        'employee.position' => 'required|string',
+        'employee.tax_id' => 'nullable|min:8|max:10',
+        'employee.employee_type' => 'required|string',
     ])]
 
     public ?array $employee = [];
@@ -98,6 +96,51 @@ class EmployeeFormRequest extends Form
     {
         return $this->validate($this->rulesForModel($model)->toArray());
     }
+
+
+    public function validateBeforeSendApi(): array
+    {
+        if (empty($this->employee)){
+            return [
+                'status'=> true,
+                'message' => __('validation.custom.employee_table'),
+            ];
+        }
+
+        if (!isset($this->employee['tax_id']) && empty($this->documents)){
+            return [
+                'status'=> true,
+                'message' => __('validation.custom.documents_empty'),
+            ];
+        }
+//        if (empty($this->role) ){
+//            return [
+//                'status'=> true,
+//                'message' => __('validation.custom.role_table'),
+//            ];
+//        }
+
+//        if (empty($this->educations) ){
+//           return [
+//               'status'=> true,
+//               'message' => __('validation.custom.educations_table'),
+//           ];
+//       }
+//
+//        if (empty($this->specialities) ){
+//            return [
+//                'status'=> true,
+//                'message' => __('validation.custom.specialities_table'),
+//            ];
+//        }
+
+        return [
+            'status'=> false,
+            'message' => '',
+        ];
+
+    }
+
 
 
 

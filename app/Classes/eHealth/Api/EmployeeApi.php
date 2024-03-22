@@ -16,4 +16,10 @@ class EmployeeApi extends Request
     }
 
 
+    public static function _dismissed($id): array
+    {
+        return self::patch('employees/'.$id.'/actions/deactivate');
+    }
+
+
 }

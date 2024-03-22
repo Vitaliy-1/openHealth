@@ -5,7 +5,7 @@
         {{__('Додати Посаду')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="store('positions')">
+        <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'positions\',' . $key_property . ')' : 'store(\'positions\')' !!}">
             <x-slot name="form">
                 <div  class="pt-4 grid grid gap-4 grid-cols-2">
                     <x-forms.form-group class="">
