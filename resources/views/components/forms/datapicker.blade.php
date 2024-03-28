@@ -1,6 +1,6 @@
 @props(['disabled' => false])
 
-<div wire:ignore>
+<div >
     <div class="relative">
         <input
             {{ $disabled ? 'disabled' : '' }}
@@ -30,8 +30,3 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener("livewire:load", function () {
-        formDatepicker();
-    });
-</script>

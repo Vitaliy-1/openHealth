@@ -46,6 +46,7 @@
                 </div>
 
  </div>
+
     @if($showModal == 'educations')
         @include('livewire.employee._parts.modals._modal_education')
     @elseif($showModal == 'documents')

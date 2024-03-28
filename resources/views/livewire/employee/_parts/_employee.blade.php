@@ -1,4 +1,4 @@
-<div>
+<div wire:ignore>
     <div class=" py-4">
         <h3 class="font-medium text-2xl	 text-black dark:text-white">
             {{__('forms.personal_data')}}

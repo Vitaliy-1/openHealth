@@ -19,11 +19,6 @@ import map01 from "./components/map-01";
 
 Alpine.plugin(mask)
 Alpine.plugin(focus)
-Alpine.plugin(flatpickr)
-
-// Init flatpickr
-
-
 
 function formDatepicker() {
     flatpickr(".datepicker", {
@@ -67,7 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
     chart03();
     chart04();
     map01();
+
     formDatepicker();
 
 });
-
+Livewire.on('message.processed', () => {
+    formDatepicker();
+    console.log(1323213);
+});

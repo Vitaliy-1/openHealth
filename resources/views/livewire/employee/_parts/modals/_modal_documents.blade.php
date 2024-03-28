@@ -1,4 +1,4 @@
-<x-dialog-modal wire:after="initializeFlatpickr" maxWidth="3xl" class="w-3 h-full" wire:model.live="showModal">
+<x-dialog-modal  maxWidth="3xl" class="w-3 h-full" wire:model.live="showModal">
     <x-slot name="title">
         {{__('forms.documents')}}
     </x-slot>
@@ -83,8 +83,8 @@
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name="input">
-                                        <x-forms.datapicker id="document_issued_at"  wire:model="employee_request.documents.issued_at"/>
-
+                                        <x-forms.input class="default-input" id="document_issued_at"  wire:model="employee_request.documents.issued_at" type="date"
+                                                       />
                                     </x-slot>
                                     @error('employee_request.documents.issued_at')
                                     <x-slot name="message">
@@ -97,9 +97,9 @@
 
                             </div>
                             <div class="mb-4.5 mt-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
-                                <div class="xl:w-1/4 text-left">
+                                <div  class="xl:w-1/4 text-left">
                                     <x-secondary-button wire:click="closeModalModel()">
-                                        {{__('forms.close ')}}
+                                        {{__('forms.close')}}
                                     </x-secondary-button>
                                 </div>
                                 <div class="xl:w-1/4 text-right">
@@ -127,6 +127,7 @@
 
     </x-slot>
 </x-dialog-modal>
+
 
 
 

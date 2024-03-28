@@ -151,7 +151,7 @@ return [
     'add_qualification' => 'Додати кваліфікація',
     'add_science_degree' => 'Додати науковий ступінь',
     'add_document'=>'Додати документ',
-
+    'close' => 'Закрити',
     'cancel' => 'Скасувати',
     'name_of_institution'=>' Назва закладу',
     'certificate'=> 'Сертифікат',
