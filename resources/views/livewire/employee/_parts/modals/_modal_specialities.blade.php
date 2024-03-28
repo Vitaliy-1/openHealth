@@ -5,7 +5,7 @@
         {{__('Додати Спеціальність')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="store('specialities')">
+         <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'specialities\',' . $key_property . ')' : 'store(\'specialities\')' !!}">
             <x-slot name="form">
                 <div  class="pt-4 grid grid gap-4 grid-cols-2">
                     <x-forms.form-group class="">

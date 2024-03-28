@@ -127,7 +127,14 @@ return [
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-message',
+            'first_name' => 'Прізвище',
         ],
+     ':attribute.required' => 'Поле :attribute є обов\'язковим для заповнення.',
+     'role_table' => 'Заповніть таблицю Ролі',
+     'documents_empty' => 'Заповніть таблицю Документи Паспорт або Номер РНОКПП',
+     'educations_table' => 'Заповніть таблицю Освіта',
+     'specialities_table' => 'Заповніть таблицю Спеціальності',
+     'employee_table' => 'Заповніть данні Працівника',
     ],
 
     /*
@@ -163,6 +170,26 @@ return [
                 'number' => 'Cерія/номер документа',
             ],
 
+        ],
+        'employee' => [
+            'first_name' => 'Ім’я',
+            'last_name' => 'Прізвище',
+            'second_name' => 'По батькові',
+            'birth_date' => 'Дата народження',
+            'email' => 'E-mail',
+            'gender' => 'Стать',
+            'position' => 'Посада керівника НМП',
+            'tax_id' => 'РНОКПП',
+            'employee_type' => 'Роль',
+            'documents' => [
+                'type' => 'Тип документа',
+                'number' => 'Cерія/номер документа',
+            ],
+
+        ],
+        'documents' => [
+            'type' => 'Тип документа',
+            'number' => 'Cерія/номер документа',
         ],
         'passport_data' => [
             'first_name' => 'Ім’я',
@@ -224,6 +251,19 @@ return [
             'license_number' => 'Номер ліцензії',
             'active_from_date' => 'Дата початку дії ліцензії',
         ],
+        'educations'=>[
+            'degree' => 'Ступінь',
+            'speciality' => 'Спеціальність',
+            'institution_name' => 'Назва закладу',
+            'country' => 'Країна',
+            'city' => 'Місто',
+            'institution_type' => 'Тип закладу',
+            'speciality_type' => 'Тип спеціальності',
+            'institute_type' => 'Тип закладу',
+            'speciality_level' => 'Рівень спеціальності',
+            'diploma_number' => 'Номер диплому',
+        ]
     ],
 
+    //
 ];
