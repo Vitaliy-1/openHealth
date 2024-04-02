@@ -20,6 +20,9 @@ return [
     'RNOCPP'=>'РНОКПП',
     'number'=>'Номер',
     'select'=>'Обрати',
+    'legal_entity_name' =>'Медична організація',
+    'legal_entity_owner' => 'Передставник організації',
+    'legal_entity_info' => 'Інформація про заклад',
     'save'=>'Зберегти',
     'agree'=>'Я погоджуюсь з умовами',
     'digital_signature'=>'Цифровий підпис',
@@ -159,5 +162,10 @@ return [
     'issued_at'=> 'Коли видано',
     'serial_and_number'=>'Серія та номер',
     'documents'=>'Документ',
-
+    'contract_type'=>'Тип договору',
+    'contract'=>'Договір',
+    'initialization_contract'=>'Ініціалізація договору',
+    'add_contract'=>'Додати договір',
+    'continue'=>'Продовжити',
+    'alert_initialization_contract' => 'У вас вже ініціалізовано контракт',
 ];

@@ -262,7 +262,8 @@ return [
             'institute_type' => 'Тип закладу',
             'speciality_level' => 'Рівень спеціальності',
             'diploma_number' => 'Номер диплому',
-        ]
+        ],
+        'contract_type' => 'Тип договору',
     ],
 
     //
