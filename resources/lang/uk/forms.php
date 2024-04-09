@@ -168,4 +168,18 @@ return [
     'add_contract'=>'Додати договір',
     'continue'=>'Продовжити',
     'alert_initialization_contract' => 'У вас вже ініціалізовано контракт',
+    'contractor_base' => 'На якій підставі діє підписант: закон/домовленість',
+    'contractor_rmsp_amount' => 'Кількість населення, яке обслуговувало цей MSP',
+    'bank_name' => 'Назва банку',
+    'MFO' => 'МФО',
+    'payer_account' => 'Рахунок платника',
+    'statute_md5' => 'Статут',
+    'additional_document_md5'=> 'Додатковий документ',
+    'start_date_contract' => 'Дата початку дії договору',
+    'end_date_contract' => 'Дата закінчення дії договору',
+    'medical_service' => 'Медична послуга',
+    'external_contractors_number' => 'Номер договору з субпідрядником',
+    'external_contractors_issued_at' => 'Дата укладання контракту з субпідрядником',
+    'external_contractors_expires_at' => 'Дата закінчення договору з субпідрядником',
+
 ];

@@ -7,9 +7,8 @@
 
 
 <div class="">
-    <select {{ $disabled ? 'disabled' : '' }}  x-cloak id="select" {!! $attributes->merge(['class' => '']) !!}>
+    <select multiple {{ $disabled ? 'disabled' : '' }}  x-cloak id="select" {!! $attributes->merge(['class' => '']) !!}>
         {{$option}}
-
     </select>
 
     <div
@@ -18,7 +17,7 @@
         class="flex flex-col items-center"
     >
         <input
-            name="values"
+            wire:model="{{$model}}"
             type="hidden"
             :value="selectedValues()"
         />

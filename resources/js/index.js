@@ -66,7 +66,3 @@ document.addEventListener("DOMContentLoaded", () => {
     formDatepicker();
 
 });
-Livewire.on('message.processed', () => {
-    formDatepicker();
-    console.log(1323213);
-});

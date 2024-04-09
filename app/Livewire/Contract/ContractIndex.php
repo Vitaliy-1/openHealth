@@ -70,7 +70,6 @@ class ContractIndex extends Component
         if (!empty($initContractRequestApi)){
            Cache::put($this->contractCacheKey, $initContractRequestApi);
         }
-
         return redirect()->route('contract.form');
 
     }
@@ -81,6 +80,7 @@ class ContractIndex extends Component
             $this->hasInitContract = false;
         }
     }
+
 
 
 }

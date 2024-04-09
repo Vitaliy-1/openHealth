@@ -66,7 +66,13 @@
                                                type="text"
                                                id="contractor_base"/>
                             </x-slot>
-
+                            @error('contract_request.contractor_base')
+                            <x-slot name="error">
+                                <x-forms.error>
+                                    {{$message}}
+                                </x-forms.error>
+                            </x-slot>
+                            @enderror
                         </x-forms.form-group>
                         <x-forms.form-group>
                             <x-slot name="label">
@@ -79,10 +85,14 @@
                                                type="number"
                                                id="contractor_rmsp_amount"/>
                             </x-slot>
-
+                            @error('contract_request.contractor_rmsp_amount')
+                            <x-slot name="error">
+                                <x-forms.error>
+                                    {{$message}}
+                                </x-forms.error>
+                            </x-slot>
+                            @enderror
                         </x-forms.form-group>
-
-
                     </div>
                 </div>
             </div>
@@ -100,25 +110,38 @@
                         <x-forms.form-group>
                             <x-slot name="label">
                                 <x-forms.label for="contractor_base" class="default-label">
-                                    {{__('forms.statute_md5	')}} *
+                                    {{__('forms.statute_md5')}} *
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
                                 <x-forms.file wire:model="contract_request.statute_md5" type="file"
                                               id="statute_md5"/>
                             </x-slot>
-
+                            @error('contract_request.statute_md5')
+                            <x-slot name="error">
+                                <x-forms.error>
+                                    {{$message}}
+                                </x-forms.error>
+                            </x-slot>
+                            @enderror
                         </x-forms.form-group>
                         <x-forms.form-group>
                             <x-slot name="label">
                                 <x-forms.label for="additional_document_md5" class="default-label">
-                                    {{__('forms.contractor_rmsp_amount')}} *
+                                    {{__('forms.additional_document_md5')}} *
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
                                 <x-forms.file wire:model="contract_request.additional_document_md5" type="file"
                                               id="additional_document_md5"/>
                             </x-slot>
+                            @error('contract_request.additional_document_md5')
+                            <x-slot name="error">
+                                <x-forms.error>
+                                    {{$message}}
+                                </x-forms.error>
+                            </x-slot>
+                            @enderror
                         </x-forms.form-group>
 
 
@@ -137,7 +160,7 @@
                     <x-forms.form-group>
                         <x-slot name="label">
                             <x-forms.label for="contractor_base" class="default-label">
-                                {{__('forms.statute_md5	')}} *
+                                {{__('forms.contract_type')}} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
@@ -146,7 +169,6 @@
                                 id="position"
                             >
                                 <x-slot name="option">
-                                    <option>{{__('forms.select')}} {{__('forms.position')}}</option>
                                     @foreach($this->dictionaries['CONTRACT_TYPE'] as $k=>$contract_type )
                                         <option value="{{$k}}">{{$contract_type}}</option>
                                     @endforeach
@@ -156,7 +178,7 @@
                         </x-slot>
 
                     </x-forms.form-group>
-                    <x-forms.form-group>
+                    <x-forms.form-group wire:ignore>
                         <x-slot name="label">
                             <x-forms.label for="start_date" class="default-label">
                                 {{__('forms.start_date_contract')}} *
@@ -166,8 +188,15 @@
                             <x-forms.datapicker wire:model="contract_request.start_date" type="dat"
                                                 id="start_date"/>
                         </x-slot>
+                        @error('contract_request.start_date')
+                        <x-slot name="error">
+                            <x-forms.error>
+                                {{$message}}
+                            </x-forms.error>
+                        </x-slot>
+                        @enderror
                     </x-forms.form-group>
-                    <x-forms.form-group>
+                    <x-forms.form-group wire:ignore>
                         <x-slot name="label">
                             <x-forms.label for="end_date" class="default-label">
                                 {{__('forms.end_date_contract')}} *
@@ -177,7 +206,13 @@
                             <x-forms.datapicker wire:model="contract_request.end_date"
                                                 id="end_date"/>
                         </x-slot>
-
+                        @error('contract_request.end_date')
+                        <x-slot name="error">
+                            <x-forms.error>
+                                {{$message}}
+                            </x-forms.error>
+                        </x-slot>
+                        @enderror
                     </x-forms.form-group>
 
                 </div>
@@ -194,7 +229,7 @@
                     <div class="flex flex-col gap-5.5 p-6.5">
                         <x-forms.form-group>
                             <x-slot name="label">
-                                <x-forms.label for="contractor_base" class="default-label">
+                                <x-forms.label for="bank_name" class="default-label">
                                     {{__('forms.bank_name')}} *
                                 </x-forms.label>
                             </x-slot>
@@ -204,7 +239,13 @@
                                                type="text"
                                                id="bank_name"/>
                             </x-slot>
-
+                            @error('contract_request.contractor_payment_details.bank_name')
+                            <x-slot name="error">
+                                <x-forms.error>
+                                    {{$message}}
+                                </x-forms.error>
+                            </x-slot>
+                            @enderror
                         </x-forms.form-group>
 
                         <x-forms.form-group>
@@ -218,7 +259,13 @@
                                                wire:model="contract_request.contractor_payment_details.MFO" type="text"
                                                id="MFO"/>
                             </x-slot>
-
+                            @error('contract_request.contractor_payment_details.MFO')
+                            <x-slot name="error">
+                                <x-forms.error>
+                                    {{$message}}
+                                </x-forms.error>
+                            </x-slot>
+                            @enderror
                         </x-forms.form-group>
 
                         <x-forms.form-group>
@@ -233,7 +280,13 @@
                                                type="text"
                                                id="payer_account"/>
                             </x-slot>
-
+                            @error('contract_request.contractor_payment_details.payer_account')
+                            <x-slot name="error">
+                                <x-forms.error>
+                                    {{$message}}
+                                </x-forms.error>
+                            </x-slot>
+                            @enderror
                         </x-forms.form-group>
 
                     </div>
@@ -256,15 +309,21 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.multi-select class="hidden" wire:model="employee_request.employee.position"
-                                >
+                                <x-forms.select  multiple=""  class="default-input"  wire:model="contract_request.contractor_divisions">
                                     <x-slot name="option">
                                         @foreach($divisions as $k=>$division )
-                                            <option value="{{$division->uuid}}">{{$division->name}}</option>
+                                            <option value="{{$division->id}}">{{$division->name}}</option>
                                         @endforeach
                                     </x-slot>
-                                </x-forms.multi-select>
+                                </x-forms.select>
                             </x-slot>
+                            @error('contract_request.contractor_divisions')
+                            <x-slot name="error">
+                                <x-forms.error>
+                                    {{$message}}
+                                </x-forms.error>
+                            </x-slot>
+                            @enderror
                         </x-forms.form-group>
                     </div>
                 </div>
@@ -278,7 +337,66 @@
                     </h3>
                 </div>
                 <div class="flex flex-col gap-5.5 p-6.5">
-                    
+                    @if($external_contractors)
+
+                    <table class="w-full table-auto">
+                        <thead>
+                        <tr class="bg-gray-2 text-left dark:bg-meta-4">
+                            <th class="px-4 py-4 font-medium text-black dark:text-white">
+                                {{__('forms.legal_entity')}}
+
+                            </th>
+                            <th class="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
+                                {{__('forms.external_contractor_number')}}
+                            </th>
+                            <th class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
+                                {{__('forms.external_contractor_issued_at')}}
+                            </th>
+
+                            <th class="px-4 py-4 font-medium text-black dark:text-white">
+                                {{__('forms.external_contractor_expires_at')}}
+                            </th>
+                            <th class="px-4 py-4 font-medium text-black dark:text-white">
+
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($external_contractors as $key => $external_contractor)
+                                <tr>
+                                    <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
+                                        {{$external_contractor['legal_entity']['name'] ?? ''}}
+                                    </td>
+                                    <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                                        {{$external_contractor['contract']['number'] ?? ''}}
+                                    </td>
+                                    <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                                        {{$external_contractor['contract']['issued_at'] ?? ''}}
+
+                                    </td>
+                                    <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
+                                        {{$external_contractor['contract']['expires_at'] ?? ''}}
+
+                                    </td>
+
+                                    <td class="border-b border-[#eee] flex px-4 py-5 dark:border-strokedark">
+                                        <a wire:click.prevent="editExternalContractors({{$key}})" href="">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                            </svg>
+                                        </a>
+                                        <a wire:click.prevent="deleteExternalContractors({{$key}})" href="">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    @endif
+
                     <a class="text-primary" wire:click.prevent="openModal()" href="">+ Додати залучену особу</a>
                 </div>
 
