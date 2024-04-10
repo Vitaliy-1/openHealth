@@ -2,13 +2,16 @@
 
 namespace App\Livewire\Contract;
 
-use App\Classes\eHealth\Api\LegalEntitiesApi;
+use App\Livewire\Contract\Forms\Api\ContractRequestApi;
 use App\Livewire\Contract\Forms\ContractFormRequest;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesRequestApi;
+use App\Models\Contract;
 use App\Models\Division;
 use App\Models\LegalEntity;
 use App\Traits\FormTrait;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -17,6 +20,7 @@ class ContractForm extends Component
     use FormTrait,WithFileUploads;
 
 
+    const CACHE_PREFIX = 'register_contract_form';
     public ?array $dictionaries_field = [
         'CONTRACT_TYPE',
     ];
@@ -32,6 +36,11 @@ class ContractForm extends Component
     public array $external_contractors = [];
     public string $external_contractor_key = '';
     public string $legalEntity_search = '';
+    public string $contractCacheKey;
+
+    public function boot(){
+        $this->contractCacheKey = self::CACHE_PREFIX . '-'. Auth::user()->legalEntity->uuid;
+    }
 
     public function mount()
     {
@@ -128,7 +137,18 @@ class ContractForm extends Component
     }
 
 
+
+
     public function sendApiRequest(){
         $this->contract_request->rulesForModelValidate();
+        $contract_response = ContractRequestApi::contractRequestApi($this->contract_request->toArray(),$this->contractCacheKey);
+        $contract = new Contract($contract_response);
+        $contract->uuid = $contract_response['id'];
+        $contract->contractor_legal_entity_id = $contract_response['contractor_legal_entity']['id'];
+        $contract->contractor_owner_id = $contract_response['contractor_owner']['id'];
+//        dd($contract_response);
+        $this->legalEntity->contract()->save($contract);
+        Cache::forget($this->contractCacheKey);
+        return redirect()->route('contract.form');
     }
 }

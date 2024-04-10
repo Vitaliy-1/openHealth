@@ -6,16 +6,16 @@ use App\Rules\CheckDateDifference;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
+use PhpParser\ErrorHandler\Collecting;
 
 class ContractFormRequest extends Form
 {
 
     #[Validate([
         'contractor_payment_details.bank_name' => 'required',
-        'contractor_payment_details.MFO' => 'required|date',
-        'contractor_payment_details.payer_account' => 'required|date',
+        'contractor_payment_details.MFO' => 'required',
+        'contractor_payment_details.payer_account' => 'required',
     ])]
-
     public ?array $contractor_payment_details = [];
 
     #[Validate('required|min:10')]
@@ -31,9 +31,6 @@ class ContractFormRequest extends Form
     #[Validate('required|integer')]
     public string $contractor_rmsp_amount = '';
 
-    #[Validate('required')]
-    public ?string $id_form = '';
-
     #[Validate('required|date')]
     public ?string $start_date = '';
 
@@ -47,7 +44,6 @@ class ContractFormRequest extends Form
         'external_contractors.divisions.name' => 'required|string',
         'external_contractors.divisions.medical_service' => 'required|string',
     ])]
-
     public  ?array $external_contractors = [];
 
 
@@ -57,12 +53,15 @@ class ContractFormRequest extends Form
      */
     public function rulesForModelValidate(string $model = ''): array
     {
-        if (empty($model) ){
-            return $this->validate()->except('contractor_payment_details');
+        $rules = $this->getRules();
+
+        if (empty($model)) {
+            $rules = array_filter($rules, function ($key) {
+                return strpos($key, 'external_contractors') !== 0;
+            }, ARRAY_FILTER_USE_KEY);
+            return $this->validate($rules);
         }
-        Request::macro('validatedExcept', function ($except = []) {
-            return Arr::except($this->validated(), $except);
-        });
+
         return $this->validate($this->rulesForModel($model)->toArray());
     }
 

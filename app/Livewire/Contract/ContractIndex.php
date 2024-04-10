@@ -3,8 +3,11 @@
 namespace App\Livewire\Contract;
 
 use App\Livewire\Contract\Forms\Api\ContractRequestApi;
+use App\Models\Contract;
 use App\Models\Employee;
+use App\Models\LegalEntity;
 use App\Traits\FormTrait;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -30,6 +33,13 @@ class ContractIndex extends Component
      */
     public bool $hasInitContract = true;
 
+    public ?LegalEntity $legalEntity;
+
+    public ?Contract $contract;
+    public function getLegalEntity(): void
+    {
+        $this->legalEntity = auth()->user()->legalEntity;
+    }
 
     public function boot(): void
     {
@@ -37,22 +47,28 @@ class ContractIndex extends Component
     }
 
 
-    public function mount()
+    public function mount(): void
     {
         $this->tableHeaders();
         $this->getDictionary();
         $this->hasInitContract();
+        $this->getLegalEntity();
+
 //        dd(Cache::get($this->contractCacheKey));
     }
 
-    public function tableHeaders()
+    public function tableHeaders(): void
     {
         $this->tableHeaders = [
-            'Contract Name',
-            'Description',
-            'Actions',
+            __('ID'),
+            __('Номер договору'),
+            __('Дата початку'),
+            __('Дата закінчення'),
+            __('Статус'),
         ];
     }
+
+
 
     public function render()
     {
@@ -74,13 +90,17 @@ class ContractIndex extends Component
 
     }
 
-    public function hasInitContract()
+    public function hasInitContract(): void
     {
         if (Cache::has($this->contractCacheKey)){
             $this->hasInitContract = false;
         }
     }
 
-
+    public function showContract($id):void
+    {
+        $this->contract = Contract::find($id);
+        $this->openModal('show_contract');
+    }
 
 }

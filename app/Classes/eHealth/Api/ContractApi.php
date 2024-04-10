@@ -14,4 +14,10 @@ class ContractApi extends Request
         return self::post(self::URL.'/'.$contract_type);
     }
 
+    public static function create_request($data,$id,$contract_type = 'PMD_1')
+    {
+        return self::post(self::URL.'/'.$contract_type.'/'.$id, $data);
+    }
+
+
 }

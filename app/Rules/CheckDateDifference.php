@@ -11,7 +11,7 @@ class CheckDateDifference implements Rule
 
     public function __construct($startDate)
     {
-        $this->startDate = $startDate;
+        $this->startDate = $startDate ?? Carbon::now()->format('d.m.Y');
     }
 
     public function passes($attribute, $value)

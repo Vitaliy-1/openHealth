@@ -181,5 +181,6 @@ return [
     'external_contractors_number' => 'Номер договору з субпідрядником',
     'external_contractors_issued_at' => 'Дата укладання контракту з субпідрядником',
     'external_contractors_expires_at' => 'Дата закінчення договору з субпідрядником',
-
+    'status_reason' => 'Причина зміни статусу',
+    'inserted_at_contract'=> 'Дата підписання договору'
 ];

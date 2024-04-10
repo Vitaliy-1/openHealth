@@ -71,4 +71,9 @@ class LegalEntity extends Model
         return $this->hasMany(Division::class);
     }
 
+    public function contract(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Contract::class,'legal_entity_id','id');
+    }
+
 }
