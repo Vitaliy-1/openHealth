@@ -48,8 +48,7 @@ class CreateContractsTable extends Migration
             $table->string('statute_md5')->nullable();
             $table->string('additional_document_md5')->nullable();
 
-            $table->foreignId('legal_entity_id');
-            $table->foreign('legal_entity_id')->references('id')->on('legal_entities');
+            $table->foreignId('legal_entity_id')->constrained('legal_entities');
 
         });
     }
