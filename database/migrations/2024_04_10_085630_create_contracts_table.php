@@ -43,7 +43,7 @@ class CreateContractsTable extends Migration
             $table->timestamp('updated_at');
             $table->jsonb('medical_programs')->nullable();
             $table->string('type')->nullable();
-            $table->boolean('contractor_signed ')->default(false);
+            $table->boolean('contractor_signed')->default(false);
             $table->text('misc')->nullable();
             $table->string('statute_md5')->nullable();
             $table->string('additional_document_md5')->nullable();
