@@ -15,6 +15,14 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
         return !empty($legalEntitiesApi[0]) ? $legalEntitiesApi[0] : [];
     }
 
+
+    public static function getLegalEntities($edrpou): array
+    {
+        $legalEntitiesApi = self::_get(['edrpou' => $edrpou]);
+
+        return !empty($legalEntitiesApi) ? $legalEntitiesApi : [];
+    }
+
     public static function createOrUpdate($data)
     {
         ///signed_content_encoding == base64_encode , signed_legal_entity_request

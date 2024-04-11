@@ -129,12 +129,12 @@ return [
             'rule-name' => 'custom-message',
             'first_name' => 'Прізвище',
         ],
-     ':attribute.required' => 'Поле :attribute є обов\'язковим для заповнення.',
-     'role_table' => 'Заповніть таблицю Ролі',
-     'documents_empty' => 'Заповніть таблицю Документи Паспорт або Номер РНОКПП',
-     'educations_table' => 'Заповніть таблицю Освіта',
-     'specialities_table' => 'Заповніть таблицю Спеціальності',
-     'employee_table' => 'Заповніть данні Працівника',
+        ':attribute.required' => 'Поле :attribute є обов\'язковим для заповнення.',
+        'role_table' => 'Заповніть таблицю Ролі',
+        'documents_empty' => 'Заповніть таблицю Документи Паспорт або Номер РНОКПП',
+        'educations_table' => 'Заповніть таблицю Освіта',
+        'specialities_table' => 'Заповніть таблицю Спеціальності',
+        'employee_table' => 'Заповніть данні Працівника',
     ],
 
     /*
@@ -251,7 +251,7 @@ return [
             'license_number' => 'Номер ліцензії',
             'active_from_date' => 'Дата початку дії ліцензії',
         ],
-        'educations'=>[
+        'educations' => [
             'degree' => 'Ступінь',
             'speciality' => 'Спеціальність',
             'institution_name' => 'Назва закладу',
@@ -262,7 +262,39 @@ return [
             'institute_type' => 'Тип закладу',
             'speciality_level' => 'Рівень спеціальності',
             'diploma_number' => 'Номер диплому',
+        ],
+        'contract_type' => 'Тип договору',
+        'contractor_payment_details' => [
+            'MFO' => 'МФО',
+            'bank_name' => 'Назва банку',
+            'payer_account' => 'Рахунок платника',
+        ],
+        'start_date' => 'Дата початку',
+        'end_date' => 'Дата завершення',
+        'status' => 'Статус',
+        'contractor_rmsp_amount' => 'Кількість населення',
+        'contractor_base' => 'На якій підставі діє підписант',
+        'statute_md5' => 'Статут',
+        'additional_document_md5' => 'Додатковий документ',
+        'contractor_divisions' => 'Місця надання послуг',
+        'external_contractors' => [
+            'contract' => [
+                'number' => 'Номер договору з субпідрядником',
+                'issued_at' => 'Дата початку договору',
+                'expires_at' => 'Дата закінчення договору',
+
+            ],
+            'legal_entity' => [
+                'name' => 'Медична організація',
+
+            ],
+            'divisions' => [
+                'name' => 'Назва Підрозділу',
+                'medical_service' => 'Медична послуга'
+            ]
+
         ]
+
     ],
 
     //

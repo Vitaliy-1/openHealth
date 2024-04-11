@@ -1,6 +1,6 @@
 @props(['disabled' => false])
 
-<div >
+<div wire:ignore >
     <div class="relative">
         <input
             {{ $disabled ? 'disabled' : '' }}
@@ -29,4 +29,6 @@
         </div>
     </div>
 </div>
+
+
 
