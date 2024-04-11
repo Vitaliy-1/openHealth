@@ -24,7 +24,7 @@ return new class extends Migration
             $table->jsonb('doctor');
             $table->date('inserted_at')->nullable();
             $table->string('status')->nullable();
-            $table->foreignId('person_id');
+            $table->foreignId('person_id')->nullable();
             $table->foreignId('legal_entity_id')->nullable();
             $table->foreignId('division_id')->nullable();
             $table->foreign('person_id')->references('id')->on('persons')->onDelete('set null');
