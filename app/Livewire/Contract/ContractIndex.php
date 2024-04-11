@@ -61,10 +61,10 @@ class ContractIndex extends Component
     {
         $this->tableHeaders = [
             __('ID'),
-            __('Номер договору'),
-            __('Дата початку'),
-            __('Дата закінчення'),
-            __('Статус'),
+            __('forms.number_contract'),
+            __('forms.start_date'),
+            __('forms.end_date'),
+            __('forms.status'),
         ];
     }
 

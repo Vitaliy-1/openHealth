@@ -182,5 +182,21 @@ return [
     'external_contractors_issued_at' => 'Дата укладання контракту з субпідрядником',
     'external_contractors_expires_at' => 'Дата закінчення договору з субпідрядником',
     'status_reason' => 'Причина зміни статусу',
-    'inserted_at_contract'=> 'Дата підписання договору'
+    'inserted_at_contract'=> 'Дата підписання договору',
+    'number_contract' => 'Номер договору',
+    'start_date' => 'Дата початку',
+    'end_date' => 'Дата закінчення',
+    'status' => 'Статус',
+    'external_contractors' => 'Субпідрядник',
+    'documents_medical_organization' => 'Документи медичної організації',
+    'сontract_term'=>'Термін дії договору',
+    'payment_details'=>'Платіжні реквізити',
+    'places_of_service' => 'Місця надання послуг',
+    'involved_persons' => 'Залученні особи',
+    'add_involved_person' => 'Додати залученого особи',
+    'add_involved_persons' => 'Додати залучені особи',
+    'send_for_approval' => 'Надіслати на затвердження',
+    'back' => 'Назад',
+
+
 ];

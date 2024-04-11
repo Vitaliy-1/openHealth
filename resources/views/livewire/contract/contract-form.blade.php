@@ -102,7 +102,7 @@
                 <div class="dark:bg-boxdark">
                     <div class="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
                         <h3 class="font-medium text-black dark:text-white">
-                            Документи медичної організації
+                            {{__('forms.documents_medical_organization')}}
                         </h3>
                     </div>
                     <div class="flex flex-col gap-5.5 p-6.5">
@@ -152,7 +152,9 @@
         <div class="flex flex-col gap-9">
             <div class="dark:bg-boxdark">
                 <div class="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
-                    <h3 class="font-medium text-black dark:text-white"> Строк діїї договору
+                    <h3 class="font-medium text-black dark:text-white">
+                        {{__('forms.сontract_term')}}
+
                     </h3>
                 </div>
 
@@ -223,7 +225,7 @@
                 <div class="dark:bg-boxdark">
                     <div class="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
                         <h3 class="font-medium text-black dark:text-white">
-                            Платіжні реквізити
+                            {{__('forms.payment_details')}}
                         </h3>
                     </div>
                     <div class="flex flex-col gap-5.5 p-6.5">
@@ -298,7 +300,7 @@
                 <div class="dark:bg-boxdark">
                     <div class="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
                         <h3 class="font-medium text-black dark:text-white">
-                            Місця надання послуг
+                            {{__('forms.places_of_service')}}
                         </h3>
                     </div>
                     <div class="flex flex-col gap-5.5 p-6.5">
@@ -333,7 +335,7 @@
             <div class="dark:bg-boxdark">
                 <div class="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
                     <h3 class="font-medium text-black dark:text-white">
-                        Залученні особи
+                        {{__('forms.involved_persons')}}
                     </h3>
                 </div>
                 <div class="flex flex-col gap-5.5 p-6.5">
@@ -396,7 +398,7 @@
                         </tbody>
                     </table>
                     @endif
-                    <a class="text-primary" wire:click.prevent="openModal()" href="">+ Додати залучену особу</a>
+                    <a class="text-primary" wire:click.prevent="openModal()" href="">+ {{__('forms.add_involved_person')}}</a>
                 </div>
 
             </div>
@@ -404,13 +406,14 @@
 
         <div class="mb-4.5 pt-10 flex flex-col gap-6 xl:flex-row justify-between items-center ">
             <div class="xl:w-1/4 text-left">
-                <x-secondary-button wire:click="closeModal()">
-                    {{__('Назад')}}
-                </x-secondary-button>
+                <a class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150" href="{{route('contract.index')}}">
+                    {{__('forms.back')}}
+                </a>
+
             </div>
             <div class="xl:w-1/4 text-right">
                 <button wire:click="sendApiRequest()" type="button" class="btn-primary">
-                    {{__('Відправити на затвердження')}}
+                    {{__('forms.send_for_approval')}}
                 </button>
             </div>
         </div>

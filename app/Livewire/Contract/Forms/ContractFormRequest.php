@@ -37,7 +37,7 @@ class ContractFormRequest extends Form
     public ?string $end_date = '';
 
     #[Validate([
-        'external_contractors.legal_entity' => 'required',
+        'external_contractors.legal_entity.name' => 'required',
         'external_contractors.contract.expires_at' => 'required|date',
         'external_contractors.contract.issued_at' => 'required|date',
         'external_contractors.contract.number' => 'required|string',
@@ -45,7 +45,6 @@ class ContractFormRequest extends Form
         'external_contractors.divisions.medical_service' => 'required|string',
     ])]
     public  ?array $external_contractors = [];
-
 
 
     /**
