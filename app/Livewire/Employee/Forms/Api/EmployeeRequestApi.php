@@ -22,11 +22,10 @@ class EmployeeRequestApi extends EmployeeApi
         if (!isset($data['employee']['tax_id'])) {
             $data['employee']['no_tax_id'] = true;
         }
-
         return [
             'legal_entity_id' => $uuid,
             'position'=> $data['employee']['position'],
-            'start_date'=> Carbon::parse($data['employee']['start_date'])->format('Y-m-d') ?? '',
+            'start_date'=> $data['employee']['start_date'],
             'employee_type'=> $data['employee']['employee_type'],
             'party'=> $data['employee'],
             'doctor'=> [
