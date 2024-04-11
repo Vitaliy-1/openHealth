@@ -25,11 +25,11 @@ return new class extends Migration
             $table->date('inserted_at')->nullable();
             $table->string('status')->nullable();
             $table->foreignId('person_id');
-            $table->foreignId('legal_entity_id');
+            $table->foreignId('legal_entity_id')->nullable();
             $table->foreignId('division_id')->nullable();
             $table->foreign('person_id')->references('id')->on('persons')->onDelete('set null');
             $table->foreign('legal_entity_id')->references('id')->on('legal_entities');
-            $table->foreign('division_id')->references('id')->on('divisions');//Todo: add divisions table
+            $table->foreign('division_id')->references('id')->on('divisions');
             $table->timestamps();
         });
     }
