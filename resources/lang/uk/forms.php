@@ -166,13 +166,14 @@ return [
     'contract'=>'Договір',
     'initialization_contract'=>'Ініціалізація договору',
     'add_contract'=>'Додати договір',
+    'edit_contract'=>'Редагувати договір № :contract',
     'continue'=>'Продовжити',
     'alert_initialization_contract' => 'У вас вже ініціалізовано контракт',
     'contractor_base' => 'На якій підставі діє підписант: закон/домовленість',
     'contractor_rmsp_amount' => 'Кількість населення, яке обслуговувало цей MSP',
     'bank_name' => 'Назва банку',
     'MFO' => 'МФО',
-    'payer_account' => 'Рахунок платника',
+    'payer_account' => 'IBAN',
     'statute_md5' => 'Статут',
     'additional_document_md5'=> 'Додатковий документ',
     'start_date_contract' => 'Дата початку дії договору',
@@ -197,6 +198,7 @@ return [
     'add_involved_persons' => 'Додати залучені особи',
     'send_for_approval' => 'Надіслати на затвердження',
     'back' => 'Назад',
+    'action'=>'Дія'
 
 
 ];

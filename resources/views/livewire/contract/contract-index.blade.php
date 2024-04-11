@@ -37,9 +37,70 @@
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
                                 <p class="text-black dark:text-white">{{$contract->status ?? ''}}
-                                    <a wire:click.prevent="showContract({{$contract->id}})" class="text-primary" href="">Деталі</a>
                                 </p>
                                 </p>
+                            </td>
+                            <td class="border-b border-[#eee] py-5 px-4 ">
+                                <div class="flex justify-center">
+                                    <div
+                                        x-data="{
+            open: false,
+            toggle() {
+                if (this.open) {
+                    return this.close()
+                }
+
+                this.$refs.button.focus()
+
+                this.open = true
+            },
+            close(focusAfter) {
+                if (! this.open) return
+
+                this.open = false
+
+                focusAfter && focusAfter.focus()
+            }
+        }"
+                                        x-on:keydown.escape.prevent.stop="close($refs.button)"
+                                        x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
+                                        x-id="['dropdown-button']"
+                                        class="relative">
+                                        <button
+                                            x-ref="button"
+                                            x-on:click="toggle()"
+                                            :aria-expanded="open"
+                                            :aria-controls="$id('dropdown-button')"
+                                            type="button"
+                                            class="hover:text-primary">
+                                            <svg class="fill-current" width="18" height="18"
+                                                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                 stroke-width="1.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"/>
+                                            </svg>
+                                        </button>
+                                        <div
+                                            x-ref="panel"
+                                            x-show="open"
+                                            x-transition.origin.top.left
+                                            x-on:click.outside="close($refs.button)"
+                                            :id="$id('dropdown-button')"
+                                            style="display: none;"
+                                            class="absolute right-0 mt-2 w-40 rounded-md bg-white shadow-md z-50">
+
+                                            <a href="{{route('contract.form',$contract->uuid)}}"
+                                               class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">
+                                                {{__('forms.edit')}}
+                                            </a>
+
+                                            <a wire:click.prevent="showContract({{$contract->id}})"
+                                               class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
+                                            href="">Деталі</a>
+
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     @endforeach

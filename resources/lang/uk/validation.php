@@ -267,7 +267,7 @@ return [
         'contractor_payment_details' => [
             'MFO' => 'МФО',
             'bank_name' => 'Назва банку',
-            'payer_account' => 'Рахунок платника',
+            'payer_account' => 'IBAN',
         ],
         'start_date' => 'Дата початку',
         'end_date' => 'Дата завершення',
@@ -296,6 +296,6 @@ return [
         ]
 
     ],
-
+    'consent_text'=> 'Я погоджуюсь з умовами'
     //
 ];

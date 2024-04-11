@@ -1,10 +1,10 @@
 <div>
     <x-section-title>
         <x-slot name="title">
-            {{__('forms.add_contract')}}
+            {{$contract_request->previous_request_id === '' ? __('forms.add_contract') :  __('forms.edit_contract',['contract' => $contract_request->previous_request_id]) }}
         </x-slot>
         <x-slot name="description">
-            {{__('forms.add_contract')}}
+            {{$contract_request->previous_request_id === '' ? __('forms.add_contract') :  __('forms.edit_contract',['contract' => $contract_request->previous_request_id]) }}
         </x-slot>
     </x-section-title>
 
@@ -403,6 +403,37 @@
 
             </div>
         </div>
+        <div class="flex flex-col gap-9">
+                <div class="dark:bg-boxdark">
+                    <div class="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
+                        <h3 class="font-medium text-black dark:text-white">
+                        </h3>
+                    </div>
+                    <div class="flex flex-col gap-5.5 p-6.5">
+                        <x-forms.form-group>
+                            <x-slot name="label">
+                                <x-forms.label for="consent_text" class="default-label text-sm">
+                                   {{$dictionaries['CAPITATION_CONTRACT_CONSENT_TEXT']['APPROVED']}}
+                                </x-forms.label>
+                            </x-slot>
+                            <x-slot name="input">
+                                <x-forms.input class="default-checkbox"
+                                               wire:model="contract_request.consent_text"
+                                               type="checkbox"
+                                               id="consent_text"/>
+                            </x-slot>
+                            @error('contract_request.consent_text')
+                            <x-slot name="error">
+                                <x-forms.error>
+                                    {{$message}}
+                                </x-forms.error>
+                            </x-slot>
+                            @enderror
+                        </x-forms.form-group>
+                    </div>
+                </div>
+            </div>
+
 
         <div class="mb-4.5 pt-10 flex flex-col gap-6 xl:flex-row justify-between items-center ">
             <div class="xl:w-1/4 text-left">
