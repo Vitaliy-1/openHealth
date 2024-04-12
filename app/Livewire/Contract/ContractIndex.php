@@ -65,6 +65,7 @@ class ContractIndex extends Component
             __('forms.start_date'),
             __('forms.end_date'),
             __('forms.status'),
+            __('forms.action'),
         ];
     }
 

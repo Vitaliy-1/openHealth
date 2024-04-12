@@ -46,6 +46,11 @@ class ContractFormRequest extends Form
     ])]
     public  ?array $external_contractors = [];
 
+    #[Validate('accepted')]
+    public bool $consent_text;
+
+
+    public string  $previous_request_id = '';
 
     /**
      * @throws ValidationException

@@ -23,6 +23,7 @@ class ContractForm extends Component
     const CACHE_PREFIX = 'register_contract_form';
     public ?array $dictionaries_field = [
         'CONTRACT_TYPE',
+        'CAPITATION_CONTRACT_CONSENT_TEXT',
     ];
 
     public ?LegalEntity $legalEntity;
@@ -38,12 +39,17 @@ class ContractForm extends Component
     public string $legalEntity_search = '';
     public string $contractCacheKey;
 
+
     public function boot(){
         $this->contractCacheKey = self::CACHE_PREFIX . '-'. Auth::user()->legalEntity->uuid;
     }
 
-    public function mount()
+    public function mount($id = '')
     {
+        if ($id !== '') {
+            $this->contract_request->previous_request_id = $id;
+        }
+
         $this->getDictionary();
         $this->getLegalEntity();
     }
@@ -89,6 +95,7 @@ class ContractForm extends Component
         else {
             $this->external_contractors[] = $this->contract_request->external_contractors;
         }
+        $this->contract_request->external_contractors = [];
         $this->closeModal();
     }
     private function validateExternalContractors(): void
@@ -106,9 +113,9 @@ class ContractForm extends Component
     public function closeModal(): void
     {
         $this->resetExternalContractorKeyAndRequest();
+        $this->contract_request->external_contractors = [];
         $this->legalEntity_search = '';
         $this->showModal = false;
-
     }
 
     public function editExternalContractors($key): void
@@ -120,13 +127,13 @@ class ContractForm extends Component
     }
 
 
-    public function deleteExternalContractors($key)
+    public function deleteExternalContractors($key):void
     {
         unset($this->external_contractors[$key]);
     }
 
 
-    public function getHealthcareServices($id)
+    public function getHealthcareServices($id):void
     {
         $division = Division::find($id);
         $this->contract_request->external_contractors['divisions']['name'] = $division->name;
@@ -134,6 +141,7 @@ class ContractForm extends Component
         $this->healthcareServices = $division
             ->healthcareService()
             ->get();
+
     }
 
 
@@ -149,6 +157,6 @@ class ContractForm extends Component
 //        dd($contract_response);
         $this->legalEntity->contract()->save($contract);
         Cache::forget($this->contractCacheKey);
-        return redirect()->route('contract.form');
+        return redirect()->route('contract.index');
     }
 }

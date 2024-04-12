@@ -138,6 +138,7 @@ $wire.set('contract_request.external_contractors.legal_entity.id', '{{ $legalEnt
                                     wire:change="getHealthcareServices($event.target.value,)"
                                 >
                                     <x-slot name="option">
+                                        <option value="">{{__('forms.select')}}</option>
                                         @foreach($divisions as $k=>$division )
                                             <option value="{{$division->id}}">{{$division->name}}</option>
                                         @endforeach
