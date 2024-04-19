@@ -14,7 +14,7 @@
                                 <x-forms.form-group>
                                     <x-slot name="label">
                                         <x-forms.label for="name" class="default-label">
-                                            {{__('forms.full_name_division')}}
+                                            {{__('forms.full_name_division')}} *
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name="input">
@@ -33,7 +33,7 @@
                                 <x-forms.form-group>
                                     <x-slot name="label">
                                         <x-forms.label for="email" class="default-label">
-                                            {{__('forms.email')}}
+                                            {{__('forms.email')}} *
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name="input">
@@ -52,7 +52,7 @@
                                 <x-forms.form-group>
                                     <x-slot name="label">
                                         <x-forms.label for="type" class="default-label">
-                                            {{__('forms.type')}}*
+                                            {{__('forms.type')}} *
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name="input">
@@ -99,7 +99,6 @@
                                 <x-forms.form-group>
                                     <x-slot name="label">
                                         <x-forms.label for="type_phone" class="default-label">
-
                                             {{__('forms.typeMobile')}}
                                         </x-forms.label>
                                     </x-slot>
@@ -107,7 +106,7 @@
                                         <x-forms.select wire:model.defer="division.phones.type"
                                                         class="default-select">
                                             <x-slot name="option">
-                                                <option>{{__('forms.typeMobile')}}</option>
+                                                <option>{{__('forms.typeMobile')}} *</option>
                                                 @foreach($this->dictionaries['PHONE_TYPE'] as $k=>$phone_type)
                                                     <option
                                                         {{ isset ($phone['type']) === $phone_type ? 'selected': ''}} value="{{$k}}">{{$phone_type}}</option>
@@ -126,7 +125,7 @@
                                     <x-slot name="label">
                                         <x-forms.label for="phone" class="default-label">
 
-                                            {{__('forms.phone')}}
+                                            {{__('forms.phone')}} *
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name="input">

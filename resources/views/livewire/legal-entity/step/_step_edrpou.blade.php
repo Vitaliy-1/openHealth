@@ -6,7 +6,7 @@
     <x-forms.form-group>
         <x-slot name="label">
             <x-forms.label class="default-label" for="edrpou" name="label" >
-                {{__('forms.edrpou')}} *
+                {{__('forms.edrpou_rnokpp')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">

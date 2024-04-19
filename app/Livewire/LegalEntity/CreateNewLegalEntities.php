@@ -8,17 +8,20 @@ use App\Livewire\LegalEntity\Forms\LegalEntitiesRequestApi;
 use App\Models\Employee;
 use App\Models\LegalEntity;
 use App\Models\Person;
+use App\Traits\FormTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Spatie\Permission\Models\Role;
 use Livewire\Component;
 use Illuminate\Support\Facades\Cache;
 
 class CreateNewLegalEntities extends Component
 {
+
+    use FormTrait;
     const CACHE_PREFIX = 'register_legal_entity_form';
 
     public LegalEntitiesForms $legal_entity_form;
+
     public LegalEntity $legalEntity;
 
     public Person $person;
@@ -29,10 +32,6 @@ class CreateNewLegalEntities extends Component
 
     public int $currentStep = 1;
 
-    public array $dictionaries;
-
-    public ?array $phones = [];
-
     /**
      * @var string The Cache ID to store Legal Entity being filled by the current user
      */
@@ -42,9 +41,7 @@ class CreateNewLegalEntities extends Component
     protected $listeners = ['addressDataFetched'];
     protected string $edrpouKey = '54323454';
 
-    public ?array $addresses = [];
-
-    public array $steps = [
+    public ?array $steps = [
         'edrpou' => [
             'title' => 'ЄДРПОУ',
             'step' => 1,
@@ -87,7 +84,7 @@ class CreateNewLegalEntities extends Component
             'property' => 'license'
         ],
     ];
-
+    public ?array $addresses;
 
 
     public function boot(): void
@@ -111,7 +108,6 @@ class CreateNewLegalEntities extends Component
             'ACCREDITATION_CATEGORY'
         ]);
 
-        $this->getPhones();
 
     }
 
@@ -142,12 +138,7 @@ class CreateNewLegalEntities extends Component
         return $this->phones[] = ['type' => '', 'number' => ''];
     }
 
-    public function removePhone($key)
-    {
-        if (isset($this->phones[$key])) {
-            unset($this->phones[$key]);
-        }
-    }
+
 
     public function increaseStep(): void
     {
@@ -155,7 +146,8 @@ class CreateNewLegalEntities extends Component
         $this->validateData();
         $this->currentStep++;
         $this->putLegalEntityInCache();
-        if ($this->currentStep > $this->totalSteps) {
+
+        if ($this->currentStep > $this->totalSteps ) {
             $this->currentStep = $this->totalSteps;
         }
 
@@ -164,10 +156,11 @@ class CreateNewLegalEntities extends Component
     public function stepFields(): void
     {
         foreach ($this->steps as $field => $step) {
-            if (empty($this->legal_entity_form->{$field})) {
-                $this->currentStep = $step['step'];
-                break;
+            if (!empty($this->legal_entity_form->{$field})) {
+                continue;
             }
+            $this->currentStep = $step['step'];
+            break;
         }
     }
 
@@ -211,12 +204,7 @@ class CreateNewLegalEntities extends Component
         $this->stepPublicOffer();
     }
 
-    public function getPhones()
-    {
-        if (empty($this->phones)) {
-            return $this->addRowPhone();
-        }
-    }
+
 
     public function saveLegalEntityFromExistingData($data): void
     {
@@ -240,7 +228,6 @@ class CreateNewLegalEntities extends Component
                         break;
                 }
             }
-
             $this->legalEntity->fill($normalizedData);
             $this->legal_entity_form->fill($normalizedData);
             if (!Cache::has($this->entityCacheKey) || $this->checkChanges()) {
@@ -273,25 +260,17 @@ class CreateNewLegalEntities extends Component
     public function checkOwnerChanges(): bool
     {
         if (Cache::has($this->ownerCacheKey)) {
-            // If the Legal Entity has not changed, return false
-            if (empty(array_diff_assoc($this->legal_entity_form->owner,
-                Cache::get($this->ownerCacheKey)))) {
-                return false; // If
+            $cachedOwner = Cache::get($this->ownerCacheKey);
+
+            $legalEntityOwner = $this->legal_entity_form->owner;
+
+            if (serialize($cachedOwner) === serialize($legalEntityOwner)) {
+                return false;
             }
         }
         return true; // Return true if the Legal Entity has changed
     }
 
-//    public function checkEdrpouChange()
-//    {
-//        if (Cache::has($this->entityCacheKey)
-//            && $this->legal_entity_form->edrpou != Cache::get($this->entityCacheKey)->edrpou)
-//            Cache::forget($this->entityCacheKey);
-//            Cache::forget($this->ownerCacheKey);
-//            $this->legalEntity->fill([]);
-//            $this->legal_entity_form->fill([]);
-//
-//    }
 
     public function saveLegalEntity(): void
     {
@@ -340,17 +319,22 @@ class CreateNewLegalEntities extends Component
     }
 
     // Step  4 Create/Update Address
-    public function stepAddress(): bool
+
+    /**
+     * @throws ValidationException
+     */
+    public function stepAddress(): void
     {
+        $this->legal_entity_form->addresses = [];
+
         $this->fetchDataFromAddressesComponent();
 
         if (empty($this->addresses)) {
-            throw ValidationException::withMessages(['addresses' => 'Адреса обовязкова']);
+            throw ValidationException::withMessages(
+                ['area' => 'The addresses field is required.']);
         }
 
         $this->legal_entity_form->addresses = $this->addresses;
-
-        return true;
     }
 
     // Step  5 Create/Update Accreditation
@@ -392,24 +376,22 @@ class CreateNewLegalEntities extends Component
         }
     }
 
-//    public function setField($property, $key, $value)
-//    {
-//        $this->legal_entity_form->$property[$key] = $value;
-//    }
+
+    public function fetchDataFromAddressesComponent():void
+    {
+       $this->dispatch('fetchAddressData');
+    }
 
     public function setAddressesFields()
     {
         $this->dispatch('setAddressesFields', $this->legal_entity_form->addresses ?? []);
     }
 
-    public function fetchDataFromAddressesComponent()
-    {
-        $this->dispatch('fetchAddressData');
-    }
 
     public function addressDataFetched($addressData): void
     {
         $this->addresses = $addressData;
+
     }
 
     public function render()

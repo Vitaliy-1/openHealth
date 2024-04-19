@@ -31,4 +31,10 @@
 </div>
 
 
+@push('scripts')
+
+
+@endpush
+
+
 

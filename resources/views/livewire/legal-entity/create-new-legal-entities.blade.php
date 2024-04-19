@@ -62,11 +62,11 @@
                         <div class="xl:w-1/4">
                             @if($currentStep == $totalSteps)
                                 <x-button type="submit" class="btn-primary" wire:click="increaseStep()">
-                                    {{__('Зарееструвати заклад')}}
+                                    {{__('forms.send_request')}}
                                 </x-button>
-                            @else
-                                <x-button type="button" class="btn-primary" wire:click="increaseStep()">
-                                    {{__('Далі')}}
+                                @else
+                                <x-button type="button" class="btn-primary" wire:click.defer="increaseStep()">
+                                    {{__('forms.next')}}
                                 </x-button>
                             @endif
                         </div>

@@ -2,7 +2,6 @@
 
 use App\Livewire\Contract\ContractForm;
 use App\Livewire\Contract\ContractIndex;
-use App\Livewire\Division\Division;
 use App\Livewire\Division\DivisionForm;
 use App\Livewire\Division\HealthcareServiceForm;
 use App\Livewire\Employee\EmployeeForm;
@@ -27,6 +26,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/whois', [\App\Classes\eHealth\Api\User::class, 'whois']);
+
+Route::get('/me', [\App\Classes\eHealth\Api\User::class, 'me']);
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -44,7 +46,6 @@ Route::middleware([
         Route::prefix('legal-entities')->group(function () {
             Route::get('/edit', EditLegalEntity::class)->name('edit.legalEntities');
         });
-
 
         Route::prefix('division')->group(function () {
             Route::get('/', DivisionForm::class)->name('division.index');

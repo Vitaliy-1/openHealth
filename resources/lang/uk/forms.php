@@ -11,7 +11,8 @@ return [
     | e.g., patient search, patient-related API request messages, etc,
     |
     */
-
+    'next' => 'Далі',
+    'send_request' => 'Надіслати дані',
     'step'=> 'Крок :currentSteep з :totalSteps',
     'typeMobile' =>'Обрати тип номера',
     'addPhone' =>'Додати номер',
@@ -27,7 +28,7 @@ return [
     'agree'=>'Я погоджуюсь з умовами',
     'digital_signature'=>'Цифровий підпис',
     'select_position'=>'Обрати посаду',
-    'accreditation_show' => 'Переглянути акредитацію',
+    'accreditation_show' => 'Наявна акредитація"',
     'full_name_division'=>'Повна Назва',
     'addresses_division'=>'Адреса розташування закладу',
     'type'=>'Тип',
@@ -169,7 +170,7 @@ return [
     'edit_contract'=>'Редагувати договір № :contract',
     'continue'=>'Продовжити',
     'alert_initialization_contract' => 'У вас вже ініціалізовано контракт',
-    'contractor_base' => 'На якій підставі діє підписант: закон/домовленість',
+    'contractor_base' => 'Організація діє на підставі: статуту - (ТОВ) або запису в реєстрі',
     'contractor_rmsp_amount' => 'Кількість населення, яке обслуговувало цей MSP',
     'bank_name' => 'Назва банку',
     'MFO' => 'МФО',
@@ -198,7 +199,13 @@ return [
     'add_involved_persons' => 'Додати залучені особи',
     'send_for_approval' => 'Надіслати на затвердження',
     'back' => 'Назад',
-    'action'=>'Дія'
+    'action'=>'Дія',
+    'edrpou_rnokpp'=>'ЄДРПОУ / РНОКПП',
+    'rnokpp'=>'РНОКПП',
+    'kpp'=>'КПП',
+    'ipn_rnokpp'=>'ІПН / РНОКПП',
+    'ipn'=>'ІПН',
+   'rnokpp_not_found'=>'РНОКПП/ІПН відсутній'
 
 
 ];
