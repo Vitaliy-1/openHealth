@@ -7,17 +7,17 @@
     <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
-                <x-forms.label class="default-label" for="accreditation_show"
+                <x-forms.label class="default-label flex items-center" for="accreditation_show"
+
                                name="label">
+                        <x-forms.input class="mr-1" x-bind:checked="show_accreditation"
+                                       @change="show_accreditation = !show_accreditation"
+                                       type="checkbox"
+                                       id="accreditation_show"/>
                     {{__('forms.accreditation_show')}}
                 </x-forms.label>
             </x-slot>
-            <x-slot name="input">
-                <x-forms.input x-bind:checked="show_accreditation"
-                               @change="show_accreditation = !show_accreditation"
-                               type="checkbox"
-                               id="accreditation_show"/>
-            </x-slot>
+
         </x-forms.form-group>
     </div>
 

@@ -7,7 +7,6 @@
             {{$contract_request->previous_request_id === '' ? __('forms.add_contract') :  __('forms.edit_contract',['contract' => $contract_request->previous_request_id]) }}
         </x-slot>
     </x-section-title>
-
     <div class="flex bg-white  pb-10  p-6 flex-col ">
         <div class="grid grid-cols-1   gap-9 sm:grid-cols-2">
             <div class="flex flex-col gap-9">
@@ -463,6 +462,4 @@
         @include('livewire.contract._parts.modals._external_contractors')
 
     </div>
-
-
 </div>

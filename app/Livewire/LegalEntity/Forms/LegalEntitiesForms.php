@@ -28,30 +28,20 @@ class LegalEntitiesForms extends Form
         'owner.position' => 'required|string'
     ])]
 
-    public ?array $owner = [];
+    public ?array $owner = [
+        'no_tax_id' => false
+    ];
 
     #[Validate([
         'phones.*.number' => 'required|string:digits:13',
         'phones.*.type' => 'required|string'
     ])]
-
     public ?array $phones = [];
 
     public string $website = '';
 
     #[Validate('required|email')]
     public string $email = '';
-
-
-//    #[Validate([
-////      'residence_address.country' => 'required|string|min:3',//TODO: validate country? default UA
-//        'residence_address.region' => 'required|string|min:3',
-//        'residence_address.area' => 'required|string|min:3',
-//        'residence_address.settlement' => 'required|string|min:3',
-//        'residence_address.street' => 'required|string',
-//        'residence_address.building' => 'required|string',
-//        'residence_address.settlement_type' => 'required|string|min:3',
-//    ])]
 
     public ?array $addresses = [];
 
@@ -72,7 +62,6 @@ class LegalEntitiesForms extends Form
 
     public ?array $archive = [];
     public ?string $receiver_funds_code = '';
-
     public ?string $beneficiary = '';
 
     #[Validate([
@@ -110,7 +99,6 @@ class LegalEntitiesForms extends Form
     {
         $this->validate($this->rulesForModel('email')->toArray());
         $this->validate($this->rulesForModel('phones')->toArray());
-
     }
 
     /**
@@ -136,7 +124,6 @@ class LegalEntitiesForms extends Form
     {
         $this->validate($this->rulesForModel('public_offer')->toArray());
     }
-
 
 
 }

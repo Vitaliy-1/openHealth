@@ -56,7 +56,7 @@
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>
-                            @error("legal_entity_form.contact.phones.{$key}.type")
+                            @error("legal_entity_form.phones.{$key}.type")
                             <x-forms.error>
                                 {{$message}}
                             </x-forms.error>
@@ -68,7 +68,7 @@
                                            x-mask="+380999999999"
                                            wire:model="legal_entity_form.phones.{{$key}}.number" type="text"
                                           />
-                            @error("legal_entity_form.contact.phones.{$key}.number")
+                            @error("legal_entity_form.phones.{$key}.number")
                             <x-forms.error>
                                 {{ $message }}
                             </x-forms.error>

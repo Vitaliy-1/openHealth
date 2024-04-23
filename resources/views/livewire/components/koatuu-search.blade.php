@@ -1,3 +1,4 @@
+
 <div class="{{$class}}">
     <!-- Area -->
     <x-forms.form-group class="">
@@ -32,7 +33,7 @@
         @enderror
     </x-forms.form-group>
     <!-- Region -->
-    <x-forms.form-group x-data="{ open: false }" class=" relative">
+    <x-forms.form-group  class=" relative" x-data="{ open: false }">
         <x-slot name="label">
             <x-forms.label class="default-label" for="region"
                            name="label">
@@ -43,12 +44,12 @@
             <div x-on:mouseleave="timeout = setTimeout(() => { open = false }, 300)">
                 <x-forms.input
                     wire:model.live="region"
-                    x-bind:disabled="{{ json_encode(empty($area)) }}"
+                    x-bind:disabled="{{ empty($area) ? 'true' : 'false' }}"
                     wire:keyup="searchKoatuuLevel2; open = true"
                     class="default-input"
                     autocomplete="off"
                     type="text" id="region"/>
-                <div x-show="open" x-ref="dropdown" wire:target="searchKoatuuLevel2">
+                <div x-show="open" x-ref="dropdown">
                     <div
                         class="z-10 max-h-96 overflow-auto w-full	 absolute  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
@@ -99,7 +100,7 @@
         <x-slot name="input">
             <x-forms.select
                 class="default-input"
-                x-bind:disabled="{{json_encode(empty($region))}}"
+                x-bind:disabled="{{ empty($region) ? 'true' : 'false' }}"
                 wire:model.live="settlement_type"
                 id="type"
             >
@@ -123,7 +124,7 @@
         @enderror
     </x-forms.form-group>
     <!-- Settlement -->
-    <x-forms.form-group x-data="{ open: false }" class=" relative">
+    <x-forms.form-group class=" relative" x-data="{ open: false }">
         <x-slot name="label">
             <x-forms.label class="default-label" for="settlement"
                            name="label">
@@ -137,11 +138,12 @@
                                wire:keyup="searchKoatuuLevel3; open = true"
                                class="default-input"
                                autocomplete="off"
-                               x-bind:disabled="{{json_encode(empty($settlement_type))}}"
+                               x-bind:disabled="{{ empty($settlement_type) ? 'true' : 'false' }}"
+
                                wire:model.live="settlement"
                                type="text"
                                id="settlement"/>
-                <div x-show="open" wire:target="searchKoatuuLevel3">
+                <div x-show="open" >
                     <div
                         class="z-10 max-h-96 overflow-auto w-full	 absolute  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
@@ -190,7 +192,7 @@
         <x-slot name="input">
             <x-forms.select
                 class="default-input"
-                x-bind:disabled="{{json_encode(empty($settlement))}}"
+                x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
 
                 wire:model.live="street_type"
                 id="street_type">
@@ -224,7 +226,7 @@
         <x-slot name="input">
             <x-forms.input
                 class="default-input"
-                x-bind:disabled="{{json_encode(empty($settlement))}}"
+                x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
 
                 wire:model.live="street" type="text"
                 id="street"/>
@@ -248,7 +250,7 @@
         <x-slot name="input">
             <x-forms.input class="default-input"
                            wire:model.live="building"
-                           x-bind:disabled="{{json_encode(empty($settlement))}}"
+                           x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
                            type="text" id="building"/>
         </x-slot>
         @error('building')
@@ -264,14 +266,14 @@
         <x-slot name="label">
             <x-forms.label class="default-label" for="apartment"
                            name="label">
-                {{__('forms.apartment')}} {{$zip}}
+                {{__('forms.apartment')}}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
             <x-forms.input
                 class="default-input"
                 wire:model.live="apartment"
-                x-bind:disabled="{{json_encode(empty($settlement))}}"
+                x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
                 type="text" id="apartment"/>
         </x-slot>
     </x-forms.form-group>
@@ -287,7 +289,7 @@
             <x-forms.input x-mask="99999"
                            class="default-input"
                            wire:model.live="zip"
-                           x-bind:disabled="{{json_encode(empty($settlement))}}"
+                           x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
                            type="text" id="zip"/>
         </x-slot>
     </x-forms.form-group>
