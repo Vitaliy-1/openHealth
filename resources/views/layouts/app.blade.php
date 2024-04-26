@@ -11,17 +11,17 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
-        @vite(['resources/css/style.css', 'resources/js/index.js'])
-
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-        <!-- Styles -->
         @livewireStyles
+        @livewireScripts
+        <!-- Scripts -->
+        @vite(['resources/css/style.css','resources/css/app.css', 'resources/js/index.js','resources/js/app.js'])
+
+
     </head>
 
 
     <body
+
         x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
         x-init="
          darkMode = JSON.parse(localStorage.getItem('darkMode'));
@@ -33,7 +33,6 @@
         <div class="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
     </div>
     <!-- ===== Preloader End ===== -->
-
 
 
     <!-- ===== Page Wrapper Start ===== -->
@@ -62,6 +61,8 @@
     <!-- ===== Page Wrapper End ===== -->
 
     @stack('modals')
+
+    @stack('scripts')
     </body>
 
 </html>

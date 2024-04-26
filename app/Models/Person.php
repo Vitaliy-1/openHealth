@@ -37,8 +37,11 @@ class Person extends Model
 
     protected $casts = [
         'documents' => 'array',
-        'addresses' => 'array',
         'phones' => 'array',
+        'educations' => 'array',
+        'specialities' => 'array',
+        'qualifications' => 'array',
+        'science_degree' => 'array',
         'emergency_contact' => 'array',
         'confidant_person' => 'array',
         'authentication_methods' => 'array',
@@ -48,7 +51,6 @@ class Person extends Model
     protected $attributes = [
         'documents' => '{}',
         'tax_id' => '',
-
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\hasOne

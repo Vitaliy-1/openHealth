@@ -1,6 +1,13 @@
 <?php
 
-use App\Livewire\Registration\CreateNewLegalEntities;
+use App\Livewire\Contract\ContractForm;
+use App\Livewire\Contract\ContractIndex;
+use App\Livewire\Division\DivisionForm;
+use App\Livewire\Division\HealthcareServiceForm;
+use App\Livewire\Employee\EmployeeForm;
+use App\Livewire\Employee\EmployeeIndex;
+use App\Livewire\LegalEntity\CreateNewLegalEntities;
+use App\Livewire\LegalEntity\EditLegalEntity;
 use App\Livewire\SearchPatient;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +26,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/whois', [\App\Classes\eHealth\Api\User::class, 'whois']);
+
+Route::get('/me', [\App\Classes\eHealth\Api\User::class, 'me']);
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -29,9 +39,31 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
+
     Route::get('/dashboard/legal-entities/create', CreateNewLegalEntities::class)->name('create.legalEntities');
 
-    Route::get('/dashboard/search/patient', SearchPatient::class);
+    Route::group(['middleware' => ['role:Owner']], function () {
+        Route::prefix('legal-entities')->group(function () {
+            Route::get('/edit', EditLegalEntity::class)->name('edit.legalEntities');
+        });
 
+        Route::prefix('division')->group(function () {
+            Route::get('/', DivisionForm::class)->name('division.index');
+            Route::get('/{division}/healthcare-service', HealthcareServiceForm::class)->name('healthcare_service.index');
+        });
+
+        Route::prefix('employee')->group(function () {
+            Route::get('/', EmployeeIndex::class)->name('employee.index');
+            Route::get('/form/{id?}', EmployeeForm::class)->name('employee.form');
+        });
+
+        Route::prefix('contract')->group(function () {
+            Route::get('/', ContractIndex::class)->name('contract.index');
+            Route::get('/form/{id?}', ContractForm::class)->name('contract.form');
+        });
+
+        Route::get('/search/patient', [SearchPatient::class, 'index']);
+
+    });
 
 });

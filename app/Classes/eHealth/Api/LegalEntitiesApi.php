@@ -4,18 +4,20 @@ namespace App\Classes\eHealth\Api;
 
 use App\Classes\eHealth\Request;
 
-class LegalEntitiesApi
+class LegalEntitiesApi extends Request
 {
 
-    private string $getV2 = '/legal_entities';
 
-    public function getLegalEntities($params = []): array
+    public const URL = '/v2/legal_entities';
+
+    public static function _get($params = []): array
     {
-        return Request::get($this->getV2, $params);
+        return self::get(self::URL, $params);
     }
 
-    public function createOrUpdateLegalEntities($params = []): array
+    public static function _createOrUpdate($params = []): array
     {
-        return Request::put($this->getV2, $params);
+        return self::put(self::URL, $params);
     }
+
 }

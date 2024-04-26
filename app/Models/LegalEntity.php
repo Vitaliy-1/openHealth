@@ -37,9 +37,9 @@ class LegalEntity extends Model
     ];
 
     protected $casts = [
-        'addresses' => 'array',
+        'addresses' => 'json',
         'phones' => 'array',
-        'archive' => 'array',
+        'archive' => 'json',
         'kveds' => 'array',
         'license' => 'array',
         'accreditation'=>'array',
@@ -50,7 +50,6 @@ class LegalEntity extends Model
         'is_active' => false,
         'owner_property_type' => '',
     ];
-
 
     public function employee(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -67,5 +66,14 @@ class LegalEntity extends Model
     }
 
 
+    public function division(): \Illuminate\Database\Eloquent\Relations\hasMany
+    {
+        return $this->hasMany(Division::class);
+    }
+
+    public function contract(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Contract::class,'legal_entity_id','id');
+    }
 
 }

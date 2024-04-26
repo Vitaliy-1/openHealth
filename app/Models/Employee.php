@@ -11,7 +11,9 @@ class Employee extends Model
 
 
     protected $fillable = [
-        'employee_uuid',
+        'uuid',
+        'legal_entity_uuid',
+        'division_uuid',
         'person_id',
         'legal_entity_id',
         'status',
@@ -26,14 +28,7 @@ class Employee extends Model
     protected $casts = [
         'party' => 'array',
         'doctor' => 'array',
-    ];
-
-    protected $attributes = [
-        'status' => '',
-        'employee_type' => '',
-        'employee' => '',
-        'start_date' => '2021-01-01',
-        'is_active' => true,
+        'speciality' => 'array',
     ];
 
 
@@ -46,6 +41,11 @@ class Employee extends Model
     public function legalEntity(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(LegalEntity::class);
+    }
+
+    public function division(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Division::class);
     }
 
 }

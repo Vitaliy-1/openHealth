@@ -10,14 +10,15 @@ class Request extends Configuration
 
     protected static function makeApiUrl(string $url): string
     {
-        return self::getApiUrl() . '/api/' . self::$ApiVersion . $url;
+
+        return self::getApiUrl() . '/api/'. $url;
     }
 
     protected static function sendRequest(string $method, string $url, array $params = []): array
     {
-
         $response = Http::acceptJson()
             ->{$method}(self::makeApiUrl($url), $params);
+
         if ($response->successful()) {
             return json_decode($response->body(), true)['data'] ?? [];
         }
@@ -40,5 +41,10 @@ class Request extends Configuration
     public static function put(string $url, array $params = []): array
     {
         return self::sendRequest('put', $url, $params);
+    }
+
+    public static function patch(string $url, array $params = []): array
+    {
+        return self::sendRequest('patch', $url, $params);
     }
 }
