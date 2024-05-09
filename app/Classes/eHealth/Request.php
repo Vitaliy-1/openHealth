@@ -2,49 +2,84 @@
 
 namespace App\Classes\eHealth;
 
+use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
+use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealthInterface;
+use App\Classes\eHealth\Exceptions\ApiException;
 use Illuminate\Support\Facades\Http;
 
-class Request extends Configuration
+class Request
 {
+    private string $method;
+
+    private string $url;
+
+    private array $params;
+
+    private bool $isToken ;
+    private oAuthEhealthInterface $oAuthEhealth;
+
+    private array $headers = [];
 
 
-    protected static function makeApiUrl(string $url): string
-    {
-
-        return self::getApiUrl() . '/api/'. $url;
+    public function __construct(
+        string $method,
+        string $url,
+        array $params,
+        bool $isToken = true,
+    ) {
+        $this->method = $method;
+        $this->url = $url;
+        $this->params = $params;
+        $this->isToken = $isToken;
+        $this->oAuthEhealth = new oAuthEhealth();
     }
 
-    protected static function sendRequest(string $method, string $url, array $params = []): array
+    protected function makeApiUrl(): string
+    {
+        return config('ehealth.api.domain'). $this->url;
+    }
+
+    /**
+     * @throws ApiException
+     */
+    public function sendRequest()
     {
         $response = Http::acceptJson()
-            ->{$method}(self::makeApiUrl($url), $params);
-
+            ->withHeaders($this->getHeaders())
+            ->{$this->method}(self::makeApiUrl(), $this->params);
         if ($response->successful()) {
+            $error = json_decode($response->body(), true);
+            dd($error);
             return json_decode($response->body(), true)['data'] ?? [];
         }
+        if ($response->status() === 401) {
+            $this->oAuthEhealth->forgetToken();
+        }
 
-        // Handle failed requests if necessary
+        if ($response->failed()) {
+            $error = json_decode($response->body(), true);
+            throw match ($response->status()) {
+                400 => new ApiException($error['message'] ?? 'Невірний запит'),
+                403 => new ApiException($error['message'] ?? 'Немає доступу'),
+                404 => new ApiException($error['message'] ?? 'Не вдалося знайти запитану сторінку'),
+                default => new ApiException($error['message'] ?? 'API request failed'),
+            };
 
-        return [];
+        }
+
     }
 
-    public static function get(string $url, array $params = []): array
-    {
-        return self::sendRequest('get', $url, $params);
-    }
 
-    public static function post(string $url, array $params = []): array
+    public function getHeaders(): array
     {
-        return self::sendRequest('post', $url, $params);
-    }
+        $headers = [
+            'X-Custom-PSK' => env('EHEALTH_X_CUSTOM_PSK'),
+        ];
 
-    public static function put(string $url, array $params = []): array
-    {
-        return self::sendRequest('put', $url, $params);
-    }
+        if ($this->isToken) {
+            $headers['Authorization'] = 'Bearer '. $this->oAuthEhealth->getToken();
+        }
 
-    public static function patch(string $url, array $params = []): array
-    {
-        return self::sendRequest('patch', $url, $params);
+        return array_merge($headers, $this->headers);
     }
 }
