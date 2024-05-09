@@ -8,6 +8,8 @@ use Livewire\Component;
 class LegalEntitiesRequestApi extends LegalEntitiesApi
 {
 
+
+
     public static function getLegalEntitie($edrpou): array
     {
         $legalEntitiesApi = self::_get(
