@@ -10,7 +10,7 @@ use Livewire\Form;
 class LegalEntitiesForms extends Form
 {
 
-    #[Validate('required|integer|digits_between:8,10')]
+    #[Validate('required|integer|digits_between:6,10')]
     public string $edrpou = '';
 
     #[Validate([
