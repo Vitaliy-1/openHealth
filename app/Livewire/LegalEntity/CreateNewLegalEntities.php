@@ -360,6 +360,10 @@ class CreateNewLegalEntities extends Component
     public function stepPublicOffer(): void
     {
 //        $this->legal_entity_form->rulesForPublicOffer();
+        $request = $this->legal_entity_form->toArray();
+        $request['nhs_verified']=true;
+        $request['nhs_reviewed']=true;
+
         $request = LegalEntitiesRequestApi::_createOrUpdate($this->legal_entity_form->toArray());
 
         if (!empty($request) ){

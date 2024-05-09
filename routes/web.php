@@ -1,5 +1,8 @@
 <?php
 
+use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
+use App\Http\Controllers\Auth\LoginController;
+use App\Livewire\Auth\Login;
 use App\Livewire\Contract\ContractForm;
 use App\Livewire\Contract\ContractIndex;
 use App\Livewire\Division\DivisionForm;
@@ -26,19 +29,20 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/whois', [\App\Classes\eHealth\Api\User::class, 'whois']);
 
-Route::get('/me', [\App\Classes\eHealth\Api\User::class, 'me']);
+Route::get('/ehealth/oauth/', [oAuthEhealth::class, 'callback'])->name('ehealth.oauth.callback');
+Route::get('/login', [LoginController::class, 'index'])->middleware('guest')->name('index.login');
+Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-    'verified',
+//    'verified',
 ])->group(function () {
 
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-
 
     Route::get('/dashboard/legal-entities/create', CreateNewLegalEntities::class)->name('create.legalEntities');
 

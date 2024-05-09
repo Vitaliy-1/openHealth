@@ -16,7 +16,6 @@
         <!-- Scripts -->
         @vite(['resources/css/style.css','resources/css/app.css', 'resources/js/index.js','resources/js/app.js'])
 
-
     </head>
 
 
