@@ -12,7 +12,6 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
 
     public static function getLegalEntitie($edrpou): array
     {
-        dd($iResult = euspe_resetprivatekey());
         $legalEntitiesApi = self::_get(
             ['edrpou' => $edrpou,
              'is_active' => true,
