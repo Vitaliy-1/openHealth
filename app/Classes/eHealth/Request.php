@@ -48,8 +48,7 @@ class Request
             ->withHeaders($this->getHeaders())
             ->{$this->method}(self::makeApiUrl(), $this->params);
         if ($response->successful()) {
-            $error = json_decode($response->body(), true);
-            dd($error);
+
             return json_decode($response->body(), true)['data'] ?? [];
         }
         if ($response->status() === 401) {
@@ -64,7 +63,6 @@ class Request
                 404 => new ApiException($error['message'] ?? 'Не вдалося знайти запитану сторінку'),
                 default => new ApiException($error['message'] ?? 'API request failed'),
             };
-
         }
 
     }
