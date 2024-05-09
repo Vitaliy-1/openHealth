@@ -2,6 +2,10 @@
 
 namespace App\Helpers;
 
+
+
+use Illuminate\Support\Facades\Cache;
+
 /**
  * Class JsonHelper
  *
@@ -14,9 +18,28 @@ class JsonHelper
     /**
      * Define the paths to JSON files using constant keys.
      */
-    const JSON_PATH = [
-        'DICTIONARIES_PATH' => '/app/public/json/dictionaries.json',
-    ];
+    private static  array $json_path = [];
+
+    const DICTIONARIES_API_URL = 'https://api.ehealth.gov.ua/api/dictionaries';
+
+    public static function handle(): void
+    {
+        if (!Cache::has('json_path')) {
+            $response = file_get_contents(self::DICTIONARIES_API_URL);
+            if ($response === false) {
+                // Handle error when fetching data from the API
+                throw new \RuntimeException('Failed to fetch data from the API.');
+            }
+            $dictionaries = json_decode($response, true);
+            if ($dictionaries === null) {
+                // Handle error when decoding JSON data
+                throw new \RuntimeException('Failed to decode JSON data.');
+            }
+            Cache::put('json_path', $dictionaries['data'], now()->addDays(7));
+
+        }
+        self::$json_path = Cache::get('json_path');
+    }
 
     /**
      * Search for values in a JSON file based on the provided keys.
@@ -28,23 +51,22 @@ class JsonHelper
      */
     public static function searchValue(string $pathKey, array $searchKeys): ?array
     {
-        $path = self::getPath($pathKey);
+
+
+        static::handle();
+
+
+        $path = self::getPath();
 
         if ($path === null) {
             return null;
         }
 
-        $jsonData = json_decode(file_get_contents(storage_path($path)), true);
-
-        if ($jsonData === null) {
-            return null;
-        }
         // Search results
         $searchResults = [];
 
         foreach ($searchKeys as $searchKey) {
-            $result = self::recursiveSearch($jsonData, $searchKey);
-
+            $result = self::recursiveSearch($path, $searchKey);
             if ($result !== null) {
                 // Add only the found results to the array
                 $searchResults[$searchKey] = $result;
@@ -68,7 +90,6 @@ class JsonHelper
             if (isset($value['name']) && $value['name'] === $searchKey) {
                 return $value['values'];
             }
-
             if (is_array($value)) {
                 $result = self::recursiveSearch($value, $searchKey);
                 if ($result !== null) {
@@ -87,8 +108,8 @@ class JsonHelper
      *
      * @return mixed|null The path if found, or null if not found.
      */
-    private static function getPath(string $pathKey): mixed
+    private static function getPath(): mixed
     {
-        return self::JSON_PATH[$pathKey] ?? null;
+        return static::$json_path ?? null;
     }
 }
