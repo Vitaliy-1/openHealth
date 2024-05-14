@@ -17,7 +17,7 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function callback(): \Illuminate\Http\RedirectResponse
     {
-        dd('Відлючив для тестування - на localhost машині - бо авторизуе і я не можу з користуватися тоекном другий раз!');
+//        dd('Відлючив для тестування - на localhost машині - бо авторизуе і я не можу з користуватися тоекном другий раз!');
         if (!request()->has('code')) {
             return redirect()->route('login');
         }

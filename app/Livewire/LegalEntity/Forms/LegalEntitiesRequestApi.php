@@ -12,6 +12,7 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
 
     public static function getLegalEntitie($edrpou): array
     {
+
         $legalEntitiesApi = self::_get(
             ['edrpou' => $edrpou,
              'is_active' => true,
