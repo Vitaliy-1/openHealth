@@ -17,6 +17,10 @@ class LoginController extends Controller
     }
 
     public function login(Request $request){
+//        Validator::make($request->all(), [
+//            'email' => ['required', 'string', 'email', 'max:255'],
+//        ]);
+
         $oAuth = oAuthEhealth::loginUrl($request->email);
         return redirect()->to($oAuth);
     }
