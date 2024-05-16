@@ -13,9 +13,8 @@
         <!-- Scripts -->
         @livewireScripts
 
-        @vite(['resources/css/style.css', 'resources/js/index.js'])
+        @vite(['resources/css/style.css', 'resources/js/index.js','resources/css/app.css', 'resources/js/app.js'])
 
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <!-- Styles -->
         @livewireStyles
