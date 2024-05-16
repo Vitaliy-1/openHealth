@@ -13,21 +13,25 @@
         <!-- Scripts -->
         @livewireScripts
 
-
+        @vite([
+            'resources/js/index.js',
+            'resources/js/app.js',
+            ])
 
         <!-- Styles -->
         @livewireStyles
 
-        @vite([ 'resources/js/index.js','resources/css/app.css', 'resources/js/app.js'])
-        @vite([ 'resources/css/style.css'])
-
+        @vite([
+            'resources/css/style.css',
+            'resources/css/app.css',
+            ])
     </head>
     <body>
     <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 antialiased">
         <div class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div class="flex flex-wrap items-center">
                 {{ $slot }}
-21321
+
             </div>
         </div>
         <!-- ====== Forms Section Start -->

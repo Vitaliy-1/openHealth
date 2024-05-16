@@ -17,7 +17,7 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function callback(): \Illuminate\Http\RedirectResponse
     {
-        if ( env('EHEALTH_CALBACK_PROD') === true) {
+        if ( env('EHEALTH_CALBACK_PROD') === false) {
             dd(request()->all());
         }
 
@@ -33,7 +33,6 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function authenticate($code)
     {
-
         $data = [
             'token' => [
                 'client_id' => env('EHEALTH_CLIENT_ID'),
