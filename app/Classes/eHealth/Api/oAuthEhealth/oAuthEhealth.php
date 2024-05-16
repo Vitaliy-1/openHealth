@@ -17,10 +17,10 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function callback(): \Illuminate\Http\RedirectResponse
     {
-        if ( env('EHEALTH_CALBACK_PROD') === false) {
+        if ( env('EHEALTH_CALBACK_PROD') === true) {
             dd(request()->all());
         }
-//        dd('Відлючив для тестування - на localhost машині - бо авторизуе і я не можу з користуватися тоекном другий раз!');
+
         if (!request()->has('code')) {
             return redirect()->route('login');
         }
