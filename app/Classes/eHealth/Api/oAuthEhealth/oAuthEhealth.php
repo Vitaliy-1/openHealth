@@ -17,7 +17,7 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function callback(): \Illuminate\Http\RedirectResponse
     {
-        if ( env('EHEALTH_CALBACK_PROD') === false) {
+        if ( env('EHEALTH_CALBACK_PROD') === true) {
             dd(request()->all());
         }
 
