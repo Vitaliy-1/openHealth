@@ -17,7 +17,10 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function callback(): \Illuminate\Http\RedirectResponse
     {
-//        dd('Відлючив для тестування - на localhost машині - бо авторизуе і я не можу з користуватися тоекном другий раз!');
+        if ( env('EHEALTH_CALBACK_PROD') === true) {
+            dd(request()->all());
+        }
+
         if (!request()->has('code')) {
             return redirect()->route('login');
         }
@@ -30,6 +33,7 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function authenticate($code)
     {
+
         $data = [
             'token' => [
                 'client_id' => env('EHEALTH_CLIENT_ID'),
