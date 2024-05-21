@@ -1,0 +1,18 @@
+* {
+    color: rgb(125, 125, 125);
+}
+
+#responsiveMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+}
+
+#menuToggle.active + #responsiveMenu {
+    display: block;
+}
+
+#header {
+    transition: transform 0.3s ease;
+}

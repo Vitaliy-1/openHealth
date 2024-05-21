@@ -91,6 +91,7 @@ return [
     'not_in' => 'Вибране для :attribute значення не коректне.',
     'not_regex' => 'The :attribute format is invalid.',
     'numeric' => 'Поле :attribute повинно містити число.',
+    'phone' => 'Поле :attribute має бути дійсним номером телефону з мінімум :min цифрами, без пробілів та крапок.',
     'present' => 'Поле :attribute повинне бути присутнє.',
     'regex' => 'Поле :attribute має хибний формат.',
     'required' => "Поле :attribute є обов'язковим для заповнення.",
@@ -135,6 +136,9 @@ return [
         'educations_table' => 'Заповніть таблицю Освіта',
         'specialities_table' => 'Заповніть таблицю Спеціальності',
         'employee_table' => 'Заповніть данні Працівника',
+        '_token' => [
+            'csrf_token' => 'Токен CSRF є недійсним.',
+        ],
     ],
 
     /*
@@ -149,6 +153,9 @@ return [
     */
 
     'attributes' => [
+        'name' => 'ім\'я',
+        'phone' => 'телефон',
+        '_token' => 'токен CSRF',
         'edrpou' => 'ЄДРПОУ',
         'email' => 'E-mail',
         'contact.phones.*.number' => 'Телефон',

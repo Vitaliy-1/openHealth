@@ -50,9 +50,17 @@ export default {
             'meta-7': '#FF6766',
             'meta-8': '#F0950C',
             'meta-9': '#E5E7EB',
+
+            'meta-10': '#3cacae',
+
             success: '#219653',
             danger: '#D34053',
             warning: '#FFA70B',
+
+            'orange': '#f4881b',
+            'blue': '#259AE6',
+            'link': '#7d7d7d',
+            'icon': '#17c8da',
         },
         screens: {
             '2xsm': '375px',
@@ -203,6 +211,18 @@ export default {
                 47.5: '11.875rem',
                 75: '18.75rem',
             },
+            height: {
+                '10vh': '10vh',
+                '20vh': '20vh',
+                '30vh': '30vh',
+                '40vh': '40vh',
+                '50vh': '50vh',
+                '60vh': '60vh',
+                '70vh': '70vh',
+                '80vh': '80vh',
+                '90vh': '90vh',
+                '100vh': '100vh',
+            },
             zIndex: {
                 999999: '999999',
                 99999: '99999',
@@ -215,8 +235,24 @@ export default {
             opacity: {
                 65: '.65',
             },
+            logo: {
+                'logo': 'url("../images/logo.webp")',
+            },
             backgroundImage: {
                 video: "url('../images/video/video.png')",
+                'image-1': "url('../images/OH.png')",
+                'image-2': "url('../images/OH-2.jpg')",
+                'image-3': "url('../images/item1.jpg')",
+                'image-4': "url('../images/item2.jpg')",
+            },
+            backgroundPosition: {
+                'right-top': 'right top',
+                'right-center': 'right center',
+                'right-bottom': 'right bottom',
+            },
+            backgroundRepeat: {
+                'no-repeat': 'no-repeat',
+                'repeat': 'repeat',
             },
             content: {
                 'icon-copy': 'url("../images/icon/icon-copy-alt.svg")',
