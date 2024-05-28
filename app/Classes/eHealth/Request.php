@@ -57,7 +57,6 @@ class Request
 
         if ($response->failed()) {
             $error = json_decode($response->body(), true);
-            dd($error);
             throw match ($response->status()) {
                 400 => new ApiException($error['message'] ?? 'Невірний запит'),
                 403 => new ApiException($error['message'] ?? 'Немає доступу'),
@@ -78,7 +77,6 @@ class Request
         if ($this->isToken) {
             $headers['Authorization'] = 'Bearer '. $this->oAuthEhealth->getToken();
         }
-
         return array_merge($headers, $this->headers);
     }
 }
