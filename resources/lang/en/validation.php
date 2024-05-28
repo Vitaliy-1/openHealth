@@ -120,6 +120,7 @@ return [
         'symbols' => 'The :attribute field must contain at least one symbol.',
         'uncompromised' => 'The given :attribute has appeared in a data leak. Please choose a different :attribute.',
     ],
+    'phone' => 'The :attribute must be a valid phone number with a minimum of :min digits, no spaces or dots.',
     'present' => 'The :attribute field must be present.',
     'prohibited' => 'The :attribute field is prohibited.',
     'prohibited_if' => 'The :attribute field is prohibited when :other is :value.',
@@ -167,6 +168,9 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+        '_token' => [
+            'csrf_token1' => 'CSRF token is invalid.',
+        ],
     ],
 
     /*
@@ -181,6 +185,9 @@ return [
     */
 
     'attributes' => [
+        'name' => 'name',
+        'phone' => 'phone',
+        '_token' => 'token CSRF',
         'form'=> [
             'edrpou'=>'EDRPOU'
         ],

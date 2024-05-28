@@ -13,6 +13,8 @@ use App\Livewire\LegalEntity\CreateNewLegalEntities;
 use App\Livewire\LegalEntity\EditLegalEntity;
 use App\Livewire\SearchPatient;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\EmailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,9 +27,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home.index');
+Route::post('/send-email', [EmailController::class, 'sendEmail'])->name('send.email');
 
 
 Route::get('/ehealth/oauth/', [oAuthEhealth::class, 'callback'])->name('ehealth.oauth.callback');

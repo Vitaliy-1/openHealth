@@ -2,7 +2,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@tailwind 'style.css';
+@tailwind "style.css";
+@tailwind "home.css";
+
 [x-cloak] {
     display: none;
 }
