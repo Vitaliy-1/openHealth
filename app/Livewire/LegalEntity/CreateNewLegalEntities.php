@@ -375,12 +375,11 @@ class CreateNewLegalEntities extends Component
     {
 
          $base64Data =  (new CipherApi())->sendSession(
-             $this->legal_entity_form->toArray(),
+             json_encode($this->legal_entity_form->toArray()),
              $this->password,
              $this->convertFileToBase64(),
              $this->knedp
          );
-
         dd($base64Data);
         $data = [
             'signed_legal_entity_request' => json_encode( $base64Data),
@@ -388,7 +387,6 @@ class CreateNewLegalEntities extends Component
         ];
 
         $request = LegalEntitiesRequestApi::_createOrUpdate($data);
-
         if (!empty($request) ){
             $this->saveLegalEntityFromExistingData($request);
             $this->legalEntity->fill($request);

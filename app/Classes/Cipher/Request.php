@@ -39,7 +39,6 @@ class Request
         //920cafec-2316-4c92-90de-48c89fe16f49
         if ($response->successful()) {
             $success = json_decode($response->body(), true);
-
             return $success ?? [];
         }
 
