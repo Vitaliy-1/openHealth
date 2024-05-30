@@ -57,6 +57,7 @@ class Request
 
         if ($response->failed()) {
             $error = json_decode($response->body(), true);
+            dd($error);
             throw match ($response->status()) {
                 400 => new ApiException($error['message'] ?? 'Невірний запит'),
                 403 => new ApiException($error['message'] ?? 'Немає доступу'),
@@ -72,6 +73,8 @@ class Request
     {
         $headers = [
             'X-Custom-PSK' => env('EHEALTH_X_CUSTOM_PSK'),
+            'API-key' => env('EHEALTH_CLIENT_SECRET'),
+
         ];
 
         if ($this->isToken) {

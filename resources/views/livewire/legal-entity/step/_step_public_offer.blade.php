@@ -5,7 +5,7 @@
 
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
-            <x-forms.label class="default-label" for="KNEDP"
+            <x-forms.label class="default-label" for="knedp"
                            name="label">
                 {{__('forms.KNEDP')}} *
             </x-forms.label>
@@ -13,7 +13,7 @@
         <x-slot name="input">
             <x-forms.select   class="default-input"
                             wire:model="knedp"
-                            id="KNEDP">
+                            id="knedp">
                 <x-slot name="option">
                     @foreach($getCertificateAuthority as $k =>$certificate_type)
                         <option   value="{{$certificate_type['id']}}">{{$certificate_type['name']}}</option>
@@ -21,7 +21,11 @@
                 </x-slot>
             </x-forms.select>
         </x-slot>
-
+        @error("knedp")
+        <x-forms.error>
+            {{$message}}
+        </x-forms.error>
+        @enderror
     </x-forms.form-group>
 
     <x-forms.form-group class="xl:w-1/2">
@@ -35,7 +39,11 @@
             <x-forms.input class="default-input" wire:model="keyContainerUpload"
                            type="file" id="keyContainerUpload"/>
         </x-slot>
-
+        @error("keyContainerUpload")
+        <x-forms.error>
+            {{$message}}
+        </x-forms.error>
+        @enderror
     </x-forms.form-group>
 
     <x-forms.form-group class="xl:w-1/2">

@@ -30,7 +30,6 @@ class CipherApi
         $this->password = $password;
         $this->base64File = $base64File;
         $this->knedp = $knedp;
-
         $this->createSession();
         $this->loadTicket();
         $this->setParamsSession();
@@ -88,7 +87,7 @@ class CipherApi
         (new Request('get', "/ticket/{$this->ticketUuid}/ds/creator", ''))->sendRequest();
     }
 
-    // Get KEYP
+    // Get KEP in base64
     private function getKep(): string
     {
         $base64Data = (new Request('get', "/ticket/{$this->ticketUuid}/ds/base64Data", ''))->sendRequest();

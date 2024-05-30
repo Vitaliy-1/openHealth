@@ -10,6 +10,4 @@ interface oAuthEhealthInterface
 
     public function login(array $email = []): void;
 
-
-
 }
