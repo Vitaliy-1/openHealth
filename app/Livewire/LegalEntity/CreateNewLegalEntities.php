@@ -381,10 +381,10 @@ class CreateNewLegalEntities extends Component
              $this->convertFileToBase64(),
              $this->knedp
          );
-        dd($base64Data);
+
         $data = [
-            'signed_legal_entity_request' => '1',
-            'signed_content_encoding' => '2',
+            'signed_legal_entity_request' => json_encode($this->legal_entity_form->toArray()),
+            'signed_content_encoding' => $base64Data,
         ];
 
         $request = LegalEntitiesRequestApi::_createOrUpdate($data);
