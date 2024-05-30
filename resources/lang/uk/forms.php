@@ -205,7 +205,8 @@ return [
     'kpp'=>'КПП',
     'ipn_rnokpp'=>'ІПН / РНОКПП',
     'ipn'=>'ІПН',
-   'rnokpp_not_found'=>'РНОКПП/ІПН відсутній'
-
-
+    'rnokpp_not_found'=>'РНОКПП/ІПН відсутній',
+    'KNEDP'=> 'КНЕДП',
+    'keyContainerUpload'=>'Шлях до контейнеруа',
+    'password'=>'Пароль',
 ];

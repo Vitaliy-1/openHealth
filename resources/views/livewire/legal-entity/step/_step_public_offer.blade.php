@@ -2,32 +2,62 @@
     {{  __('Згода') }}
 </x-slot>
 <div class="mb-4.5 flex flex-col gap-6 xl:flex-container">
-    <x-forms.form-group class="flex items-center mb-4 flex-row-reverse	justify-end	">
 
-
+    <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
-            <x-forms.label class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                           name="label" for="digital_signature">
-                <div>
-                    <label class="mb-3 block text-sm font-medium text-black dark:text-white">
-                        {{__('forms.digital_signature')}}
-                    </label>
-                    <x-forms.input class="w-full rounded-md border border-stroke p-3 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm file:font-medium focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                                   wire:model="legal_entity_form.public_offer.digital_signature" value="true" type="file"
-                                   id="digital_signature" />
-                </div>
+            <x-forms.label class="default-label" for="knedp"
+                           name="label">
+                {{__('forms.KNEDP')}} *
             </x-forms.label>
-
         </x-slot>
-{{--        <x-slot name="error">--}}
-{{--        @error("legal_entity_form.public_offer.digital_signature")--}}
-{{--        <x-forms.error>--}}
-{{--            {{$message}}--}}
-{{--        </x-forms.error>--}}
-{{--        @enderror--}}
-{{--        </x-slot>--}}
+        <x-slot name="input">
+            <x-forms.select   class="default-input"
+                            wire:model="knedp"
+                            id="knedp">
+                <x-slot name="option">
+                    @foreach($getCertificateAuthority as $k =>$certificate_type)
+                        <option   value="{{$certificate_type['id']}}">{{$certificate_type['name']}}</option>
+                    @endforeach
+                </x-slot>
+            </x-forms.select>
+        </x-slot>
+        @error("knedp")
+        <x-forms.error>
+            {{$message}}
+        </x-forms.error>
+        @enderror
     </x-forms.form-group>
 
+    <x-forms.form-group class="xl:w-1/2">
+        <x-slot name="label">
+            <x-forms.label class="default-label" for="keyContainerUpload"
+                           name="label">
+                {{__('forms.keyContainerUpload')}} *
+            </x-forms.label>
+        </x-slot>
+        <x-slot name="input">
+            <x-forms.input class="default-input" wire:model="keyContainerUpload"
+                           type="file" id="keyContainerUpload"/>
+        </x-slot>
+        @error("keyContainerUpload")
+        <x-forms.error>
+            {{$message}}
+        </x-forms.error>
+        @enderror
+    </x-forms.form-group>
+
+    <x-forms.form-group class="xl:w-1/2">
+        <x-slot name="label">
+            <x-forms.label class="default-label" for="password"
+                           name="label">
+                {{__('forms.password')}} *
+            </x-forms.label>
+        </x-slot>
+        <x-slot name="input">
+            <x-forms.input class="default-input" wire:model="password"
+                           type="password" id="password"/>
+        </x-slot>
+    </x-forms.form-group>
     <x-forms.form-group class="flex items-center mb-4 flex-row-reverse	justify-end	">
         <x-slot name="input">
             <x-forms.input wire:model="legal_entity_form.public_offer.consent" value="true" type="checkbox"
@@ -45,5 +75,4 @@
         </x-forms.error>
         @enderror
     </x-forms.form-group>
-
 </div>
