@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Components;
 
+use App\Classes\eHealth\Api\AdressesApi;
 use App\Helpers\JsonHelper;
 use App\Models\Koatuu\KoatuuLevel1;
 use App\Models\Koatuu\KoatuuLevel2;
@@ -52,6 +53,7 @@ class KoatuuSearch extends Component
 
     public function mount($addresses,$class)
     {
+//        dd(AdressesApi::_regions());
         if (!empty($addresses)) {
             $this->updatedFields($addresses);
             if (!empty($addresses['region'])) {

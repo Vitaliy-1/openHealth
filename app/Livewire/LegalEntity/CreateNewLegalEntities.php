@@ -33,7 +33,6 @@ class CreateNewLegalEntities extends Component
     public int $totalSteps = 8;
 
     public int $currentStep = 1;
-
     /**
      * @var string The Cache ID to store Legal Entity being filled by the current user
      */
@@ -91,6 +90,8 @@ class CreateNewLegalEntities extends Component
 
     public  ? array $getCertificateAuthority;
 
+
+    #[Validate('required|string|max:255')]
     public string $knedp = '';
 
     #[Validate('required|max:1024')] // 1MB Max
@@ -98,6 +99,11 @@ class CreateNewLegalEntities extends Component
 
     #[Validate('required|string|max:255')]
     public string $password = '';
+
+    protected $rules = [
+        'knedp' => 'required|string|max:255',
+    ];
+
 
     public function boot(): void
     {
@@ -151,8 +157,6 @@ class CreateNewLegalEntities extends Component
     {
         return $this->phones[] = ['type' => '', 'number' => ''];
     }
-
-
 
     public function increaseStep(): void
     {
@@ -217,8 +221,6 @@ class CreateNewLegalEntities extends Component
     {
         $this->stepPublicOffer();
     }
-
-
 
     public function saveLegalEntityFromExistingData($data): void
     {
@@ -285,18 +287,15 @@ class CreateNewLegalEntities extends Component
         return true; // Return true if the Legal Entity has changed
     }
 
-
     public function saveLegalEntity(): void
     {
         $this->legalEntity->save();
     }
 
-    // #Step  1 Request to Ehealth API
+    // #Step  1 Request to Ehealth API get Legal Entity
     public function stepEdrpou(): void
     {
         $this->legal_entity_form->rulesForEdrpou();
-
-//        $this->checkEdrpouChange();
 
         $data = LegalEntitiesRequestApi::getLegalEntitie($this->legal_entity_form->edrpou);
 
@@ -305,6 +304,7 @@ class CreateNewLegalEntities extends Component
         } else {
             $this->putLegalEntityInCache();
         }
+
     }
 
     // Step  2 Create Owner
@@ -374,6 +374,7 @@ class CreateNewLegalEntities extends Component
     public function stepPublicOffer(): void
     {
 
+//         $this->validate();
          $base64Data =  (new CipherApi())->sendSession(
              json_encode($this->legal_entity_form->toArray()),
              $this->password,
@@ -382,8 +383,8 @@ class CreateNewLegalEntities extends Component
          );
         dd($base64Data);
         $data = [
-            'signed_legal_entity_request' => json_encode( $base64Data),
-            'signed_content_encoding' => $base64Data,
+            'signed_legal_entity_request' => '1',
+            'signed_content_encoding' => '2',
         ];
 
         $request = LegalEntitiesRequestApi::_createOrUpdate($data);
@@ -401,7 +402,6 @@ class CreateNewLegalEntities extends Component
         }
     }
 
-
     public function fetchDataFromAddressesComponent():void
     {
        $this->dispatch('fetchAddressData');
@@ -412,13 +412,12 @@ class CreateNewLegalEntities extends Component
         $this->dispatch('setAddressesFields', $this->legal_entity_form->addresses ?? []);
     }
 
-
     public function addressDataFetched($addressData): void
     {
         $this->addresses = $addressData;
 
     }
-    public function convertFileToBase64()
+    public function convertFileToBase64(): ?string
     {
         if ($this->keyContainerUpload && $this->keyContainerUpload->exists()) {
             $filePath = $this->keyContainerUpload->storeAs('uploads/kep/', 'kep.ppx', 'public');
@@ -434,7 +433,6 @@ class CreateNewLegalEntities extends Component
             }
         }
 
-        // Если что-то пошло не так, возвращаем null
         return null;
     }
     public function render()
