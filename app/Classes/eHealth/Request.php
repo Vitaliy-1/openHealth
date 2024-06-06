@@ -6,6 +6,7 @@ use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealthInterface;
 use App\Classes\eHealth\Exceptions\ApiException;
 use Illuminate\Support\Facades\Http;
+use mysql_xdevapi\Exception;
 
 class Request
 {
@@ -44,27 +45,30 @@ class Request
      */
     public function sendRequest()
     {
-        $response = Http::acceptJson()
-            ->withHeaders($this->getHeaders())
-            ->{$this->method}(self::makeApiUrl(), $this->params);
-        if ($response->successful()) {
+        try {
+            $response = Http::acceptJson()
+                ->withHeaders($this->getHeaders())
+                ->{$this->method}(self::makeApiUrl(), $this->params);
+            if ($response->successful()) {
+                return json_decode($response->body(), true)['data'] ?? [];
+            }
+            if ($response->status() === 401) {
+                $this->oAuthEhealth->forgetToken();
+            }
+            if ($response->failed()) {
+                $error = json_decode($response->body(), true);
+                throw match ($response->status()) {
+                    400 => new ApiException($error['message'] ?? 'Невірний запит'),
+                    403 => new ApiException($error['message'] ?? 'Немає доступу'),
+                    404 => new ApiException($error['message'] ?? 'Не вдалося знайти запитану сторінку'),
+                    default => new ApiException($error['message'] ?? 'API request failed'),
+                };
+            }
+        }
+        catch (Exception $exception){
+            return json_decode($exception);
+        }
 
-            return json_decode($response->body(), true)['data'] ?? [];
-        }
-        if ($response->status() === 401) {
-            $this->oAuthEhealth->forgetToken();
-        }
-
-        if ($response->failed()) {
-            $error = json_decode($response->body(), true);
-            dd($error);
-            throw match ($response->status()) {
-                400 => new ApiException($error['message'] ?? 'Невірний запит'),
-                403 => new ApiException($error['message'] ?? 'Немає доступу'),
-                404 => new ApiException($error['message'] ?? 'Не вдалося знайти запитану сторінку'),
-                default => new ApiException($error['message'] ?? 'API request failed'),
-            };
-        }
 
     }
 
@@ -74,12 +78,12 @@ class Request
         $headers = [
             'X-Custom-PSK' => env('EHEALTH_X_CUSTOM_PSK'),
             'API-key' => env('EHEALTH_CLIENT_SECRET'),
-
         ];
 
         if ($this->isToken) {
             $headers['Authorization'] = 'Bearer '. $this->oAuthEhealth->getToken();
         }
+
         return array_merge($headers, $this->headers);
     }
 }

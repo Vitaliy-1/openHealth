@@ -3,6 +3,7 @@
 namespace App\Livewire\LegalEntity;
 
 use App\Classes\Cipher\Api\CipherApi;
+use App\Classes\eHealth\Api\AdressesApi;
 use App\Helpers\JsonHelper;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesForms;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesRequestApi;
@@ -11,6 +12,7 @@ use App\Models\LegalEntity;
 use App\Models\Person;
 use App\Traits\FormTrait;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -116,6 +118,7 @@ class CreateNewLegalEntities extends Component
 
         $this->getLegalEntity();
         $this->setCertificateAuthority();
+
         $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', [
             'PHONE_TYPE',
             'POSITION',
@@ -209,7 +212,7 @@ class CreateNewLegalEntities extends Component
             1 => $this->stepEdrpou(),
             2 => $this->stepOwner(),
             3 => $this->stepContact(),
-            4 => $this->stepAddress(),
+//            4 => $this->stepAddress(),
             5 => $this->stepAccreditation(),
             6 => $this->stepLicense(),
             7 => $this->stepAdditionalInformation(),
@@ -231,7 +234,7 @@ class CreateNewLegalEntities extends Component
                     case 'id':
                         $normalizedData['uuid'] = $value;
                         break;
-                    case 'residence_address':
+                    case 'addresses':
                         $normalizedData['addresses'] = $value;
                         break;
                     case 'edr':
@@ -339,16 +342,19 @@ class CreateNewLegalEntities extends Component
      */
     public function stepAddress(): void
     {
-        $this->legal_entity_form->addresses = [];
 
         $this->fetchDataFromAddressesComponent();
+        $this->dispatch('address-data-fetched');
 
-        if (empty($this->addresses)) {
-            throw ValidationException::withMessages(
-                ['area' => 'The addresses field is required.']);
+    }
+
+    public function checkAndProceedToNextStep(): void
+    {
+        if (is_array($this->legal_entity_form->addresses) && !empty($this->legal_entity_form->addresses)) {
+            $this->currentStep++;
         }
 
-        $this->legal_entity_form->addresses = $this->addresses;
+        $this->putLegalEntityInCache();
     }
 
     // Step  5 Create/Update Accreditation
@@ -404,19 +410,23 @@ class CreateNewLegalEntities extends Component
 
     public function fetchDataFromAddressesComponent():void
     {
-       $this->dispatch('fetchAddressData');
+
+        $this->dispatch('fetchAddressData');
     }
 
-    public function setAddressesFields()
-    {
-        $this->dispatch('setAddressesFields', $this->legal_entity_form->addresses ?? []);
-    }
+
 
     public function addressDataFetched($addressData): void
     {
-        $this->addresses = $addressData;
+        $this->legal_entity_form->addresses = $addressData;
 
+        if (is_array($this->legal_entity_form->addresses) && !empty($this->legal_entity_form->addresses)) {
+            $this->currentStep++;
+        }
+
+        $this->putLegalEntityInCache();
     }
+
     public function convertFileToBase64(): ?string
     {
         if ($this->keyContainerUpload && $this->keyContainerUpload->exists()) {
@@ -426,8 +436,7 @@ class CreateNewLegalEntities extends Component
                 $fileContents = file_get_contents(storage_path('app/public/' . $filePath));
                 if ($fileContents !== false) {
                     $base64Content = base64_encode($fileContents);
-
-                    \Storage::disk('public')->delete($filePath);
+                    Storage::disk('public')->delete($filePath);
                     return $base64Content;
                 }
             }

@@ -43,6 +43,14 @@ class LegalEntitiesForms extends Form
     #[Validate('required|email')]
     public string $email = '';
 
+
+    #[Validate([
+        'addresses.area' => 'required',
+        'addresses.region' => 'required',
+        'addresses.settlement' => 'required',
+        'addresses.settlement_type' => 'required',
+        'addresses.street_type' => 'required',
+    ])]
     public ?array $addresses = [];
 
     //TODO: validate acrreditation.category ?
@@ -106,7 +114,7 @@ class LegalEntitiesForms extends Form
 //     */
 //    public function rulesForAddress(): void
 //    {
-//        $this->validate($this->rulesForModel('residence_address')->toArray());
+//        $this->validate($this->rulesForModel('addresses')->toArray());
 //    }
 
     /**

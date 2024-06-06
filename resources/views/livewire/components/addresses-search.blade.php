@@ -1,4 +1,3 @@
-
 <div class="{{$class}}">
     <!-- Area -->
     <x-forms.form-group class="">
@@ -15,10 +14,14 @@
                 id="area">
                 <x-slot name="option">
                     <option value="">{{__('forms.select')}}</option>
-                    @if($koatuu_level1)
-                        @foreach($koatuu_level1 as $lvl1)
+                    @if($regions)
+                        @foreach($regions as $region_item)
                             <option
-                                {{ isset($addresseses['area']) && stripos($lvl1->name, $addresseses['area'])  ? 'selected' : '' }} value="{{ $lvl1->name }}">{{ $lvl1->name }}</option>
+                                value="{{$region_item['name']}}"
+                                {{ isset($addresseses['area']) && stripos($region_item['name'], $addresseses['area'])  ? 'selected' : '' }}
+                            >
+                                {{ $region_item['name'] }}
+                            </option>
                         @endforeach
                     @endif
                 </x-slot>
@@ -32,10 +35,10 @@
         </x-slot>
         @enderror
     </x-forms.form-group>
-    <!-- Region -->
-    <x-forms.form-group  class=" relative" x-data="{ open: false }">
+    <!-- DISTRICT -->
+    <x-forms.form-group class=" relative" x-data="{ open: false }">
         <x-slot name="label">
-            <x-forms.label class="default-label" for="region"
+            <x-forms.label class="default-label" for="district"
                            name="label">
                 {{__('forms.area')}} *
             </x-forms.label>
@@ -45,25 +48,29 @@
                 <x-forms.input
                     wire:model.live="region"
                     x-bind:disabled="{{ empty($area) ? 'true' : 'false' }}"
-                    wire:keyup="searchKoatuuLevel2; open = true"
-                    class="default-input"
+                    x-on:keyup.debounce.500ms="
+                    if ($event.target.value.length >= 3) {
+                        $wire.call('getDisstricts');
+                        open = true;
+                    }
+                " class="default-input"
                     autocomplete="off"
-                    type="text" id="region"/>
+                    type="text" id="area"/>
                 <div x-show="open" x-ref="dropdown">
                     <div
                         class="z-10 max-h-96 overflow-auto w-full	 absolute  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                             aria-labelledby="dropdownHoverButton">
-                            @if($koatuu_level2)
-                                @foreach($koatuu_level2 as $lvl2)
+                            @if($districts)
+                                @foreach($districts as $district)
                                     <li>
                                         <a x-on:click.prevent="
-                                            $wire.set('region', '{{$lvl2->name}}');
+                                            $wire.set('region', '{{$district['name']}}');
                                             open = false;"
                                            href="#"
                                            class="pointer
                                    block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                            {{$lvl2->name}}
+                                            {{$district['name']}}
                                         </a>
                                     </li>
                                 @endforeach
@@ -134,8 +141,13 @@
         </x-slot>
         <x-slot name="input">
             <div x-on:mouseleave="timeout = setTimeout(() => { open = false }, 300)">
-                <x-forms.input id="searchKoatuuLevel2"
-                               wire:keyup="searchKoatuuLevel3; open = true"
+                <x-forms.input id="settlement"
+                               x-on:keyup.debounce.500ms="
+                    if ($event.target.value.length >= 3) {
+                        $wire.call('getSettlements');
+                        open = true;
+                    }
+                "
                                class="default-input"
                                autocomplete="off"
                                x-bind:disabled="{{ empty($settlement_type) ? 'true' : 'false' }}"
@@ -143,19 +155,21 @@
                                wire:model.live="settlement"
                                type="text"
                                id="settlement"/>
-                <div x-show="open" >
+                <div x-show="open">
                     <div
                         class="z-10 max-h-96 overflow-auto w-full	 absolute  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                             aria-labelledby="dropdownHoverButton">
-                            @if($koatuu_level3)
-                                @foreach($koatuu_level3 as $lvl3)
+                            @if($settlements)
+                                @foreach($settlements as $settlement)
                                     <li>
                                         <a href="#" x-on:click.prevent="
-                                              $wire.set('settlement', '{{$lvl3->name}}');
+                                              $wire.set('settlement', '{{$settlement['name']}}');
+                                              $wire.set('settlement_id', '{{$settlement['id']}}');
+
                                              open = false; "
                                            class="pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                            {{$lvl3->name}}
+                                            {{$settlement['name']}}
                                         </a>
                                     </li>
                                 @endforeach
@@ -182,7 +196,7 @@
         @enderror
     </x-forms.form-group>
     <!-- Street_TYPE -->
-    <x-forms.form-group class="">
+    <x-forms.form-group x-data="{ open: false }" class="">
         <x-slot name="label">
             <x-forms.label class="default-label" for="area"
                            name="label">
@@ -216,22 +230,53 @@
         @enderror
     </x-forms.form-group>
     <!-- Street -->
-    <x-forms.form-group class="">
+    <x-forms.form-group class=" relative" x-data="{ open: false }">
         <x-slot name="label">
             <x-forms.label class="default-label" for="street"
                            name="label">
                 {{__('forms.street')}}
+                *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input
-                class="default-input"
-                x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
+            <div x-on:mouseleave="timeout = setTimeout(() => { open = false }, 300)">
+                <x-forms.input id="street"
+                               x-on:keyup.debounce.500ms="
+{{--                    if ($event.target.value.length >= 3) {--}}
+                        $wire.call('getStreets');
+                        open = true;
+{{--                    }--}}
+                "
+                               class="default-input"
+                               autocomplete="off"
+                               x-bind:disabled="{{ empty($settlement_type) ? 'true' : 'false' }}"
 
-                wire:model.live="street" type="text"
-                id="street"/>
+                               wire:model.live="street"
+                               type="text"
+                               id="street"/>
+                <div x-show="open">
+                    <div
+                        class="z-10 max-h-96 overflow-auto w-full	 absolute  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                            aria-labelledby="dropdownHoverButton">
+                            @if($streets)
+                                @foreach($streets as $street)
+                                    <li>
+                                        <a href="#" x-on:click.prevent="
+                                              $wire.set('street', '{{$street['name']}}');
+                                             open = false; "
+                                             class="pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                            {{$street['name']}}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            @endif
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </x-slot>
-        @error('street')
+        @error('settlement')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -294,3 +339,14 @@
         </x-slot>
     </x-forms.form-group>
 </div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Livewire.on('address-data-fetched', function () {
+        @this.call('checkAndProceedToNextStep');
+        });
+    });
+</script>
+

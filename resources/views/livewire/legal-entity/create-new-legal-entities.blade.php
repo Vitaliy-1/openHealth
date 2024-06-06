@@ -64,6 +64,10 @@
                                 <x-button type="submit" class="btn-primary" wire:click="increaseStep()">
                                     {{__('forms.send_request')}}
                                 </x-button>
+                            @elseif($currentStep == 4)
+                                <x-button type="button" class="btn-primary" wire:click="stepAddress()">
+                                    {{__('forms.next')}}
+                                </x-button>
                                 @else
                                 <x-button type="button" class="btn-primary" wire:click.defer="increaseStep()">
                                     {{__('forms.next')}}
