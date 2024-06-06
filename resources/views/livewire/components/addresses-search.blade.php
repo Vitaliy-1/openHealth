@@ -47,7 +47,7 @@
             <div x-on:mouseleave="timeout = setTimeout(() => { open = false }, 300)">
                 <x-forms.input
                     wire:model.live="region"
-                    x-bind:disabled="{{ empty($area) || $area == 'М.КИЇВ' ? 'true' : 'false' }}"
+                    x-bind:disabled="{{ empty($area) ? 'true' : 'false' }}"
                     x-on:keyup.debounce.500ms="
                     if ($event.target.value.length >= 3) {
                         $wire.call('getDisstricts');
@@ -150,7 +150,7 @@
                 "
                                class="default-input"
                                autocomplete="off"
-                               x-bind:disabled="{{ empty($settlement_type) || $area == 'М.КИЇВ' ? 'true' : 'false' }}"
+                               x-bind:disabled="{{ empty($settlement_type) ? 'true' : 'false' }}"
 
                                wire:model.live="settlement"
                                type="text"
@@ -229,7 +229,6 @@
         </x-slot>
         @enderror
     </x-forms.form-group>
-
     <!-- Street -->
     <x-forms.form-group class=" relative" x-data="{ open: false }">
         <x-slot name="label">
@@ -346,7 +345,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         Livewire.on('address-data-fetched', function () {
-            Livewire.emit('checkAndProceedToNextStep');
+        @this.call('checkAndProceedToNextStep');
         });
     });
 </script>
