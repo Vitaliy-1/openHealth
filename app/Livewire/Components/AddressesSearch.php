@@ -6,7 +6,6 @@ use App\Classes\eHealth\Api\AdressesApi;
 use App\Helpers\JsonHelper;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
-use Illuminate\Validation\Rule;
 
 class AddressesSearch extends Component
 {
@@ -22,7 +21,14 @@ class AddressesSearch extends Component
 
     public ?array $streets;
 
+    #[Validate([
+        'area' => 'required',
+        'region' => 'required',
+        'settlement' => 'required',
+        'settlement_type' => 'required',
+        'street_type' => 'required',
 
+    ])]
 
     public string $area = '';
 
@@ -48,20 +54,6 @@ class AddressesSearch extends Component
 
     protected $listeners = ['fetchAddressData' => 'provideAddressData','setAddressesFields'];
 
-    protected function rules()
-    {
-        return [
-            'area' => 'required',
-            'region' => [
-                Rule::requiredIf(function () {
-                    return $this->area != 'М.КИЇВ';
-                }),
-            ],
-            'settlement' => 'required',
-            'settlement_type' => 'required',
-            'street_type' => 'required',
-        ];
-    }
 
 
     public function mount($addresses,$class)
@@ -74,6 +66,7 @@ class AddressesSearch extends Component
         $this->class = $class;
 
         $this->regions = AdressesApi::_regions();
+
         $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', [
             'SETTLEMENT_TYPE',
             'STREET_TYPE',
@@ -89,15 +82,6 @@ class AddressesSearch extends Component
         }
     }
 
-    public function updatedArea($value)
-    {
-        if ($value === 'М.КИЇВ') {
-            $this->region = '';
-            $this->settlement = 'Київ';
-            $this->settlement_type = 'CITY';
-            $this->settlement_id = 'adaa4abf-f530-461c-bcbf-a0ac210d955b';
-        }
-    }
     public function setAddressesFields($addresses)
     {
         $this->updatedFields($addresses);
@@ -112,15 +96,14 @@ class AddressesSearch extends Component
             case 'area':
                 $fieldsToReset = ['region', 'settlement', 'settlement_id', 'settlement_type', 'street_type', 'street', 'building', 'apartment', 'zip'];
                 break;
-            case 'region':
-                $fieldsToReset = [ 'settlement', 'settlement_id', 'settlement_type', 'street_type', 'street', 'building', 'apartment', 'zip'];
-                break;
+
             case 'settlement':
                 $fieldsToReset = ['street_type', 'street', 'building', 'apartment', 'zip'];
                 break;
+
+
             case 'street':
                 $fieldsToReset = [ 'building', 'apartment', 'zip'];
-                break;
             default:
                 // Дополнительные условия обновления полей, если необходимо
                 break;
@@ -134,8 +117,6 @@ class AddressesSearch extends Component
 
     public function provideAddressData()
     {
-
-
         $this->validate();
 
         $addresses = [
@@ -145,13 +126,13 @@ class AddressesSearch extends Component
             'region' => $this->region,
             'settlement' => $this->settlement,
             'settlement_type' => $this->settlement_type,
-            'settlement_id' => $this->settlement_id,
             'street_type' => $this->street_type,
             'street' => $this->street,
             'building' => $this->building,
             'apartment' => $this->apartment,
             'zip' => $this->zip,
         ];
+
         $this->dispatch('addressDataFetched',$addresses);
     }
 
@@ -187,7 +168,6 @@ class AddressesSearch extends Component
         if (empty($this->settlement_id)) {
             return;
         }
-
         $this->streets = AdressesApi::_streets(
             $this->settlement_id,
             $this->street_type,
