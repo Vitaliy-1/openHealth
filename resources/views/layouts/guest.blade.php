@@ -22,8 +22,8 @@
         @livewireStyles
 
         @vite([
-            'resources/css/style.css',
             'resources/css/app.css',
+            'resources/css/style.css',
             ])
     </head>
     <body>
