@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
 return [
+    'email' => env('APP_EMAIL', 'mm@openhealths.com'),
+    'phone' => env('APP_PHONE', '+380505188617'),
 
     /*
     |--------------------------------------------------------------------------
