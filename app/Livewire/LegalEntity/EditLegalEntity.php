@@ -2,23 +2,15 @@
 
 namespace App\Livewire\LegalEntity;
 
-
-use App\Livewire\LegalEntity\Forms\LegalEntitiesRequestApi;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
+use App\Classes\eHealth\Api\PersonApi;
 use Livewire\Component;
 
 class EditLegalEntity extends Component
 {
 
-
-
     public function render()
     {
-
-        if (Session::get('auth_token')) {
-            dd(LegalEntitiesRequestApi::_getById(Auth::user()->legalEntity->uuid));
-        }
+        dd(PersonApi::_getAuthMethod(['legal_entity_id'=>'f13ab4b7-1167-4215-9fb3-2116b775ddb1']));
 
         return view('livewire.legal-entity.edit-legal-entity');
     }
