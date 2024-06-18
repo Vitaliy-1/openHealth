@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 class LegalEntity extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'uuid',
         'accreditation',

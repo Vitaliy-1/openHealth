@@ -2,25 +2,25 @@
 
 namespace App\Classes\eHealth\Api\oAuthEhealth;
 
+use App\Classes\eHealth\Api\PersonApi;
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Classes\eHealth\Request;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-
+use Illuminate\Support\Str;
 
 class oAuthEhealth implements oAuthEhealthInterface
 {
     const OAUTH_TOKENS = '/oauth/tokens';
     const OAUTH_USER = '/oauth/user';
-    const OAUTH_APPROVAL = '/oauth/apps/authorize';
-    const OAUTH_NONCE = '/oauth/nonce';
+
+
 
     public function callback(): \Illuminate\Http\RedirectResponse
     {
-
-        if (env('EHEALTH_CALBACK_PROD') === false) {
+        if ( env('EHEALTH_CALBACK_PROD') === false) {
             dd(request()->all());
         }
 
@@ -29,7 +29,6 @@ class oAuthEhealth implements oAuthEhealthInterface
         }
 
         $code = request()->input('code');
-
         $this->authenticate($code);
 
         return redirect()->route('dashboard'); // Add this line
@@ -37,149 +36,102 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function authenticate($code)
     {
-
-        $user = User::find(\session()->get('user_id_auth_ehealth'));
-        if (!$user) {
-            return redirect()->route('login');
-        }
         $data = [
             'token' => [
-                'client_id'     => $user->legalEntity->client_id ?? '',
-                'client_secret' => $user->legalEntity->client_secret ?? '',
-                'grant_type'    => 'authorization_code',
-                'code'          => $code,
-                'redirect_uri'  => env('EHEALTH_REDIRECT_URI'),
-                'scope'         => $user->getAllPermissions()->unique()->pluck('name')->join(' ')
+                'client_id' => env('EHEALTH_CLIENT_ID'),
+                'client_secret' => env('EHEALTH_CLIENT_SECRET'),
+                'grant_type' => 'authorization_code',
+                'code' => $code,
+                'redirect_uri' => env('EHEALTH_REDIRECT_URI')
             ]
         ];
+
         $request = (new Request('POST', self::OAUTH_TOKENS, $data, false))->sendRequest();
+
         self::setToken($request);
+        $user = self::getUser();
+
 
         $this->login($user);
     }
 
-    public function approve(){
-        $user = User::find(\session()->get('user_id_auth_ehealth'));
-
-        $redirectUri = env('EHEALTH_REDIRECT_URI');
-
-        $queryParams = [
-            'app'=> [
-                'client_id'     => $user->legalEntity->client_id ?? '',
-                'redirect_uri'  => $redirectUri,
-                'scope'         => $user->getAllPermissions()->unique()->pluck('name')->join(' ')
-            ]
-        ];
-
-
-        $request = (new Request('POST', self::OAUTH_APPROVAL, $queryParams))->sendRequest();
-
-
-
-    }
-
-    public function nonce(){
-        $queryParams = [
-            'client_id'     => $user->legalEntity->client_id ?? '',
-            'client_secret' => $user->legalEntity->client_secret ?? '',
-        ];
-        $request = (new Request('POST', self::OAUTH_NONCE, $queryParams))->sendRequest();
-
-    }
-
-    public function login($user): void
+    public function login(array $email = []): void
     {
-        Auth::login($user);
-//        redirect()->route('dashboard');
+        $user = $this->findOrCreateUser($email);
+
+        $this->loginUser($user);
     }
 
-
-    public static function loginUrl($user)
+    private function findOrCreateUser(array $data): User
     {
-        // Base URL and client ID
-        $baseUrl = env('EHEALTH_AUTH_HOST') . '/sign-in';
-        $redirectUri = env('EHEALTH_REDIRECT_URI');
-        // Base query parameters
-        $queryParams = [
-            'client_id'     => $user->legalEntity->client_id ?? '',
-            'redirect_uri'  => $redirectUri,
-            'response_type' => 'code'
-        ];
-        // Additional query parameters if email is provided
+        $existingUser = User::where('email', $data['email'])->first();
 
-        if (!empty($user->email)) {
-            $scope = $user->getAllPermissions()->unique()->pluck('name')->join(' ');
-            $queryParams['email'] = $user->email;
-            $queryParams['scope'] = $scope;
+        if ($existingUser) {
+            return $existingUser;
         }
 
-        \session()->put('user_id_auth_ehealth', $user->id);
-        // Build the full URL with query parameters
-        return $baseUrl . '?' . http_build_query($queryParams);
+        $data['password'] = Hash::make(Str::random(16));
+
+        return User::create($data);
+    }
+
+    private function loginUser(User $user): void
+    {
+        Auth::login($user);
+        redirect()->route('dashboard');
+    }
+
+
+    public static function loginUrl($email = '')
+    {
+        $url = env('EHEALTH_AUTH_HOST') . '/sign-in?client_id=' . env('EHEALTH_CLIENT_ID') . '&redirect_uri=' . env('EHEALTH_REDIRECT_URI');
+
+        if (!empty($email)) {
+            $url .= '&email=' . $email;
+        }
+
+        return $url;
     }
 
     public static function setToken($data)
     {
         Session::put('auth_token', $data['value']);
-        Session::put('auth_token_expires_at', Carbon::createFromTimestamp($data['expires_at']));
+        Session::put('auth_token_expires_at', now()->addHours(1));
+
         Session::put('refresh_token', $data['details']['refresh_token']);
+        Session::put('refresh_token_expires_at', now()->addHours(1));
+
         Session::save();
     }
 
     public function getToken(): string
     {
-        return Session::get('auth_token') ?? '';
+        return Session::get('auth_token');
     }
 
     /**
      * @throws ApiException
      */
-    public static function getUser(): array
+    public function getUser(): array
     {
-        return (new Request('GET', self::OAUTH_USER, []))->sendRequest();
+        return (new Request('GET', self::OAUTH_USER, [], true))->sendRequest();
     }
 
     public static function forgetToken()
     {
-        if (Session::has('auth_token')){
-            Session::forget('auth_token');
-            Session::forget('auth_token_expires_at');
-            Session::forget('refresh_token');
-            Session::forget('refresh_token_expires_at');
-        }
-
-
+        Session::forget('auth_token');
+        Session::forget('auth_token_expires_at');
+        Session::forget('refresh_token');
+        Session::forget('refresh_token_expires_at');
         return redirect()->route('login');
 
     }
 
-    public function getApikey(): string
-    {
-        return  env('EHEALTH_API_KEY');
+
+
+    public static function person(){
+        return PersonApi::_getAuthMethod(['id'=>'f13ab4b7-1167-4215-9fb3-2116b775ddb1']);
     }
-
-    public function refreshAuthToken(): array
-    {
-        $user = Auth::user();
-        $data = [
-            'token' => [
-                'client_id'     => $user->legalEntity->client_id ?? '',
-                'client_secret' => $user->legalEntity->client_secret ?? '',
-                'grant_type'    => 'refresh_token',
-                'refresh_token' => Session::get('refresh_token'),
-            ]
-        ];
-        $request = (new Request('POST', self::OAUTH_TOKENS, $data, false))->sendRequest();
-        self::setToken($request);
-        return $request;
-    }
-
-
-    public function isLoggedIn(): bool
-    {
-        return Session::has('auth_token') && Session::has('auth_token_expires_at');
-    }
-
 }
 
 
