@@ -13,6 +13,7 @@ class CheckSessionToken
         if ( !$request->session()->has('auth_token')) {
             Auth::guard('web')->logout();
         }
+
         return $next($request);
     }
 }

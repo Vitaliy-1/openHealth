@@ -4,7 +4,6 @@
         {{__('Додати місце надання послуг')}}
     </x-slot>
     <x-slot name="content">
-
         <x-forms.forms-section-modal submit="{{$mode === 'edit' ? 'update' : 'store'}}">
             <x-slot name="form">
                 <div class="mb-4">
@@ -188,12 +187,10 @@
                                         @enderror
                                     </x-slot>
                                 </x-forms.form-group>
-
                             </div>
-                            <livewire:components.koatuu-search :addresses="$division['addresses'] ?? []" :class="'grid grid-cols-2 gap-6'" />
+                            <livewire:components.addresses-search :addresses="$division['addresses'] ?? []" :class="'grid grid-cols-2 gap-6'" />
                         </div>
                     </div>
-
                 </div>
                 <div x-data="{ working: false }" class="mb-4">
                     <h3 class="text-lg  mb-6 font-bold dark:text-white">{{__('Графік роботи')}}

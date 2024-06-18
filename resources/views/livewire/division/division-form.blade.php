@@ -111,7 +111,6 @@
                                     </div>
                                 </div>
                             </td>
-
                         </tr>
                     @endforeach
                 @endif

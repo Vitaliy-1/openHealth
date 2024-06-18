@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
+use App\Classes\eHealth\Api\PersonApi;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +21,6 @@ class LoginController extends Controller
 //        Validator::make($request->all(), [
 //            'email' => ['required', 'string', 'email', 'max:255'],
 //        ]);
-
         $oAuth = oAuthEhealth::loginUrl($request->email);
         return redirect()->to($oAuth);
     }

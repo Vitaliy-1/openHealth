@@ -2,6 +2,7 @@
 
 namespace App\Classes\eHealth\Api\oAuthEhealth;
 
+use App\Classes\eHealth\Api\PersonApi;
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Classes\eHealth\Request;
 use App\Models\User;
@@ -15,6 +16,8 @@ class oAuthEhealth implements oAuthEhealthInterface
     const OAUTH_TOKENS = '/oauth/tokens';
     const OAUTH_USER = '/oauth/user';
 
+
+
     public function callback(): \Illuminate\Http\RedirectResponse
     {
         if ( env('EHEALTH_CALBACK_PROD') === false) {
@@ -24,11 +27,11 @@ class oAuthEhealth implements oAuthEhealthInterface
         if (!request()->has('code')) {
             return redirect()->route('login');
         }
+
         $code = request()->input('code');
         $this->authenticate($code);
 
         return redirect()->route('dashboard'); // Add this line
-
     }
 
     public function authenticate($code)
@@ -46,8 +49,8 @@ class oAuthEhealth implements oAuthEhealthInterface
         $request = (new Request('POST', self::OAUTH_TOKENS, $data, false))->sendRequest();
 
         self::setToken($request);
-
         $user = self::getUser();
+
 
         $this->login($user);
     }
@@ -92,15 +95,12 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public static function setToken($data)
     {
-        // Устанавливаем токен аутентификации с временем жизни 1 минута
         Session::put('auth_token', $data['value']);
-        Session::put('auth_token_expires_at', now()->addMinutes(1));
+        Session::put('auth_token_expires_at', now()->addHours(1));
 
-        // Устанавливаем токен обновления с временем жизни 1 минута
         Session::put('refresh_token', $data['details']['refresh_token']);
-        Session::put('refresh_token_expires_at', now()->addMinutes(1));
+        Session::put('refresh_token_expires_at', now()->addHours(1));
 
-        // Сохраняем данные сессии
         Session::save();
     }
 
@@ -127,6 +127,11 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     }
 
+
+
+    public static function person(){
+        return PersonApi::_getAuthMethod(['id'=>'f13ab4b7-1167-4215-9fb3-2116b775ddb1']);
+    }
 }
 
 

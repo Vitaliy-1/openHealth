@@ -15,13 +15,9 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
 
         $legalEntitiesApi = self::_get(
             ['edrpou' => $edrpou,
-             'is_active' => true,
-             'page_size' => 50,
-             'page' => 2,
-             'nhs_verified' => true
+             'page' => 1,
             ]
         );
-
         return !empty($legalEntitiesApi[0]) ? $legalEntitiesApi[0] : [];
     }
 
@@ -30,6 +26,14 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
     {
 
         $legalEntitiesApi = self::_get(['edrpou' => $edrpou]);
+
+        return !empty($legalEntitiesApi) ? $legalEntitiesApi : [];
+    }
+
+    public static function getLegalEntitiesById($id): array
+    {
+
+        $legalEntitiesApi = self::_getById($id);
 
         return !empty($legalEntitiesApi) ? $legalEntitiesApi : [];
     }

@@ -35,3 +35,22 @@ if (!function_exists('get_day_value')) {
         return '';
     }
 }
+
+if (!function_exists('removeEmptyKeys')) {
+
+function removeEmptyKeys(array $array): array {
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            $array[$key] = removeEmptyKeys($value);
+            if (empty($array[$key])) {
+                unset($array[$key]);
+            }
+        } else {
+            if (empty($value) && $value !== false) {
+                unset($array[$key]);
+            }
+        }
+    }
+    return $array;
+}
+}
