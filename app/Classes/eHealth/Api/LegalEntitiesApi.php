@@ -29,6 +29,11 @@ class LegalEntitiesApi extends Request
         return (new Request('PATCH', self::URL.'/'.$id.'/actions/nhs_verify',[]))->sendRequest();
     }
 
+    public static function _getById(string $id): array
+    {
+        return (new Request('GET', self::URL.'/'.$id,[]))->sendRequest();
+    }
+
     public static function _createOrUpdate(array $params = []): array
     {
         return (new Request('PUT', self::URL_V2, $params,false))->sendRequest();

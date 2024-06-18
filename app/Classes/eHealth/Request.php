@@ -92,6 +92,7 @@ class Request
              'X-Custom-PSK' => env('EHEALTH_X_CUSTOM_PSK'),
              'API-key' => $this->oAuthEhealth->getApikey(),
         ];
+
         if ($this->isToken) {
             $headers['Authorization'] = 'Bearer '. $this->oAuthEhealth->getToken();
         }

@@ -64,8 +64,9 @@ class LegalEntitiesForms extends Form
         'license.issued_by'        => 'required|string|min:3',
         'license.issued_date'      => 'required|date|min:3',
         'license.active_from_date' => 'required|date|min:3',
-        'license.order_no'         => 'required|string',
+        'license.order_no' => 'required|string',
     ])]
+
     public ?array $license = [];
 
     #[Validate([
