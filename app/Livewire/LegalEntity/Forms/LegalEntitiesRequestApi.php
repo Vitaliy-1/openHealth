@@ -18,7 +18,7 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
              'page' => 1,
             ]
         );
-        return !empty($legalEntitiesApi[0]) ? $legalEntitiesApi[0] : [];
+        return !empty($legalEntitiesApi['data'][0]) ? $legalEntitiesApi['data'][0] : [];
     }
 
 
@@ -27,7 +27,7 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
 
         $legalEntitiesApi = self::_get(['edrpou' => $edrpou]);
 
-        return !empty($legalEntitiesApi) ? $legalEntitiesApi : [];
+        return !empty($legalEntitiesApi['data']) ? $legalEntitiesApi['data'] : [];
     }
 
     public static function getLegalEntitiesById($id): array
@@ -35,7 +35,7 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
 
         $legalEntitiesApi = self::_getById($id);
 
-        return !empty($legalEntitiesApi) ? $legalEntitiesApi : [];
+        return !empty($legalEntitiesApi['data']) ? $legalEntitiesApi['data'] : [];
     }
 
     public static function createOrUpdate($data)
@@ -47,6 +47,7 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
 
         return !empty($legalEntitiesApi) ? $legalEntitiesApi : [];
     }
+
 
 
 }
