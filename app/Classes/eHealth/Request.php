@@ -51,7 +51,14 @@ class Request
                 ->withHeaders($this->getHeaders())
                 ->{$this->method}(self::makeApiUrl(), $this->params);
             if ($response->successful()) {
-                return json_decode($response->body(), true)['data'] ?? [];
+                $data = json_decode($response->body(), true);
+
+                if (isset($data['urgent']) && !empty($data['urgent'])) {
+                    return $data ?? [];
+                }
+
+                return $data['data'] ?? [];
+
             }
             if ($response->status() === 401) {
                 $this->oAuthEhealth->forgetToken();

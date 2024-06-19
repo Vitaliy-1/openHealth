@@ -17,24 +17,13 @@ class LegalEntitiesApi extends Request
 
     public static function _getById(string $id): array
     {
-        $params = [
-            'legal_entity_id' => $id
-        ];
-        return (new Request('GET', self::URL.'/'.$id,$params))->sendRequest();
-    }
-
-    public static function _getById(string $id): array
-    {
         return (new Request('GET', self::URL.'/'.$id,[]))->sendRequest();
     }
 
     public static function _createOrUpdate(array $params = []): array
     {
-        return (new Request('PUT', self::URL, $params,false))->sendRequest();
+        return (new Request('PUT', self::URL, $params))->sendRequest();
     }
-
-
-
 
 
 }
