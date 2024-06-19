@@ -66,11 +66,12 @@
                                     >
                                         <x-slot name="option">
                                             <option>{{__('forms.type')}}</option>
-                                            @foreach($this->dictionaries['DIVISION_TYPE'] as $k=>$type)
-                                                <option value="{{$k}}">{{$type}}</option>
+                                            @foreach($this->dictionaries['DIVISION_TYPE'] as $k=>$position)
+                                                <option value="{{$k}}">{{$position}}</option>
                                             @endforeach
                                         </x-slot>
                                     </x-forms.select>
+
                                 </x-slot>
                                 @error('division.type')
                                 <x-slot name="error">
@@ -263,9 +264,9 @@
             </div>
             <div class="mb-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
                 <div class="xl:w-1/4 text-left">
-                    <a  class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150" href="{{route('division.index')}}">
-                        {{__('forms.back')}}
-                    </a>
+                    <x-secondary-button wire:click="closeModal()">
+                        {{__('Закрити ')}}
+                    </x-secondary-button>
                 </div>
                 <div class="xl:w-1/4 text-right">
                     <x-button type="submit" class="btn-primary">
