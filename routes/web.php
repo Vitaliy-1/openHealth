@@ -32,8 +32,8 @@ Route::post('/send-email', [EmailController::class, 'sendEmail'])->name('send.em
 
 
 Route::get('/ehealth/oauth/', [oAuthEhealth::class, 'callback'])->name('ehealth.oauth.callback');
-Route::get('/login', [LoginController::class, 'index'])->middleware('guest')->name('index.login');
-Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login');
+//Route::get('/login', [LoginController::class, 'index'])->middleware('guest')->name('index.login');
+//Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login');
 
 Route::middleware([
     'auth:sanctum',

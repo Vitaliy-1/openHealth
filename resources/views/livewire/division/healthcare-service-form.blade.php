@@ -1,4 +1,6 @@
 <div>
+    <div class="mb-10 rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+
     <x-section-title>
         <x-slot name="title">{{ __('Послуги') }}</x-slot>
         <x-slot name="description">{{ __('Послуги') }}</x-slot>
@@ -115,7 +117,7 @@
                href="{{route('division.index')}}">{{__('Назад')}}</a>
         </div>
     </div>
-
+    </div>
     @include('livewire.division._parts._healthcare_service_form')
 </div>
 

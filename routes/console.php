@@ -17,3 +17,11 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+
+Artisan::command('first-run', function () {
+    $this->call('key:generate');
+    $this->call('migrate');
+    $this->call('db:seed');
+    $this->call('permission:create-role', ['name' => 'Owner']);
+})->purpose('Completes the first run of the application');

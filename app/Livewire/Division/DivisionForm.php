@@ -18,12 +18,13 @@ class DivisionForm extends Component
         'division.email' => 'required',
         'division.phones.number' => 'required|string',
         'division.phones.type' => 'required',
+        'division.addresses' => 'required',
+
     ])]
 
     public ?array $division = [];
     public ?object $divisions;
 
-    public ?array $addresses = [];
     public ?object $legalEntity;
 
     public ?array $dictionaries;
@@ -38,9 +39,10 @@ class DivisionForm extends Component
     ];
 
     public ?array $tableHeaders = [];
+
     public bool $showModal = false;
 
-    public string $mode = 'create';
+    public string $mode = 'default';
 
     protected $listeners = ['addressDataFetched'];
 
@@ -61,20 +63,18 @@ class DivisionForm extends Component
         $this->legalEntity =auth()->user()->legalEntity;
     }
 
-    public function openModal()
-    {
-        $this->showModal = true;
-        $this->addresses  = [];
-    }
-
-    public function closeModal()
-    {
-        $this->showModal = false;
-        $this->getDivisions();
-        $this->resetErrorBag();
-        $this->division = [];
-        $this->addresses = [];
-    }
+//    public function openModal()
+//    {
+//        $this->showModal = true;
+//    }
+//
+//    public function closeModal()
+//    {
+//        $this->showModal = false;
+//        $this->getDivisions();
+//        $this->resetErrorBag();
+//        $this->division = [];
+//    }
 
     public function tableHeaders(): void
     {
@@ -94,9 +94,11 @@ class DivisionForm extends Component
         $this->dispatch('fetchAddressData');
     }
 
+
+
     public function addressDataFetched($addressData): void
     {
-        $this->addresses = $addressData;
+        $this->division['addresses'] = $addressData;
 
     }
 
@@ -104,38 +106,33 @@ class DivisionForm extends Component
     {
         $this->resetErrorBag();
         $this->validate();
-        if (empty($this->addresses)){
+        if (isset($this->division['addresses']) && empty($this->division['addresses'])){
             return false;
         }
+
         return true;
     }
 
     public function create()
     {
         $this->mode = 'create';
-        $this->openModal();
     }
 
     public function store()
     {
         $this->fetchDataFromAddressesComponent();
-        if (!$this->validateDivision()){
-            return false;
-        }
+        $this->dispatch('address-data-fetched');
+        $this->validateDivision();
         $this->updateOrCreate(new Division());
-        $this->closeModal();
         $this->getDivisions();
         $this->resetErrorBag();
     }
 
     public function edit(Division $division)
     {
-        $this->openModal();
-
         $this->mode = 'edit';
         $this->division = $division->toArray();
         $this->setAddressesFields();
-
     }
 
     public function setAddressesFields()
@@ -148,14 +145,11 @@ class DivisionForm extends Component
 
         $this->fetchDataFromAddressesComponent();
 
-        if (!$this->validateDivision()){
-            return false;
-        }
+        $this->dispatch('address-data-fetched');
 
         $divisionId = $this->division['id'];
         $division = $division::find($divisionId);
         $this->updateOrCreate($division);
-        $this->closeModal();
 
     }
 
@@ -213,14 +207,6 @@ class DivisionForm extends Component
         $this->division['working_hours'][$day][] = [];
     }
 
-//    public function getDivisionsApi(): array
-//    {
-//        if (!empty($this->legalEntity->uuid))
-//            return $this->divisions[] = (new DivisionApi())->getDivisions(
-//                ['legal_entity_id' => auth()->user()->person->employee->uuid]
-//            );
-//        return (new DivisionApi())->_get() ?? [];
-//    }
 
     public function getDivisions(): object
     {
@@ -229,6 +215,11 @@ class DivisionForm extends Component
 
     public function render()
     {
+        if ($this->mode === 'create')
+        {
+            return view('livewire.division.division-form-create');
+
+        }
         return view('livewire.division.division-form');
     }
 
