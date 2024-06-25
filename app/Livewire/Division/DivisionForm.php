@@ -166,12 +166,13 @@ class DivisionForm extends Component
 
     private function updateDivision(): array
     {
-        return DivisionRequestApi::updateDivisionRequest($this->division['uuid'], $this->division);
+        return DivisionRequestApi::updateDivisionRequest($this->division['uuid'],removeEmptyKeys($this->division));
     }
 
     private function createDivision(): array
     {
-        return DivisionRequestApi::createDivisionRequest($this->division);
+
+        return DivisionRequestApi::createDivisionRequest(removeEmptyKeys($this->division));
     }
 
     public function activate(Division $division): void

@@ -31,7 +31,7 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
     {
 
         $legalEntitiesApi = self::_getById($id);
-
+        
         return !empty($legalEntitiesApi['data']) ? $legalEntitiesApi['data'] : [];
     }
 

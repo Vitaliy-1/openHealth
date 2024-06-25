@@ -20,30 +20,21 @@ class DivisionRequestApi extends DivisionApi
             'name' => $data['name'],
             'type' =>$data['type'],
             'email' => $data['email'],
-            'phones' => [$data['phones']],
-            'addresses' => [$data['addresses']],
-//            'locations' => (object)$data['location'],
-            ];
+            'phones' => $data['phones'],
+            'addresses' => $data['addresses'],
+            'locations' => json_encode($data['location']),
+        ];
 
         return self::_create($params);
     }
 
     public static function updateDivisionRequest($id, $data):array
     {
-        $params = [
-            'name' => $data['name'],
-            'type' =>$data['type'],
-            'email' => $data['email'],
-            'phones' => [$data['phones']],
-            'addresses' => [$data['addresses']],
-            //            'locations' => (object)$data['location'],
-        ];
-        return self::_update($id, $params);
+        return self::_update($id, $data);
     }
 
     public static function deactivateDivisionRequest($id):array
     {
-        dd(self::_deactivate($id));
         return self::_deactivate($id);
     }
 
@@ -52,8 +43,4 @@ class DivisionRequestApi extends DivisionApi
         return self::_activate($id);
     }
 
-    public static function syncDivisionRequest($legal_entity_id):array
-    {
-        return self::_sync($legal_entity_id);
-    }
 }
