@@ -13,7 +13,7 @@
                 <x-slot name="status">{{ session('status') }}</x-slot>
             </x-message.successes>
         @endif
-        <form method="POST" action="{{ route('login') }}">
+        <form x-data="{is_ehealth_auth: true}" method="POST" action="{{ route('login') }}">
             @csrf
             <div>
                 <x-label class="default-label" for="email" value="{{ __('Email') }}"/>
@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            <div class="mt-4">
+            <div class="mt-4" x-show="is_ehealth_auth">
                 <x-label class="default-label" for="password" value="{{ __('Пароль') }}" />
                 <div class="relative @error('password') input-danger @enderror" >
                     <x-input id="password" class="default-input" type="password" name="password"  autocomplete="current-password" />
@@ -59,19 +59,18 @@
 
             <div class="block mt-4">
                 <div x-data="{ checkboxToggle: false }">
-                    <label for="remember_me" class="flex cursor-pointer select-none items-center">
+                    <label for="is_ehealth_auth" class="flex cursor-pointer select-none items-center">
                         <div class="relative">
-                            <input type="checkbox" name=remember_me"" id="remember_me" class="sr-only"
-                                   @change="checkboxToggle = !checkboxToggle" />
+                            <input type="checkbox" name="is_ehealth_auth" id="is_ehealth_auth" class="sr-only"
+                                   @change="checkboxToggle = !checkboxToggle; is_ehealth_auth = !is_ehealth_auth" />
                             <div :class="checkboxToggle && 'border-primary bg-gray dark:bg-transparent'"
                                  class="mr-4 flex h-5 w-5 items-center justify-center rounded border">
                                 <span :class="checkboxToggle && 'bg-primary'" class="h-2.5 w-2.5 rounded-sm"></span>
                             </div>
                         </div>
-                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Запам\'ятати мене?') }}</span>
+                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Авторизація на eHealth') }}</span>
                     </label>
                 </div>
-
             </div>
 
 

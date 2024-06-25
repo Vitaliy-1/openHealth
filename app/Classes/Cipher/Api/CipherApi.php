@@ -10,6 +10,7 @@ class CipherApi
 {
     private string $ticketUuid = '';
     private string $base64File = '';
+
     private string $password = '';
     private string $dataSignature;
     private string $knedp;
@@ -34,6 +35,9 @@ class CipherApi
         $this->loadTicket();
         $this->setParamsSession();
         $this->uploadFileContainerSession();
+        $this->decodingFileContainer();
+        $this->getDecodingFileContainerResultData();
+        $this->getDecodingFileContainerBase64();
         $this->createKep();
         $this->getKepCreator();
         $kep = $this->getKep();
@@ -72,6 +76,34 @@ class CipherApi
     {
         $data = ['base64Data' => $this->base64File];
         (new Request('put', "/ticket/{$this->ticketUuid}/keyStore", json_encode($data)))->sendRequest();
+    }
+
+    // Decoding file container
+    private function decodingFileContainer(): void
+    {
+        $data = ['keyStorePassword' => $this->password];
+
+        (new Request('post', "/ticket/{$this->ticketUuid}/decryptor", json_encode($data)))->sendRequest();
+    }
+
+    //get decoding status file container
+    private function getDecodingFileContainerResultData($retryCount = 0, $maxRetries = 5){
+        $status = (new Request('get', "/ticket/{$this->ticketUuid}/decryptor", ''))->sendRequest();
+        if($status['status'] == 202){
+            if ($retryCount < $maxRetries) {
+                // Increment the retry count and call the function again
+                return $this->getDecodingFileContainerResultData($retryCount + 1, $maxRetries);
+            } else {
+                // Handle the case where the maximum retries are reached
+                return ['status' => 'error', 'message' => 'Maximum retries reached.'];
+            }
+        }
+        return $status;
+    }
+
+    // Get decoding file container in base64
+    public function getDecodingFileContainerBase64(){
+        return (new Request('get', "/ticket/{$this->ticketUuid}/decryptor/base64Data", ''))->sendRequest();
     }
 
     // Create KEYP

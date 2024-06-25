@@ -2,12 +2,15 @@
 
 namespace App\Classes\eHealth\Api\oAuthEhealth;
 
+use App\Models\User;
+
 interface oAuthEhealthInterface
 {
     public function getToken(): string;
 
-    public function getUser(): array;
+    public static function getUser(): array;
 
-    public function login(array $email = []): void;
+    public function login($user) : void;
 
+    public function getApikey(): string;
 }

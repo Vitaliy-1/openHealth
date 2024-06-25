@@ -31,7 +31,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'legal_entity_id'
+        'legal_entity_id',
+        'client_id',
+        'secret_key',
     ];
 
     /**
@@ -77,5 +79,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(LegalEntity::class);
     }
 
+    public function isClientId(): bool
+    {
+        return $this->client_id  ?? false;
+    }
 
 }

@@ -8,10 +8,6 @@ class DivisionRequestApi extends DivisionApi
 {
 
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     public static  function getDivisionRequest($params = []):array
     {
@@ -20,7 +16,16 @@ class DivisionRequestApi extends DivisionApi
 
     public static function createDivisionRequest($data):array
     {
-        return self::_create($data);
+        $params = [
+            'name' => $data['name'],
+            'type' =>$data['type'],
+            'email' => $data['email'],
+            'phones' => $data['phones'],
+            'addresses' => $data['addresses'],
+            'locations' => json_encode($data['location']),
+        ];
+
+        return self::_create($params);
     }
 
     public static function updateDivisionRequest($id, $data):array

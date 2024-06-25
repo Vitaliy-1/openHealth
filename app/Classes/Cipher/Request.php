@@ -38,6 +38,7 @@ class Request
 
         if ($response->successful()) {
             $success = json_decode($response->body(), true);
+            $success['status'] = $response->status();
             return $success ?? [];
         }
 
