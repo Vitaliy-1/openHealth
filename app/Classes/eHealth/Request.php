@@ -5,6 +5,7 @@ namespace App\Classes\eHealth;
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealthInterface;
 use App\Classes\eHealth\Exceptions\ApiException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use mysql_xdevapi\Exception;
 
@@ -21,6 +22,8 @@ class Request
     private oAuthEhealthInterface $oAuthEhealth;
 
     private array $headers = [];
+
+    //private bool $isApiKey;
 
 
     public function __construct(
@@ -52,14 +55,12 @@ class Request
                 ->{$this->method}(self::makeApiUrl(), $this->params);
             if ($response->successful()) {
                 $data = json_decode($response->body(), true);
-
                 if (isset($data['urgent']) && !empty($data['urgent'])) {
                     return $data ?? [];
                 }
-
                 return $data['data'] ?? [];
-
             }
+
             if ($response->status() === 401) {
                 $this->oAuthEhealth->forgetToken();
             }
@@ -87,9 +88,12 @@ class Request
     public function getHeaders(): array
     {
         $headers = [
-            'X-Custom-PSK' => env('EHEALTH_X_CUSTOM_PSK'),
-            'API-key' => env('EHEALTH_CLIENT_SECRET'),
+             'X-Custom-PSK' => env('EHEALTH_X_CUSTOM_PSK'),
+             'API-key' => $this->oAuthEhealth->getApikey(),
         ];
+
+
+
         if ($this->isToken) {
             $headers['Authorization'] = 'Bearer '. $this->oAuthEhealth->getToken();
         }
