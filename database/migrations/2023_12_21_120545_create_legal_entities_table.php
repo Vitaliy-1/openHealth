@@ -33,6 +33,8 @@ return new class extends Migration
             $table->string('status')->nullable();
             $table->string('type')->nullable();
             $table->uuid('updated_by')->nullable();
+            $table->string('client_id')->nullable();
+            $table->string('client_secret')->nullable();
             $table->string('website')->nullable();
             $table->timestamp('inserted_at')->nullable();
             $table->timestamps();
