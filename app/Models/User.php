@@ -81,7 +81,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isClientId(): bool
     {
-        return $this->client_id  ?? false;
+        return $this->legalEntity->client_id  ?? false;
     }
 
 }

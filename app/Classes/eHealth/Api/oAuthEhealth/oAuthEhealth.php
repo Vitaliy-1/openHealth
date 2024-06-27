@@ -39,11 +39,10 @@ class oAuthEhealth implements oAuthEhealthInterface
         if (!$user) {
            return redirect()->route('login');
         }
-
         $data = [
             'token' => [
-                'client_id' => $user->client_id,
-                'client_secret' => $user->secret_key,
+                'client_id' => $user->legalEntity->client_id ?? '',
+                'client_secret' => $user->legalEntity->client_secret ?? '',
                 'grant_type' => 'authorization_code',
                 'code' => $code,
                 'redirect_uri' => env('EHEALTH_REDIRECT_URI')
@@ -57,25 +56,6 @@ class oAuthEhealth implements oAuthEhealthInterface
         $this->login($user);
     }
 
-//    public function login(array $email = []): void
-//    {
-////        $user = $this->findOrCreateUser($email);
-//
-//        $this->loginUser($user);
-//    }
-////
-//    private function findOrCreateUser(array $data): User
-//    {
-//        $existingUser = User::where('email', $data['email'])->first();
-//
-//        if ($existingUser) {
-//            return $existingUser;
-//        }
-//
-//        $data['password'] = Hash::make(Str::random(16));
-//
-//        return User::create($data);
-//    }
 
     public function login( $user): void
     {
@@ -87,20 +67,19 @@ class oAuthEhealth implements oAuthEhealthInterface
     public static function loginUrl($user)
     {
 
+        $user->assignRole('Admin');
         // Base URL and client ID
         $baseUrl = env('EHEALTH_AUTH_HOST') . '/sign-in';
-        $clientId = $user->client_id;
         $redirectUri = env('EHEALTH_REDIRECT_URI');
         // Base query parameters
         $queryParams = [
-            'client_id' => $clientId,
+            'client_id' => $user->legalEntity->client_id ?? '',
             'redirect_uri' => $redirectUri,
             'response_type' => 'code'
         ];
-
         // Additional query parameters if email is provided
         if (!empty($user->email)) {
-            $scope = 'capitation_report:read client:read connection:delete connection:read connection:refresh_secret connection:write contract:read contract:write contract_request:approve contract_request:create contract_request:read contract_request:sign contract_request:terminate declaration:read declaration_request:approve declaration_request:read declaration_request:reject declaration_request:write division:activate division:deactivate division:details division:read division:write employee:deactivate employee:details employee:read employee:write employee_request:approve employee_request:read employee_request:reject employee_request:write legal_entity:read otp:read otp:write person:read person_verification:details reimbursement_report:read related_legal_entities:read secret:refresh healthcare_service:read healthcare_service:write employee_role:read employee_role:write license:details license:read license:write rule_engine_rule:read party_verification:details party_verification:write';
+            $scope = $user->getAllPermissions()->unique()->pluck('name')->join( ' ');
             $queryParams['email'] = $user->email;
             $queryParams['scope'] = $scope;
         }
