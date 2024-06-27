@@ -34,6 +34,8 @@ class LegalEntity extends Model
         'updated_at',
         'updated_by',
         'website',
+        'client_id',
+        'client_secret',
     ];
 
     protected $casts = [
