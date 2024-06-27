@@ -67,7 +67,6 @@ class oAuthEhealth implements oAuthEhealthInterface
     public static function loginUrl($user)
     {
 
-        $user->assignRole('Admin');
         // Base URL and client ID
         $baseUrl = env('EHEALTH_AUTH_HOST') . '/sign-in';
         $redirectUri = env('EHEALTH_REDIRECT_URI');
