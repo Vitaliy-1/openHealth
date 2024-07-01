@@ -184,7 +184,7 @@ class LicenseForms extends Component
             return LicenseRequestApi::update( $this->license_uuid, $data);
         }
 
-        return LicenseRequestApi::create($data);
+        return LicenseRequestApi::create(  $data);
     }
 
     public function back()
