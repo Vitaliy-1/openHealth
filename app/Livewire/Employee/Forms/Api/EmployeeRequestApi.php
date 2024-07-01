@@ -11,10 +11,10 @@ class EmployeeRequestApi extends EmployeeApi
 
 
 
-    public static function getEmployees($id):array
+    public static function getEmployees($legal_entity_id):array
     {
         $params = [
-            'legal_entity_id' => $id ,
+            'legal_entity_id' => $legal_entity_id ,
             'page' => 1,
             'page_size' => 300
         ];

@@ -10,6 +10,7 @@ use Livewire\Form;
 class LegalEntitiesForms extends Form
 {
 
+    public string $type = 'PRIMARY_CARE';
     #[Validate('required|integer|digits_between:6,10')]
     public string $edrpou = '';
 
@@ -78,7 +79,15 @@ class LegalEntitiesForms extends Form
 //        'public_offer.digital_signature' => 'required|file|max:2048'
     ])]
 
-    public array $public_offer = [];
+    public array $public_offer = [
+        'consent_text' => 'Тестове consent_text',
+        'consent' => true
+    ];
+
+    public array  $security =  [
+        'redirect_uri' => 'http://localhost:8000/callback'
+    ];
+
         /**
      * @var array|mixed
      */

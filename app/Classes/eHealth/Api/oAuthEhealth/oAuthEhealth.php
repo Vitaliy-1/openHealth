@@ -5,6 +5,7 @@ namespace App\Classes\eHealth\Api\oAuthEhealth;
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Classes\eHealth\Request;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -66,8 +67,6 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public static function loginUrl($user)
     {
-
-        $user->assignRole('Admin');
         // Base URL and client ID
         $baseUrl = env('EHEALTH_AUTH_HOST') . '/sign-in';
         $redirectUri = env('EHEALTH_REDIRECT_URI');
@@ -90,12 +89,10 @@ class oAuthEhealth implements oAuthEhealthInterface
     }
     public static function setToken($data)
     {
+        dd($data);
         Session::put('auth_token', $data['value']);
-        Session::put('auth_token_expires_at', now()->addHours(1));
-
+        Session::put('auth_token_expires_at', Carbon::createFromTimestamp($data['expires_at']));
         Session::put('refresh_token', $data['details']['refresh_token']);
-        Session::put('refresh_token_expires_at', now()->addHours(1));
-
         Session::save();
     }
 
@@ -123,9 +120,13 @@ class oAuthEhealth implements oAuthEhealthInterface
     }
 
     public function getApikey(): string{
-        return Auth::user()->api_key ?? '9df299abe8c7a24d581429e625b23324';
+        return Auth::user()->legalEntity->secret_key ?? '9df299abe8c7a24d581429e625b23324';
     }
 
+
+    public function refreshAuthToken ($refreshToken){
+        return (new Request('POST', self::OAUTH_TOKENS, ['refresh_token' => $refreshToken, 'grant_type' => 'refresh_token']))->sendRequest();
+    }
 
 }
 
