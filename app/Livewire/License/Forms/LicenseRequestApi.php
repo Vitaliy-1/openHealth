@@ -40,7 +40,6 @@ class LicenseRequestApi extends LicenseApi
     public static function create($data): array
     {
         $data['type'] = '"LEGAL_ENTITY_' . $data['type'] . '_ADDITIONAL_LICENSE_TYPE';
-
         $licenseCreateApi = self::_create($data);
 
         return !empty($licenseCreateApi) ? $licenseCreateApi : [];
