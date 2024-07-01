@@ -8,12 +8,20 @@ class PersonApi extends Request
 {
 
 
-    public const URL = '/api/clients';
+    public const URL = '/api/stats/parties';
 
-    public static function _getAuthMethod(array $params = []): array
+    public static function _getAuthMethod(): array
     {
-        //050b5d17-3bd9-4230-b707-b4528bfe0afc
-        return (new Request('GET', self::URL, $params,true,true))->sendRequest();
+
+
+
+        $data = [
+            'party_id' => '843081c3-90f8-43cf-9cdb-8abdf5b0b507',
+        ];
+
+        return (new Request('get', self::URL,$data,true))->sendRequest();
+
+
     }
 
 }

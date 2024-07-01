@@ -66,12 +66,11 @@
                                     >
                                         <x-slot name="option">
                                             <option>{{__('forms.type')}}</option>
-                                            @foreach($this->dictionaries['DIVISION_TYPE'] as $k=>$position)
-                                                <option value="{{$k}}">{{$position}}</option>
+                                            @foreach($this->dictionaries['DIVISION_TYPE'] as $k=>$type)
+                                                <option value="{{$k}}">{{$type}}</option>
                                             @endforeach
                                         </x-slot>
                                     </x-forms.select>
-
                                 </x-slot>
                                 @error('division.type')
                                 <x-slot name="error">
