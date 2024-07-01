@@ -19,7 +19,7 @@ class CreateNewLicense extends LicenseForms
         $this->error['status'] = false;
 
         $data = [
-            'legal_entity_id' => $this->legalEntity->id,
+            'legal_entity_id' => $this->legal_entity_id,
             'type' => $this->type,
             'issued_by' => $this->issued_by,
             'issued_date' => $this->issued_date,
@@ -71,7 +71,6 @@ class CreateNewLicense extends LicenseForms
 
     public function sendApiRequest($data): array
     {
-        unset($data['legal_entity_id']);
         return LicenseRequestApi::create($data);
     }
 }

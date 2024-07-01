@@ -2,7 +2,6 @@
 
 namespace App\Livewire\License\Forms;
 
-use App\Models\LegalEntity;
 use Livewire\Component;
 use App\Models\License;
 use App\Traits\FormTrait;
@@ -18,7 +17,7 @@ class LicenseForms extends Component
     public ?int $license_order_no = null;
     public ?string $mode = 'edit';
     public ?int $user_id = null;
-    public LegalEntity $legalEntity;
+    public ?int $legal_entity_id = null;
     public string $type = '';
     public string $selected_type = '';
     public string $issued_by = '';
@@ -34,22 +33,23 @@ class LicenseForms extends Component
 
     public array $success = [
         'message' => '',
-        'status'  => false,
+        'status' => false,
     ];
 
     public ?array $error = [
         'message' => '',
-        'status'  => false,
+        'status' => false,
     ];
 
     public function mount($id = null)
     {
-        if (isset($id) && $id !== null) {
+        if(isset($id) && $id !== null) {
             $this->license_id = $id;
         }
 
         if ($this->license_id) {
             $license = License::find($this->license_id);
+
             $this->type = $license->type;
             $this->issued_by = $license->issued_by;
             $this->issued_date = $license->issued_date;
@@ -59,24 +59,24 @@ class LicenseForms extends Component
             $this->expiry_date = $license->expiry_date;
             $this->what_licensed = $license->what_licensed;
 
-            if (isset($license->uuid) && $license->uuid !== null) {
+            if(isset($license->uuid) && $license->uuid !== null) {
                 $this->license_uuid = $license->uuid;
             }
         }
 
         $this->user_id = auth()->user()->id;
-        $this->legalEntity = auth()->user()->legalEntity;
+        $this->legal_entity_id = auth()->user()->legal_entity_id;
         $this->dictionaries = $this->loadLicenseType();
 
         //! for debug
-        if (config('app.debug')) {
+        if(config('app.debug')) {
             $this->license_order_no = '1234567';
             $this->type = 'MSP';
             $this->issued_by = 'Кваліфікацйна комісія';
             $this->issued_date = '2022-02-28';
             $this->active_from_date = '2022-02-28';
             $this->order_no = 'ВА43234';
-            $this->license_number = 'f1123443';
+            $this->license_number = 'fd123443';
             $this->expiry_date = '2026-02-28';
             $this->what_licensed = 'реалізація наркотичних засобів';
         }
@@ -87,7 +87,9 @@ class LicenseForms extends Component
         $dataHelper = JsonHelper::searchValue('DICTIONARIES_PATH', [
             'LICENSE_TYPE',
         ]);
+
         $licenseTypes = $dataHelper['LICENSE_TYPE'];
+
         return [
             'licenseTypes' => [
                 $licenseTypes
@@ -100,41 +102,46 @@ class LicenseForms extends Component
         $expiry_date_type = $this->type === 'PHARMACY_DRUGS' ? 'required' : 'nullable';
         $expiry_date_check = $this->expiry_date === null ? '' : 'before_or_equal:expiry_date';
 
-        return [
-            'type'             => 'required|string',
-            'issued_by'        => 'required|string',
-            'issued_date'      => 'required|date|before_or_equal:active_from_date',
+        $rule = [
+            'legal_entity_id' => 'required|exists:legal_entities,id',
+            'type' => 'required|string',
+            'issued_by' => 'required|string',
+            'issued_date' => 'required|date|before_or_equal:active_from_date',
             'active_from_date' => "required|date|{$expiry_date_check}",
-            'order_no'         => 'required|string',
-            'license_number'   => 'nullable|string',
-            'expiry_date'      => "{$expiry_date_type}|date|after_or_equal:active_from_date",
-            'what_licensed'    => 'required|string',
+            'order_no' => 'required|string',
+            'license_number' => 'nullable|string',
+            'expiry_date' => "{$expiry_date_type}|date|after_or_equal:active_from_date",
+            'what_licensed' => 'required|string',
         ];
+
+        return $rule;
     }
 
     public function save()
     {
         $this->validate($this->getValidationRules());
+
         $this->success['status'] = false;
         $this->error['status'] = false;
 
         $data = [
-            'type'             => $this->type,
-            'issued_by'        => $this->issued_by,
-            'issued_date'      => $this->issued_date,
+            'legal_entity_id' => $this->legal_entity_id,
+            'type' => $this->type,
+            'issued_by' => $this->issued_by,
+            'issued_date' => $this->issued_date,
             'active_from_date' => $this->active_from_date,
-            'order_no'         => $this->order_no,
-            'license_number'   => $this->license_number,
-            'expiry_date'      => $this->expiry_date,
-            'what_licensed'    => $this->what_licensed,
-            'is_primary'       => $this->is_primary,
+            'order_no' => $this->order_no,
+            'license_number' => $this->license_number,
+            'expiry_date' => $this->expiry_date,
+            'what_licensed' => $this->what_licensed,
+            'is_primary' => $this->is_primary,
         ];
 
         if ($this->license_id) {
             $license = License::find($this->license_id);
 
             if ($license) {
-                if ($license->is_primary) {
+                if($license->is_primary) {
                     unset($data['is_primary']);
                 }
 
@@ -147,7 +154,7 @@ class LicenseForms extends Component
 
                     $res = $this->sendApiRequest($data);
 
-                    if (!$this->license_uuid && $res['id']) {
+                    if(!$this->license_uuid && $res['id']) {
                         $license->update([
                             'uuid' => $res['id']
                         ]);
@@ -173,17 +180,15 @@ class LicenseForms extends Component
 
     public function sendApiRequest($data): array
     {
-        if ($this->license_uuid) {
-            return LicenseRequestApi::update($this->license_uuid, $data);
+        if($this->license_uuid) {
+            return LicenseRequestApi::update( $this->license_uuid, $data);
         }
 
-        return LicenseRequestApi::create($data);
+        return LicenseRequestApi::create(  $data);
     }
 
     public function back()
     {
         return redirect()->route('license.index');
     }
-
-
 }

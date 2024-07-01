@@ -3,7 +3,6 @@
 namespace App\Livewire\License\Forms;
 
 use App\Classes\eHealth\Api\LicenseApi;
-use App\Classes\eHealth\Request;
 use Livewire\Component;
 
 class LicenseRequestApi extends LicenseApi
@@ -40,7 +39,7 @@ class LicenseRequestApi extends LicenseApi
 
     public static function create($data): array
     {
-        $data['type'] = 'MSP';
+        $data['type'] = '"LEGAL_ENTITY_' . $data['type'] . '_ADDITIONAL_LICENSE_TYPE';
         $licenseCreateApi = self::_create($data);
 
         return !empty($licenseCreateApi) ? $licenseCreateApi : [];
