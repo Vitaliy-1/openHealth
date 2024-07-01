@@ -31,6 +31,9 @@ class Employee extends Model
         'speciality' => 'array',
     ];
 
+    protected $attributes = [
+        'doctor' => '{}',
+    ];
 
 
     public function person(): \Illuminate\Database\Eloquent\Relations\BelongsTo

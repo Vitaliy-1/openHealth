@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Employee;
 
+use App\Classes\eHealth\Api\PersonApi;
 use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
 use App\Models\Employee;
 use App\Traits\FormTrait;
@@ -65,25 +66,27 @@ class EmployeeIndex extends Component
 
     public function getEmployees($status = ''): void
     {
-        $this->employees = DB::table('legal_entities')
-            ->join('users', 'legal_entities.id', '=', 'users.legal_entity_id')
-            ->join('employees', 'legal_entities.id', '=', 'employees.legal_entity_id')
-            ->join('persons', 'employees.person_id', '=', 'persons.id')
-            ->where('users.id', Auth::id())
-            ->select(
-                'employees.id as id',
-                'employees.uuid',
-                'employees.start_date',
-                'employees.end_date',
-                'employees.status',
-                DB::raw("CONCAT(persons.first_name, ' ', persons.last_name, ' ', persons.second_name) AS full_name"),
-                'persons.email',
-                'persons.phones',
+        $this->employees = Auth::user()->legalEntity->employees()->get();
 
-                'employees.position',
-                'employees.employee_type',
-            )
-            ->get();
+//            DB::table('legal_entities')
+//            ->join('users', 'legal_entities.id', '=', 'users.legal_entity_id')
+//            ->join('employees', 'legal_entities.id', '=', 'employees.legal_entity_id')
+//            ->join('persons', 'employees.person_id', '=', 'persons.id')
+//            ->where('users.id', Auth::id())
+//            ->select(
+//                'employees.id as id',
+//                'employees.uuid',
+//                'employees.start_date',
+//                'employees.end_date',
+//                'employees.status',
+//                DB::raw("CONCAT(persons.first_name, ' ', persons.last_name, ' ', persons.second_name) AS full_name"),
+//                'persons.email',
+//                'persons.phones',
+//
+//                'employees.position',
+//                'employees.employee_type',
+//            )
+//            ->get();
 
     }
 
@@ -153,8 +156,34 @@ class EmployeeIndex extends Component
     }
 
 
+    public function syncEmployees(){
+
+        $user = Auth::user();
+
+        $person = PersonApi::_getAuthMethod();
+        dd($person);
+        $requests = EmployeeRequestApi::getEmployees($user->legalEntity->uuid);
+
+        dd($requests);
+        foreach ($requests as $k => $request) {
+            $request['uuid'] = $request['id'];
+          $employee =  Employee::updateOrCreate(
+                ['uuid'=> $request['id']],
+              $request
+            );
+
+          $employee->legalEntity()->associate($user->legalEntity);
+          $employee->save();
+        }
+
+
+
+    }
+
     public function render()
     {
         return view('livewire.employee.employee-index');
     }
+
+
 }

@@ -35,9 +35,9 @@ class CipherApi
         $this->loadTicket();
         $this->setParamsSession();
         $this->uploadFileContainerSession();
-        $this->decodingFileContainer();
-        $this->getDecodingFileContainerResultData();
-        $this->getDecodingFileContainerBase64();
+//        $this->decodingFileContainer();
+//        $this->getDecodingFileContainerResultData();
+//        $this->getDecodingFileContainerBase64();
         $this->createKep();
         $this->getKepCreator();
         $kep = $this->getKep();

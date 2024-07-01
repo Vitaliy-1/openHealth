@@ -56,7 +56,7 @@ class LegalEntity extends Model
         'is_active' => false,
     ];
 
-    public function employee(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function employees(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Employee::class,'legal_entity_id','id');
     }

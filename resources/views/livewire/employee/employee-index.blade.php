@@ -24,6 +24,7 @@
                     </select>
                 </div>
             </div>
+            <a href="" class="btn-green h-[66px]"  wire:click.prevent="syncEmployees()">Синхрозувати з ЕСОЗ</a>
             <a href="" type="button" class="btn-green h-[66px]" wire:click="create('employee.employee-form')">
                 {{__('Додати Співробітника')}}
             </a>

@@ -92,8 +92,6 @@ class Request
              'API-key' => $this->oAuthEhealth->getApikey(),
         ];
 
-
-
         if ($this->isToken) {
             $headers['Authorization'] = 'Bearer '. $this->oAuthEhealth->getToken();
         }
