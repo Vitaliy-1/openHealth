@@ -56,6 +56,8 @@ return [
     'deactivate'=>'Деактивувати',
     'activate'=>'Активувати',
     'edit'=>'Редагувати',
+    'info'=>'Детальна інформація',
+    'update_info'=>'Оновити інформацію',
     //Form fields
     'edrpou'=>'ЄДРПОУ',
     'first_name' => 'Ім’я',
