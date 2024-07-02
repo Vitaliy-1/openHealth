@@ -9,6 +9,10 @@ use App\Livewire\Division\DivisionForm;
 use App\Livewire\Division\HealthcareServiceForm;
 use App\Livewire\Employee\EmployeeForm;
 use App\Livewire\Employee\EmployeeIndex;
+use App\Livewire\License\LicenseIndex;
+use App\Livewire\License\LicenseShow;
+use App\Livewire\License\Forms\LicenseForms;
+use App\Livewire\License\Forms\CreateNewLicense;
 use App\Livewire\LegalEntity\CreateNewLegalEntities;
 use App\Livewire\LegalEntity\EditLegalEntity;
 use App\Livewire\SearchPatient;
@@ -69,6 +73,11 @@ Route::middleware([
 
         Route::get('/search/patient', [SearchPatient::class, 'index']);
 
+        Route::prefix('license')->group(function () {
+            Route::get('/', LicenseIndex::class)->name('license.index');
+            Route::get('/update/{id}', LicenseForms::class)->name('license.form');
+            Route::get('/create', CreateNewLicense::class)->name('license.create');
+            Route::get('/show/{id}', LicenseShow::class)->name('license.show');
+        });
     });
-
 });
