@@ -23,13 +23,10 @@ class EmployeeApi extends Request
 
     public static function _dismissed($id): array
     {
-
-        return (new Request('POST', 'employees/'.$id.'/actions/deactivate', []))->sendRequest();
-
+        return (new Request('POST', '/api/employees/'.$id.'/actions/deactivate', []))->sendRequest();
     }
 
     public static function _getRolesById(){
-
 
         return (new Request('GET', '/api/employee_roles/796612ee-452b-4933-b522-714bc399a55e', []))->sendRequest();
     }

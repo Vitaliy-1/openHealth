@@ -15,6 +15,7 @@ class ContractRequestApi extends ContractApi
 
     public static function contractRequestApi($data,$contract_id){
         return self::create_request($data,$contract_id);
+
     }
 
 }

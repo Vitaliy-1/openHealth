@@ -58,5 +58,4 @@ class Division extends Model
     {
         $this->attributes['location'] = $value ?: json_encode([]);
     }
-
 }

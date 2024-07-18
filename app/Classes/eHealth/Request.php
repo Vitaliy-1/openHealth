@@ -5,8 +5,10 @@ namespace App\Classes\eHealth;
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealthInterface;
 use App\Classes\eHealth\Exceptions\ApiException;
+use App\Livewire\Components\FlashMessage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use mysql_xdevapi\Exception;
 
 class Request
@@ -49,10 +51,22 @@ class Request
      */
     public function sendRequest()
     {
+
+//        if (!$this->oAuthEhealth->isLoggedIn()){
+//            abort(401);
+//        }
+//        Log::info('HTTP Request:', [
+//            'url' => $this->url,
+//            'method' => $this->method,
+//            'headers' => $this->headers,
+//            'params' => $this->params,
+//        ]);
         try {
             $response = Http::acceptJson()
                 ->withHeaders($this->getHeaders())
                 ->{$this->method}(self::makeApiUrl(), $this->params);
+
+
             if ($response->successful()) {
                 $data = json_decode($response->body(), true);
                 if (isset($data['urgent']) && !empty($data['urgent'])) {
@@ -68,12 +82,8 @@ class Request
             if ($response->failed()) {
                 $error = json_decode($response->body(), true);
                 dd($error);
-                throw match ($response->status()) {
-                    400 => new ApiException($error['message'] ?? 'Невірний запит'),
-                    403 => new ApiException($error['message'] ?? 'Немає доступу'),
-                    404 => new ApiException($error['message'] ?? 'Не вдалося знайти запитану сторінку'),
-                    default => new ApiException($error['message'] ?? 'API request failed'),
-                };
+//                FlashMessage::class($error['error']['message'], 'error');
+                throw new ApiException($error['message'], $response->status());
             }
         }
 
@@ -87,15 +97,20 @@ class Request
 
     public function getHeaders(): array
     {
+//        dd($this->oAuthEhealth->getApikey());
         $headers = [
              'X-Custom-PSK' => env('EHEALTH_X_CUSTOM_PSK'),
              'API-key' => $this->oAuthEhealth->getApikey(),
         ];
-
         if ($this->isToken) {
             $headers['Authorization'] = 'Bearer '. $this->oAuthEhealth->getToken();
         }
-
         return array_merge($headers, $this->headers);
+    }
+
+    private function flashMessage($message, $type)
+    {
+        // Виклик події браузера через Livewire
+        \Livewire\Component::dispatch('flashMessage', ['message' => $message, 'type' => $type]);
     }
 }
