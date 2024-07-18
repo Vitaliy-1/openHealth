@@ -19,13 +19,14 @@ class DivisionForm extends Component
         'division.phones.number' => 'required|string',
         'division.phones.type' => 'required',
         'division.addresses' => 'required',
-
     ])]
 
     public ?array $division = [];
-    public ?object $divisions;
+
 
     public ?object $legalEntity;
+
+     public string $mode = 'create';
 
     public ?array $dictionaries;
     public ?array $working_hours = [
@@ -38,19 +39,16 @@ class DivisionForm extends Component
         'sun' => 'Неділя',
     ];
 
-    public ?array $tableHeaders = [];
-
-    public bool $showModal = false;
-
-    public string $mode = 'default';
 
     protected $listeners = ['addressDataFetched'];
 
-    public function mount()
+    public function mount($id = '')
     {
-        $this->tableHeaders();
+        if ( !empty($id)) {
+            $this->getDivision($id);
+            $this->mode = 'edit';
+        }
         $this->getLegalEntity();
-        $this->getDivisions();
         $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', [
             'PHONE_TYPE',
             'SETTLEMENT_TYPE',
@@ -60,36 +58,17 @@ class DivisionForm extends Component
 
     public function getLegalEntity()
     {
-        $this->legalEntity =auth()->user()->legalEntity;
+        $this->legalEntity = auth()->user()->legalEntity;
     }
 
-//    public function openModal()
-//    {
-//        $this->showModal = true;
-//    }
-//
-//    public function closeModal()
-//    {
-//        $this->showModal = false;
-//        $this->getDivisions();
-//        $this->resetErrorBag();
-//        $this->division = [];
-//    }
-
-    public function tableHeaders(): void
+    public function getDivision($id)
     {
-        $this->tableHeaders = [
-            __('ID E-health '),
-            __('Назва'),
-            __('Тип'),
-            __('Телефон'),
-            __('Email'),
-            __('Статус'),
-            __('Дія'),
-        ];
+        $this->division = Division::find($id)->toArray();
+        $this->division['phones'] = $this->division['phones'][0];
+        $this->division['addresses'] = $this->division['addresses'][0];
     }
 
-    public function fetchDataFromAddressesComponent()
+    public function fetchDataFromAddressesComponent():void
     {
         $this->dispatch('fetchAddressData');
     }
@@ -102,15 +81,11 @@ class DivisionForm extends Component
 
     }
 
-    public function validateDivision(): bool
+    public function validateDivision(): void
     {
         $this->resetErrorBag();
         $this->validate();
-        if (isset($this->division['addresses']) && empty($this->division['addresses'])){
-            return false;
-        }
 
-        return true;
     }
 
     public function create()
@@ -124,7 +99,6 @@ class DivisionForm extends Component
         $this->dispatch('address-data-fetched');
         $this->validateDivision();
         $this->updateOrCreate(new Division());
-        $this->getDivisions();
         $this->resetErrorBag();
     }
 
@@ -132,28 +106,29 @@ class DivisionForm extends Component
     {
         $this->mode = 'edit';
         $this->division = $division->toArray();
+
         $this->setAddressesFields();
     }
 
-    public function setAddressesFields()
+    public function setAddressesFields():void
     {
         $this->dispatch('setAddressesFields',$this->division['addresses'] ?? []);
     }
 
-    public function update(Division $division)
+    public function update():void
     {
 
         $this->fetchDataFromAddressesComponent();
-
         $this->dispatch('address-data-fetched');
+        $this->validateDivision();
+        $division = Division::find($this->division['id']);
 
-        $divisionId = $this->division['id'];
-        $division = $division::find($divisionId);
         $this->updateOrCreate($division);
+
 
     }
 
-    public function updateOrCreate(Division $division): void
+    public function updateOrCreate(Division $division)
     {
         $response = $this->mode === 'edit'
             ? $this->updateDivision()
@@ -161,7 +136,11 @@ class DivisionForm extends Component
 
         if ($response) {
             $this->saveDivision($division, $response);
+
+            return redirect()->route('division.index');
         }
+
+        $this->dispatch('flashMessage', ['message' => __('Інформацію не оновлено'), 'type' => 'error']);
     }
 
     private function updateDivision(): array
@@ -171,35 +150,20 @@ class DivisionForm extends Component
 
     private function createDivision(): array
     {
-
-        return DivisionRequestApi::createDivisionRequest(removeEmptyKeys($this->division));
+        $division = removeEmptyKeys($this->division);
+        return DivisionRequestApi::createDivisionRequest($division);
     }
 
-    public function activate(Division $division): void
-    {
-        DivisionRequestApi::activateDivisionRequest($division['uuid']);
-        $division->setAttribute('status', 'ACTIVE');
-        $division->save();
-        $this->getDivisions();
-    }
 
-    public function deactivate(Division $division): void
-    {
-        DivisionRequestApi::deactivateDivisionRequest($division['uuid']);
-        $division->setAttribute('status', 'DEACTIVATED');
-        $division->save();
-        $this->getDivisions();
-    }
 
     private function saveDivision(Division $division, array $response): void
     {
-        $division->fill($this->division);
+
+        $division->fill($response);
         $division->setAttribute('uuid', $response['id']);
-        $division->setAttribute('addresses', $this->addresses);
         $division->setAttribute('legal_entity_uuid', $response['legal_entity_id']);
         $division->setAttribute('external_id', $response['external_id']);
         $division->setAttribute('status', $response['status']);
-
         $this->legalEntity->division()->save($division);
     }
 
@@ -209,19 +173,12 @@ class DivisionForm extends Component
     }
 
 
-    public function getDivisions(): object
-    {
-        return $this->divisions = $this->legalEntity->division()->get();
-    }
+
 
     public function render()
     {
-        if ($this->mode === 'create')
-        {
-            return view('livewire.division.division-form-create');
+    return view('livewire.division.division-form-create');
 
-        }
-        return view('livewire.division.division-form');
     }
 
 }

@@ -8,15 +8,13 @@ class PersonApi extends Request
 {
 
 
-    public const URL = '/api/stats/parties';
+    public const URL = '/api/cabinet/persons';
 
     public static function _getAuthMethod(): array
     {
 
-
-
         $data = [
-            'party_id' => '843081c3-90f8-43cf-9cdb-8abdf5b0b507',
+            'page' => 2,
         ];
 
         return (new Request('get', self::URL,$data,true))->sendRequest();

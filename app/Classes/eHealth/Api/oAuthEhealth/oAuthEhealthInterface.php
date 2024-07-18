@@ -13,5 +13,5 @@ interface oAuthEhealthInterface
 
     public function getApikey(): string;
 
-    public function refreshAuthToken(string $refreshToken): array;
+    public function refreshAuthToken(): array;
 }
