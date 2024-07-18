@@ -40,6 +40,14 @@ class DivisionApi extends Request
     {
         return (new Request('PATCH', self::URL . '/' . $id . '/actions/deactivate', []))->sendRequest();
     }
-
+    public static function _sync($legal_entity_id): array
+    {
+        $data = [
+            'legal_entity_id' => $legal_entity_id,
+            'page'=> 1,
+            'page_size' => 100
+        ];
+        return (new Request('GET', self::URL, $data))->sendRequest();
+    }
 
 }
