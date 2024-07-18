@@ -9,8 +9,6 @@ class EmployeeRequestApi extends EmployeeApi
 {
 
 
-
-
     public static function getEmployees($legal_entity_id):array
     {
         $params = [
@@ -22,10 +20,9 @@ class EmployeeRequestApi extends EmployeeApi
         return self::_get($params);
     }
 
-    public static function createEmployeeRequest($uuid,$data):array
+    public static function createEmployeeRequest($data):array
     {
 //        $params = self::createEmployeeRequestBuilder($uuid,$data);
-
         return self::_create($data);
     }
 
