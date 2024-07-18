@@ -112,14 +112,15 @@ class AddressesSearch extends Component
             case 'area':
                 $fieldsToReset = ['region', 'settlement', 'settlement_id', 'settlement_type', 'street_type', 'street', 'building', 'apartment', 'zip'];
                 break;
-////
+            case 'region':
+                $fieldsToReset = [ 'settlement', 'settlement_id', 'settlement_type', 'street_type', 'street', 'building', 'apartment', 'zip'];
+                break;
             case 'settlement':
                 $fieldsToReset = ['street_type', 'street', 'building', 'apartment', 'zip'];
                 break;
-
-
             case 'street':
                 $fieldsToReset = [ 'building', 'apartment', 'zip'];
+                break;
             default:
                 // Дополнительные условия обновления полей, если необходимо
                 break;
@@ -133,6 +134,8 @@ class AddressesSearch extends Component
 
     public function provideAddressData()
     {
+
+
         $this->validate();
 
         $addresses = [
@@ -142,13 +145,13 @@ class AddressesSearch extends Component
             'region' => $this->region,
             'settlement' => $this->settlement,
             'settlement_type' => $this->settlement_type,
+            'settlement_id' => $this->settlement_id,
             'street_type' => $this->street_type,
             'street' => $this->street,
             'building' => $this->building,
             'apartment' => $this->apartment,
             'zip' => $this->zip,
         ];
-
         $this->dispatch('addressDataFetched',$addresses);
     }
 
@@ -184,6 +187,7 @@ class AddressesSearch extends Component
         if (empty($this->settlement_id)) {
             return;
         }
+
         $this->streets = AdressesApi::_streets(
             $this->settlement_id,
             $this->street_type,

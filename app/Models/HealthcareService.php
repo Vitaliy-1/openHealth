@@ -19,6 +19,7 @@ class HealthcareService extends Model
         'coverage_area',
         'available_time',
         'not_available',
+        'status',
     ];
 
     protected $casts = [
@@ -29,13 +30,14 @@ class HealthcareService extends Model
         'not_available' => 'json',
     ];
 
-    protected  $attributes = [
-        'status' => false,
-    ];
-
     public function division()
     {
         return $this->belongsTo(Division::class);
+    }
+
+    public function getHealthcareCategoryAttribute(){
+
+        return $this->category['coding'][0]['code'] ?? '';
     }
 
 

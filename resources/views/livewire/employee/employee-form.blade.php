@@ -28,7 +28,7 @@
                         </x-secondary-button>
                     </div>
                     <div class="xl:w-1/4 text-right">
-                        <button wire:click="sendApiRequest()" type="button" class="btn-primary">
+                        <button wire:click="openModal('signed_content')" type="button" class="btn-primary">
                             {{__('Відправити на затвердження ')}}
                         </button>
                     </div>
@@ -53,6 +53,8 @@
         @include('livewire.employee._parts.modals._modal_documents')
     @elseif($showModal == 'specialities')
         @include('livewire.employee._parts.modals._modal_specialities')
+    @elseif($showModal == 'signed_content')
+        @include('livewire.employee._parts.modals._modal_signed_content')
 {{--    @elseif($showModal == 'positions')--}}
 {{--        @include('livewire.employee._parts.modals._modal_positions')--}}
 {{--    @elseif($showModal == 'role')--}}

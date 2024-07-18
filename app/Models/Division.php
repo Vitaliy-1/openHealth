@@ -27,17 +27,18 @@ class Division extends Model
     ];
 
     protected $casts = [
-        'location' => 'json',
-        'addresses' => 'json',
-        'healthcare_services' => 'json',
-        'phones' => 'json',
-        'working_hours' => 'json',
+        'location' => 'array',
+        'addresses' => 'array',
+        'healthcare_services' => 'array',
+        'phones' => 'array',
+        'working_hours' => 'array',
         'is_active' => 'boolean',
     ];
 
     public $attributes = [
         'is_active' => false,
         'mountaint_group' => false,
+        'uuid' => 'string',
         'addresses' => '[]',
         'location' => '[]',
         'working_hours' =>  '[]',
@@ -53,5 +54,8 @@ class Division extends Model
         return $this->hasMany(HealthcareService::class);
     }
 
-
+    public function setLocationAttribute($value)
+    {
+        $this->attributes['location'] = $value ?: json_encode([]);
+    }
 }

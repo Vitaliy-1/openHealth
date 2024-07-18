@@ -62,6 +62,28 @@
     @stack('modals')
 
     @stack('scripts')
+        @livewire('components.flash-message')
+
+    <script>
+        document.addEventListener('livewire:load', function () {
+            Livewire.on('flashMessage', (message, type) => {
+                console.log('message', message, type);
+                let flashMessage = document.getElementById('flash-message');
+                if (flashMessage) {
+                    flashMessage.textContent = message;
+                    flashMessage.classList.add('alert-' + type);
+                    flashMessage.classList.remove('hidden');
+
+                    setTimeout(() => {
+                        flashMessage.classList.add('hidden');
+                        flashMessage.classList.remove('alert-' + type);
+                    }, 5000);
+                }
+            });
+        });
+
+    </script>
     </body>
+
 
 </html>

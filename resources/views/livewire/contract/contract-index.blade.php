@@ -119,9 +119,11 @@
                         <x-forms.select wire:model="contract_type" class="default-select">
                             <x-slot name="option">
                                 <option value="">{{__('forms.contract_type')}}</option>
-                                @foreach($this->dictionaries['CONTRACT_TYPE'] as $k=>$contract_type)
-                                    <option value="{{$k}}">{{$contract_type}}</option>
-                                @endforeach
+                                <option  value="capitation">CAPITATION</option>
+
+                                {{--                                @foreach($this->dictionaries['CONTRACT_TYPE'] as $k=>$contract_type)--}}
+{{--                                    <option value="{{$k}}">{{$contract_type}}</option>--}}
+{{--                                @endforeach--}}
                             </x-slot>
                         </x-forms.select>
                         @error('contract_type')

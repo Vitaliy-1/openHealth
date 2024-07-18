@@ -6,41 +6,41 @@ use App\Classes\eHealth\Request;
 
 class HealthcareServiceApi extends Request
 {
-     public const URL = '/healthcare_services';
+     public const URL = '/api/healthcare_services';
 
-    public function __construct()
-    {
-        self::setApiVersion('');
-    }
 
     public static function  _get($params = []): array
     {
-        return self::get(self::URL, $params);
+        return  (new Request('get', self::URL, $params))->sendRequest();
     }
 
     public static function _getById($id,$params = []): array
     {
-        return self::get(self::URL.'/'.$id, $params);
+        return (new Request('get', self::URL.'/'.$id, $params))->sendRequest();
     }
 
-    public static  function _create($data): array
+    public static  function _create($params): array
     {
-        return self::post(self::URL, $data);
+        return (new Request('post', self::URL, $params))->sendRequest();
+
     }
 
-    public static  function _update($id, $data): array
+    public static  function _update($id, $params): array
     {
-        return self::patch(self::URL . '/' . $id, $data);
+        return (new Request('patch', self::URL. '/' . $id, $params))->sendRequest();
+
     }
 
     public static  function _activate($id): array
     {
-        return self::patch(self::URL . '/' . $id);
+        return (new Request('patch', self::URL. '/' . $id, []))->sendRequest();
+
     }
 
     public static  function _deactivate($id): array
     {
-        return self::patch(self::URL  . '/' .  $id . '/actions/deactivate');
+        return (new Request('patch', self::URL  . '/' .  $id . '/actions/deactivate', []))->sendRequest();
+
     }
 
 

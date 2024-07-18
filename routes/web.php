@@ -6,6 +6,7 @@ use App\Livewire\Auth\Login;
 use App\Livewire\Contract\ContractForm;
 use App\Livewire\Contract\ContractIndex;
 use App\Livewire\Division\DivisionForm;
+use App\Livewire\Division\DivisionIndex;
 use App\Livewire\Division\HealthcareServiceForm;
 use App\Livewire\Employee\EmployeeForm;
 use App\Livewire\Employee\EmployeeIndex;
@@ -57,7 +58,8 @@ Route::middleware([
         });
 
         Route::prefix('division')->group(function () {
-            Route::get('/', DivisionForm::class)->name('division.index');
+            Route::get('/', DivisionIndex::class)->name('division.index');
+            Route::get('/form/{id?}', DivisionForm::class)->name('division.form');
             Route::get('/{division}/healthcare-service', HealthcareServiceForm::class)->name('healthcare_service.index');
         });
 
@@ -79,5 +81,9 @@ Route::middleware([
             Route::get('/create', CreateNewLicense::class)->name('license.create');
             Route::get('/show/{id}', LicenseShow::class)->name('license.show');
         });
+
+        Route::get('/test-license', [HomeController::class, 'test']);
+
+
     });
 });

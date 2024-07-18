@@ -45,6 +45,8 @@ class Request
         if ($response->failed()) {
             $error = json_decode($response->body(), true);
             dd($error);
+            return $error ?? [];
+
             throw match ($response->status()) {
                 400 => new ApiException($error['message'] ?? 'Невірний запит'),
                 403 => new ApiException($error['message'] ?? 'Немає доступу'),
