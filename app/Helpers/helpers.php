@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\JsonHelper;
 use Carbon\Carbon;
 
 if (!function_exists("all_day")) {
@@ -133,6 +134,17 @@ if (!function_exists("not_available")) {
             $dateTime = Carbon::parse($dateString);
             return $dateTime->format("Y-m-d\TH:i:s.v\Z"); // Используем .v для миллисекунд
         }
+    }
+
+}
+if (!function_exists('replacePhone')) {
+    function removeSpacePhones($phones): array
+    {
+        return collect($phones)->map(function ($phone) {
+            $phone['number'] ='+'. str_replace(' ', '', $phone['number']);
+            return $phone;
+        })->toArray();
+
     }
 }
 

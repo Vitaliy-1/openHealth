@@ -13,8 +13,6 @@ class Request
 
     private string $params;
 
-
-
     public function __construct(
         string $method,
         string $url,
