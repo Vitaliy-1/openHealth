@@ -69,7 +69,7 @@
                                     {{__('forms.next')}}
                                 </x-button>
                                 @else
-                                <x-button type="button" class="btn-primary" wire:click.defer="increaseStep()">
+                                <x-button type="button" class="btn-primary" wire:click="increaseStep()">
                                     {{__('forms.next')}}
                                 </x-button>
                             @endif

@@ -90,4 +90,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(License::class, 'legal_entity_id', 'legal_entity_id');
     }
+
+
+    public function hasToken(): bool
+    {
+        return $this->token !== null;
+    }
 }

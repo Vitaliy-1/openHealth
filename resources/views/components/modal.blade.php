@@ -31,7 +31,7 @@ $maxWidth = [
                     x-transition:leave="ease-in duration-200"
                     x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0">
-        <div class="absolute inset-0 bg-body dark:bg-gray-900 opacity-75"></div>
+        <div class="absolute inset-0 bg-body dark:bg-gray-900 opacity-75"  wire:click="closeModalModel()"></div>
     </div>
 
     <div x-show="show" class="mb-6 mt-6 absolute top-0 right-0 left-0 bg-white dark:bg-gray-800 rounded-lg  shadow-xl overflow-auto transform transition-all sm:w-full {{ $maxWidth }} sm:mx-auto"

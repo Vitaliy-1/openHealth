@@ -211,4 +211,5 @@ return [
     'KNEDP'=> 'КНЕДП',
     'keyContainerUpload'=>'Шлях до контейнеруа',
     'password'=>'Пароль',
+    'speciality_officio'=>'Основна спеціалазація (лише одна має бути)',
 ];

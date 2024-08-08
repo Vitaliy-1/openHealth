@@ -30,7 +30,7 @@ class LegalEntitiesForms extends Form
     ])]
 
     public ?array $owner = [
-        'no_tax_id' => false
+//        'no_tax_id' => false
     ];
 
     #[Validate([
@@ -85,7 +85,7 @@ class LegalEntitiesForms extends Form
     ];
 
     public array  $security =  [
-        'redirect_uri' => 'http://localhost:8000/callback'
+        'redirect_uri' => 'https://openhealths.com/ehealth/oauth',
     ];
 
         /**

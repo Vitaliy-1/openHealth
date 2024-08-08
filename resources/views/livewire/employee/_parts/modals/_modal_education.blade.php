@@ -15,8 +15,18 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.educations.degree" type="text"
-                                           id="degree"/>
+                            <x-forms.select
+                                class="default-input" wire:model="employee_request.educations.degree"
+                                id="education_country"
+                            >
+                                <x-slot name="option">
+                                    <option>{{__('forms.select')}}</option>
+                                    @foreach($this->dictionaries['EDUCATION_DEGREE'] as $k=>$country)
+                                        <option value="{{$k}}">{{$country}}</option>
+                                    @endforeach
+                                </x-slot>
+                            </x-forms.select>
+
                         </x-slot>
                         @error('employee_request.educations.degree')
                         <x-slot name="error">
@@ -76,7 +86,7 @@
                                 <x-slot name="option">
                                     <option>{{__('forms.select_country')}}</option>
                                     @foreach($this->dictionaries['COUNTRY'] as $k=>$country)
-                                        <option value="{{$country}}">{{$country}}</option>
+                                        <option value="{{$k}}">{{$country}}</option>
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>

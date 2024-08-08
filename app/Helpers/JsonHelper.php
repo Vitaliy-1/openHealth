@@ -114,4 +114,11 @@ class JsonHelper
     {
         return static::$json_path ?? null;
     }
+
+
+
+    public static function getDictionaries(){
+
+    }
+
 }

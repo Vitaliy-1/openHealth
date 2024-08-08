@@ -180,7 +180,7 @@
                             @enderror
                         </div>
                         <div class="w-1/2">
-                            <x-forms.input x-mask="38099 999 99 99" class="default-input"
+                            <x-forms.input x-mask="+380999999999" class="default-input"
                                            wire:model="legal_entity_form.owner.phones.{{$key}}.number" type="text"
                                            placeholder="{{__('+ 3(80)00 000 00 00 ')}}"/>
                             @error("legal_entity_form.owner.phones.{$key}.number")
@@ -210,11 +210,13 @@
     <div class="mb-4.5 flex flex-col gap-0 gap-6 ">
         <x-forms.form-group class="flex items-center  flex-row-reverse	justify-end	">
             <x-slot name="input">
-                <x-forms.input x-bind:checked="show"
-                               @change="show = !show"
-                               wire:model="legal_entity_form.owner.no_tax_id"
-                               type="checkbox"
-                               id="owner_no_tax_id"/>
+                <x-forms.input
+                    x-bind:checked="show"
+                    @change="show = !show; $wire.set('legal_entity_form.owner.tax_id', show ? '' : $wire.legal_entity_form.owner.tax_id)"
+                    wire:model="legal_entity_form.owner.no_tax_id"
+                    type="checkbox"
+                    id="owner_no_tax_id"
+                />
             </x-slot>
             <x-slot name="label">
                 <x-forms.label for="owner_no_tax_id"
@@ -239,9 +241,15 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input maxlength="10"
-                               class="default-input" checked wire:model="legal_entity_form.owner.tax_id" type="text"
-                               id="tax_id" name="tax_id"/>
+                <x-forms.input
+                    maxlength="10"
+                    class="default-input"
+                    x-bind:value="show ? '' : @entangle('legal_entity_form.owner.tax_id')"
+                    wire:model="legal_entity_form.owner.tax_id"
+                    type="text"
+                    id="tax_id"
+                    name="tax_id"
+                />
             </x-slot>
             @error('legal_entity_form.owner.tax_id')
             <x-slot name="error">
@@ -252,7 +260,7 @@
             @enderror
         </x-forms.form-group>
     </div>
-    <div x-show="show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
+    <div class="mb-4.5 flex flex-col gap-6   xl:flex-row">
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
                 <x-forms.label for="documents_type" class="default-label">
@@ -264,7 +272,9 @@
                                 class="default-select">
                     <x-slot name="option">
                         <option>{{__('Обрати тип')}}</option>
-                        <option value="PASPORT">{{__('Паспорт')}}</option>
+                        @foreach($this->dictionaries['DOCUMENT_TYPE'] as $k_d=>$document_type)
+                            <option value="{{$k_d}}">{{$document_type}}</option>
+                        @endforeach
                     </x-slot>
                 </x-forms.select>
             </x-slot>
@@ -296,7 +306,7 @@
             @enderror
         </x-forms.form-group>
     </div>
-    <div x-show="show" class="mb-4.5 flex flex-col gap-6   xl:flex-row">
+    <div  class="mb-4.5 flex flex-col gap-6   xl:flex-row">
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
                 <x-forms.label for="documents_issued_by" class="default-label">

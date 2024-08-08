@@ -5,11 +5,14 @@ namespace App\Livewire\Employee;
 use App\Classes\eHealth\Api\PersonApi;
 use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
 use App\Models\Employee;
+use App\Models\LegalEntity;
+use App\Models\User;
 use App\Traits\FormTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 
 class EmployeeIndex extends Component
@@ -27,6 +30,8 @@ class EmployeeIndex extends Component
     public string $dismiss_text;
 
     public int $dismissed_id;
+    private LegalEntity $legalEntity;
+
     /**
      * @var false
      */
@@ -35,6 +40,8 @@ class EmployeeIndex extends Component
     public function boot(Employee $employee): void
     {
         $this->employeeCacheKey = self::CACHE_PREFIX . '-'. Auth::user()->legalEntity->uuid;
+
+        $this->legalEntity = Auth::user()->legalEntity;
     }
 
 
@@ -154,30 +161,39 @@ class EmployeeIndex extends Component
 
         $this->openModal();
     }
-
-
+    
     public function syncEmployees(){
 
-        $user = Auth::user();
-
-        $person = PersonApi::_getAuthMethod();
-        dd($person);
-        $requests = EmployeeRequestApi::getEmployees($user->legalEntity->uuid);
-
-        dd($requests);
-        foreach ($requests as $k => $request) {
+        $requests = EmployeeRequestApi::getEmployees($this->legalEntity->uuid);
+        foreach ($requests as $request) {
             $request['uuid'] = $request['id'];
-          $employee =  Employee::updateOrCreate(
-                ['uuid'=> $request['id']],
-              $request
-            );
+            $getEmployeeById = EmployeeRequestApi::getEmployeeById( $request['id']);
+            $email = $getEmployeeById['party']['email'] ?? '';
 
-          $employee->legalEntity()->associate($user->legalEntity);
+
+            if (!empty($email)) {
+                if (!User::where('email', $getEmployeeById['party']['email'])->exists()) {
+                    $user = User::create(
+                        ['email' => $getEmployeeById['party']['email'],
+                         'password' => Hash::make(\Illuminate\Support\Str::random(8))
+                        ]
+                    );
+                    $user->legalEntity()->associate($this->legalEntity);
+                    $user->assignRole($getEmployeeById['employee_type']);
+                    $user->save();
+                }
+
+            }
+            $getEmployeeById['uuid'] = $getEmployeeById['id'];
+            $employee =  Employee::updateOrCreate(
+                ['uuid'=> $getEmployeeById['id']],
+                $getEmployeeById
+          );
+          $employee->legalEntity()->associate($this->legalEntity);
           $employee->save();
         }
 
-
-
+        $this->getEmployees();
     }
 
     public function render()

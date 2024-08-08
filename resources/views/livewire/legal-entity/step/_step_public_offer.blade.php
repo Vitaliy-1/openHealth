@@ -57,6 +57,11 @@
             <x-forms.input class="default-input" wire:model="password"
                            type="password" id="password"/>
         </x-slot>
+        @error("password")
+        <x-forms.error>
+            {{$message}}
+        </x-forms.error>
+        @enderror
     </x-forms.form-group>
     <x-forms.form-group class="flex items-center mb-4 flex-row-reverse	justify-end	">
         <x-slot name="input">
