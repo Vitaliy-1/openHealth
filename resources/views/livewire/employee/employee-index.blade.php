@@ -24,7 +24,7 @@
                     </select>
                 </div>
             </div>
-            <a href="" class="btn-green h-[66px]"  wire:click.prevent="syncEmployees()">Синхрозувати з ЕСОЗ</a>
+            <button class="btn-green h-[66px]"  wire:click.prevent="syncEmployees">Синхрозувати з ЕСОЗ</button>
             <a href="" type="button" class="btn-green h-[66px]" wire:click="create('employee.employee-form')">
                 {{__('Додати Співробітника')}}
             </a>
@@ -39,14 +39,14 @@
                                 <p class="text-black dark:text-white">{{ ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white">{{$item->employee['first_name'] ?? ''}}
-                                    {{$item->employee['last_name'] ?? ' '}}
-                                    {{$item->employee['second_name'] ?? ' '}}
+                                <p class="text-black dark:text-white">{{$item->employee->party['first_name'] ?? ''}}
+                                    {{$item->employee->party['last_name'] ?? ' '}}
+                                    {{$item->employee->party['second_name'] ?? ' '}}
                                 </p>
                             </td>
 
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white">{{$item->employee['phones'][0]['number'] ?? ''}}</p>
+                                <p class="text-black dark:text-white">{{$item->employee->party['phones'][0]['number'] ?? ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
                                 <p class="text-black dark:text-white">{{$item->employee['email']  ?? ''}}</p>
@@ -128,16 +128,19 @@
                                 <p class="text-black dark:text-white">{{ $employee->uuid ?? ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white">{{$employee->full_name ?? ''}}
+                                <p class="text-black dark:text-white">
 
+                                    {{$employee->party['first_name'] ?? ' '}}
+                                    {{$employee->party['last_name'] ?? ' '}}
+                                    {{$employee->party['second_name'] ?? ' '}}
                                 </p>
                             </td>
 
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white">{{$employee->phones[0]['number'] ?? ''}}</p>
+                                <p class="text-black dark:text-white">{{$employee->party['phones'][0]['number'] ?? ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white">{{$employee->email  ?? ''}}</p>
+                                <p class="text-black dark:text-white">{{$employee->party['email']  ?? ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
                                 <p class="text-black dark:text-white">{{$employee->position ?? ''}}</p>

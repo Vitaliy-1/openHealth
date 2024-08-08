@@ -8,7 +8,7 @@ class PersonApi extends Request
 {
 
 
-    public const URL = '/api/cabinet/persons';
+    public const URL = '/api/persons';
 
     public static function _getAuthMethod(): array
     {

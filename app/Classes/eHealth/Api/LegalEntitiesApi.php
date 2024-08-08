@@ -12,7 +12,7 @@ class LegalEntitiesApi extends Request
 
     public static function _get(array $params = []): array
     {
-       return (new Request('GET', self::URL, $params))->sendRequest();
+       return (new Request('GET', self::URL, $params,false))->sendRequest();
     }
 
     public static function _getById(string $id): array
