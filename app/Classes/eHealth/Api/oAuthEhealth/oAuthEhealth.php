@@ -29,6 +29,7 @@ class oAuthEhealth implements oAuthEhealthInterface
         }
 
         $code = request()->input('code');
+
         $this->authenticate($code);
 //        $this->approve();
 
@@ -101,6 +102,8 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public static function loginUrl($user)
     {
+
+
         // Base URL and client ID
         $baseUrl = env('EHEALTH_AUTH_HOST') . '/sign-in';
         $redirectUri = env('EHEALTH_REDIRECT_URI');
@@ -111,6 +114,7 @@ class oAuthEhealth implements oAuthEhealthInterface
             'response_type' => 'code'
         ];
         // Additional query parameters if email is provided
+
         if (!empty($user->email)) {
             $scope = $user->getAllPermissions()->unique()->pluck('name')->join(' ');
             $queryParams['email'] = $user->email;

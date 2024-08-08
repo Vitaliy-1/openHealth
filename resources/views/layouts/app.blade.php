@@ -63,11 +63,14 @@
 
     @stack('scripts')
         @livewire('components.flash-message')
-
     <script>
+
         document.addEventListener('livewire:load', function () {
+            Livewire.on('testEvent', (message) => {
+                console.log('Test event received:', message);
+            });
+
             Livewire.on('flashMessage', (message, type) => {
-                console.log('message', message, type);
                 let flashMessage = document.getElementById('flash-message');
                 if (flashMessage) {
                     flashMessage.textContent = message;
