@@ -26,10 +26,12 @@ class EmployeeRequestApi extends EmployeeApi
         return self::_create($data);
     }
 
-
-    public static function getEmployeeRolesById(){
-        return self::_getRolesById();
+    public static function getEmployeeById($id): array
+    {
+        return self::_getById($id);
     }
+
+
     public static function createEmployeeRequestBuilder($uuid,$data):array
     {
         if (!isset($data['employee']['tax_id'])) {

@@ -5,15 +5,17 @@ namespace App\Classes\Cipher\Api;
 use App\Classes\Cipher\Request;
 use App\Classes\eHealth\Exceptions\ApiException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class CipherApi
 {
     private string $ticketUuid = '';
-    private string $base64File = '';
+    private  $base64File ;
 
     private string $password = '';
     private string $dataSignature;
     private string $knedp;
+
 
     /**
      * Send request to create session and subsequently upload KEYP.
@@ -25,9 +27,8 @@ class CipherApi
      * @return string Returns KEYP in base64 format.
      * @throws ApiException
      */
-    public function sendSession(string $dataSignature, string $password, string $base64File, string $knedp): string
+    public function sendSession(string $dataSignature, string $password,  $base64File, string $knedp): string
     {
-
         $this->dataSignature = base64_encode($dataSignature);
         $this->password = $password;
         $this->base64File = $base64File;
@@ -40,7 +41,6 @@ class CipherApi
         $this->getKepCreator();
         $kep = $this->getKep();
         $this->deleteSession();
-
         return $kep;
     }
 
@@ -55,28 +55,27 @@ class CipherApi
     private function loadTicket(): void
     {
         $data = ['base64Data' => $this->dataSignature];
-        (new Request('post', "/ticket/{$this->ticketUuid}/data", json_encode($data)))->sendRequest();
+        $request = (new Request('post', "/ticket/{$this->ticketUuid}/data", json_encode($data)))->sendRequest();
+
     }
 
     // Set session parameters
     private function setParamsSession(): void
     {
         $data = [
-                "caId"          => $this->knedp,
-                "cadesType" => "CADES_X_LONG",
-                "signatureType" => "attached",
+            "caId"          => $this->knedp,
+            "cadesType" => "CADES_X_LONG",
+            "signatureType" => "attached",
+            'embedDataTs' => 'true'
         ];
-
         $request = (new Request('put', "/ticket/{$this->ticketUuid}/option", json_encode($data)))->sendRequest();
     }
 
     // Upload file to session
     private function uploadFileContainerSession(): void
     {
-        $data = ['base64Data' => $this->base64File];
-        $request =  (new Request('put', "/ticket/{$this->ticketUuid}/keyStore", json_encode($data)))->sendRequest();
-
-//        dd($request);
+        $data = ['base64Data' => $this->convertFileToBase64()];
+        $request =  (new Request('put', "/ticket/{$this->ticketUuid}/keyStore", json_encode($data), true))->sendRequest();
     }
 
     // Create KEYP
@@ -102,7 +101,6 @@ class CipherApi
 
             return $status;
         }
-
         return $status;
 
     }
@@ -111,13 +109,14 @@ class CipherApi
     private function getKep(): string
     {
         $base64Data = (new Request('get', "/ticket/{$this->ticketUuid}/ds/base64Data", ''))->sendRequest();
+//        dd($base64Data);
         return $base64Data['base64Data'] ?? '';
     }
 
     // Delete session
     private function deleteSession(): void
     {
-       $request = (new Request('get', "/ticket/{$this->ticketUuid}", ''))->sendRequest();
+        $request = (new Request('get', "/ticket/{$this->ticketUuid}", ''))->sendRequest();
 
     }
 
@@ -149,12 +148,24 @@ class CipherApi
         return (new Request('get', "/ticket/{$this->ticketUuid}/decryptor/base64Data", ''))->sendRequest();
     }
 
-    /**
-     * Get list of supported Certificate Authorities.
-     *
-     * @return array
-     * @throws ApiException
-     */
+
+    public function convertFileToBase64(): ?string
+    {
+        if ($this->base64File && $this->base64File->exists()) {
+            $fileExtension = $this->base64File->getClientOriginalExtension();
+            $filePath = $this->base64File->storeAs('uploads/kep', 'kep.'.$fileExtension, 'public');
+            if ($filePath) {
+                $fileContents = file_get_contents(storage_path('app/public/' . $filePath));
+                if ($fileContents !== false) {
+                    $base64Content = base64_encode($fileContents);
+                    Storage::disk('public')->delete($filePath);
+                    return $base64Content;
+                }
+            }
+        }
+
+        return null;
+    }
     public function getCertificateAuthority(): array
     {
         if (!Cache::has('knedp_certificate_authority')) {

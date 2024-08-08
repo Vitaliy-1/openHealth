@@ -1,5 +1,4 @@
 
-
 <x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model.live="showModal">
     <x-slot name="title">
         {{__('Додати Спеціальність')}}
@@ -65,7 +64,7 @@
 
             <div class="mb-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
                 <div class="xl:w-1/4 text-left">
-                    <x-secondary-button wire:click="closeModal()">
+                    <x-secondary-button wire:click="closeModalModel()">
                         {{__('Назад')}}
                     </x-secondary-button>
                 </div>
