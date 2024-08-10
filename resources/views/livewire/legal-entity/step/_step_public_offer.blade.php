@@ -1,5 +1,5 @@
 <x-slot name="title">
-    {{  __('Згода') }}
+    {{  __('Завершити реєстрацію') }}
 </x-slot>
 <div class="mb-4.5 flex flex-col gap-6 xl:flex-container">
 
@@ -21,10 +21,13 @@
                 </x-slot>
             </x-forms.select>
         </x-slot>
-        @error("knedp")
-        <x-forms.error>
-            {{$message}}
-        </x-forms.error>
+
+        @error('knedp')
+        <x-slot name="error">
+            <x-forms.error>
+                {{$message}}
+            </x-forms.error>
+        </x-slot>
         @enderror
     </x-forms.form-group>
 
@@ -39,10 +42,12 @@
             <x-forms.input class="default-input" wire:model="keyContainerUpload"
                            type="file" id="keyContainerUpload"/>
         </x-slot>
-        @error("keyContainerUpload")
-        <x-forms.error>
-            {{$message}}
-        </x-forms.error>
+        @error('keyContainerUpload')
+        <x-slot name="error">
+            <x-forms.error>
+                {{$message}}
+            </x-forms.error>
+        </x-slot>
         @enderror
     </x-forms.form-group>
 
@@ -57,11 +62,14 @@
             <x-forms.input class="default-input" wire:model="password"
                            type="password" id="password"/>
         </x-slot>
-        @error("password")
-        <x-forms.error>
-            {{$message}}
-        </x-forms.error>
+        @error('password')
+        <x-slot name="error">
+            <x-forms.error>
+                {{$message}}
+            </x-forms.error>
+        </x-slot>
         @enderror
+
     </x-forms.form-group>
     <x-forms.form-group class="flex items-center mb-4 flex-row-reverse	justify-end	">
         <x-slot name="input">
