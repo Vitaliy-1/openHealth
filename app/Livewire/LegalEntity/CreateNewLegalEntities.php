@@ -441,7 +441,7 @@ class CreateNewLegalEntities extends Component
 
         // Check if the authenticated user's email matches the owner's email
         if ($user->email === $this->legal_entity_form->owner['email']) {
-            $user->assignRole('Owner');
+            $user->assignRole('OWNER');
             return $user; // Return the authenticated user if the update is done
         }
 
@@ -453,7 +453,7 @@ class CreateNewLegalEntities extends Component
 
         $user->legalEntity()->associate($this->legalEntity);
         $user->save(); // Save the new user with the association
-        $user->assignRole('Owner');
+        $user->assignRole('OWNER');
 
         return $user;
     }
