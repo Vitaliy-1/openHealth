@@ -23,7 +23,7 @@
         </ol>
     </div>
 
-    <x-forms.forms-section class="max-w-5xl m-auto" submit="">
+    <x-forms.forms-section class="max-w-5xl m-auto" submit="register">
         <x-slot name="form">
             <div class="grid-cols-1">
                 <div class="p-6.5">
@@ -61,7 +61,7 @@
                         </div>
                         <div class="xl:w-1/4">
                             @if($currentStep == $totalSteps)
-                                <x-button type="click" class="btn-primary" wire:click="stepPublicOffer">
+                                <x-button type="submit" class="btn-primary" wire:click="stepPublicOffer">
                                     {{__('forms.send_request')}}
                                 </x-button>
                             @elseif($currentStep == 4)

@@ -92,19 +92,22 @@ class CreateNewLegalEntities extends Component
 
     public  ? array $getCertificateAuthority;
 
-    #[Validate('required|string|max:255')]
     public string $knedp = '';
 
-    #[Validate('required|max:1024')] // 1MB Max
     public   $keyContainerUpload;
 
-    #[Validate('required|string|max:255')]
     public string $password = '';
 
-    protected $rules = [
-        'knedp' => 'required|string|max:255',
-    ];
+    public function rules()
+    {
+        return [
+            'knedp' => 'required|string',
+            'keyContainerUpload' => 'required|file|mimes:dat,zs2,sk,jks,pk8,pfx',
+            'password' => 'required|string|max:255',
+            'legal_entity_form.public_offer.consent' => 'accepted',
 
+        ];
+    }
 
     public function boot(): void
     {
@@ -176,7 +179,8 @@ class CreateNewLegalEntities extends Component
     public function stepFields(): void
     {
         foreach ($this->steps as $field => $step) {
-            if (!empty($this->legal_entity_form->{$field})) {
+            if (!empty($this->legal_entity_form->{$field})
+            ) {
                 continue;
             }
             $this->currentStep = $step['step'];
@@ -383,22 +387,26 @@ class CreateNewLegalEntities extends Component
     public function stepPublicOffer(): void
     {
 
-         $this->validate();
+
+
+            $this->validate();
 
 
          $this->legal_entity_form->public_offer = [
              'consent_text' => 'Тестове consent_text',
              'consent' => true
          ];
-         $this->legal_entity_form->owner['documents'] = [$this->legal_entity_form->owner['documents']];
+
+        $this->legal_entity_form->owner['documents'] = [$this->legal_entity_form->owner['documents']];
         $this->legal_entity_form->owner['no_tax_id'] = !isset($this->legal_entity_form->owner['tax_id']);
 
         $this->legal_entity_form->security = [
             'redirect_uri' => 'https://openhealths.com'
           ];
-
          $removeKeyEmpty = removeEmptyKeys($this->legal_entity_form->toArray());
-         $base64Data =  (new CipherApi())->sendSession(
+        dd($removeKeyEmpty);
+
+        $base64Data =  (new CipherApi())->sendSession(
              json_encode($removeKeyEmpty),
              $this->password,
              $this->keyContainerUpload,
@@ -412,9 +420,6 @@ class CreateNewLegalEntities extends Component
         ];
 
         $request = LegalEntitiesRequestApi::_createOrUpdate($data);
-
-//        $request = removeEmptyKeys($this->legal_entity_form->toArray());
-        $request['uuid'] = 'f13ab4b7-1167-4215-9fb3-2116b775ddb1';
 
         if (!empty($request) ){
             $this->saveLegalEntityFromExistingData($request['data']);
