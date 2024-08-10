@@ -402,7 +402,6 @@ class CreateNewLegalEntities extends Component
             'redirect_uri' => 'https://openhealths.com'
           ];
          $removeKeyEmpty = removeEmptyKeys($this->legal_entity_form->toArray());
-        dd($removeKeyEmpty);
 
         $base64Data =  (new CipherApi())->sendSession(
              json_encode($removeKeyEmpty),
