@@ -4,6 +4,7 @@ namespace App\Classes\eHealth;
 
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealthInterface;
+use App\Classes\eHealth\Errors\ErrorHandler;
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Livewire\Components\FlashMessage;
 use Illuminate\Support\Facades\Auth;
@@ -52,15 +53,7 @@ class Request
     public function sendRequest()
     {
 
-//        if (!$this->oAuthEhealth->isLoggedIn()){
-//            abort(401);
-//        }
-//        Log::info('HTTP Request:', [
-//            'url' => $this->url,
-//            'method' => $this->method,
-//            'headers' => $this->headers,
-//            'params' => $this->params,
-//        ]);
+
         try {
             $response = Http::acceptJson()
                 ->withHeaders($this->getHeaders())
@@ -80,14 +73,12 @@ class Request
             }
 
             if ($response->failed()) {
-                $error = json_decode($response->body(), true);
-                dd($error);
-//                FlashMessage::class($error['error']['message'], 'error');
-                throw new ApiException($error['message'], $response->status());
+               $errors = json_decode($response->body(), true);
+               dd($errors);
+               return (new ErrorHandler())->handleError($errors);
             }
         }
-
-        catch (Exception $exception){
+        catch (\Exception $exception){
             return json_decode($exception);
         }
 

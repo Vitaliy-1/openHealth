@@ -11,17 +11,26 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.select readonly disabled class="default-input"
-                            wire:model="legal_entity_form.license.category"
-                            type="text" id="license_category">
+            <x-forms.select readonly class="default-input"
+                            wire:model.defer="legal_entity_form.license.type"
+                            disabled
+                            type="text" id="license_type">
                 <x-slot name="option">
-                    @foreach($dictionaries['LICENSE_TYPE'] as $k =>$license_type)
-                        <option
-                           selected="{{$k === 'MSP' ? 'selected' : ''}}"   value="{{$k}}">{{$license_type}}</option>
+                    @foreach($dictionaries['LICENSE_TYPE'] as $k => $license_type)
+                        <option value="{{ $k }}" {{ $k === 'MSP' ? 'selected' : '' }}>
+                            {{ $license_type }}
+                        </option>
                     @endforeach
                 </x-slot>
             </x-forms.select>
         </x-slot>
+        @error('legal_entity_form.license.type')
+        <x-slot name="error">
+            <x-forms.error>
+                {{$message}}
+            </x-forms.error>
+        </x-slot>
+        @enderror
     </x-forms.form-group>
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
