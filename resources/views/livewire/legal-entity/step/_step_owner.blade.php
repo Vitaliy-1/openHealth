@@ -158,8 +158,8 @@
     <x-forms.label name="label" class="default-label">
         {{__('forms.phonesOwner')}} *
     </x-forms.label>
-    @if($phones)
-        @foreach($phones as $key=>$phone)
+    @if(isset($legal_entity_form->owner['phones']))
+        @foreach($legal_entity_form->owner['phones'] as $key=>$phone)
             <x-forms.form-group class="mb-2">
                 <x-slot name="label">
                     <div class="flex-row flex gap-6 items-center">
@@ -191,7 +191,7 @@
                         </div>
                         <div class="w-1/4">
                             @if($key != 0)
-                                <a wire:click="removePhone({{$key}})"
+                                <a wire:click="removePhone({{$key}},'owner')"
                                    class="text-primary m-t-5"
                                    href="#">{{__('forms.removePhone')}}</a>
                             @endif
@@ -203,7 +203,7 @@
         @endforeach
     @endif
 
-    <a wire:click="addRowPhone" class="text-primary m-t-5"
+    <a wire:click="addRowPhone('owner')" class="text-primary m-t-5"
        href="#">{{__('forms.addPhone')}}</a>
 </div>
 <div x-data="{ show: false }">
@@ -333,7 +333,7 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.datapicker  wire:model="legal_entity_form.owner.documents.issued_at"
+                <x-forms.input class="default-input" type="date" wire:model="legal_entity_form.owner.documents.issued_at"
                                id="owner_documents_issued_at"
                               />
             </x-slot>
