@@ -3,7 +3,7 @@
 namespace App\Classes\Cipher\Api;
 
 use App\Classes\Cipher\Request;
-use App\Classes\eHealth\Exceptions\ApiException;
+use App\Classes\Cipher\Exceptions\ApiException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
@@ -25,23 +25,47 @@ class CipherApi
      * @param string $base64File KEYP file in base64 format.
      * @param string $knedp Certificate Authority Identifier (KNEPD).
      * @return string Returns KEYP in base64 format.
-     * @throws ApiException
+     * @throws array ApiException
      */
-    public function sendSession(string $dataSignature, string $password,  $base64File, string $knedp): string
+    public function sendSession(string $dataSignature, string $password, $base64File, string $knedp): array|string
     {
         $this->dataSignature = base64_encode($dataSignature);
         $this->password = $password;
         $this->base64File = $base64File;
         $this->knedp = $knedp;
-        $this->createSession();
-        $this->loadTicket();
-        $this->setParamsSession();
-        $this->uploadFileContainerSession();
-        $this->createKep();
-        $this->getKepCreator();
-        $kep = $this->getKep();
-        $this->deleteSession();
-        return $kep;
+
+        try {
+            // Create session
+            $this->createSession();
+
+            // Download KEYP
+            $this->loadTicket();
+
+            // Set session parameters
+            $this->setParamsSession();
+
+            // upload file to session
+            $this->uploadFileContainerSession();
+
+            // Create KEYP
+            $this->createKep();
+
+            // get KEYP creator
+            $this->getKepCreator();
+
+            // Get KEP in base64
+            $kep = $this->getKep();
+
+            // Delete session
+            $this->deleteSession();
+
+            return $kep;
+
+        } catch (ApiException $e) {
+            // Возвращаем массив с ошибками
+            return $e->getErrors();
+
+        }
     }
 
     // Create session
@@ -68,21 +92,21 @@ class CipherApi
             "signatureType" => "attached",
             'embedDataTs' => 'true'
         ];
-        $request = (new Request('put', "/ticket/{$this->ticketUuid}/option", json_encode($data)))->sendRequest();
+        (new Request('put', "/ticket/{$this->ticketUuid}/option", json_encode($data)))->sendRequest();
     }
 
     // Upload file to session
     private function uploadFileContainerSession(): void
     {
         $data = ['base64Data' => $this->convertFileToBase64()];
-        $request =  (new Request('put', "/ticket/{$this->ticketUuid}/keyStore", json_encode($data), true))->sendRequest();
+       (new Request('put', "/ticket/{$this->ticketUuid}/keyStore", json_encode($data), true))->sendRequest();
     }
 
     // Create KEYP
     private function createKep(): void
     {
         $data = ['keyStorePassword' => $this->password];
-        $request =    (new Request('post', "/ticket/{$this->ticketUuid}/ds/creator", json_encode($data)))->sendRequest();
+        (new Request('post', "/ticket/{$this->ticketUuid}/ds/creator", json_encode($data)))->sendRequest();
 
     }
 
@@ -109,14 +133,13 @@ class CipherApi
     private function getKep(): string
     {
         $base64Data = (new Request('get', "/ticket/{$this->ticketUuid}/ds/base64Data", ''))->sendRequest();
-//        dd($base64Data);
         return $base64Data['base64Data'] ?? '';
     }
 
     // Delete session
     private function deleteSession(): void
     {
-        $request = (new Request('get', "/ticket/{$this->ticketUuid}", ''))->sendRequest();
+       (new Request('get', "/ticket/{$this->ticketUuid}", ''))->sendRequest();
 
     }
 
@@ -145,7 +168,7 @@ class CipherApi
 
     // Get decoding file container in base64
     public function getDecodingFileContainerBase64(){
-        return (new Request('get', "/ticket/{$this->ticketUuid}/decryptor/base64Data", ''))->sendRequest();
+        (new Request('get', "/ticket/{$this->ticketUuid}/decryptor/base64Data", ''))->sendRequest();
     }
 
 
@@ -163,9 +186,9 @@ class CipherApi
                 }
             }
         }
-
         return null;
     }
+
     public function getCertificateAuthority(): array
     {
         if (!Cache::has('knedp_certificate_authority')) {
