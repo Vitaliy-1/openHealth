@@ -35,7 +35,7 @@
 {{--                    </li>--}}
                     <!-- Menu Item Dashboard -->
                     <!-- Menu Item Calendar -->
-                    @if(empty(auth()->user()->legalEntities) )
+                    @if(empty(auth()->user()->legalEntity) )
                         <li>
                             <a class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4" href="{{route('create.legalEntities')}}" @click="selected = (selected === 'Calendar' ? '':'Calendar')" :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'Calendar') && (page === 'calendar') }">
                                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 21">
@@ -45,7 +45,7 @@
                         </li>
                     @endif
 
-                    @role('[Owner,Admin]')
+                    @hasanyrole('OWNER|ADMIN')
                     <li>
                         <a class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4" href="{{route('edit.legalEntities')}}" @click="selected = (selected === 'Calendar' ? '':'Calendar')" :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'Calendar') && (page === 'calendar') }">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 22 21">
@@ -89,7 +89,7 @@
                             {{ __('Ліцензії') }}
                         </a>
                     </li>
-                    @endrole
+                    @endhasanyrole
 
                     <li>
                         <a class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4" href="{{route('profile.show')}}" @click="selected = (selected === 'Profile' ? '':'Profile')" :class="{ 'bg-graydark dark:bg-meta-4': (selected === 'Profile') && (page === 'profile') }" :class="page === 'profile' && 'bg-graydark'">

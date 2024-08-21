@@ -8,15 +8,18 @@ class FlashMessage extends Component
 {
 
     public string $message = '';
+
     public string $type = 'success';
+
+    public  array  $errors = [];
 
     protected $listeners = ['flashMessage'];
 
     public function flashMessage($flash)
     {
-        $this->message = $flash['message'];
+        $this->message = $flash['message'] ?? '';
         $this->type = $flash['type'];
-
+        $this->errors = $flash['errors'] ?? [];
     }
 
 

@@ -217,13 +217,16 @@ class EmployeeForm extends Component
             ->get();
     }
 
+    public function openModalModel($model)
+    {
+        $this->showModal = $model;
+    }
 
     public function create($model)
     {
 
         $this->mode = 'create';
         $this->employee_request->{$model} = [];
-
 
         $this->openModal($model);
 
