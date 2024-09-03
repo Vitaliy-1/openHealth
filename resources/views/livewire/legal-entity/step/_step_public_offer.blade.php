@@ -80,12 +80,16 @@
             <x-forms.label class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                            name="label" for="public_offer_consent">
                 <a href="#">{{__('forms.agree')}}</a>
+                @error("legal_entity_form.public_offer.consent")
+                <span class="flex items-center font-medium tracking-wide text-danger text-xs mt-1 ml-1">
+                {{$message}}
+            </span>
+
+                @enderror
             </x-forms.label>
         </x-slot>
-        @error("legal_entity_form.public_offer.consent")
-        <x-forms.error>
-            {{$message}}
-        </x-forms.error>
-        @enderror
+
+
     </x-forms.form-group>
+
 </div>

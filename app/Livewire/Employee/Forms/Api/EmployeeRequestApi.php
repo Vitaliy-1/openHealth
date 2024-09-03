@@ -22,7 +22,6 @@ class EmployeeRequestApi extends EmployeeApi
 
     public static function createEmployeeRequest($data):array
     {
-//        $params = self::createEmployeeRequestBuilder($uuid,$data);
         return self::_create($data);
     }
 
@@ -55,9 +54,30 @@ class EmployeeRequestApi extends EmployeeApi
     }
 
 
+
+
     public static function dismissedEmployeeRequest($id):array
     {
         return self::_dismissed($id);
     }
+
+    public static function getEmployeeRequestsList():array
+    {
+        $data = [
+            'status' => 'APPROVED',
+        ];
+        return self::_getRequestList($data);
+
+    }
+
+    public static function getEmployeeRequestById($id):array
+    {
+
+        return self::_getRequestById($id);
+
+    }
+
+
+
 
 }
