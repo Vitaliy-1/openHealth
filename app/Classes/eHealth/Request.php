@@ -40,6 +40,7 @@ class Request
         $this->params = $params;
         $this->isToken = $isToken;
         $this->oAuthEhealth = new oAuthEhealth();
+
     }
 
     protected function makeApiUrl(): string
@@ -52,6 +53,7 @@ class Request
      */
     public function sendRequest()
     {
+
 
 
         try {

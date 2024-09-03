@@ -161,33 +161,39 @@ class EmployeeIndex extends Component
 
         $this->openModal();
     }
-    
-    public function syncEmployees(){
 
+
+    public function getEmployeeRequestsList()
+    {
+        $requests = EmployeeRequestApi::getEmployeeRequestsList();
+        dd($requests);
+
+    }
+
+    public function syncEmployees(){
+        $this->getEmployeeRequestsList();
         $requests = EmployeeRequestApi::getEmployees($this->legalEntity->uuid);
         foreach ($requests as $request) {
             $request['uuid'] = $request['id'];
-            $getEmployeeById = EmployeeRequestApi::getEmployeeById( $request['id']);
-            $email = $getEmployeeById['party']['email'] ?? '';
-
+            $request['legal_entity_uuid'] = $request['legal_entity']['id'];
+            $email = $request['party']['email'] ?? '';
 
             if (!empty($email)) {
-                if (!User::where('email', $getEmployeeById['party']['email'])->exists()) {
+                if (!User::where('email', $request['party']['email'])->exists()) {
                     $user = User::create(
-                        ['email' => $getEmployeeById['party']['email'],
+                        ['email' => $request['party']['email'],
                          'password' => Hash::make(\Illuminate\Support\Str::random(8))
                         ]
                     );
                     $user->legalEntity()->associate($this->legalEntity);
-                    $user->assignRole($getEmployeeById['employee_type']);
+                    $user->assignRole($request['employee_type']);
                     $user->save();
                 }
 
             }
-            $getEmployeeById['uuid'] = $getEmployeeById['id'];
             $employee =  Employee::updateOrCreate(
-                ['uuid'=> $getEmployeeById['id']],
-                $getEmployeeById
+                ['uuid'=> $request['id']],
+                $request
           );
           $employee->legalEntity()->associate($this->legalEntity);
           $employee->save();

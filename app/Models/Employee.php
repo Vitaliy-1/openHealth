@@ -51,4 +51,9 @@ class Employee extends Model
         return $this->belongsTo(Division::class);
     }
 
+    public function party(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Party::class);
+    }
+
 }

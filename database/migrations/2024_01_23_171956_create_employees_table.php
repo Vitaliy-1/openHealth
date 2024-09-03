@@ -13,24 +13,29 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid');
-            $table->uuid('division_uuid')->nullable();
-            $table->uuid('legal_entity_uuid')->nullable();
+            $table->uuid('party_uuid');
             $table->string('position');
-            $table->date('start_date');
-            $table->date('end_date')->nullable();
+            $table->string('email');
+            $table->string('status');
+            $table->string('status_reason')->nullable();
             $table->string('employee_type');
-            $table->jsonb('party');
-            $table->jsonb('doctor');
-            $table->date('inserted_at')->nullable();
-            $table->string('status')->nullable();
-            $table->foreignId('person_id')->nullable();
-            $table->foreignId('legal_entity_id')->nullable();
-            $table->foreignId('division_id')->nullable();
-            $table->foreign('person_id')->references('id')->on('persons')->onDelete('set null');
+            $table->boolean('is_active')->default(true);
+            $table->timestamp('start_date')->nullable();
+            $table->timestamp('end_date')->nullable();
+            $table->uuid('legal_entity_uui');
+            $table->uuid('division_uuid')->nullable();
+            $table->jsonb('speciality')->nullable();
+            $table->jsonb('properties')->nullable();
+            $table->timestamp('inserted_at')->useCurrent();
+            $table->uuid('inserted_by');
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
+            $table->uuid('updated_by')->nullable();
+            $table->foreignId('legal_entity_id');
+            $table->foreignId('party_id');
+            $table->foreignId('division_id');
+            $table->foreign('party_id')->references('id')->on('parties');
             $table->foreign('legal_entity_id')->references('id')->on('legal_entities');
             $table->foreign('division_id')->references('id')->on('divisions');
-            $table->timestamps();
         });
     }
 

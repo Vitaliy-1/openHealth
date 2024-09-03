@@ -155,6 +155,9 @@ return [
     'attributes' => [
         'name' => 'ім\'я',
         'phone' => 'телефон',
+        'password' => 'пароль',
+        'keyContainerUpload' => 'контейнер ключа',
+        'knedp' => 'КНЕДП',
         '_token' => 'токен CSRF',
         'edrpou' => 'ЄДРПОУ',
         'email' => 'E-mail',
@@ -213,7 +216,7 @@ return [
             ],
 
         ],
-        'owner.phones.*.phone' => 'Телефон',
+        'owner.phones.*.number' => 'елефон',
         'owner.phones.*.type' => 'Тип Номера',
         'country' => 'Країна',
         'region' => 'Область',
