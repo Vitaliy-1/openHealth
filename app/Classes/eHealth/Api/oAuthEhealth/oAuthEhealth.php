@@ -7,9 +7,8 @@ use App\Classes\eHealth\Request;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
+
 
 class oAuthEhealth implements oAuthEhealthInterface
 {
@@ -102,8 +101,6 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public static function loginUrl($user)
     {
-
-
         // Base URL and client ID
         $baseUrl = env('EHEALTH_AUTH_HOST') . '/sign-in';
         $redirectUri = env('EHEALTH_REDIRECT_URI');
@@ -136,7 +133,7 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function getToken(): string
     {
-        return Session::get('auth_token');
+        return Session::get('auth_token') ?? '';
     }
 
     /**

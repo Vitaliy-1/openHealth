@@ -2,9 +2,11 @@
 
 namespace App\Livewire\LegalEntity\Forms;
 
+use App\Models\User;
 use App\Rules\AgeCheck;
 use App\Rules\Cyrillic;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -15,7 +17,8 @@ class LegalEntitiesForms extends Form
     #[Validate(['required', 'integer','regex:/^\d{6}$|^\d{10}$/'])]
     public string $edrpou = '';
 
-    #[Validate([
+    #[Validate(
+        [
         'owner.last_name'        => ['required', 'min:3', new Cyrillic()],
         'owner.first_name'       => ['required', 'min:3', new Cyrillic()],
         'owner.second_name'      => [new Cyrillic()],
@@ -27,9 +30,13 @@ class LegalEntitiesForms extends Form
         'owner.documents.number' => 'required|string',
         'owner.phones.*.number'  => 'required|string:digits:13',
         'owner.phones.*.type'    => 'required|string',
-        'owner.email'            => 'required|email|regex:/^([a-z0-9+-]+)(.[a-z0-9+-]+)*@([a-z0-9-]+.)+[a-z]{2,6}$/ix',
+        'owner.email'            => 'required|email|regex:/^([a-z0-9+-]+)(\.[a-z0-9+-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/ix',
         'owner.position'         => 'required|string'
-    ])]
+    ],
+     message: [
+        'owner.email.unique' => 'Поле :attribute вже зарееєстровано в системі.',
+        ]
+    )]
     public ?array $owner = [];
 
     #[Validate([
@@ -68,7 +75,7 @@ class LegalEntitiesForms extends Form
     public ?array $archive = [];
     public ?string $receiver_funds_code = '';
 
-    #[Validate([ 'required', 'min:3', new Cyrillic()])]
+    #[Validate([  'min:3', new Cyrillic()])]
     public ?string $beneficiary = '';
 
     #[Validate([
@@ -95,7 +102,15 @@ class LegalEntitiesForms extends Form
      */
     public function rulesForOwner(): void
     {
+
         $this->validate($this->rulesForModel('owner')->toArray());
+        $userQuery = User::where('email', $this->owner['email'])->first();
+        if ($userQuery && $userQuery->legalEntity()->exists()) {
+            throw ValidationException::withMessages([
+                'legal_entity_form.owner.email' => 'Цей користувач вже зареєстрований як співробітник в іншому закладі',
+            ]);
+        }
+
     }
 
     /**
