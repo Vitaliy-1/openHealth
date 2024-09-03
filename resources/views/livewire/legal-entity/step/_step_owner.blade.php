@@ -201,38 +201,73 @@
                 </x-slot>
             </x-forms.form-group>
         @endforeach
+    @else
+        <x-forms.form-group class="mb-2">
+            <x-slot name="label">
+                <div class="flex-row flex gap-6 items-center">
+                    <div class="w-1/4">
+                        <x-forms.select wire:model.defer="legal_entity_form.owner.phones.0.type"
+                                        class="default-select">
+                            <x-slot name="option">
+                                <option>{{__('forms.typeMobile')}}</option>
+                                @foreach($this->dictionaries['PHONE_TYPE'] as $k=>$phone_type)
+                                    <option value="{{$k}}">{{$phone_type}}</option>
+                                @endforeach
+                            </x-slot>
+                        </x-forms.select>
+                        @error("legal_entity_form.owner.phones.0.type")
+                        <x-forms.error>
+                            {{$message}}
+                        </x-forms.error>
+                        @enderror
+                    </div>
+                    <div class="w-1/2">
+                        <x-forms.input x-mask="+380999999999" class="default-input"
+                                       wire:model="legal_entity_form.owner.phones.0.number" type="text"
+                                       placeholder="{{__('+ 3(80)00 000 00 00 ')}}"/>
+                        @error("legal_entity_form.owner.phones.0.number")
+                        <x-forms.error>
+                            {{ $message }}
+                        </x-forms.error>
+                        @enderror
+                    </div>
+
+                </div>
+            </x-slot>
+        </x-forms.form-group>
+
     @endif
 
     <a wire:click="addRowPhone('owner')" class="text-primary m-t-5"
        href="#">{{__('forms.addPhone')}}</a>
 </div>
 <div x-data="{ show: false }">
-    <div class="mb-4.5 flex flex-col gap-0 gap-6 ">
-        <x-forms.form-group class="flex items-center  flex-row-reverse	justify-end	">
-            <x-slot name="input">
-                <x-forms.input
-                    x-bind:checked="show"
-                    @change="show = !show; $wire.set('legal_entity_form.owner.tax_id', show ? '' : $wire.legal_entity_form.owner.tax_id)"
-                    wire:model="legal_entity_form.owner.no_tax_id"
-                    type="checkbox"
-                    id="owner_no_tax_id"
-                />
-            </x-slot>
-            <x-slot name="label">
-                <x-forms.label for="owner_no_tax_id"
-                               class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                    {{__('forms.other_documents')}}
-                </x-forms.label>
-            </x-slot>
-            @error('legal_entity_form.owner.no_tax_id')
-            <x-slot name="error">
-                <x-forms.error>
-                    {{$message}}
-                </x-forms.error>
-            </x-slot>
-            @enderror
-        </x-forms.form-group>
-    </div>
+{{--    <div class="mb-4.5 flex flex-col gap-0 gap-6 ">--}}
+{{--        <x-forms.form-group class="flex items-center  flex-row-reverse	justify-end	">--}}
+{{--            <x-slot name="input">--}}
+{{--                <x-forms.input--}}
+{{--                    x-bind:checked="show"--}}
+{{--                    @change="show = !show; $wire.set('legal_entity_form.owner.tax_id', show ? '' : $wire.legal_entity_form.owner.tax_id)"--}}
+{{--                    wire:model="legal_entity_form.owner.no_tax_id"--}}
+{{--                    type="checkbox"--}}
+{{--                    id="owner_no_tax_id"--}}
+{{--                />--}}
+{{--            </x-slot>--}}
+{{--            <x-slot name="label">--}}
+{{--                <x-forms.label for="owner_no_tax_id"--}}
+{{--                               class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">--}}
+{{--                    {{__('forms.other_documents')}}--}}
+{{--                </x-forms.label>--}}
+{{--            </x-slot>--}}
+{{--            @error('legal_entity_form.owner.no_tax_id')--}}
+{{--            <x-slot name="error">--}}
+{{--                <x-forms.error>--}}
+{{--                    {{$message}}--}}
+{{--                </x-forms.error>--}}
+{{--            </x-slot>--}}
+{{--            @enderror--}}
+{{--        </x-forms.form-group>--}}
+{{--    </div>--}}
     <div x-show="!show" class="mb-4.5 flex flex-col gap-0 gap-6 ">
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">

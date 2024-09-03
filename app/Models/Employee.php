@@ -56,9 +56,4 @@ class Employee extends Model
         return $this->belongsTo(Party::class);
     }
 
-    public function getUuid()
-    {
-        return $this->uuid;
-    }
-
 }
