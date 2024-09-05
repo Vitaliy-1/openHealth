@@ -13,28 +13,30 @@ return new class extends Migration
     {
         Schema::create('legal_entities', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid');
-            $table->json('addresses');
+            $table->uuid();
+            $table->json('accreditation')->nullable();
             $table->json('archive')->nullable();
             $table->string('beneficiary')->nullable();
-            $table->string('edrpou');
-            $table->string('email');
-            $table->boolean('is_active');
-            $table->string('kveds');
-            $table->string('legal_form');
-            $table->boolean('mis_verified')->nullable();
-            $table->string('name');
-            $table->boolean('nhs_verified')->nullable();
-            $table->string('owner_property_type');
-            $table->json('phones');
-            $table->string('public_name');
+            $table->json('edr')->nullable();
+            $table->boolean('edr_verified')->nullable();
+            $table->string('edrpou')->nullable();
+            $table->string('email')->nullable();
+            $table->uuid('inserted_by')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->json('license')->nullable();
-            $table->json('accreditation')->nullable();
+            $table->text('nhs_comment')->nullable();
+            $table->boolean('nhs_reviewed')->default(false);
+            $table->boolean('nhs_verified')->default(false);
+            $table->json('phones')->nullable();
             $table->string('receiver_funds_code')->nullable();
-            $table->string('short_name');
-            $table->string('status');
-            $table->string('type');
+            $table->json('residence_address')->nullable();
+            $table->string('status')->nullable();
+            $table->string('type')->nullable();
+            $table->uuid('updated_by')->nullable();
+            $table->string('client_id')->nullable();
+            $table->string('client_secret')->nullable();
             $table->string('website')->nullable();
+            $table->timestamp('inserted_at')->nullable();
             $table->timestamps();
         });
     }

@@ -155,6 +155,9 @@ return [
     'attributes' => [
         'name' => 'ім\'я',
         'phone' => 'телефон',
+        'password' => 'пароль',
+        'keyContainerUpload' => 'контейнер ключа',
+        'knedp' => 'КНЕДП',
         '_token' => 'токен CSRF',
         'edrpou' => 'ЄДРПОУ',
         'email' => 'E-mail',
@@ -213,7 +216,7 @@ return [
             ],
 
         ],
-        'owner.phones.*.phone' => 'Телефон',
+        'owner.phones.*.number' => 'елефон',
         'owner.phones.*.type' => 'Тип Номера',
         'country' => 'Країна',
         'region' => 'Область',
@@ -300,8 +303,14 @@ return [
                 'medical_service' => 'Медична послуга'
             ]
 
-        ]
-
+            ],
+        //! Licence
+        'issued_by' => 'ким видано ліцензію',
+        'issued_date' => 'дата видачі ліцензії',
+        'active_from_date' => 'дата початку дії ліцензії',
+        'order_no' => 'номер наказу',
+        'expiry_date' => 'дата завершення дії ліцензії',
+        'what_licensed' => 'напрям діяльності, що ліцензовано',
     ],
     'consent_text'=> 'Я погоджуюсь з умовами'
     //

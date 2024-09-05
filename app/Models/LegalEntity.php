@@ -10,48 +10,53 @@ use Illuminate\Database\Eloquent\Model;
 class LegalEntity extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'uuid',
-        'addresses',
+        'accreditation',
         'archive',
         'beneficiary',
+        'edr',
+        'edr_verified',
         'edrpou',
         'email',
+        'inserted_at',
+        'inserted_by',
         'is_active',
-        'kveds',
-        'legal_form',
-        'mis_verified',
-        'name',
-        'nhs_verified',
-        'owner_property_type',
-        'phones',
-        'public_name',
-        'receiver_funds_code',
-        'short_name',
-        'status',
-        'accreditation',
         'license',
+        'nhs_comment',
+        'nhs_reviewed',
+        'nhs_verified',
+        'phones',
+        'receiver_funds_code',
+        'residence_address',
+        'status',
         'type',
+        'updated_at',
+        'updated_by',
         'website',
+        'client_id',
+        'client_secret',
     ];
 
     protected $casts = [
-        'addresses' => 'json',
-        'phones' => 'array',
-        'archive' => 'json',
-        'kveds' => 'array',
+        'accreditation' => 'array',
+        'archive' => 'array',
+        'edr' => 'array',
         'license' => 'array',
-        'accreditation'=>'array',
+        'phones' => 'array',
+        'residence_address' => 'array',
+        'inserted_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'id' => 'string',
+        'inserted_by' => 'string',
+        'updated_by' => 'string',
     ];
-
 
     protected $attributes = [
         'is_active' => false,
-        'owner_property_type' => '',
     ];
 
-    public function employee(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function employees(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Employee::class,'legal_entity_id','id');
     }

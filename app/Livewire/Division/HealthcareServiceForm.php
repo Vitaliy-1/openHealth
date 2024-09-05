@@ -15,10 +15,11 @@ class HealthcareServiceForm extends Component
 {
 
     #[Validate([
-        'healthcare_service.category' => 'required|min:6|max:255',
+        'healthcare_service.category' => 'required|max:255',
         'healthcare_service.providing_condition' => 'required',
         'healthcare_service.speciality_type' => 'required',
-        'healthcare_service.type' => 'required_if:healthcare_service.category,PHARMACY_DRUGS',
+//        'healthcare_service.type' => 'required_if:healthcare_service.category,PHARMACY_DRUGS',
+//        'healthcare_service.license_id' => 'required_if:healthcare_service.category,PHARMACY_DRUGS',
     ])]
 
     public ?array $healthcare_service = [] ;
@@ -27,9 +28,11 @@ class HealthcareServiceForm extends Component
     public Division $division;
 
     public  string $mode = 'create';
+
     public ?array $tableHeaders = [];
 
     public ?array $dictionaries =[];
+
     public bool $showModal = false;
     public ?array $available_time = [];
     public ?array $speciality_type_key = ["THERAPIST", "PEDIATRICIAN", "FAMILY_DOCTOR",'RECEPTIONIST'];
@@ -47,12 +50,10 @@ class HealthcareServiceForm extends Component
         $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', [
             'HEALTHCARE_SERVICE_CATEGORIES',
             'SPECIALITY_TYPE',
-            'HEALTHCARE_SERVICE_SPECIALITY_TYPE_FIELD_REQUIRED_FOR_CATEGORIES',
-            'HEALTHCARE_SERVICE_PHARMACY_DRUGS_TYPES',
             'PROVIDING_CONDITION',
         ]);
-        $this->speciality_type = $this->dictionaries['SPECIALITY_TYPE'];
-        $this->specialityType();
+//        $this->speciality_type = $this->dictionaries['SPECIALITY_TYPE'];
+//        $this->specialityType();
         $this->tableHeadersHealthcare();
     }
 
@@ -111,7 +112,6 @@ class HealthcareServiceForm extends Component
             ? $this->updateHealthcareService()
             : $this->createHealthcareService();
 
-
         if ($response) {
             $this->saveHealthcareService($healthcareService, $response);
         }
@@ -122,15 +122,19 @@ class HealthcareServiceForm extends Component
         return HealthcareServiceRequestApi::updateHealthcareServiceRequest($this->healthcare_service['uuid'],$this->healthcare_service);
     }
 
+
+
     private function createHealthcareService(): array
     {
-        return HealthcareServiceRequestApi::createHealthcareServiceRequest($this->healthcare_service);
+        return HealthcareServiceRequestApi::createHealthcareServiceRequest($this->division->uuid,$this->healthcare_service);
     }
 
     private function saveHealthcareService(HealthcareService $healthcareService, array $response): void
     {
-        $healthcareService->fill($this->healthcare_service);
         $healthcareService->setAttribute('uuid', $response['id']);
+
+        $healthcareService->fill($response);
+
         $this->division->healthcareService()->save($healthcareService);
     }
 
@@ -150,6 +154,22 @@ class HealthcareServiceForm extends Component
         $this->getHealthcareServices();
     }
 
+    public function syncHealthcareServices(){
+
+        $syncHealthcareServices = HealthcareServiceRequestApi::syncHealthcareServiceRequest($this->division->uuid);
+        $this->dispatch('flashMessage', ['message' => __('Інформацію успішно оновлено'), 'type' => 'success']);
+        $this->synсHealthcareServicesSave($syncHealthcareServices);
+        $this->getHealthcareServices();
+    }
+    public function synсHealthcareServicesSave($responses){
+
+        foreach ($responses as $response){
+            $healthcareService = HealthcareService::firstOrNew(['uuid' => $response['id']]);
+            $healthcareService->setAttribute('uuid', $response['id']);
+            $healthcareService->fill($response);
+            $this->division->healthcareService()->save($healthcareService);
+        }
+    }
 
     public function tableHeadersHealthcare(): void
     {
@@ -181,7 +201,7 @@ class HealthcareServiceForm extends Component
     {
          $this->healthcare_service['available_time'][] = [
             'days_of_week' => get_day_key($k),
-            'all_day' => '',
+            'all_day' => false,
             'available_start_time' =>'',
             'available_end_time' =>'',
         ];
@@ -191,7 +211,7 @@ class HealthcareServiceForm extends Component
         $this->healthcare_service['not_available'][] = [
             'description' => '',
             'during' => [
-                'start' => Carbon::now(),
+                'start' => '',
                 'end' => '',
             ],
         ];

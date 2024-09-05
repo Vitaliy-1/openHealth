@@ -43,6 +43,13 @@
                         </x-slot>
                     </x-forms.select>
                 </x-slot>
+                @error('legal_entity_form.accreditation.category')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
             </x-forms.form-group>
             <x-forms.form-group class="xl:w-1/2">
                 <x-slot name="label">
@@ -55,6 +62,14 @@
                     <x-forms.input class="default-input" wire:model="legal_entity_form.accreditation.order_no"
                                    type="text" id="accreditation_order_no"/>
                 </x-slot>
+                @error('legal_entity_form.accreditation.order_no')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+
             </x-forms.form-group>
         </div>
 
@@ -96,6 +111,14 @@
                     <x-forms.input class="default-input" wire:model="legal_entity_form.accreditation.order_date"
                                    type="date" id="accreditation_order_date"/>
                 </x-slot>
+                @error('legal_entity_form.accreditation.order_date')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+
             </x-forms.form-group>
         </div>
     </div>

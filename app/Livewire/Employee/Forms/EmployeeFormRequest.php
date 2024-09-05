@@ -17,7 +17,7 @@ class EmployeeFormRequest extends Form
         'employee.phones.*.type' => 'required|string',
         'employee.email' => 'required|email',
         'employee.position' => 'required|string',
-        'employee.tax_id' => 'nullable|min:8|max:10',
+        'employee.tax_id' => 'required|min:8|max:10',
         'employee.employee_type' => 'required|string',
     ])]
 
@@ -31,7 +31,7 @@ class EmployeeFormRequest extends Form
     public ?array $documents = [];
 
     #[Validate([
-        'educations.country' => 'required|string|min:3',
+        'educations.country' => 'required|string',
         'educations.city' => 'required|string|min:3',
         'educations.institution_name' => 'required|string|min:3',
         'educations.diploma_number' => 'required|string|min:3',
@@ -100,42 +100,34 @@ class EmployeeFormRequest extends Form
 
     public function validateBeforeSendApi(): array
     {
+
         if (empty($this->employee)){
             return [
-                'status'=> true,
-                'message' => __('validation.custom.employee_table'),
-            ];
-        }
-
-        if (!isset($this->employee['tax_id']) && empty($this->documents)){
-            return [
-                'status'=> true,
+                'error'=> true,
                 'message' => __('validation.custom.documents_empty'),
             ];
         }
-//        if (empty($this->role) ){
-//            return [
-//                'status'=> true,
-//                'message' => __('validation.custom.role_table'),
-//            ];
-//        }
 
-//        if (empty($this->educations) ){
-//           return [
-//               'status'=> true,
-//               'message' => __('validation.custom.educations_table'),
-//           ];
-//       }
-//
-//        if (empty($this->specialities) ){
-//            return [
-//                'status'=> true,
-//                'message' => __('validation.custom.specialities_table'),
-//            ];
-//        }
+        if (isset($this->employee['tax_id']) && empty($this->employee['tax_id'])){
+           return [
+               'error'=> true,
+               'message' => __('validation.custom.documents_empty'),
+           ];
+        }
+        if ( isset($this->employee['employee_type']) && $this->employee['employee_type'] == 'DOCTOR' && empty($this->specialities)){
+            return [
+                'error'=> true,
+                'message' => __('validation.custom.specialities_table'),
+            ];        }
 
+        if (isset($this->employee['employee_type'])  && $this->employee['employee_type'] == 'DOCTOR' && empty($this->educations) ){
+            return [
+                'error'=> true,
+                'message' => __('validation.custom.educations_table'),
+            ];
+        }
         return [
-            'status'=> false,
+            'error'=> false,
             'message' => '',
         ];
 

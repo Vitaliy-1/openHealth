@@ -9,13 +9,27 @@ class EmployeeRequestApi extends EmployeeApi
 {
 
 
-
-    public static function createEmployeeRequest($uuid,$data):array
+    public static function getEmployees($legal_entity_id):array
     {
-        $params = self::createEmployeeRequestBuilder($uuid,$data);
+        $params = [
+            'legal_entity_id' => $legal_entity_id ,
+            'page' => 1,
+            'page_size' => 300
+        ];
 
-        return self::_create($params);
+        return self::_get($params);
     }
+
+    public static function createEmployeeRequest($data):array
+    {
+        return self::_create($data);
+    }
+
+    public static function getEmployeeById($id): array
+    {
+        return self::_getById($id);
+    }
+
 
     public static function createEmployeeRequestBuilder($uuid,$data):array
     {
@@ -40,9 +54,30 @@ class EmployeeRequestApi extends EmployeeApi
     }
 
 
+
+
     public static function dismissedEmployeeRequest($id):array
     {
         return self::_dismissed($id);
     }
+
+    public static function getEmployeeRequestsList():array
+    {
+        $data = [
+            'status' => 'APPROVED',
+        ];
+        return self::_getRequestList($data);
+
+    }
+
+    public static function getEmployeeRequestById($id):array
+    {
+
+        return self::_getRequestById($id);
+
+    }
+
+
+
 
 }

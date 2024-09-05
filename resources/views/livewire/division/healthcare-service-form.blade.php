@@ -1,10 +1,15 @@
 <div>
+
     <x-section-title>
         <x-slot name="title">{{ __('Послуги') }}</x-slot>
         <x-slot name="description">{{ __('Послуги') }}</x-slot>
     </x-section-title>
     <div class="mb-10 rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div class="border-b flex justify-end border-stroke px-7 py-4 dark:border-strokedark">
+        <div class="border-b flex justify-between border-stroke px-7 py-4 dark:border-strokedark">
+
+            <button type="button" class="btn-green" wire:click="syncHealthcareServices">
+                {{__('Синхронізувати з ЕСОЗ')}}
+            </button>
             <button type="button" class="btn-green" wire:click="create">
                 {{__('Додати Послугу')}}
             </button>
@@ -19,23 +24,24 @@
                                 <p class="text-black dark:text-white">{{$item->uuid ?? ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white"> {{$item->category ?? ''}}</p>
+                                <p class="text-black dark:text-white"> {{$item->healthcare_category ?? ''}}</p>
 
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                <p class="text-black dark:text-white">{{$item['type'] ?? ''}}</p>
+                                <p class="text-black dark:text-white">{{$item->providing_condition   ?? ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
                                 <p class="text-black dark:text-white">{{ $dictionaries['SPECIALITY_TYPE'][$item->speciality_type] ?? ''}}</p>
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
-                                @if($item->status == 'DEACTIVATED')
+                                @if($item->status == 'INACTIVE')
                                     <span class="text-meta-1">{{__('Не активний')}}</span>
                                 @else
                                     <span class="text-meta-3">{{__('Активний')}}</span>
                                 @endif
                             </td>
                             <td class="border-b border-[#eee] py-5 px-4 ">
+                                @if($item->status == 'ACTIVE')
                                 <div class="flex justify-center">
                                     <div
                                         x-data="{
@@ -102,7 +108,7 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -115,8 +121,6 @@
                href="{{route('division.index')}}">{{__('Назад')}}</a>
         </div>
     </div>
-
     @include('livewire.division._parts._healthcare_service_form')
+
 </div>
-
-

@@ -35,9 +35,11 @@ class JsonHelper
                 // Handle error when decoding JSON data
                 throw new \RuntimeException('Failed to decode JSON data.');
             }
+
             Cache::put('json_path', $dictionaries['data'], now()->addDays(7));
 
         }
+
         self::$json_path = Cache::get('json_path');
     }
 
@@ -112,4 +114,11 @@ class JsonHelper
     {
         return static::$json_path ?? null;
     }
+
+
+
+    public static function getDictionaries(){
+
+    }
+
 }

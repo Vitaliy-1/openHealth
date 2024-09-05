@@ -4,25 +4,32 @@ namespace App\Http\Controllers\Auth;
 
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
 
-    public function index(){
-        return view('auth.login');
+
+
+    public function login(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if ($user && $request->has('is_ehealth_auth') && $user->isClientId() ) {
+          $url = oAuthEhealth::loginUrl($user);
+          return redirect()->to($url);
+        }
+
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            return redirect()->intended('dashboard');
+        }
+
+        return back()->withErrors([
+            'email' => 'Невірний логін або пароль.',
+        ]);
     }
-
-    public function login(Request $request){
-//        Validator::make($request->all(), [
-//            'email' => ['required', 'string', 'email', 'max:255'],
-//        ]);
-
-        $oAuth = oAuthEhealth::loginUrl($request->email);
-        return redirect()->to($oAuth);
-    }
-
 }

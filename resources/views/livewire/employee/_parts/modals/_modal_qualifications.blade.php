@@ -21,7 +21,7 @@
                                 <x-slot name="option">
                                     <option>{{__('forms.type')}}</option>
                                     @foreach($this->dictionaries['QUALIFICATION_TYPE'] as $k=>$type)
-                                        <option value="{{$type}}">{{$type}}</option>
+                                        <option value="{{$k}}">{{$type}}</option>
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>

@@ -2,7 +2,8 @@
 
 namespace App\Classes\Cipher;
 
-use App\Classes\eHealth\Exceptions\ApiException;
+use App\Classes\Cipher\Errors\ErrorHandler;
+use App\Classes\Cipher\Exceptions\ApiException;
 use Illuminate\Support\Facades\Http;
 
 class Request
@@ -12,8 +13,6 @@ class Request
     private string $url;
 
     private string $params;
-
-
 
     public function __construct(
         string $method,
@@ -38,18 +37,14 @@ class Request
 
         if ($response->successful()) {
             $success = json_decode($response->body(), true);
+            $success['status'] = $response->status();
             return $success ?? [];
         }
 
         if ($response->failed()) {
             $error = json_decode($response->body(), true);
-            dd($error);
-            throw match ($response->status()) {
-                400 => new ApiException($error['message'] ?? 'Невірний запит'),
-                403 => new ApiException($error['message'] ?? 'Немає доступу'),
-                404 => new ApiException($error['message'] ?? 'Не вдалося знайти запитану сторінку'),
-                default => new ApiException($error['message'] ?? 'API request failed'),
-            };
+            $error = ErrorHandler::handleError($error);
+            throw new ApiException($error);
         }
 
     }

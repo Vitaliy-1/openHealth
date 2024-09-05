@@ -10,13 +10,40 @@
                 <div  class="pt-4 grid grid gap-4 grid-cols-2">
                     <x-forms.form-group class="">
                         <x-slot name="label">
-                            <x-forms.label for="degree" class="default-label">
+                            <x-forms.label for="speciality_officio" class="default-label">
+                                {{__('forms.speciality_officio')}} *
+                            </x-forms.label>
+                        </x-slot>
+                        <x-slot name="input">
+                            <x-forms.input  wire:model="employee_request.specialities.speciality_officio" type="checkbox"
+                                           id="speciality_officio"/>
+                        </x-slot>
+                        @error('employee_request.specialities.speciality')
+                        <x-slot name="error">
+                            <x-forms.error>
+                                {{$message}}
+                            </x-forms.error>
+                        </x-slot>
+                        @enderror
+                    </x-forms.form-group>
+
+                    <x-forms.form-group class="">
+                        <x-slot name="label">
+                            <x-forms.label  for="specialities_speciality" class="default-label">
                                 {{__('forms.speciality')}} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.specialities.speciality" type="text"
-                                           id="speciality"/>
+                            <x-forms.select
+                                class="default-input" wire:model="employee_request.specialities.speciality"
+                                id="specialities_speciality">
+                                <x-slot name="option">
+                                    <option>{{__('forms.select')}}</option>
+                                    @foreach($this->dictionaries['SPECIALITY_TYPE'] as $k=>$type)
+                                        <option value="{{$k}}">{{$type}}</option>
+                                    @endforeach
+                                </x-slot>
+                            </x-forms.select>
                         </x-slot>
                         @error('employee_request.specialities.speciality')
                         <x-slot name="error">
@@ -40,7 +67,7 @@
                                 <x-slot name="option">
                                     <option>{{__('forms.select_country')}}</option>
                                     @foreach($this->dictionaries['SPECIALITY_LEVEL'] as $k=>$level)
-                                        <option value="{{$level}}">{{$level}}</option>
+                                        <option value="{{$k}}">{{$level}}</option>
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>
@@ -56,19 +83,19 @@
                     </x-forms.form-group>
                     <x-forms.form-group class="">
                         <x-slot name="label">
-                            <x-forms.label for="specialities_country" class="default-label">
+                            <x-forms.label for="qualification_type" class="default-label">
                                 {{__('forms.qualification_type')}}*
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select
                                 class="default-input" wire:model="employee_request.specialities.qualification_type" type="text"
-                                id="specialities_country"
+                                id="qualification_type"
                             >
                                 <x-slot name="option">
                                     <option>{{__('forms.qualification_type')}}</option>
                                     @foreach($this->dictionaries['SPEC_QUALIFICATION_TYPE'] as $k=>$qualification_type)
-                                        <option value="{{$qualification_type}}">{{$qualification_type}}</option>
+                                        <option value="{{$k}}">{{$qualification_type}}</option>
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>

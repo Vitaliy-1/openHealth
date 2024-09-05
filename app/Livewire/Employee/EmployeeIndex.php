@@ -2,13 +2,17 @@
 
 namespace App\Livewire\Employee;
 
+use App\Classes\eHealth\Api\PersonApi;
 use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
 use App\Models\Employee;
+use App\Models\LegalEntity;
+use App\Models\User;
 use App\Traits\FormTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 
 class EmployeeIndex extends Component
@@ -26,6 +30,8 @@ class EmployeeIndex extends Component
     public string $dismiss_text;
 
     public int $dismissed_id;
+    private LegalEntity $legalEntity;
+
     /**
      * @var false
      */
@@ -34,6 +40,8 @@ class EmployeeIndex extends Component
     public function boot(Employee $employee): void
     {
         $this->employeeCacheKey = self::CACHE_PREFIX . '-'. Auth::user()->legalEntity->uuid;
+
+        $this->legalEntity = Auth::user()->legalEntity;
     }
 
 
@@ -65,25 +73,27 @@ class EmployeeIndex extends Component
 
     public function getEmployees($status = ''): void
     {
-        $this->employees = DB::table('legal_entities')
-            ->join('users', 'legal_entities.id', '=', 'users.legal_entity_id')
-            ->join('employees', 'legal_entities.id', '=', 'employees.legal_entity_id')
-            ->join('persons', 'employees.person_id', '=', 'persons.id')
-            ->where('users.id', Auth::id())
-            ->select(
-                'employees.id as id',
-                'employees.uuid',
-                'employees.start_date',
-                'employees.end_date',
-                'employees.status',
-                DB::raw("CONCAT(persons.first_name, ' ', persons.last_name, ' ', persons.second_name) AS full_name"),
-                'persons.email',
-                'persons.phones',
+        $this->employees = Auth::user()->legalEntity->employees()->get();
 
-                'employees.position',
-                'employees.employee_type',
-            )
-            ->get();
+//            DB::table('legal_entities')
+//            ->join('users', 'legal_entities.id', '=', 'users.legal_entity_id')
+//            ->join('employees', 'legal_entities.id', '=', 'employees.legal_entity_id')
+//            ->join('persons', 'employees.person_id', '=', 'persons.id')
+//            ->where('users.id', Auth::id())
+//            ->select(
+//                'employees.id as id',
+//                'employees.uuid',
+//                'employees.start_date',
+//                'employees.end_date',
+//                'employees.status',
+//                DB::raw("CONCAT(persons.first_name, ' ', persons.last_name, ' ', persons.second_name) AS full_name"),
+//                'persons.email',
+//                'persons.phones',
+//
+//                'employees.position',
+//                'employees.employee_type',
+//            )
+//            ->get();
 
     }
 
@@ -153,8 +163,49 @@ class EmployeeIndex extends Component
     }
 
 
+    public function getEmployeeRequestsList()
+    {
+        $requests = EmployeeRequestApi::getEmployeeRequestsList();
+        dd($requests);
+
+    }
+
+    public function syncEmployees(){
+        $this->getEmployeeRequestsList();
+        $requests = EmployeeRequestApi::getEmployees($this->legalEntity->uuid);
+        foreach ($requests as $request) {
+            $request['uuid'] = $request['id'];
+            $request['legal_entity_uuid'] = $request['legal_entity']['id'];
+            $email = $request['party']['email'] ?? '';
+
+            if (!empty($email)) {
+                if (!User::where('email', $request['party']['email'])->exists()) {
+                    $user = User::create(
+                        ['email' => $request['party']['email'],
+                         'password' => Hash::make(\Illuminate\Support\Str::random(8))
+                        ]
+                    );
+                    $user->legalEntity()->associate($this->legalEntity);
+                    $user->assignRole($request['employee_type']);
+                    $user->save();
+                }
+
+            }
+            $employee =  Employee::updateOrCreate(
+                ['uuid'=> $request['id']],
+                $request
+          );
+          $employee->legalEntity()->associate($this->legalEntity);
+          $employee->save();
+        }
+
+        $this->getEmployees();
+    }
+
     public function render()
     {
         return view('livewire.employee.employee-index');
     }
+
+
 }

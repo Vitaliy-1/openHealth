@@ -31,6 +31,9 @@ class Employee extends Model
         'speciality' => 'array',
     ];
 
+    protected $attributes = [
+        'doctor' => '{}',
+    ];
 
 
     public function person(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -46,6 +49,11 @@ class Employee extends Model
     public function division(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Division::class);
+    }
+
+    public function party(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Party::class);
     }
 
 }

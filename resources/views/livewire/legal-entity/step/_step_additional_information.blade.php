@@ -27,6 +27,13 @@
             <x-forms.input class="default-input" wire:model="legal_entity_form.beneficiary"
                            type="text" id="additional_information_beneficiary"/>
         </x-slot>
+        @error('legal_entity_form.beneficiary')
+        <x-slot name="error">
+            <x-forms.error>
+                {{$message}}
+            </x-forms.error>
+        </x-slot>
+        @enderror
     </x-forms.form-group>
 
 </div>
@@ -40,9 +47,16 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.archive.0.date"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.archive.date"
                            type="date" id="additional_information_archive_date"/>
         </x-slot>
+        @error('legal_entity_form.archive.date')
+        <x-slot name="error">
+            <x-forms.error>
+                {{$message}}
+            </x-forms.error>
+        </x-slot>
+        @enderror
     </x-forms.form-group>
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
@@ -52,9 +66,18 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.archive.0.place"
+            <x-forms.input class="default-input" wire:model="legal_entity_form.archive.place"
                            type="text" id="additional_information_archive_place"/>
         </x-slot>
+        @error('legal_entity_form.archive.place')
+
+        <x-slot name="error">
+            <x-forms.error>
+                {{$message}}
+            </x-forms.error>
+        </x-slot>
+        @enderror
+
     </x-forms.form-group>
 
 </div>

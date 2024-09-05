@@ -56,6 +56,8 @@ return [
     'deactivate'=>'Деактивувати',
     'activate'=>'Активувати',
     'edit'=>'Редагувати',
+    'info'=>'Детальна інформація',
+    'update_info'=>'Оновити інформацію',
     //Form fields
     'edrpou'=>'ЄДРПОУ',
     'first_name' => 'Ім’я',
@@ -209,4 +211,5 @@ return [
     'KNEDP'=> 'КНЕДП',
     'keyContainerUpload'=>'Шлях до контейнеруа',
     'password'=>'Пароль',
+    'speciality_officio'=>'Основна спеціалазація (лише одна має бути)',
 ];

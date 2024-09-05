@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -12,6 +13,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\License;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -31,7 +33,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'legal_entity_id'
+        'legal_entity_id',
+        'client_id',
+        'secret_key',
     ];
 
     /**
@@ -77,5 +81,19 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(LegalEntity::class);
     }
 
+    public function isClientId(): bool
+    {
+        return $this->legalEntity->client_id  ?? false;
+    }
 
+    public function licenses(): HasMany
+    {
+        return $this->hasMany(License::class, 'legal_entity_id', 'legal_entity_id');
+    }
+
+
+    public function hasToken(): bool
+    {
+        return $this->token !== null;
+    }
 }

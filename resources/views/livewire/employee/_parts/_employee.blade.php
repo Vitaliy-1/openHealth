@@ -1,4 +1,4 @@
-<div wire:ignore>
+<div >
     <div class=" py-4">
         <h3 class="font-medium text-2xl	 text-black dark:text-white">
             {{__('forms.personal_data')}}
@@ -72,7 +72,7 @@
 
             <x-slot name="input">
 
-                <x-forms.datapicker id="birth_date" wire:model="employee_request.employee.birth_date"
+               <x-forms.input class="default-input" type="date" id="birth_date" wire:model="employee_request.employee.birth_date"
 
                                />
             </x-slot>
@@ -111,8 +111,7 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input  maxlength="10"
-                                class="default-input" checked wire:model="employee_request.employee.tax_id" type="text" id="tax_id" name="tax_id"/>
+                <x-forms.input  maxlength="10" class="default-input" checked wire:model="employee_request.employee.tax_id" type="text" id="tax_id" name="tax_id"/>
             </x-slot>
             @error('employee_request.employee.tax_id')
             <x-slot name="error">
@@ -188,7 +187,7 @@
             </x-slot>
             <x-slot name="input">
 
-                <x-forms.datapicker id="start_date"  wire:model="employee_request.employee.start_date"
+                <x-forms.input class="default-input" type="date" id="start_date"  wire:model="employee_request.employee.start_date"
                                />
             </x-slot>
             @error('employee_request.positions.start_date')
@@ -290,7 +289,7 @@
                                 @enderror
                             </div>
                             <div class="w-1/2">
-                                <x-forms.input  x-mask="38099 999 99 99" class="default-input"
+                                <x-forms.input  x-mask="+380999999999" class="default-input"
                                                 wire:model="employee_request.employee.phones.{{$key}}.number" type="text"
                                                 placeholder="{{__('+ 3(80)00 000 00 00 ')}}"/>
 
