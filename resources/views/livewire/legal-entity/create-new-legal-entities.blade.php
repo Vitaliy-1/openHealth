@@ -23,7 +23,7 @@
         </ol>
     </div>
 
-    <x-forms.forms-section class="max-w-5xl m-auto" >
+    <x-forms.forms-section class="max-w-5xl m-auto" submit="">
         <x-slot name="form">
             <div class="grid-cols-1">
                 <div class="p-6.5">
