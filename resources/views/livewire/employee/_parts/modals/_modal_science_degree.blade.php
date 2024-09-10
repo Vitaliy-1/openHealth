@@ -125,7 +125,7 @@
                                 <x-slot name="option">
                                     <option>{{__('forms.country')}}</option>
                                     @foreach($this->dictionaries['COUNTRY'] as $k=>$country)
-                                        <option value="{{$country}}">{{$country}}</option>
+                                        <option value="{{$k}}">{{$country}}</option>
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>

@@ -81,4 +81,9 @@ class LegalEntity extends Model
         return $this->hasMany(Contract::class,'legal_entity_id','id');
     }
 
+
+    public function getId()
+    {
+        return $this->id;
+    }
 }

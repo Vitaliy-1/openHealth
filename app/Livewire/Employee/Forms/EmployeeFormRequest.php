@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Employee\Forms;
 
+use App\Rules\AgeCheck;
+use App\Rules\Cyrillic;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -9,13 +11,13 @@ use Livewire\Form;
 class EmployeeFormRequest extends Form
 {
     #[Validate([
-        'employee.last_name' => 'required|min:3',
-        'employee.first_name' => 'required|min:3',
+        'employee.last_name' => ['required', 'min:3', new Cyrillic()],
+        'employee.first_name' => ['required', 'min:3', new Cyrillic()],
         'employee.gender' => 'required|string',
-        'employee.birth_date' => 'required|date' ,
+        'employee.birth_date' => ['required', 'date', new AgeCheck()] ,
         'employee.phones.*.number' => 'required|string:digits:13',
         'employee.phones.*.type' => 'required|string',
-        'employee.email' => 'required|email',
+        'employee.email' => 'required|unique:users,email',
         'employee.position' => 'required|string',
         'employee.tax_id' => 'required|min:8|max:10',
         'employee.employee_type' => 'required|string',
