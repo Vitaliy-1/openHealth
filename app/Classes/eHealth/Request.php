@@ -76,6 +76,11 @@ class Request
 
             if ($response->failed()) {
                $errors = json_decode($response->body(), true);
+                Log::channel('api_errors')->error('API request failed', [
+                    'url' => self::makeApiUrl(),
+                    'status' => $response->status(),
+                    'errors' => $errors
+                ]);
                dd($errors);
                return (new ErrorHandler())->handleError($errors);
             }
@@ -90,7 +95,6 @@ class Request
 
     public function getHeaders(): array
     {
-//        dd($this->oAuthEhealth->getApikey());
         $headers = [
              'X-Custom-PSK' => env('EHEALTH_X_CUSTOM_PSK'),
              'API-key' => $this->oAuthEhealth->getApikey(),

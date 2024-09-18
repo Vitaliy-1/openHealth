@@ -24,7 +24,8 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.input disabled class="default-input" value="{{$legalEntity->name}}" type="text"
+                                <x-forms.input disabled class="default-input"
+                                               value="{{$legalEntity->edr['public_name'] ?? ''}}" type="text"
                                                id="legal_entity_name"/>
                             </x-slot>
 
@@ -36,7 +37,7 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.input disabled class="default-input" value="{{$legalEntity->beneficiary}}"
+                                <x-forms.input disabled class="default-input" value="{{$legalEntity->edr['name']}}"
                                                type="text"
                                                id="legal_entity_owner"/>
                             </x-slot>
@@ -61,30 +62,12 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.input disabled="" class="default-input" wire:model="contract_request.contractor_base"
+                                <x-forms.input disabled="" class="default-input"
+                                               wire:model="contract_request.contractor_base"
                                                type="text"
                                                id="contractor_base"/>
                             </x-slot>
                             @error('contract_request.contractor_base')
-                            <x-slot name="error">
-                                <x-forms.error>
-                                    {{$message}}
-                                </x-forms.error>
-                            </x-slot>
-                            @enderror
-                        </x-forms.form-group>
-                        <x-forms.form-group>
-                            <x-slot name="label">
-                                <x-forms.label for="contractor_rmsp_amount" class="default-label">
-                                    {{__('forms.contractor_rmsp_amount')}} *
-                                </x-forms.label>
-                            </x-slot>
-                            <x-slot name="input">
-                                <x-forms.input disabled="" class="default-input" wire:model="contract_request.contractor_rmsp_amount"
-                                               type="number"
-                                               id="contractor_rmsp_amount"/>
-                            </x-slot>
-                            @error('contract_request.contractor_rmsp_amount')
                             <x-slot name="error">
                                 <x-forms.error>
                                     {{$message}}
@@ -160,19 +143,19 @@
                 <div class="grid grid-cols-3 gap-5.5 p-6.5">
                     <x-forms.form-group>
                         <x-slot name="label">
-                            <x-forms.label for="contractor_base" class="default-label">
+                            <x-forms.label for="id_form" class="default-label">
                                 {{__('forms.contract_type')}} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select
                                 class="default-input" disabled wire:model="contract_request.id_form" type="text"
-                                id="position"
+                                id="id_form"
                             >
                                 <x-slot name="option">
-                                    @foreach($this->dictionaries['CONTRACT_TYPE'] as $k=>$contract_type )
-                                        <option selected  value="{{$k}}">{{$contract_type}}</option>
-                                    @endforeach
+{{--                                    @foreach($this->dictionaries['CONTRACT_TYPE'] as $k=>$contract_type )--}}
+                                        <option  value="PMD_1">{{$this->dictionaries['CONTRACT_TYPE']['PMD_1']}}</option>
+{{--                                    @endforeach--}}
                                 </x-slot>
                             </x-forms.select>
 
@@ -186,7 +169,7 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.datapicker   wire:model="contract_request.start_date"
+                            <x-forms.datapicker wire:model="contract_request.start_date"
                                                 id="start_date"/>
                         </x-slot>
                         @error('contract_request.start_date')
@@ -197,7 +180,7 @@
                         </x-slot>
                         @enderror
                     </x-forms.form-group>
-                    <x-forms.form-group >
+                    <x-forms.form-group>
                         <x-slot name="label">
                             <x-forms.label for="end_date" class="default-label">
                                 {{__('forms.end_date_contract')}} *
@@ -276,10 +259,26 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.input class="default-input"
-                                               wire:model="contract_request.contractor_payment_details.payer_account"
-                                               type="text"
-                                               id="payer_account"/>
+                                <div x-data="{
+        value: 'UA',
+        applyMask() {
+            this.value = this.value.replace(/[^A-Za-z0-9]/g, '');
+
+            if (!this.value.startsWith('UA')) {
+                this.value = 'UA' + this.value.slice(2);
+            }
+
+            if (this.value.length > 29) {
+                this.value = this.value.slice(0, 29);
+            }
+
+            $wire.set('contract_request.contractor_payment_details.payer_account', this.value);
+        }
+    }">
+                                    <input type="text"  wire:model="contract_request.contractor_payment_details.payer_account" x-model="value" @input="applyMask"
+                                           placeholder="UAxxxxxxxxxxxxxxxxxxxxxx" class="default-input"/>
+
+                                </div>
                             </x-slot>
                             @error('contract_request.contractor_payment_details.payer_account')
                             <x-slot name="error">
@@ -310,10 +309,11 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.multi-select id="contractor_divisions" class="default-input"  wire:model="contract_request.contractor_divisions">
+                                <x-forms.multi-select id="contractor_divisions" class="default-input"
+                                                      wire:model="contract_request.contractor_divisions">
                                     <x-slot name="option">
                                         @foreach($divisions as $k=>$division )
-                                            <option value="{{$division->id}}">{{$division->name}}</option>
+                                            <option value="{{$division->uuid}}">{{$division->name}}</option>
                                         @endforeach
                                     </x-slot>
                                 </x-forms.multi-select>
@@ -340,29 +340,29 @@
                 <div class="flex flex-col gap-5.5 p-6.5">
                     @if($external_contractors)
 
-                    <table class="w-full table-auto">
-                        <thead>
-                        <tr class="bg-gray-2 text-left dark:bg-meta-4">
-                            <th class="px-4 py-4 font-medium text-black dark:text-white">
-                                {{__('forms.legal_entity')}}
+                        <table class="w-full table-auto">
+                            <thead>
+                            <tr class="bg-gray-2 text-left dark:bg-meta-4">
+                                <th class="px-4 py-4 font-medium text-black dark:text-white">
+                                    {{__('forms.legal_entity')}}
 
-                            </th>
-                            <th class="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
-                                {{__('forms.external_contractor_number')}}
-                            </th>
-                            <th class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
-                                {{__('forms.external_contractor_issued_at')}}
-                            </th>
+                                </th>
+                                <th class="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
+                                    {{__('forms.external_contractor_number')}}
+                                </th>
+                                <th class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
+                                    {{__('forms.external_contractor_issued_at')}}
+                                </th>
 
-                            <th class="px-4 py-4 font-medium text-black dark:text-white">
-                                {{__('forms.external_contractor_expires_at')}}
-                            </th>
-                            <th class="px-4 py-4 font-medium text-black dark:text-white">
+                                <th class="px-4 py-4 font-medium text-black dark:text-white">
+                                    {{__('forms.external_contractor_expires_at')}}
+                                </th>
+                                <th class="px-4 py-4 font-medium text-black dark:text-white">
 
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
                             @foreach($external_contractors as $key => $external_contractor)
                                 <tr>
                                     <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
@@ -382,67 +382,73 @@
 
                                     <td class="border-b border-[#eee] flex px-4 py-5 dark:border-strokedark">
                                         <a wire:click.prevent="editExternalContractors({{$key}})" href="">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                 stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
                                             </svg>
                                         </a>
                                         <a wire:click.prevent="deleteExternalContractors({{$key}})" href="">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                 stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
                                             </svg>
                                         </a>
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
                     @endif
-                    <a class="text-primary" wire:click.prevent="openModal()" href="">+ {{__('forms.add_involved_person')}}</a>
+                    <a class="text-primary" wire:click.prevent="openModal('addExternalContractors')"
+                       href="">+ {{__('forms.add_involved_person')}}</a>
                 </div>
 
             </div>
         </div>
         <div class="flex flex-col gap-9">
-                <div class="dark:bg-boxdark">
-                    <div class="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
-                        <h3 class="font-medium text-black dark:text-white">
-                        </h3>
-                    </div>
-                    <div class="flex flex-col gap-5.5 p-6.5">
-                        <x-forms.form-group>
-                            <x-slot name="label">
-                                <x-forms.label for="consent_text" class="default-label text-sm">
-                                   {{$dictionaries['CAPITATION_CONTRACT_CONSENT_TEXT']['APPROVED']}}
-                                </x-forms.label>
-                            </x-slot>
-                            <x-slot name="input">
-                                <x-forms.input class="default-checkbox"
-                                               wire:model="contract_request.consent_text"
-                                               type="checkbox"
-                                               id="consent_text"/>
-                            </x-slot>
-                            @error('contract_request.consent_text')
-                            <x-slot name="error">
-                                <x-forms.error>
-                                    {{$message}}
-                                </x-forms.error>
-                            </x-slot>
-                            @enderror
-                        </x-forms.form-group>
-                    </div>
+            <div class="dark:bg-boxdark">
+                <div class="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
+                    <h3 class="font-medium text-black dark:text-white">
+                    </h3>
+                </div>
+                <div class="flex flex-col gap-5.5 p-6.5">
+                    <x-forms.form-group>
+                        <x-slot name="label">
+                            <x-forms.label for="consent_text" class="default-label text-sm">
+                                {{$dictionaries['CAPITATION_CONTRACT_CONSENT_TEXT']['APPROVED']}}
+                            </x-forms.label>
+                        </x-slot>
+                        <x-slot name="input">
+                            <x-forms.input class="default-checkbox"
+                                           wire:model="contract_request.consent_text"
+                                           type="checkbox"
+                                           id="consent_text"/>
+                        </x-slot>
+                        @error('contract_request.consent_text')
+                        <x-slot name="error">
+                            <x-forms.error>
+                                {{$message}}
+                            </x-forms.error>
+                        </x-slot>
+                        @enderror
+                    </x-forms.form-group>
                 </div>
             </div>
+        </div>
 
 
         <div class="mb-4.5 pt-10 flex flex-col gap-6 xl:flex-row justify-between items-center ">
             <div class="xl:w-1/4 text-left">
-                <a class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150" href="{{route('contract.index')}}">
+                <a class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150"
+                   href="{{route('contract.index')}}">
                     {{__('forms.back')}}
                 </a>
 
             </div>
             <div class="xl:w-1/4 text-right">
-                <button wire:click="sendApiRequest()" type="button" class="btn-primary">
+                <button wire:click="openModalSigned()" type="button" class="btn-primary">
                     {{__('forms.send_for_approval')}}
                 </button>
             </div>
@@ -458,8 +464,12 @@
                     fill="currentFill"/>
             </svg>
         </div>
-
-        @include('livewire.contract._parts.modals._external_contractors')
+        @if($showModal =='addExternalContractors')
+            @include('livewire.contract._parts.modals._external_contractors')
+        @endif
+        @if($showModal =='signed_content')
+            @include('livewire.contract._parts.modals._modal_signed_content')
+        @endif
 
     </div>
 </div>

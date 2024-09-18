@@ -9,14 +9,14 @@ class ContractApi extends Request
 
     public const URL = '/api/contract_requests';
 
-    public static function _create_initialize($contract_type = []): array
+    public static function _create_initialize($contract_type = 'capitation'): array
     {
         return (new Request('POST', self::URL.'/'.$contract_type, []))->sendRequest();
     }
 
-    public static function create_request($data,$id,$contract_type = 'PMD_1')
+    public static function create_request($data,$param,$contract_type = 'capitation'): array
     {
-        return self::post(self::URL.'/'.$contract_type.'/'.$id, $data);
+        return (new Request('POST',self::URL.'/'.$contract_type.'/'.$param['id'], $data))->sendRequest();
     }
 
 

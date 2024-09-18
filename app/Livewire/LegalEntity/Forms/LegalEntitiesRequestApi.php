@@ -39,6 +39,12 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
         return !empty($legalEntitiesApi['data']) ? $legalEntitiesApi['data'] : [];
     }
 
+    public static function verifyLegalEntity($id): array
+    {
+
+        return self::_verify($id);
+    }
+
     public static function createOrUpdate($data)
     {
         $data['signed_content_encoding'] = base64_encode($data);

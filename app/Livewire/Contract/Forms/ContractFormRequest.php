@@ -47,9 +47,9 @@ class ContractFormRequest extends Form
     public  ?array $external_contractors = [];
 
     #[Validate('accepted')]
-    public bool $consent_text;
+    public string $consent_text;
 
-
+    public string $id_form = '';
     public string  $previous_request_id = '';
 
     /**

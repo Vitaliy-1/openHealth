@@ -16,11 +16,8 @@ class CheckDateDifference implements Rule
 
     public function passes($attribute, $value)
     {
-        // Преобразование строковых дат в объекты Carbon
         $startDate = Carbon::createFromFormat('d.m.Y', $this->startDate);
         $endDate = Carbon::createFromFormat('d.m.Y', $value);
-
-        // Проверка разницы между датами (в данном случае, больше года)
         return $endDate->diffInDays($startDate) <= 365;
     }
 

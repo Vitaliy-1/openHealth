@@ -86,4 +86,10 @@ class LegalEntity extends Model
     {
         return $this->id;
     }
+
+
+    public function getOwner()
+    {
+        return $this->employees->where('employee_type','OWNER')->first();
+    }
 }

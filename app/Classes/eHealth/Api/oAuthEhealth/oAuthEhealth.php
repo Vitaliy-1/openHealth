@@ -19,9 +19,7 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function callback(): \Illuminate\Http\RedirectResponse
     {
-        if (env('EHEALTH_CALBACK_PROD') === false) {
-            dd(request()->all());
-        }
+
 
         if (!request()->has('code')) {
             return redirect()->route('login');
@@ -30,7 +28,6 @@ class oAuthEhealth implements oAuthEhealthInterface
         $code = request()->input('code');
 
         $this->authenticate($code);
-//        $this->approve();
 
         return redirect()->route('dashboard'); // Add this line
     }
@@ -39,6 +36,10 @@ class oAuthEhealth implements oAuthEhealthInterface
     {
 
         $user = User::find(\session()->get('user_id_auth_ehealth'));
+
+        if (env('EHEALTH_CALBACK_PROD') === true && $user->email !== 'test@openhealths.com') {
+            return redirect('http://localhost/ehealth/oauth?code=' . $code);
+        }
 
         if (!$user) {
             return redirect()->route('login');
