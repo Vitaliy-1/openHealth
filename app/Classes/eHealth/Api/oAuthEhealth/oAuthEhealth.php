@@ -34,11 +34,9 @@ class oAuthEhealth implements oAuthEhealthInterface
     {
 
         $user = User::find(\session()->get('user_id_auth_ehealth'));
-        
         if (!$user) {
             return redirect('http://localhost/ehealth/oauth?code=' . $code);
         }
-
 
         $data = [
             'token' => [
@@ -52,7 +50,9 @@ class oAuthEhealth implements oAuthEhealthInterface
         ];
 
         $request = (new Request('POST', self::OAUTH_TOKENS, $data, false))->sendRequest();
-
+        if (!$request) {
+            return redirect()->route('login'); // Add this line
+        }
         self::setToken($request);
 
         $this->login($user);
