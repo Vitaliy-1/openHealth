@@ -19,6 +19,12 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function callback(): \Illuminate\Http\RedirectResponse
     {
+
+        if (env('EHEALTH_CALBACK_PROD') === false) {
+            dd(request()->all());
+        }
+
+
         if (!request()->has('code')) {
             return redirect()->route('login');
         }
@@ -35,9 +41,8 @@ class oAuthEhealth implements oAuthEhealthInterface
 
         $user = User::find(\session()->get('user_id_auth_ehealth'));
         if (!$user) {
-            return redirect('http://localhost/ehealth/oauth?code=' . $code);
+            return redirect()->route('login');
         }
-
         $data = [
             'token' => [
                 'client_id'     => $user->legalEntity->client_id ?? '',
@@ -50,9 +55,7 @@ class oAuthEhealth implements oAuthEhealthInterface
         ];
 
         $request = (new Request('POST', self::OAUTH_TOKENS, $data, false))->sendRequest();
-        if (!$request) {
-            return redirect()->route('login'); // Add this line
-        }
+
         self::setToken($request);
 
         $this->login($user);
