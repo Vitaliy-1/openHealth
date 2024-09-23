@@ -9,7 +9,6 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
 {
 
 
-
     public static function getLegalEntitie($edrpou): array
     {
 
@@ -48,7 +47,6 @@ class LegalEntitiesRequestApi extends LegalEntitiesApi
 
         return !empty($legalEntitiesApi) ? $legalEntitiesApi : [];
     }
-
 
 
 }
