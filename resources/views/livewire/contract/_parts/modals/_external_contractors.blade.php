@@ -16,7 +16,7 @@
                             <x-slot name="input">
                                 <div >
                                     <x-forms.input class="default-input"
-                                                   type="text"
+                                                   x-mask="9999999999"
                                                    wire:model="legalEntity_search"
                                                    wire:keyup.debounce.500ms="getLegalEntityApi; open = true"
                                                    id=""/>
@@ -42,7 +42,7 @@ $wire.set('contract_request.external_contractors.legal_entity.id', '{{ $legalEnt
                                                     @endforeach
                                                 </ul>
 
-                                    </div>
+                                            </div>
                                         @endif
                                     </div>
                                 </div>
@@ -144,7 +144,6 @@ $wire.set('contract_request.external_contractors.legal_entity.id', '{{ $legalEnt
                                         @endforeach
                                     </x-slot>
                                 </x-forms.select>
-
                             </x-slot>
                             @error('contract_request.external_contractors.divisions.name')
                             <x-slot name="error">
@@ -166,10 +165,11 @@ $wire.set('contract_request.external_contractors.legal_entity.id', '{{ $legalEnt
                                     id="division_external_contractors"
                                 >
                                     <x-slot name="option">
+                                        <option value="">{{__('forms.select')}}</option>
                                         @if($healthcareServices)
                                             @foreach($healthcareServices as $k=>$healthcareService )
                                                 <option
-                                                    value="{{$healthcareService->id}}">{{$healthcareService->speciality_type}}</option>
+                                                    value="{{$healthcareService->uuid}}">{{$healthcareService->speciality_type}}</option>
                                             @endforeach
                                         @endif
                                     </x-slot>

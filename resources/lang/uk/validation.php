@@ -275,7 +275,7 @@ return [
         ],
         'contract_type' => 'Тип договору',
         'contractor_payment_details' => [
-            'MFO' => 'МФО',
+            'mfo' => 'МФО',
             'bank_name' => 'Назва банку',
             'payer_account' => 'IBAN',
         ],

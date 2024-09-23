@@ -54,13 +54,9 @@ class Request
     public function sendRequest()
     {
 
-
-
-        try {
             $response = Http::acceptJson()
                 ->withHeaders($this->getHeaders())
                 ->{$this->method}(self::makeApiUrl(), $this->params);
-
 
             if ($response->successful()) {
                 $data = json_decode($response->body(), true);
@@ -69,25 +65,21 @@ class Request
                 }
                 return $data['data'] ?? [];
             }
-
             if ($response->status() === 401) {
                 $this->oAuthEhealth->forgetToken();
             }
 
             if ($response->failed()) {
                $errors = json_decode($response->body(), true);
+               dd($errors);
                 Log::channel('api_errors')->error('API request failed', [
                     'url' => self::makeApiUrl(),
                     'status' => $response->status(),
                     'errors' => $errors
                 ]);
-               dd($errors);
                return (new ErrorHandler())->handleError($errors);
             }
-        }
-        catch (\Exception $exception){
-            return json_decode($exception);
-        }
+
 
 
     }

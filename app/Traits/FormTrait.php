@@ -58,6 +58,7 @@ trait FormTrait
     public function getDictionary(): void
     {
         $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', $this->dictionaries_field ?? []  );
+
     }
 
 

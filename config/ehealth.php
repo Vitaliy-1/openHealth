@@ -9,4 +9,9 @@ return [
         'cooldown' => 300,
         'retries' => 10
     ],
+
+    'capitation_contract_max_period_days' => 366,
+
+
+
 ];

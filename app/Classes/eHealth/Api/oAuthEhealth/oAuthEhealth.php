@@ -24,7 +24,6 @@ class oAuthEhealth implements oAuthEhealthInterface
             dd(request()->all());
         }
 
-
         if (!request()->has('code')) {
             return redirect()->route('login');
         }
@@ -53,9 +52,7 @@ class oAuthEhealth implements oAuthEhealthInterface
                 'scope'         => $user->getAllPermissions()->unique()->pluck('name')->join(' ')
             ]
         ];
-
         $request = (new Request('POST', self::OAUTH_TOKENS, $data, false))->sendRequest();
-
         self::setToken($request);
 
         $this->login($user);
@@ -144,10 +141,14 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public static function forgetToken()
     {
-        Session::forget('auth_token');
-        Session::forget('auth_token_expires_at');
-        Session::forget('refresh_token');
-        Session::forget('refresh_token_expires_at');
+        if (Session::has('auth_token')){
+            Session::forget('auth_token');
+            Session::forget('auth_token_expires_at');
+            Session::forget('refresh_token');
+            Session::forget('refresh_token_expires_at');
+        }
+
+
         return redirect()->route('login');
 
     }

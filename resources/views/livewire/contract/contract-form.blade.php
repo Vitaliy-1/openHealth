@@ -25,7 +25,7 @@
                             </x-slot>
                             <x-slot name="input">
                                 <x-forms.input disabled class="default-input"
-                                               value="{{$legalEntity->edr['public_name'] ?? ''}}" type="text"
+                                               value="{{$edr['public_name'] ?? ''}}" type="text"
                                                id="legal_entity_name"/>
                             </x-slot>
 
@@ -37,7 +37,7 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.input disabled class="default-input" value="{{$legalEntity->edr['name']}}"
+                                <x-forms.input disabled class="default-input" value="{{$edr['name']}}"
                                                type="text"
                                                id="legal_entity_owner"/>
                             </x-slot>
@@ -169,7 +169,7 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.datapicker wire:model="contract_request.start_date"
+                            <x-forms.input class="default-input" type="date" wire:model="contract_request.start_date"
                                                 id="start_date"/>
                         </x-slot>
                         @error('contract_request.start_date')
@@ -187,7 +187,7 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.datapicker wire:model="contract_request.end_date"
+                            <x-forms.input class="default-input" type="date" wire:model="contract_request.end_date"
                                                 id="end_date"/>
                         </x-slot>
                         @error('contract_request.end_date')
@@ -240,10 +240,10 @@
                             </x-slot>
                             <x-slot name="input">
                                 <x-forms.input class="default-input"
-                                               wire:model="contract_request.contractor_payment_details.MFO" type="text"
+                                               wire:model="contract_request.contractor_payment_details.mfo" type="text"
                                                id="MFO"/>
                             </x-slot>
-                            @error('contract_request.contractor_payment_details.MFO')
+                            @error('contract_request.contractor_payment_details.mfo')
                             <x-slot name="error">
                                 <x-forms.error>
                                     {{$message}}
@@ -259,26 +259,12 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <div x-data="{
-        value: 'UA',
-        applyMask() {
-            this.value = this.value.replace(/[^A-Za-z0-9]/g, '');
-
-            if (!this.value.startsWith('UA')) {
-                this.value = 'UA' + this.value.slice(2);
-            }
-
-            if (this.value.length > 29) {
-                this.value = this.value.slice(0, 29);
-            }
-
-            $wire.set('contract_request.contractor_payment_details.payer_account', this.value);
-        }
-    }">
-                                    <input type="text"  wire:model="contract_request.contractor_payment_details.payer_account" x-model="value" @input="applyMask"
-                                           placeholder="UAxxxxxxxxxxxxxxxxxxxxxx" class="default-input"/>
-
-                                </div>
+                                <x-forms.input class="default-input"
+                                               wire:model="contract_request.contractor_payment_details.payer_account" type="text"
+                                               id="payer_account"
+                                               x-data
+                                               x-mask="UA99 9999999 999999999999999999"
+                                               />
                             </x-slot>
                             @error('contract_request.contractor_payment_details.payer_account')
                             <x-slot name="error">
@@ -302,6 +288,7 @@
                         </h3>
                     </div>
                     <div class="flex flex-col gap-5.5 p-6.5">
+                        @if($divisions)
                         <x-forms.form-group>
                             <x-slot name="label">
                                 <x-forms.label for="contractor_divisions" class="default-label">
@@ -326,6 +313,7 @@
                             </x-slot>
                             @enderror
                         </x-forms.form-group>
+                        @endif
                     </div>
                 </div>
             </div>

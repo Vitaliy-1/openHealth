@@ -8,8 +8,8 @@ use App\Livewire\Contract\Forms\ContractFormRequest;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesRequestApi;
 use App\Models\Contract;
 use App\Models\Division;
-use App\Models\HealthcareService;
 use App\Models\LegalEntity;
+use App\Services\LegalEntityService;
 use App\Traits\FormTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -29,13 +29,17 @@ class ContractForm extends Component
         'CAPITATION_CONTRACT_CONSENT_TEXT',
     ];
 
-    public ?LegalEntity $legalEntity;
+    public LegalEntity  $legalEntity;
 
-    public ?Collection $divisions;
+    public ?Collection   $divisions;
     public ?Collection $healthcareServices;
 
     public ContractFormRequest $contract_request;
 
+    public array $edr = [
+        'name' => '1',
+        'public_name' => '2',
+    ];
     public  ? array $getCertificateAuthority;
 
     public array $legalEntityApi = [];
@@ -44,10 +48,15 @@ class ContractForm extends Component
     public string $external_contractor_key = '';
     public string $legalEntity_search = '';
     public string $contractCacheKey;
+
     public string $knedp = '';
+
     public $keyContainerUpload;
 
     public string $password = '';
+
+
+    public string $legalEntitySearch= '';
 
     public function boot()
     {
@@ -60,7 +69,6 @@ class ContractForm extends Component
             $this->contract_request->previous_request_id = $id;
         }
         $this->getCertificateAuthority = (new CipherApi())->getCertificateAuthority();
-
         $this->getDictionary();
         $this->getLegalEntity();
     }
@@ -68,18 +76,13 @@ class ContractForm extends Component
     public function getLegalEntity()
     {
         $this->legalEntity = auth()->user()->legalEntity;
-        $this->getDivisions();
+        $legalEntity = auth()->user()->legalEntity;
+
+        $this->legalEntityService = new LegalEntityService($legalEntity);
+
+        $this->divisions = $this->legalEntity->getActiveDivisions();
     }
 
-    public function render()
-    {
-        return view('livewire.contract.contract-form');
-    }
-
-    public function getDivisions()
-    {
-        $this->divisions = $this->legalEntity->division->where('status', 'ACTIVE');
-    }
 
 
     public function contractType()
@@ -99,11 +102,16 @@ class ContractForm extends Component
 
     public function addExternalContractors(): void
     {
+        $clientId = $this->legalEntity->getClientId();
         $this->validateExternalContractors();
         if ($this->external_contractor_key !== '') {
             $this->external_contractors[$this->external_contractor_key] = $this->contract_request->external_contractors;
+            $this->external_contractors[$this->external_contractor_key]['legal_entity_id'] = $clientId;
+
         } else {
             $this->external_contractors[] = $this->contract_request->external_contractors;
+            $this->external_contractors[0]['legal_entity_id'] = $clientId;
+
         }
         $this->contract_request->external_contractors = [];
         $this->closeModal();
@@ -133,8 +141,8 @@ class ContractForm extends Component
     {
         $this->external_contractor_key = $key;
         $this->contract_request->external_contractors = $this->external_contractors[$this->external_contractor_key];
-        $this->legalEntity_search = $this->contract_request->external_contractors['legal_entity']['name'];
-        $this->openModal();
+//        $this->legalEntity_search = $this->contract_request->external_contractors['legal_entity']['name'];
+        $this->openModal('addExternalContractors');
     }
 
     public function openModalSigned(): void
@@ -163,10 +171,9 @@ class ContractForm extends Component
 
     public function sendApiRequest()
     {
-        dd($this->requestBuilder());
 
         $this->contract_request->rulesForModelValidate();
-        $removeKeyEmpty = removeEmptyKeys($this->contract_request->toArray());
+        $removeKeyEmpty = removeEmptyKeys($this->requestBuilder());
         $base64Data = (new CipherApi())->sendSession(
             json_encode($removeKeyEmpty),
             $this->password,
@@ -199,18 +206,22 @@ class ContractForm extends Component
 
     public function requestBuilder()
     {
-
-        dd($this->legalEntity);
         $data = $this->contract_request->toArray();
+        $data['external_contractors'] = $this->external_contractors;
         $data['additional_document_md5'] = md5_file($this->contract_request->additional_document_md5->getRealPath());
         $data['statute_md5'] = md5_file($this->contract_request->statute_md5->getRealPath());
         $data['end_date'] = Carbon::parse($this->contract_request->end_date)->format('Y-m-d');
         $data['start_date'] = Carbon::parse($this->contract_request->start_date)->format('Y-m-d');
         $data['contractor_owner_id'] = $this->legalEntity->getOwner()->uuid;
-
+        $data['consent_text'] = $this->dictionaries['CAPITATION_CONTRACT_CONSENT_TEXT']['APPROVED'];
         return $data;
     }
 
+
+    public function render()
+    {
+        return view('livewire.contract.contract-form');
+    }
 
 
 }
