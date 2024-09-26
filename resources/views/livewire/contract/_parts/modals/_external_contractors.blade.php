@@ -14,29 +14,28 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <div >
+                                <div>
                                     <x-forms.input class="default-input"
                                                    x-mask="9999999999"
-                                                   wire:model="legalEntity_search"
+                                                   wire:model="contract_request.external_contractors.name"
                                                    wire:keyup.debounce.500ms="getLegalEntityApi; open = true"
                                                    id=""/>
 
                                     <div x-show="open" x-ref="dropdown" wire:target="getLegalEntityApi">
                                         @if($legalEntityApi)
-                                            <div class="z-10 max-h-96 overflow-auto w-full	 absolute  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                                            <div
+                                                class="z-10 max-h-96 overflow-auto w-fullabsolute  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                                                 <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                                                     aria-labelledby="dropdownHoverButton">
                                                     @foreach($legalEntityApi as $legalEntity)
                                                         <li>
                                                             <a x-on:click.prevent="
-      $wire.set('legalEntity_search', '{{ $legalEntity['edr']['name'] }}');
-
-    $wire.set('contract_request.external_contractors.legal_entity.name', '{{ $legalEntity['edr']['name'] }}');
-$wire.set('contract_request.external_contractors.legal_entity.id', '{{ $legalEntity['id'] }}');
-    open = false;"
+                                                               $wire.set('contract_request.external_contractors.name', '{{ $legalEntity['edrpou'] }}');
+                                                               $wire.set('contract_request.external_contractors.legal_entity_id', '{{ $legalEntity['id'] }}');
+                                                               open = false;"
                                                                href="#"
                                                                class="pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                                                {{ $legalEntity['edr']['name'] }}
+                                                                {{ $legalEntity['edrpou'] ?? ''}}
                                                             </a>
                                                         </li>
                                                     @endforeach
@@ -88,10 +87,10 @@ $wire.set('contract_request.external_contractors.legal_entity.id', '{{ $legalEnt
                             </x-slot>
                             <x-slot name="input">
                                 <x-forms.input type="date"
-                                    class="default-input"
+                                               class="default-input"
 
-                                    wire:model="contract_request.external_contractors.contract.issued_at"
-                                    id="contract_issued_at"/>
+                                               wire:model="contract_request.external_contractors.contract.issued_at"
+                                               id="contract_issued_at"/>
                             </x-slot>
                             @error('contract_request.external_contractors.contract.issued_at')
                             <x-slot name="error">
@@ -110,9 +109,9 @@ $wire.set('contract_request.external_contractors.legal_entity.id', '{{ $legalEnt
                             </x-slot>
                             <x-slot name="input">
                                 <x-forms.input type="date"
-                                     class="default-input"
-                                    wire:model="contract_request.external_contractors.contract.expires_at"
-                                    id="contract_expires_at"/>
+                                               class="default-input"
+                                               wire:model="contract_request.external_contractors.contract.expires_at"
+                                               id="contract_expires_at"/>
                             </x-slot>
                             @error('contract_request.external_contractors.contract.expires_at')
                             <x-slot name="error">
@@ -133,14 +132,15 @@ $wire.set('contract_request.external_contractors.legal_entity.id', '{{ $legalEnt
                             </x-slot>
                             <x-slot name="input">
                                 <x-forms.select
-                                    class="default-input"  type="text"
+                                    class="default-input" type="text"
                                     id="division"
+                                    wire:model="contract_request.external_contractors.divisions.id"
                                     wire:change="getHealthcareServices($event.target.value,)"
                                 >
                                     <x-slot name="option">
                                         <option value="">{{__('forms.select')}}</option>
                                         @foreach($divisions as $k=>$division )
-                                            <option value="{{$division->id}}">{{$division->name}}</option>
+                                            <option value="{{$division->uuid}}">{{$division->name}}</option>
                                         @endforeach
                                     </x-slot>
                                 </x-forms.select>
@@ -155,23 +155,20 @@ $wire.set('contract_request.external_contractors.legal_entity.id', '{{ $legalEnt
                         </x-forms.form-group>
                         <x-forms.form-group class="">
                             <x-slot name="label">
-                                <x-forms.label for="division_external_contractors" class="default-label">
+                                <x-forms.label for="division_external_contractors_medical_service" class="default-label">
                                     {{__('forms.medical_service')}}*
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
                                 <x-forms.select
-                                    class="default-input" wire:model="contract_request.external_contractors.divisions.medical_service" type="text"
-                                    id="division_external_contractors"
+                                    class="default-input"
+                                    wire:model="contract_request.external_contractors.divisions.medical_service"
+                                    type="text"
+                                    id="division_external_contractors_medical_service"
                                 >
                                     <x-slot name="option">
-                                        <option value="">{{__('forms.select')}}</option>
-                                        @if($healthcareServices)
-                                            @foreach($healthcareServices as $k=>$healthcareService )
-                                                <option
-                                                    value="{{$healthcareService->uuid}}">{{$healthcareService->speciality_type}}</option>
-                                            @endforeach
-                                        @endif
+                                        <option  value="">{{__('forms.select')}}</option>
+                                        <option  value="PMD_1">Послуга ПМД</option>
                                     </x-slot>
                                 </x-forms.select>
 

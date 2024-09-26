@@ -23,10 +23,10 @@ class ContractFormRequest extends Form
     ])]
     public ?array $contractor_payment_details = [];
 
-    #[Validate('required|min:10')]
+    #[Validate('required')]
     public ?object $statute_md5;
 
-    #[Validate('required|min:10')]
+    #[Validate('required')]
     public ?object $additional_document_md5;
     #[Validate('required')]
     public ?array $contractor_divisions = [];
@@ -38,11 +38,11 @@ class ContractFormRequest extends Form
     public ?string $end_date = '';
 
     #[Validate([
-//        'external_contractors.legal_entity.name'         => 'required',
+        'external_contractors.legal_entity_id'       => 'required',
         'external_contractors.contract.expires_at'       => 'required|date',
         'external_contractors.contract.issued_at'        => 'required|date',
         'external_contractors.contract.number'           => 'required|string',
-        'external_contractors.divisions.name'            => 'required|string',
+        'external_contractors.divisions.id'            => 'required|string',
         'external_contractors.divisions.medical_service' => 'required|string',
     ])]
     public ?array $external_contractors = [];

@@ -25,10 +25,9 @@
                             </x-slot>
                             <x-slot name="input">
                                 <x-forms.input disabled class="default-input"
-                                               value="{{$edr['public_name'] ?? ''}}" type="text"
+                                               value="{{$legalEntity['edr']['public_name'] ?? ''}}" type="text"
                                                id="legal_entity_name"/>
                             </x-slot>
-
                         </x-forms.form-group>
                         <x-forms.form-group>
                             <x-slot name="label">
@@ -37,7 +36,7 @@
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name="input">
-                                <x-forms.input disabled class="default-input" value="{{$edr['name']}}"
+                                <x-forms.input disabled class="default-input" value="{{$legalEntity['edr']['name'] ?? ''}}"
                                                type="text"
                                                id="legal_entity_owner"/>
                             </x-slot>

@@ -27,20 +27,18 @@ class ContractForm extends Component
     public ?array $dictionaries_field = [
         'CONTRACT_TYPE',
         'CAPITATION_CONTRACT_CONSENT_TEXT',
+        'SPECIALITY_TYPE'
     ];
 
-    public LegalEntity  $legalEntity;
+    public LegalEntity $legalEntity;
 
-    public ?Collection   $divisions;
+    public ?Collection $divisions;
     public ?Collection $healthcareServices;
 
     public ContractFormRequest $contract_request;
 
-    public array $edr = [
-        'name' => '1',
-        'public_name' => '2',
-    ];
-    public  ? array $getCertificateAuthority;
+
+    public ?array $getCertificateAuthority;
 
     public array $legalEntityApi = [];
 
@@ -56,7 +54,7 @@ class ContractForm extends Component
     public string $password = '';
 
 
-    public string $legalEntitySearch= '';
+    public string $legalEntitySearch = '';
 
     public function boot()
     {
@@ -76,13 +74,9 @@ class ContractForm extends Component
     public function getLegalEntity()
     {
         $this->legalEntity = auth()->user()->legalEntity;
-        $legalEntity = auth()->user()->legalEntity;
-
-        $this->legalEntityService = new LegalEntityService($legalEntity);
 
         $this->divisions = $this->legalEntity->getActiveDivisions();
     }
-
 
 
     public function contractType()
@@ -93,8 +87,8 @@ class ContractForm extends Component
 
     public function getLegalEntityApi()
     {
-        if (strlen($this->legalEntity_search) >= 7) {
-            $this->legalEntityApi = LegalEntitiesRequestApi::getLegalEntities($this->legalEntity_search);
+        if (strlen($this->contract_request->external_contractors['name']) >= 3) {
+            $this->legalEntityApi = LegalEntitiesRequestApi::getLegalEntities($this->contract_request->external_contractors['name']);
         }
 
     }
@@ -102,16 +96,11 @@ class ContractForm extends Component
 
     public function addExternalContractors(): void
     {
-        $clientId = $this->legalEntity->getClientId();
         $this->validateExternalContractors();
         if ($this->external_contractor_key !== '') {
             $this->external_contractors[$this->external_contractor_key] = $this->contract_request->external_contractors;
-            $this->external_contractors[$this->external_contractor_key]['legal_entity_id'] = $clientId;
-
         } else {
             $this->external_contractors[] = $this->contract_request->external_contractors;
-            $this->external_contractors[0]['legal_entity_id'] = $clientId;
-
         }
         $this->contract_request->external_contractors = [];
         $this->closeModal();
@@ -128,7 +117,6 @@ class ContractForm extends Component
         $this->contract_request->external_contractors = [];
     }
 
-
     public function closeModal(): void
     {
         $this->resetExternalContractorKeyAndRequest();
@@ -141,7 +129,6 @@ class ContractForm extends Component
     {
         $this->external_contractor_key = $key;
         $this->contract_request->external_contractors = $this->external_contractors[$this->external_contractor_key];
-//        $this->legalEntity_search = $this->contract_request->external_contractors['legal_entity']['name'];
         $this->openModal('addExternalContractors');
     }
 
@@ -158,12 +145,18 @@ class ContractForm extends Component
     }
 
 
-    public function getHealthcareServices($id): void
+    public function getHealthcareServices($id): object|array
     {
-        $division = Division::find($id);
-        $this->contract_request->external_contractors['divisions']['name'] = $division->name;
-        $this->contract_request->external_contractors['divisions']['uuid'] = $division->uuid;
-        $this->healthcareServices = $division
+        if (!$id) {
+            return [];
+        }
+        $division = Division::where('uuid', $id)->first();
+        if (!$division) {
+            return [];
+        }
+        $this->contract_request->external_contractors['divisions']['id'] = $division->uuid;
+
+        return $this->healthcareServices = $division
             ->healthcareService()
             ->get();
 
@@ -207,13 +200,27 @@ class ContractForm extends Component
     public function requestBuilder()
     {
         $data = $this->contract_request->toArray();
-        $data['external_contractors'] = $this->external_contractors;
+
+        if (!empty($this->external_contractors)) {
+            $data['external_contractors'] = array_map(function ($contractor) {
+                unset($contractor['name']);
+                if (isset($contractor['divisions']) ) {
+                    $contractor['divisions'] = [$contractor['divisions']];
+                }
+                return $contractor;
+            }, $this->external_contractors);
+
+        }
+
         $data['additional_document_md5'] = md5_file($this->contract_request->additional_document_md5->getRealPath());
         $data['statute_md5'] = md5_file($this->contract_request->statute_md5->getRealPath());
         $data['end_date'] = Carbon::parse($this->contract_request->end_date)->format('Y-m-d');
         $data['start_date'] = Carbon::parse($this->contract_request->start_date)->format('Y-m-d');
         $data['contractor_owner_id'] = $this->legalEntity->getOwner()->uuid;
         $data['consent_text'] = $this->dictionaries['CAPITATION_CONTRACT_CONSENT_TEXT']['APPROVED'];
+        $data['contractor_payment_details'] = $this->contract_request->contractor_payment_details;
+        $data['contractor_payment_details']['payer_account'] = str_replace(' ', '', $data['contractor_payment_details']['payer_account']);
+
         return $data;
     }
 
