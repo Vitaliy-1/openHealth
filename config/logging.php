@@ -126,6 +126,13 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'api_errors' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/api_errors.log'), // путь к вашему файлу логов
+            'level' => 'error',
+        ],
+
     ],
 
 ];

@@ -8,11 +8,13 @@ class LegalEntitiesApi extends Request
 {
 
 
-    public const URL = '/api/v2/legal_entities';
+    public const URL_V2 = '/api/v2/legal_entities';
+    public const URL = '/api/legal_entities';
+
 
     public static function _get(array $params = []): array
     {
-       return (new Request('GET', self::URL, $params,false))->sendRequest();
+       return (new Request('GET', self::URL_V2, $params))->sendRequest();
     }
 
     public static function _getById(string $id): array
@@ -20,12 +22,16 @@ class LegalEntitiesApi extends Request
         $params = [
             'legal_entity_id' => $id
         ];
-        return (new Request('GET', self::URL.'/'.$id,$params))->sendRequest();
+        return (new Request('GET', self::URL_V2.'/'.$id,$params))->sendRequest();
+    }
+
+    public static function _verify(string $id): array{
+        return (new Request('PATCH', self::URL.'/'.$id.'/actions/nhs_verify',[]))->sendRequest();
     }
 
     public static function _createOrUpdate(array $params = []): array
     {
-        return (new Request('PUT', self::URL, $params,false))->sendRequest();
+        return (new Request('PUT', self::URL_V2, $params,false))->sendRequest();
     }
 
 

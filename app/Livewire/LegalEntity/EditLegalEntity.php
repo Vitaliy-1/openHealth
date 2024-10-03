@@ -16,6 +16,7 @@ class EditLegalEntity extends Component
     public function render()
     {
 
+
         if (Session::get('auth_token')) {
             dd(LegalEntitiesRequestApi::_getById(Auth::user()->legalEntity->uuid));
         }
