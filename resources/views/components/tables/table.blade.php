@@ -1,19 +1,16 @@
 @props(['headers'])
 
-<table {{ $attributes->merge(['class' => 'w-full table-auto']) }}>
-    <thead>
-    <tr class="bg-gray-2 text-left dark:bg-meta-4">
+<table {{ $attributes->merge(['class' => 'min-w-full divide-y divide-gray-200 table-fixed dark:divide-gray-600']) }}>
+    <thead class="bg-gray-100 dark:bg-gray-700">
+    <tr >
         @foreach ($headers->attributes['list'] as $key => $header)
-            <th class="py-4 px-4 font-medium text-black dark:text-white">{{ $header }}</th>
+            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">{{ $header }}</th>
         @endforeach
     </tr>
     </thead>
-    <tbody>
+    <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
     {{ $tbody }}
     </tbody>
-    @isset($footer)
-        <tfoot>
-            {{ $footer }}
-        </tfoot>
-    @endif
+
 </table>
+

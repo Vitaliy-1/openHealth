@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Livewire\Auth\Login;
 use App\Livewire\Contract\ContractForm;
 use App\Livewire\Contract\ContractIndex;
+use App\Livewire\Declaration\DeclarationIndex;
 use App\Livewire\Division\DivisionForm;
 use App\Livewire\Division\DivisionIndex;
 use App\Livewire\Division\HealthcareServiceForm;
@@ -80,6 +81,11 @@ Route::middleware([
             Route::get('/update/{id}', LicenseForms::class)->name('license.form');
             Route::get('/create', CreateNewLicense::class)->name('license.create');
             Route::get('/show/{id}', LicenseShow::class)->name('license.show');
+        });
+
+        Route::prefix('declaration')->group(function () {
+            Route::get('/', DeclarationIndex::class)->name('declaration.index');
+
         });
 
         Route::get('/test-license', [HomeController::class, 'test']);
