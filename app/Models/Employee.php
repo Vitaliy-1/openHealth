@@ -71,13 +71,14 @@ class Employee extends Model
 
 
     //Scopes for employees type
-    public function scopeDoctor($query){
+    public function scopeDoctor($query)
+    {
         return $query->where('employee_type', 'DOCTOR');
     }
 
     //Get employee full name Split
-    public function getFullNameAttribute()
+    public function getFullNameAttribute(): string
     {
-        return $this->party['first_name'] . ' ' . $this->party['last_name'] . ' ' . $this->party['second_name'];
+        return ($this->party['first_name'] ?? '') . ' ' . ($this->party['last_name'] ?? '') . ' ' . ($this->party['second_name'] ?? '');
     }
 }

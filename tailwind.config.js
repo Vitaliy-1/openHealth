@@ -9,7 +9,7 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './resources/js/**/*.js',
-        './node_modules/flowbite/**/*.js', // Add this line
+        './node_modules/flowbite/**/*.js',
     ],
     darkMode: 'class',
     theme: {

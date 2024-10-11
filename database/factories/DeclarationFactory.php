@@ -117,7 +117,7 @@ class DeclarationFactory extends Factory
                 'division_id' => $this->faker->uuid,
                 'legal_entity_id' => $this->legalEntity->uuid,
             ],
-            'person_id'=> $this->faker->numberBetween([1, 1000000]),
+//            'person_id'=> $this->faker->numberBetween([1, 1000000]),
             'status' => $this->faker->randomElement(['NEW', 'APPROVED', 'REJECTED','SIGNED']),
             'scope' => 'family_doctor',
             'legal_entity' => [
@@ -136,6 +136,8 @@ class DeclarationFactory extends Factory
                     ]
                 ]
             ],
+            'reason' => $this->faker->text(10),
+            'reason_description' => $this->faker->text(30),
             'employee_id' => $this->employee->id ?? $this->faker->numberBetween([1, 1000000]),
             'declaration_request_id' => $this->faker->uuid,
 
