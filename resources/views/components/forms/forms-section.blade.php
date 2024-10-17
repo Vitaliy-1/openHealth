@@ -1,9 +1,7 @@
 @props(['submit'])
 <div {{ $attributes->merge(['class' => 'grid grid-cols-1 gap-9']) }}>
     <div class="flex flex-col gap-9">
-        <div class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <form wire:submit="{{ $submit }}">
-                <x-forms.form-title>
+                <x-forms.form-title  class="mb-4 text-xl font-semibold dark:text-white" >
                     <x-slot name="title">{{ $title }}</x-slot>
                 </x-forms.form-title>
                 {{ $form }}
@@ -14,8 +12,6 @@
                 @endif
             </form>
         </div>
-    </div>
-</div>
 </div>
 
 

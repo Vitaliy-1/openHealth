@@ -1,9 +1,5 @@
-<x-slot name="title">
-    {{  __('5. Ліцензія') }}
-    <h3>  {{  __('Крок :currentSteep з :totalSteps', ['currentSteep' => $currentStep,'totalSteps' => $totalSteps]) }}</h3>
-</x-slot>
-<div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
-    <x-forms.form-group class="xl:w-1/2">
+<x-forms.form-row class="flex-wrap">
+    <x-forms.form-group class="xl:w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="license_type"
                            name="label">
@@ -32,7 +28,7 @@
         </x-slot>
         @enderror
     </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/2">
+    <x-forms.form-group class="xl:w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="license_license_number"
                            name="label">
@@ -44,13 +40,11 @@
                            type="text" id="license_license_number"/>
         </x-slot>
     </x-forms.form-group>
-</div>
-<div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
-    <x-forms.form-group class="xl:w-1/2">
+    <x-forms.form-group class="xl:w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="license_issued_by"
                            name="label">
-               {{__('forms.license_issued_by')}} *
+                {{__('forms.license_issued_by')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -65,7 +59,7 @@
         </x-slot>
         @enderror
     </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/2">
+    <x-forms.form-group class="xl:w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="license_issued_date"
                            name="label">
@@ -73,8 +67,8 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.license.issued_date"
-                           type="date" id="license_issued_date"/>
+            <x-forms.input-date  wire:model="legal_entity_form.license.issued_date"
+                            id="license_issued_date"/>
         </x-slot>
         @error('legal_entity_form.license.issued_date')
         <x-slot name="error">
@@ -84,9 +78,7 @@
         </x-slot>
         @enderror
     </x-forms.form-group>
-</div>
-<div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
-    <x-forms.form-group class="xl:w-1/2">
+    <x-forms.form-group class="xl:w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="license_active_from_date"
                            name="label">
@@ -94,8 +86,8 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.license.active_from_date"
-                           type="date" id="license_active_from_date"/>
+            <x-forms.input-date  wire:model="legal_entity_form.license.active_from_date"
+                           id="license_active_from_date"/>
         </x-slot>
         @error('legal_entity_form.license.active_from_date')
         <x-slot name="error">
@@ -105,7 +97,7 @@
         </x-slot>
         @enderror
     </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/2">
+    <x-forms.form-group class="xl:w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="license_expiry_date"
                            name="label">
@@ -113,14 +105,11 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.license.expiry_date"
-                           type="date" id="license_expiry_date"/>
+            <x-forms.input-date wire:model="legal_entity_form.license.expiry_date"
+                           id="license_expiry_date"/>
         </x-slot>
     </x-forms.form-group>
-
-</div>
-<div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
-    <x-forms.form-group class="xl:w-1/2">
+    <x-forms.form-group class="xl:w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="license_what_licensed"
                            name="label">
@@ -132,7 +121,7 @@
                            type="text" id="license_what_licensed"/>
         </x-slot>
     </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/2">
+    <x-forms.form-group class="xl:w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="license_order_no"
                            name="label">
@@ -152,4 +141,4 @@
         @enderror
     </x-forms.form-group>
 
-</div>
+</x-forms.form-row>

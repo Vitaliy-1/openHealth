@@ -3,41 +3,37 @@
 namespace App\Livewire\LegalEntity;
 
 use App\Classes\Cipher\Api\CipherApi;
-use App\Helpers\JsonHelper;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesForms;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesRequestApi;
 use App\Mail\OwnerCredentialsMail;
 use App\Models\Employee;
 use App\Models\LegalEntity;
-use App\Models\Person;
+use App\Models\License;
 use App\Models\User;
+use App\Traits\Cipher;
 use App\Traits\FormTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Illuminate\Support\Facades\Cache;
 use Livewire\WithFileUploads;
-use Mockery\Exception;
 
 /**
  *
  */
-class CreateNewLegalEntities extends Component
+class LegalEntities extends Component
 {
 
-    use FormTrait, WithFileUploads;
+    use FormTrait, Cipher, WithFileUploads;
 
     const CACHE_PREFIX = 'register_legal_entity_form';
 
     public LegalEntitiesForms $legal_entity_form;
 
     public LegalEntity $legalEntity;
-
-    public Person $person;
 
     public Employee $employee;
 
@@ -57,62 +53,66 @@ class CreateNewLegalEntities extends Component
             'title'    => 'ЄДРПОУ',
             'step'     => 1,
             'property' => 'edrpou',
+            'view'     => '_step_edrpou',
         ],
         'owner'         => [
             'title'    => 'Власник',
             'step'     => 2,
             'property' => 'owner',
+            'view'     => '_step_owner',
         ],
         'phones'        => [
             'title'    => 'Контакти',
             'step'     => 3,
             'property' => 'phones',
+            'view'     => '_step_contact',
         ],
         'addresses'     => [
             'title'    => 'Адреси',
             'step'     => 4,
             'property' => 'residence_address',
+            'view'     => '_step_residence_address',
         ],
         'accreditation' => [
             'title'    => 'Акредитація',
             'step'     => 5,
-            'property' => 'residence_address'
+            'property' => 'residence_address',
+            'view'     => '_step_accreditation',
         ],
         'license'       => [
             'title'    => 'Ліцензії',
             'step'     => 6,
-            'property' => 'license'
+            'property' => 'license',
+            'view'     => '_step_license',
 
         ],
         'beneficiary'   => [
-            'title'    => 'Додаткова інформація',
+            'title'    => 'Інформація',
             'step'     => 7,
-            'property' => 'license'
+            'property' => 'license',
+            'view'     => '_step_additional_information',
         ],
         'public_offer'  => [
-            'title'    => 'Завершити реєстрацію',
+            'title'    => 'Завершити',
             'step'     => 8,
-            'property' => 'public_offer'
+            'property' => 'public_offer',
+            'view'     => '_step_public_offer',
         ],
     ];
 
     public ?array $addresses;
-
     /**
      * @var array|null
      */
     public ?array $getCertificateAuthority;
-    public string $knedp = '';
-    public $keyContainerUpload;
 
-    public string $password = '';
 
     public function rules(): array
     {
         return [
-            'knedp'              => 'required|string',
-            'keyContainerUpload' => 'required|file|mimes:dat,zs2,sk,jks,pk8,pfx',
-            'password'           => 'required|string|max:255',
+            'knedp'                                  => 'required|string',
+            'keyContainerUpload'                     => 'required|file|mimes:dat,zs2,sk,jks,pk8,pfx',
+            'password'                               => 'required|string|max:255',
             'legal_entity_form.public_offer.consent' => 'accepted',
         ];
     }
@@ -137,6 +137,10 @@ class CreateNewLegalEntities extends Component
 
     public function mount(): void
     {
+
+        if (Auth::user()->hasRole('OWNER')) {
+          $this->redirect('/legal-entity/edit');
+        }
         $this->getLegalEntity();
         $this->getDictionary();
         $this->stepFields();
@@ -151,6 +155,7 @@ class CreateNewLegalEntities extends Component
             'POSITION'      => ['P1', 'P2', 'P3', 'P32', 'P4', 'P6', 'P5'],
             'DOCUMENT_TYPE' => ['PASSPORT', 'NATIONAL_ID']
         ];
+
         foreach ($fields as $type => $keys) {
             $this->getDictionariesFields($keys, $type);
         }
@@ -173,7 +178,6 @@ class CreateNewLegalEntities extends Component
         if (Cache::has($this->ownerCacheKey)) {
             $this->legal_entity_form->owner = Cache::get($this->ownerCacheKey);
         }
-
 
     }
 
@@ -212,6 +216,15 @@ class CreateNewLegalEntities extends Component
 
     }
 
+    public function getTitleByStep(int $currentStep): string
+    {
+        foreach ($this->steps as $step) {
+            if ($step['step'] === $currentStep) {
+                return $step['title'];
+            }
+        }
+        return '';
+    }
 
     public function setCertificateAuthority(): array|null
     {
@@ -360,10 +373,6 @@ class CreateNewLegalEntities extends Component
         return true; // Return true if the Legal Entity has changed
     }
 
-    public function saveLegalEntity(): void
-    {
-        $this->legalEntity->save();
-    }
 
     // #Step  1 Request to Ehealth API get Legal Entity
     public function stepEdrpou(): void
@@ -371,9 +380,6 @@ class CreateNewLegalEntities extends Component
         $this->legal_entity_form->rulesForEdrpou();
         $getLegalEntity = [];
 
-        if (\auth()->user()->legalEntity) {
-            $getLegalEntity = LegalEntitiesRequestApi::getLegalEntitie($this->legal_entity_form->edrpou);
-        }
         if (!empty($getLegalEntity)) {
             $this->saveLegalEntityFromExistingData($getLegalEntity);
         } else {
@@ -409,9 +415,6 @@ class CreateNewLegalEntities extends Component
 
     // Step  4 Create/Update Address
 
-    /**
-     * @throws ValidationException
-     */
     public function stepAddress(): void
     {
         $this->fetchDataFromAddressesComponent();
@@ -445,91 +448,150 @@ class CreateNewLegalEntities extends Component
     // Step  7 Create/Update Additional Information
     public function stepAdditionalInformation(): void
     {
-            $this->legal_entity_form->rulesForAdditionalInformation();
+        $this->legal_entity_form->rulesForAdditionalInformation();
     }
 
     //Final Step
     public function stepPublicOffer(): void
     {
-
+        //TODO: Upload Files with Traits 
         $this->validate($this->rules());
 
-        $this->legal_entity_form->public_offer = [
-            'consent_text' => 'Тестове consent_text',
-            'consent'      => true
-        ];
-        $this->legal_entity_form->security = [
-            'redirect_uri' => 'https://openhealths.com'
-        ];
+        // Preparing data for public offer and security fields
+        $this->legal_entity_form->public_offer = $this->preparePublicOffer();
+        $this->legal_entity_form->security = $this->prepareSecurityData();
 
-        $data = $this->legal_entity_form->toArray();
-        if (isset($this->legal_entity_form->owner['documents'])) {
-            $data['owner']['documents'] = [$this->legal_entity_form->owner['documents']];
-        }
+        // Converting the form data to an array
+        $data = $this->prepareDataForRequest($this->legal_entity_form->toArray());
 
-        $data['owner']['no_tax_id'] = empty($this->legal_entity_form->owner['tax_id']);
-        $data['archive'] = [$this->legal_entity_form->archive ?? []];
-        
-        $removeKeyEmpty = removeEmptyKeys($data);
-        $base64Data = (new CipherApi())->sendSession(
-            json_encode($removeKeyEmpty),
-            $this->password,
-            $this->keyContainerUpload,
-            $this->knedp
-        );
+        // Sending encrypted data
+        $base64Data = $this->sendEncryptedData($data);
+
         if (isset($base64Data['errors'])) {
-            $this->dispatch('flashMessage', [
-                'message' => $base64Data['errors'],
-                'type'    => 'error'
-            ]);
+            $this->dispatchErrorMessage($base64Data['errors']);
             return;
         }
 
-        $data = [
-//          'signed_legal_entity_request' => $base64Data,
-          'signed_legal_entity_request'        => 'MIIViAYJKoZIhvcNAQcCoIIVeTCCFXUCAQExDjAMBgoqhiQCAQEBAQIBMIIHhgYJKoZIhvcNAQcBoIIHdwSCB3N7CgkiZWRycG91IjogIjMxMzk4MjE1NTkiLAoJInR5cGUiOiAiUFJJTUFSWV9DQVJFIiwKCSJyZXNpZGVuY2VfYWRkcmVzcyI6IHsKCQkidHlwZSI6ICJSRVNJREVOQ0UiLAoJCSJjb3VudHJ5IjogIlVBIiwKCQkiYXJlYSI6ICLQnC7QmtCY0IfQkiIsCgkJInNldHRsZW1lbnQiOiAi0JrQuNGX0LIiLAoJCSJzZXR0bGVtZW50X3R5cGUiOiAiQ0lUWSIsCgkJInNldHRsZW1lbnRfaWQiOiAiYWRhYTRhYmYtZjUzMC00NjFjLWJjYmYtYTBhYzIxMGQ5NTViIiwKCQkic3RyZWV0X3R5cGUiOiAiU1RSRUVUIiwKCQkic3RyZWV0IjogItCR0L7RgNC40YHQv9GW0LvRjNGB0YzQutCwIiwKCQkiYnVpbGRpbmciOiAiMjbQtyIsCgkJImFwYXJ0bWVudCI6ICIxMTIiLAoJCSJ6aXAiOiAiMDIwOTMiCgl9LAoJInBob25lcyI6IFsKCQl7CgkJCSJ0eXBlIjogIk1PQklMRSIsCgkJCSJudW1iZXIiOiAiKzM4MDUwNjQ5MTI0NCIKCQl9CgldLAoJImVtYWlsIjogInZpdGFsaXliZXpzaEBnbWFpbC5jb20iLAoJIndlYnNpdGUiOiAid3d3Lm9wZW5oZWFsdGhzLmNvbSIsCgkiYmVuZWZpY2lhcnkiOiAi0JHQtdC30YjQtdC50LrQviDQktGW0YLQsNC70ZbQuSDQk9GA0LjQs9C+0YDQvtCy0LjRhyIsCgkib3duZXIiOiB7CgkJImZpcnN0X25hbWUiOiAi0JLRltGC0LDQu9GW0LkiLAoJCSJsYXN0X25hbWUiOiAi0JHQtdC30YjQtdC50LrQviIsCgkJInNlY29uZF9uYW1lIjogItCT0YDQuNCz0L7RgNC+0LLQuNGHIiwKCQkidGF4X2lkIjogIjMxMzk4MjE1NTkiLAoJCSJub190YXhfaWQiOiBmYWxzZSwKCQkiYmlydGhfZGF0ZSI6ICIxOTg1LTEyLTE4IiwKCQkiZ2VuZGVyIjogIk1BTEUiLAoJCSJlbWFpbCI6ICJ2aXRhbGl5YmV6c2hAZ21haWwuY29tIiwKCQkiZG9jdW1lbnRzIjogWwoJCQl7CgkJCQkidHlwZSI6ICJQQVNTUE9SVCIsCgkJCQkibnVtYmVyIjogItCh0J45NTk5OTMiLAoJCQkJImlzc3VlZF9ieSI6ICLQlNC10YHQvdGP0L3RgdGM0LrQuNC8INCg0JIg0JPQoyDQnNCS0KEg0LIg0LzRltGB0YLRliDQmtC40ZTQstGWIiwKCQkJCSJpc3N1ZWRfYXQiOiAiMjAwMi0wMy0yOCIKCQkJfQoJCV0sCgkJInBob25lcyI6IFsKCQkJewoJCQkJInR5cGUiOiAiTU9CSUxFIiwKCQkJCSJudW1iZXIiOiAiKzM4MDUwNjQ5MTI0NCIKCQkJfQoJCV0sCgkJInBvc2l0aW9uIjogIlAyIgoJfSwKCSJhY2NyZWRpdGF0aW9uIjogewoJCSJjYXRlZ29yeSI6ICJTRUNPTkQiLAoJCSJpc3N1ZWRfZGF0ZSI6ICIyMDE3LTAyLTI4IiwKCQkiZXhwaXJ5X2RhdGUiOiAiMjAyNy0wMi0yOCIsCgkJIm9yZGVyX25vIjogImZkMTIzNDQzIiwKCQkib3JkZXJfZGF0ZSI6ICIyMDE3LTAyLTI4IgoJfSwKCSJsaWNlbnNlIjogewoJCSJ0eXBlIjogIk1TUCIsCgkJImxpY2Vuc2VfbnVtYmVyIjogImZkMTIzNDQzIiwKCQkiaXNzdWVkX2J5IjogItCa0LLQsNC70ZbRhNGW0LrQsNGG0LnQvdCwINC60L7QvNGW0YHRltGPIiwKCQkiaXNzdWVkX2RhdGUiOiAiMjAxNy0wMi0yOCIsCgkJImV4cGlyeV9kYXRlIjogIjIwMjctMDItMjgiLAoJCSJhY3RpdmVfZnJvbV9kYXRlIjogIjIwMTctMDItMjgiLAoJCSJ3aGF0X2xpY2Vuc2VkIjogItGA0LXQsNC70ZbQt9Cw0YbRltGPINC90LDRgNC60L7RgtC40YfQvdC40YUg0LfQsNGB0L7QsdGW0LIiLAoJCSJvcmRlcl9ubyI6ICLQktCQNDMyMzQiCgl9LAoJImFyY2hpdmUiOiBbCgkJewoJCQkiZGF0ZSI6ICIyMDE3LTAyLTI4IiwKCQkJInBsYWNlIjogItCy0YPQuy4g0JPR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',
-         'signed_content_encoding'     => 'base64',
-        ];
+        // Preparing data for API request
+        $request = LegalEntitiesRequestApi::_createOrUpdate([
+            'signed_legal_entity_request' => $base64Data,
+            'signed_content_encoding'     => 'base64',
+        ]);
 
-        $request = LegalEntitiesRequestApi::_createOrUpdate($data);
-
+        // Handling request errors
         if (isset($request['errors']) && is_array($request['errors'])) {
-            $this->dispatch('flashMessage', [
-                'message' => __('Сталася помилка'),
-                'type'    => 'error',
-                'errors'  => $request['errors']
-            ]);
+            $this->dispatchErrorMessage(__('An error occurred'), $request['errors']);
             return;
         }
 
+        // Successful request handling
         if (!empty($request)) {
-            $this->saveLegalEntityFromExistingData($request['data']);
-            $this->legalEntity->client_secret = $request['urgent']['security']['client_secret'] ?? '';
-            $this->legalEntity->client_id = $request['urgent']['security']['client_id'] ?? null;
-            $this->legalEntity->save();
-            $this->createUser();
-//            Cache::forget($this->entityCacheKey);
-//            Cache::forget($this->ownerCacheKey);
-            $this->redirect('/legal-entities/edit');
+            $this->handleSuccessResponse($request);
         }
-
     }
 
-    public function createUser()
+    private function preparePublicOffer(): array
     {
+        return [
+            'consent_text' => 'Sample consent_text',
+            'consent'      => true
+        ];
+    }
+
+    private function prepareSecurityData(): array
+    {
+        return [
+            'redirect_uri' => env('APP_URL'),
+        ];
+    }
+
+    private function prepareDataForRequest(array $data): array
+    {
+        if (isset($data['owner']['documents'])) {
+            $data['owner']['documents'] = [$data['owner']['documents']];
+        }
+
+        $data['owner']['no_tax_id'] = empty($data['owner']['tax_id']);
+        $data['archive'] = [$data['archive'] ?? []];
+
+        return removeEmptyKeys($data);
+    }
+
+
+    private function dispatchErrorMessage(string $message, array $errors = []): void
+    {
+        $this->dispatch('flashMessage', [
+            'message' => $message,
+            'type'    => 'error',
+            'errors'  => $errors
+        ]);
+    }
+
+    private function handleSuccessResponse(array $request): void
+    {
+        $this->createLegalEntity($request);
+        $this->createUser();
+        $this->createLicense($request['data']['license']);
+
+        Cache::forget($this->entityCacheKey);
+        Cache::forget($this->ownerCacheKey);
+
+        $this->redirect('/legal-entities/edit');
+    }
+
+
+    /**
+     * Create a new legal entity based on the provided data.
+     *
+     * @param array $data The data needed to create the legal entity.
+     * @return void
+     */
+    public function createLegalEntity(array $data): void
+    {
+        // Fill the legal entity with the data
+        $this->legalEntity->fill($data['data']);
+
+        // Set UUID from data or default to empty string
+        $this->legalEntity->uuid = $data['data']['id'] ?? '';
+
+        // Set client secret from data or default to empty string
+        $this->legalEntity->client_secret = $data['urgent']['security']['client_secret'] ?? '';
+
+        // Set client id from data or default to null
+        $this->legalEntity->client_id = $data['urgent']['security']['client_id'] ?? null;
+        // Save the legal entity
+        $this->legalEntity->save();
+    }
+
+    /**
+     * Create a new user with provided email and assign them as the owner of a legal entity.
+     * If the user already exists, associate them with the legal entity.
+     * If the user does not exist, create a new user with a random password.
+     *
+     * @return User The created or updated user
+     */
+    public function createUser(): User
+    {
+        // Get the currently authenticated user
         $user = Auth::user();
+
+        // Get the email address of the legal entity owner from the form or set it to null
         $email = $this->legal_entity_form->owner['email'] ?? null;
+
+        // Generate a random password
         $password = Str::random(10);
 
+        // Check if a user with the same email as the legal entity owner already exists
         if ($user->email === $email) {
             $user->legalEntity()->associate($this->legalEntity);
             $user->save();
-        }elseif (User::where('email', $email)->exists()) {
+        } elseif (User::where('email', $email)->exists()) {
+            // If user exists, get the user and associate them with the legal entity
             $user = User::where('email', $email)->first();
             $user->legalEntity()->associate($this->legalEntity);
             $user->save();
-        }
-        else {
+        } else {
+            // If user does not exist, create a new user and assign them to the legal entity
             $user = User::create([
                 'email'    => $email,
                 'password' => Hash::make($password),
@@ -538,13 +600,31 @@ class CreateNewLegalEntities extends Component
             $user->save();
         }
 
+        // Assign the 'OWNER' role to the user
         $user->assignRole('OWNER');
 
-
+        // Send an email with owner credentials to the user
         Mail::to($user->email)->send(new OwnerCredentialsMail($user->email));
 
         return $user;
     }
+
+    /**
+     * Create a new license with the provided data.
+     *
+     * @param array $data The data to fill the license with.
+     */
+    public function createLicense(array $data): void
+    {
+        $license = new License();
+
+        $license->fill($data);
+        $license->legal_entity_id = $this->legalEntity->id;
+        $license->is_primary = true;
+        $license->save();
+        $license->legalEntity()->associate($this->legalEntity);
+    }
+
 
     public function fetchDataFromAddressesComponent(): void
     {
@@ -565,6 +645,6 @@ class CreateNewLegalEntities extends Component
 
     public function render()
     {
-        return view('livewire.legal-entity.create-new-legal-entities');
+        return view('livewire.legal-entity.legal-entities');
     }
 }
