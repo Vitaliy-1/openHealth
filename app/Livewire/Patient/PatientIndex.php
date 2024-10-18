@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Patient;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
 
-class SearchPatient extends Component
+class PatientIndex extends Component
 {
     public string $firstName = '';
     public string $lastName = '';
@@ -55,7 +55,7 @@ class SearchPatient extends Component
 
     public function render()
     {
-        return view('livewire.search-patient');
+        return view('livewire.patient.index');
     }
 
 

@@ -2,6 +2,8 @@
 
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\EmailController;
+use App\Http\Controllers\HomeController;
 use App\Livewire\Auth\Login;
 use App\Livewire\Contract\ContractForm;
 use App\Livewire\Contract\ContractIndex;
@@ -11,16 +13,14 @@ use App\Livewire\Division\DivisionIndex;
 use App\Livewire\Division\HealthcareServiceForm;
 use App\Livewire\Employee\EmployeeForm;
 use App\Livewire\Employee\EmployeeIndex;
-use App\Livewire\License\LicenseIndex;
-use App\Livewire\License\LicenseShow;
-use App\Livewire\License\Forms\LicenseForms;
-use App\Livewire\License\Forms\CreateNewLicense;
 use App\Livewire\LegalEntity\CreateNewLegalEntities;
 use App\Livewire\LegalEntity\EditLegalEntity;
-use App\Livewire\SearchPatient;
+use App\Livewire\License\Forms\CreateNewLicense;
+use App\Livewire\License\Forms\LicenseForms;
+use App\Livewire\License\LicenseIndex;
+use App\Livewire\License\LicenseShow;
+use App\Livewire\Patient\PatientIndex;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\EmailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,8 +74,6 @@ Route::middleware([
             Route::get('/form/{id?}', ContractForm::class)->name('contract.form');
         });
 
-        Route::get('/search/patient', [SearchPatient::class, 'index']);
-
         Route::prefix('license')->group(function () {
             Route::get('/', LicenseIndex::class)->name('license.index');
             Route::get('/update/{id}', LicenseForms::class)->name('license.form');
@@ -91,5 +89,11 @@ Route::middleware([
         Route::get('/test-license', [HomeController::class, 'test']);
 
 
+    });
+
+    Route::group(['middleware' => ['role:OWNER|ADMIN|DOCTOR']], function () {
+        Route::prefix('patient')->group(function () {
+            Route::get('/', PatientIndex::class)->name('patient.index');
+        });
     });
 });
