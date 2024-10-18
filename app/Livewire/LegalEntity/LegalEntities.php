@@ -101,6 +101,8 @@ class LegalEntities extends Component
     ];
 
     public ?array $addresses;
+
+    public ?object  $file = null;
     /**
      * @var array|null
      */
@@ -111,7 +113,7 @@ class LegalEntities extends Component
     {
         return [
             'knedp'                                  => 'required|string',
-            'keyContainerUpload'                     => 'required|file|mimes:dat,zs2,sk,jks,pk8,pfx',
+            'file'                     => 'required|file|mimes:dat,zs2,sk,jks,pk8,pfx',
             'password'                               => 'required|string|max:255',
             'legal_entity_form.public_offer.consent' => 'accepted',
         ];
@@ -228,8 +230,9 @@ class LegalEntities extends Component
 
     public function setCertificateAuthority(): array|null
     {
-        return $this->getCertificateAuthority = (new CipherApi())->getCertificateAuthority();
+        return $this->getCertificateAuthority = $this->getCertificateAuthority();
     }
+
 
     public function stepFields(): void
     {
@@ -413,6 +416,7 @@ class LegalEntities extends Component
         $this->legal_entity_form->rulesForContact();
     }
 
+
     // Step  4 Create/Update Address
 
     public function stepAddress(): void
@@ -451,14 +455,21 @@ class LegalEntities extends Component
         $this->legal_entity_form->rulesForAdditionalInformation();
     }
 
+    public function updatedFile(): void{
+        $this->keyContainerUpload = $this->file ;
+    }
+
+
     //Final Step
     public function stepPublicOffer(): void
     {
-        //TODO: Upload Files with Traits 
+        //TODO: Upload Files with Traits
+
         $this->validate($this->rules());
 
         // Preparing data for public offer and security fields
         $this->legal_entity_form->public_offer = $this->preparePublicOffer();
+
         $this->legal_entity_form->security = $this->prepareSecurityData();
 
         // Converting the form data to an array
@@ -480,7 +491,7 @@ class LegalEntities extends Component
 
         // Handling request errors
         if (isset($request['errors']) && is_array($request['errors'])) {
-            $this->dispatchErrorMessage(__('An error occurred'), $request['errors']);
+            $this->dispatchErrorMessage(__('Сталася невідома помилка'), $request['errors']);
             return;
         }
 
@@ -488,6 +499,9 @@ class LegalEntities extends Component
         if (!empty($request)) {
             $this->handleSuccessResponse($request);
         }
+
+        $this->dispatchErrorMessage(__('Сталася невідома помилка'), $request['errors']);
+
     }
 
     private function preparePublicOffer(): array
@@ -501,12 +515,13 @@ class LegalEntities extends Component
     private function prepareSecurityData(): array
     {
         return [
-            'redirect_uri' => env('APP_URL'),
+            'redirect_uri' => 'https://openhealths.com',
         ];
     }
 
     private function prepareDataForRequest(array $data): array
     {
+
         if (isset($data['owner']['documents'])) {
             $data['owner']['documents'] = [$data['owner']['documents']];
         }

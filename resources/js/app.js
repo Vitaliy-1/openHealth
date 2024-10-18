@@ -22,34 +22,39 @@ const initializeDatepickers = () => {
     const datepickerElements = document.querySelectorAll('.default-datepicker');
 
     datepickerElements.forEach(element => {
-        const datepicker = new Datepicker(element, {
-            format: 'yyyy-mm-dd',
-            language: 'uk'
-        });
+        if (!element.classList.contains('datepicker-initialized')) {
+            const datepicker = new Datepicker(element, {
+                format: 'yyyy-mm-dd',
+                language: 'uk'
+            });
 
-        element.addEventListener('changeDate', function(event) {
-            const selectedDate = event.target.value;
+            element.classList.add('datepicker-initialized');
 
-            // Получаем значение wire:model
-            const wireModel = element.getAttribute('wire:model');
+            element.addEventListener('changeDate', function(event) {
+                const selectedDate = event.target.value;
 
-            // Ищем ближайший компонент Livewire
-            const componentId = element.closest('[wire\\:id]').getAttribute('wire:id');
+                const wireModel = element.getAttribute('wire:model');
 
-            // Устанавливаем значение через Livewire
-            if (Livewire.find(componentId)) {
-                Livewire.find(componentId).set(wireModel, selectedDate);
-            }
-        });
+                const componentId = element.closest('[wire\\:id]').getAttribute('wire:id');
+
+                if (Livewire.find(componentId)) {
+                    Livewire.find(componentId).set(wireModel, selectedDate);
+                }
+            });
+        }
     });
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-
+document.addEventListener('livewire:initialRender', function() {
     initializeDatepickers();
+    console.log('livewire:render');
+
 });
 
-
+document.addEventListener('livewire:render', function() {
+    initializeDatepickers();
+    console.log('livewire:update');
+});
 import.meta.glob([
     '../images/**',
 ]);

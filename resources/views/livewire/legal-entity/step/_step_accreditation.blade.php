@@ -78,6 +78,13 @@
                     <x-forms.input-date   wire:model="legal_entity_form.accreditation.issued_date"
                                      id="accreditation_issued_date"/>
                 </x-slot>
+                @error('legal_entity_form.accreditation.issued_date')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
             </x-forms.form-group>
             <x-forms.form-group class="xl:w-1/4">
                 <x-slot name="label">
@@ -90,6 +97,13 @@
                     <x-forms.input-date wire:model="legal_entity_form.accreditation.expiry_date"
                                    id="accreditation_expiry_date"/>
                 </x-slot>
+                @error('legal_entity_form.accreditation.expiry_date')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
             </x-forms.form-group>
             <x-forms.form-group class="xl:w-1/4">
                 <x-slot name="label">

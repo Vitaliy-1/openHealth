@@ -39,6 +39,13 @@
             <x-forms.input class="default-input" wire:model="legal_entity_form.license.license_number"
                            type="text" id="license_license_number"/>
         </x-slot>
+        @error('legal_entity_form.license.license_number')
+        <x-slot name="error">
+            <x-forms.error>
+                {{$message}}
+            </x-forms.error>
+        </x-slot>
+        @enderror
     </x-forms.form-group>
     <x-forms.form-group class="xl:w-1/4">
         <x-slot name="label">

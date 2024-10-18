@@ -37,10 +37,10 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.file  wire:model="keyContainerUpload"
+            <x-forms.file  wire:model="file"
                            :id="'keyContainerUpload'"/>
         </x-slot>
-        @error('keyContainerUpload')
+        @error('file')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}

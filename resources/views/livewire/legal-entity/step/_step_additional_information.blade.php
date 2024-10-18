@@ -10,6 +10,13 @@
             <x-forms.input class="default-input" wire:model="legal_entity_form.receiver_funds_code"
                            type="text" id="additional_information_receiver_funds_coder"/>
         </x-slot>
+        @error('legal_entity_form.receiver_funds_code')
+        <x-slot name="error">
+            <x-forms.error>
+                {{$message}}
+            </x-forms.error>
+        </x-slot>
+        @enderror
     </x-forms.form-group>
     <x-forms.form-group class="xl:w-1/4">
         <x-slot name="label">
