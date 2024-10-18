@@ -92,4 +92,8 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
+    public function hasToken(): bool
+    {
+        return $this->token !== null;
+    }
 }

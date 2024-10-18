@@ -25,8 +25,8 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ Vite::asset('resources/images/logo-180x180.png') }}">
     <link rel="apple-touch-icon" sizes="152x152" href="{{ Vite::asset('resources/images/logo-152x152.png') }}">
     <link rel="apple-touch-icon" sizes="167x167" href="{{ Vite::asset('resources/images/logo-167x167.png') }}">
-    @vite('resources/css/app.css')
-    @stack('styles')
+    @vite('resources/css/style.css')
+{{--    @stack('styles')--}}
 </head>
 <body id="body">
 <header id="header" class="logo bg-gray-800 py-1 px-3.5">

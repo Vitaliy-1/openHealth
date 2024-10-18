@@ -12,6 +12,8 @@ return [
     |
     */
 
+    'add_patient' => 'додати пацієнта',
+    'patients' => 'пацієнти',
     'firstName' => 'Ім’я',
     'lastName' => 'Прізвище',
     'secondName' => 'По батькові',

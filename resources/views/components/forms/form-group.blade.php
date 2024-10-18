@@ -1,7 +1,6 @@
-<div {!! $attributes->merge(['class' => 'w-full']) !!}>
-    {{$label}}
+<div {!! $attributes->merge(['class' => '']) !!}>
+    {{$label ?? ''}}
     @isset($input)
-
     {{$input}}
     @endisset
     @isset($error)

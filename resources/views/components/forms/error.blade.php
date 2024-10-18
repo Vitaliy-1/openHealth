@@ -1,5 +1,4 @@
 @props(['message'])
 
-<span class="flex items-center font-medium tracking-wide text-danger text-xs mt-1 ml-1">
-        {{ $message ?? $slot }}
-</span>
+
+<p class="mt-2 text-sm text-red-600 dark:text-red-500"> {{ $message ?? $slot }}.</p>

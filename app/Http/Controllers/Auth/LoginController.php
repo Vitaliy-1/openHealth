@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-
-
-
     public function login(Request $request)
     {
         $user = User::where('email', $request->email)->first();

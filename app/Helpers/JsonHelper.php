@@ -39,6 +39,7 @@ class JsonHelper
             Cache::put('json_path', $dictionaries['data'], now()->addDays(7));
 
         }
+
         self::$json_path = Cache::get('json_path');
     }
 

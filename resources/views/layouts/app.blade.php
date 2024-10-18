@@ -1,69 +1,85 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet"/>
 
-        @livewireStyles
-        @livewireScripts
-        <!-- Scripts -->
-        @vite([ 'resources/js/index.js','resources/css/app.css', 'resources/js/app.js'])
-        @vite([ 'resources/css/style.css'])
-    </head>
-
-
-    <body
-
-        x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
-        x-init="
-         darkMode = JSON.parse(localStorage.getItem('darkMode'));
-         $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
-        :class="{'dark text-bodydark bg-boxdark-2': darkMode === true}">
-    <!-- ===== Preloader Start ===== -->
-    <div x-show="loaded" x-init="window.addEventListener('DOMContentLoaded', () => {setTimeout(() => loaded = false, 500)})"
-         class="fixed left-0 top-0 z-999999 flex h-screen w-screen items-center justify-center bg-white">
-        <div class="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
-    </div>
-    <!-- ===== Preloader End ===== -->
+    @livewireStyles
+    @livewireScripts
+    <!-- Scripts -->
+    @vite([ 'resources/js/index.js','resources/css/app.css', 'resources/js/app.js'])
+    {{--        @vite([ 'resources/css/style.css'])--}}
+</head>
 
 
-    <!-- ===== Page Wrapper Start ===== -->
-    <div class="flex h-screen overflow-hidden">
-        <!-- ===== Sidebar Start ===== -->
-         @livewire('components.sidebar')
-        <!-- ===== Sidebar End ===== -->
-        <!-- ===== Content Area Start ===== -->
-        <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
-            <!-- ===== Header Start ===== -->
-            @livewire('components.header')
-            <!-- ===== Header End ===== -->
-
-            <!-- ===== Main Content Start ===== -->
-            <main>
-                <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
-                    {{ $slot }}
+<body class="bg-gray-50 dark:bg-gray-800">
+@livewire('components.header')
+<div class="flex pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
+    <!-- ===== Sidebar Start ===== -->
+    @livewire('components.sidebar')
+    <div id="main-content" class="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 dark:bg-gray-900">
+        <main>
+            <div class="flex flex-col">
+                <div class="overflow-x-auto">
+                    <div class="inline-block min-w-full align-middle">
+                        <div class="overflow-hidden shadow">
+                            {{ $slot }}
+                        </div>
+                    </div>
                 </div>
-            </main>
-
-            <!-- ===== Main Content End ===== -->
-        </div>
-        <!-- ===== Content Area End ===== -->
+            </div>
+        </main>
     </div>
-    <!-- ===== Page Wrapper End ===== -->
+</div>
 
-    @stack('modals')
+@stack('modals')
 
-    @stack('scripts')
-        @livewire('components.flash-message')
+@stack('scripts')
+@livewire('components.flash-message')
+<div id="preloader" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.8); z-index: 9999;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div class="spinner"></div> <!-- Можете додати тут свій анімований прелоадер -->
+        Завантаження...
+    </div>
+</div>
 
-    </body>
+<style>
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(0,0,0,.1);
+        border-top-color: #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('livewire:load', function () {
+        Livewire.hook('message.sent', () => {
+            document.getElementById('preloader').style.display = 'block';
+        });
+
+        Livewire.hook('message.processed', () => {
+            document.getElementById('preloader').style.display = 'none';
+        });
+    });
+</script>
+
+</body>
 
 
 </html>

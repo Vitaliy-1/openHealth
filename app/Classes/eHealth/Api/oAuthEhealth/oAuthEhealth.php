@@ -19,7 +19,6 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function callback(): \Illuminate\Http\RedirectResponse
     {
-
         if (env('EHEALTH_CALBACK_PROD') === false) {
             dd(request()->all());
         }
@@ -31,6 +30,7 @@ class oAuthEhealth implements oAuthEhealthInterface
         $code = request()->input('code');
 
         $this->authenticate($code);
+//        $this->approve();
 
         return redirect()->route('dashboard'); // Add this line
     }
@@ -39,9 +39,12 @@ class oAuthEhealth implements oAuthEhealthInterface
     {
 
         $user = User::find(\session()->get('user_id_auth_ehealth'));
+
         if (!$user) {
             return redirect()->route('login');
         }
+
+
         $data = [
             'token' => [
                 'client_id'     => $user->legalEntity->client_id ?? '',
@@ -52,7 +55,9 @@ class oAuthEhealth implements oAuthEhealthInterface
                 'scope'         => $user->getAllPermissions()->unique()->pluck('name')->join(' ')
             ]
         ];
+
         $request = (new Request('POST', self::OAUTH_TOKENS, $data, false))->sendRequest();
+
         self::setToken($request);
 
         $this->login($user);
@@ -141,14 +146,10 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public static function forgetToken()
     {
-        if (Session::has('auth_token')){
-            Session::forget('auth_token');
-            Session::forget('auth_token_expires_at');
-            Session::forget('refresh_token');
-            Session::forget('refresh_token_expires_at');
-        }
-
-
+        Session::forget('auth_token');
+        Session::forget('auth_token_expires_at');
+        Session::forget('refresh_token');
+        Session::forget('refresh_token_expires_at');
         return redirect()->route('login');
 
     }
