@@ -52,7 +52,7 @@ Route::middleware([
 
     Route::get('/legal-entities/create', LegalEntities::class)->name('create.legalEntities');
 
-    Route::group(['middleware' => ['role:OWNER|ADMIN']], function () {
+    Route::group(['middleware' => ['role:OWNER|ADMIN'],'prefix' => 'dashboard'], function () {
         Route::prefix('legal-entities')->group(function () {
             Route::get('/edit/{id?}', LegalEntities::class)->name('edit.legalEntities');
         });

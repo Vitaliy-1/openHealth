@@ -19,13 +19,13 @@ class Request
     private string $url;
 
     private array $params;
-
     private bool $isToken ;
 
     private oAuthEhealthInterface $oAuthEhealth;
 
     private array $headers = [];
 
+    //TODO Check use of API key
     //private bool $isApiKey;
 
 
@@ -90,6 +90,7 @@ class Request
     {
         $headers = [
              'X-Custom-PSK' => env('EHEALTH_X_CUSTOM_PSK'),
+             //TODO Check use of API key
              'API-key' => $this->oAuthEhealth->getApikey(),
         ];
 
@@ -98,10 +99,11 @@ class Request
         }
         return array_merge($headers, $this->headers);
     }
-
-    private function flashMessage($message, $type)
-    {
-        // Виклик події браузера через Livewire
-        \Livewire\Component::dispatch('flashMessage', ['message' => $message, 'type' => $type]);
-    }
+//
+//    //TODO
+//    private function flashMessage($message, $type)
+//    {
+//        // Виклик події браузера через Livewire
+//        \Livewire\Component::dispatch('flashMessage', ['message' => $message, 'type' => $type]);
+//    }
 }

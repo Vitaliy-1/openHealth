@@ -63,7 +63,10 @@ class oAuthEhealth implements oAuthEhealthInterface
         $this->login($user);
     }
 
-    public function approve(){
+    //TODO: Check if it works
+
+    public function approve(): void
+    {
         $user = User::find(\session()->get('user_id_auth_ehealth'));
 
         $redirectUri = env('EHEALTH_REDIRECT_URI');
@@ -77,18 +80,18 @@ class oAuthEhealth implements oAuthEhealthInterface
         ];
 
 
-        $request = (new Request('POST', self::OAUTH_APPROVAL, $queryParams))->sendRequest();
-
-
+         (new Request('POST', self::OAUTH_APPROVAL, $queryParams))->sendRequest();
 
     }
 
-    public function nonce(){
+    //TODO: Check if it works
+    public function nonce():void
+    {
         $queryParams = [
             'client_id'     => $user->legalEntity->client_id ?? '',
             'client_secret' => $user->legalEntity->client_secret ?? '',
         ];
-        $request = (new Request('POST', self::OAUTH_NONCE, $queryParams))->sendRequest();
+         (new Request('POST', self::OAUTH_NONCE, $queryParams))->sendRequest();
 
     }
 
@@ -98,8 +101,11 @@ class oAuthEhealth implements oAuthEhealthInterface
 //        redirect()->route('dashboard');
     }
 
-
-    public static function loginUrl($user)
+    /**
+     * @param $user
+     * @return string
+     */
+    public static function loginUrl($user): string
     {
         // Base URL and client ID
         $baseUrl = env('EHEALTH_AUTH_HOST') . '/sign-in';
@@ -123,7 +129,7 @@ class oAuthEhealth implements oAuthEhealthInterface
         return $baseUrl . '?' . http_build_query($queryParams);
     }
 
-    public static function setToken($data)
+    public static function setToken($data):void
     {
         Session::put('auth_token', $data['value']);
         Session::put('auth_token_expires_at', Carbon::createFromTimestamp($data['expires_at']));

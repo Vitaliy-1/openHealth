@@ -191,8 +191,8 @@
                             <div class="w-1/5">
                                 @if($key != 0)
                                     <a wire:click="removePhone({{$key}},'owner')"
-                                       class="text-red-600 text-xs"
-                                       href="#">{{__('forms.removePhone')}}</a>
+                                       class="text-red-600 text-xs cursor-pointer"
+                                       >{{__('forms.removePhone')}}</a>
                                 @endif
 
                             </div>

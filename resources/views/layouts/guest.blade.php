@@ -23,20 +23,17 @@
 
         @vite([
             'resources/css/app.css',
-            'resources/css/style.css',
+//            'resources/css/style.css',
             ])
     </head>
     <body>
-    <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 antialiased">
-        <div class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div class="flex flex-wrap items-center">
-                {{ $slot }}
-            </div>
-        </div>
-        <!-- ====== Forms Section Start -->
 
-        <!-- ====== Forms Section End -->
-    </div>
+    <main class="bg-gray-50 dark:bg-gray-900">
+        <div class="flex flex-col items-center justify-center px-6 pt-8 mx-auto md:h-screen pt:mt-0 dark:bg-gray-900">
+            {{ $slot}}
+        </div>
+
+    </main>
 
 
     @stack('modals')

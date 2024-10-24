@@ -7,7 +7,7 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input maxlength="10" class="default-input" value="{{$edrpou ?? ''}}" wire:model="legal_entity_form.edrpou" type="text" id="edrpou"/>
+            <x-forms.input disabled="{{!empty(auth()->user()->legal_entity_id )? 'disabled' : ''}}"  maxlength="10" class="default-input" value="{{$edrpou ?? ''}}" wire:model="legal_entity_form.edrpou" type="text" id="edrpou"/>
         </x-slot>
         @error('legal_entity_form.edrpou')
         <x-slot name="error">
