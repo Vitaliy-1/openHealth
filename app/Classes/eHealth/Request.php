@@ -65,7 +65,7 @@ class Request
                 'isToken' => $this->isToken
             ];
             $response = Http::acceptJson()
-                ->post('https://openhealths.com//api/v1/send-request', $data);
+                ->post('https://openhealths.com/api/v1/send-request', $data);
         } else {
             $response = Http::acceptJson()
                 ->withHeaders($this->getHeaders())
