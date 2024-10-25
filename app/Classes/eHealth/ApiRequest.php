@@ -2,82 +2,107 @@
 
 namespace App\Classes\eHealth;
 
-use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
-use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealthInterface;
 use App\Classes\eHealth\Errors\ErrorHandler;
 use App\Classes\eHealth\Exceptions\ApiException;
-use App\Livewire\Components\FlashMessage;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use mysql_xdevapi\Exception;
 
 class ApiRequest
 {
-    protected ?array $data;
 
-    //TODO Check use of API key
-    //private bool $isApiKey;
-    protected string $url;
 
-    protected string $method;
+    private string $method;
 
-    protected array $params;
+    private string $url;
+
+    private array $params;
+
+    private null|string $token;
+
+    private array $headers = [];
     private bool $isToken = true;
-
-
-    public function __construct() {
-        dd(request()->all());
-
-    }
-
-
 
     /**
      * @throws ApiException
      */
     public function sendRequest()
     {
-        if (config(''))
+        // Retrieve all data from the incoming request
+        $data = request()->all();
 
-            $response = Http::acceptJson()
-                ->withHeaders($this->getHeaders())
-                ->{$this->method}($this->url, $this->params);
 
-            if ($response->successful()) {
-                $data = json_decode($response->body(), true);
-                if (isset($data['urgent']) && !empty($data['urgent'])) {
-                    return $data ?? [];
-                }
-                return $data['data'] ?? [];
-            }
+        // Check if any data was provided
+        if (empty($data)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'No data provided'
+            ], 400); // Return a 400 Bad Request response
+        }
 
-            if ($response->failed()) {
-               $errors = json_decode($response->body(), true);
+        // Extract data from the request
+        $this->method = $data['method'] ?? null; // Use null coalescing operator to avoid errors
+        $this->url = $data['url'] ?? null;
+        $this->params = $data['params'] ?? [];
 
-                Log::channel('api_errors')->error('API request failed', [
-                    'url' => $this->url,
-                    'status' => $response->status(),
-                    'errors' => $errors
+        $this->token = $data['token'] ?? null;
+        $this->isToken = $data['isToken'] ?? true;
+
+        // Validate that both method and URL are provided
+        if (empty($this->method) || empty($this->url)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Method and URL are required'
+            ], 400); // Return a 400 Bad Request response
+        }
+
+        // Send the HTTP request using the specified method, URL, and parameters
+        $response = Http::acceptJson()
+            ->withHeaders($this->getHeaders())
+            ->{$this->method}($this->url, $this->params);
+
+        // Handle a successful response
+        if ($response->successful()) {
+            $data = json_decode($response->body(), true);
+            if (isset($data['urgent']) && !empty($data['urgent'])) {
+                return response()->json([
+                    'status' => 'success',
+                    'data'   => $data
                 ]);
-
-               return (new ErrorHandler())->handleError($errors);
             }
+            return response()->json($data, $response->status()); // Return the successful response data
+        }
 
+        // Handle 401 Unauthorized error
+        if ($response->status() === 401) {
+            $data = json_decode($response->body(), true);
+            return response()->json($data, $response->status());
+        }
 
+        // Handle other types of errors
+        if ($response->failed()) {
+            $errors = json_decode($response->body(), true);
+            return response()->json($errors, $response->status());
+        }
 
+        // Handle unexpected errors
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'An unexpected error occurred'
+        ], 500); // Return a 500 Internal Server Error response
     }
 
 
     public function getHeaders(): array
     {
         $headers = [
-             'X-Custom-PSK' => env('EHEALTH_X_CUSTOM_PSK'),
+            'X-Custom-PSK' => config('ehealth.api.token'),
+            'API-key'      => config('ehealth.api.api_key'),
         ];
 
         if ($this->isToken) {
-            $headers['Authorization'] = 'Bearer '. $this->token;
+            $headers['Authorization'] = 'Bearer ' . $this->token;
         }
+
         return array_merge($headers, $this->headers);
     }
 //

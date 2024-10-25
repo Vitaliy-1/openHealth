@@ -20,9 +20,10 @@ class oAuthEhealth implements oAuthEhealthInterface
     public function callback(): \Illuminate\Http\RedirectResponse
     {
 
-        if (env('EHEALTH_CALBACK_PROD') === false) {
+
+        if (config('ehealth.api.callback_prod') === true) {
             $code = request()->input('code');
-            $url = config('app.url') . '/ehealth/oauth?code=' . $code;
+            $url =  'http://localhost/ehealth/oauth?code=' . $code;
             return redirect($url);
         }
 

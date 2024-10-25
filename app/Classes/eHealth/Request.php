@@ -57,8 +57,15 @@ class Request
 
         //TODO DELETE AFTER TESTING
         if (config('ehealth.api.key') == null && empty(config('ehealth.api.key'))) {
+            $data = [
+                'method' => $this->method,
+                'url'    => self::makeApiUrl(),
+                'params' => $this->params,
+                'token'  => $this->oAuthEhealth->getToken(),
+                'isToken' => $this->isToken
+            ];
             $response = Http::acceptJson()
-                ->{'POST'}('https://openhealths.com/api/v1/send-request', $this->params);
+                ->post('http://host.docker.internal/api/v1/send-request', $data);
         } else {
             $response = Http::acceptJson()
                 ->withHeaders($this->getHeaders())

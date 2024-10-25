@@ -93,7 +93,7 @@ class EditLegalEntity extends LegalEntities
     {
         $this->resetErrorBag();
         $this->validateUpdateLegalEntity();
+        $this->stepPublicOffer();
         //TODO: Call request to update legal entity
-        dd($this->legal_entity_form->toArray());
     }
 }
