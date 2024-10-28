@@ -2,119 +2,225 @@
 
 namespace App\Livewire\Declaration;
 
-use App\Classes\eHealth\Api\DeclarationApi;
-use App\Livewire\Declaration\forms\DeclarationRequestApi;
 use App\Models\Declaration;
 use App\Models\Employee;
 use Database\Seeders\DeclarationSeeder;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class DeclarationIndex extends Component
 {
 
-    public  array $tableHeaders  = [];
-
-    public string $employee_name = '';
+    use WithPagination;
 
 
-    public string $employee_uuid = '';
+    public array $tableHeaders = [];
 
-    public string $status_doctor = '';
-
-    public string $legal_entity_id = '';
-
-    public string $declaration_number = '';
+    /**
+     * Employee filter
+     * @var array|string[]
+     */
+    public array $employee_filter = [
+        'full_name'     => '',
+        'status'        => '',
+        'employee_uuid' => '',
+    ];
 
     /**
      * @var array|int[]
      */
     public ?array $request_declaration = [
-        'page' => 1,
+        'page'      => 1,
         'page_size' => 10,
     ];
 
+    /**
+     * @var object|null
+     */
     public ?object $employees = null;
 
-    public ?object $declarations = null;
+    /**
+     * @var array|string[]
+     */
+
+    public ?array $declarations_filter = [
+        'number_declaration' => '',
+        'first_name'         => '',
+        'last_name'          => '',
+        'second_name'        => '',
+        'gender'             => '',
+        'birthday_day'       => '',
+        'phone'              => '',
+    ];
+
+    /**
+     * @var object|null
+     */
+    public ?object $declaration_show = null;
+
+
+    protected $listeners = ['searchUpdated'];
 
     public function mount()
     {
         $this->tableHeaders();
     }
 
-    public function tableHeaders(): void{
+    public function tableHeaders(): void
+    {
         $this->tableHeaders = [
             __('ФІО'),
+            __('Телефон'),
+            __('Дата народження'),
             __('Номер декларації'),
+            __('Статус'),
+            __('Дата декларації'),
             __('Лікар'),
+            __('Дії'),
         ];
     }
 
-     public function updated($field): void
+
+    //Livewire functions
+    public function showDeclaration($declaration): void
     {
-        $this->getDeclarations();
+        $this->declaration_show = new Declaration($declaration);
     }
 
-
-
-    public function getDeclarations(): void{
-
-        if ($this->employee_name) {
-            $query = Employee::doctor();
-            $nameParts = explode(' ', $this->employee_name);
-            $firstName = $nameParts[0] ?? null;
-            $lastName = $nameParts[1] ?? null;
-            $secondName = $nameParts[2] ?? null;
-            $this->employees =   $query->where(function ($query) use ($firstName, $lastName, $secondName) {
-                if (strlen($firstName) > 3) {
-                    $query->whereRaw("party->>'first_name' ILIKE ?", ["%$firstName%"]);
-                }
-                if (strlen($lastName) > 3) {
-                    $query->whereRaw("party->>'last_name' ILIKE ?", ["%$lastName%"]);
-                }
-                if (strlen($secondName) > 3) {
-                    $query->whereRaw("party->>'second_name' ILIKE ?", ["%$secondName%"]);
-                }
-            })->get();
-
-        }
-
-        if (!empty($this->employee_uuid)) {
-            $this->request_declaration['employee_id'] = $this->employee_uuid;
-            $employee = Employee::where('uuid', $this->employee_uuid)->first();
-            $this->declarations = $employee->declarations()->get();
-
-        }
-
-        if (!empty($this->status_doctor)) {
-            $this->request_declaration['status'] = $this->status_doctor;
-        }
-
-        if (!empty($this->legal_entity_id)) {
-            $this->request_declaration['legal_entity_id'] = $this->legal_entity_id;
-        }
-
-        if (!empty($this->declaration_number)) {
-            $this->request_declaration['declaration_number'] = $this->declaration_number;
-        }
-
-//        $getListDeclaration = DeclarationRequestApi::getListDeclaration($this->request_declaration);
-
-
+    public function closeDeclaration(): void
+    {
+        $this->declaration_show = null;
     }
 
+    public function updated($field): void
+    {
 
-
-    public function callSeeder(){
-
+        if (in_array($field, $this->declarations_filter) ) {
+            $this->resetPage();
+        }
+    }
+    //TODO: Remove function after testing
+    public function callSeeder(): void
+    {
+        Declaration::truncate();
         if (!Declaration::count()) {
-            (new DeclarationSeeder)->run();
+            $seeder = new DeclarationSeeder();
+            DB::transaction(function () use ($seeder) {
+                $seeder->run(1000);
+            });
+
         }
+
     }
+
+
+    public function searchUpdated($searchData): void
+    {
+        $this->declarations_filter = $searchData;
+    }
+
+
+    public function getDeclarations(): ?object
+    {
+        if (strlen($this->employee_filter['full_name']) > 3) {
+            $query = Employee::doctor();
+
+            $this->filterByEmployeeName($query, $this->employee_filter['full_name']);
+        }
+
+        return $this->filterDeclarations();
+    }
+
+    private function filterByEmployeeName($query, string $employeeName): void
+    {
+        $nameParts = explode(' ', $employeeName);
+        $fields = ['first_name', 'last_name', 'second_name'];
+        $query->where(function ($query) use ($nameParts, $fields) {
+            foreach ($nameParts as $index => $part) {
+                if (isset($part) && strlen($part) > 3) {
+                    $field = $fields[$index] ?? null;
+                    if ($field) {
+                        $query->where("party->$field", 'ILIKE', "%$part%");
+                    }
+                }
+            }
+        });
+
+        $this->employees = $query->take(5)->get();
+
+    }
+
+    private function filterDeclarations($employee = null): ?object
+    {
+
+        if ($this->employee_filter['employee_uuid']) {
+            $employee = Employee::where('uuid', $this->employee_filter['employee_uuid'])->with('declarations')->first();
+        }
+
+        //  Get the employee by UUID
+        if ($employee) {
+            $declarations = $employee->declarations(); // Return the employee's declarations
+
+        } else {
+            $declarations = Declaration::query(); // Return all declarations
+        }
+
+        if (!empty($this->declarations_filter['first_name']) && strlen($this->declarations_filter['first_name']) > 3) {
+            $firstName = $this->declarations_filter['first_name'];
+            $declarations->where('person->first_name', 'ILIKE', "%$firstName%");
+        }
+
+        if (!empty($this->declarations_filter['last_name']) && strlen($this->declarations_filter['last_name']) > 3) {
+            $last_name = $this->declarations_filter['last_name'];
+            $declarations->where('person->last_name', 'ILIKE', "%$last_name%");
+        }
+
+        if (!empty($this->declarations_filter['second_name']) && strlen($this->declarations_filter['second_name']) > 3) {
+            $second_name = $this->declarations_filter['second_name'];
+            $declarations->where('person->second_name', 'ILIKE', "$second_name%");
+        }
+
+        if (!empty($this->declarations_filter['birth_date']) && strlen($this->declarations_filter['birth_date']) > 3) {
+            $birth_date = $this->declarations_filter['birth_date'];
+            $declarations->where('person->birth_date', 'ILIKE', "%$birth_date%");
+        }
+
+        if (!empty($this->declarations_filter['phone']) && strlen($this->declarations_filter['phone']) >= 3) {
+            $phone = trim($this->declarations_filter['phone']);
+            $declarations->whereRaw("EXISTS (
+                                SELECT 1
+                                FROM jsonb_array_elements(person->'phones') AS phone
+                                WHERE phone->>'number' ILIKE ?
+                            )", ["%$phone%"]);
+        }
+
+        if (!empty($this->declarations_filter['declaration_number']) && strlen($this->declarations_filter['declaration_number']) > 3) {
+            $declaration_number = $this->declarations_filter['declaration_number'];
+            $declarations->where('declaration_number', 'ILIKE', "%$declaration_number%");
+        }
+
+        if ($declarations) {
+            return $declarations;
+        }
+
+        return null; // Return null if the employee is not found or doesn't havE
+    }
+
 
     public function render()
     {
-        return view('livewire.declaration.declaration-index');
+        $declarations = $this->getDeclarations();
 
+        if (!$declarations) {
+            $declarations = [];
+        }
+        $paginatedDeclarations = !$declarations ? [] : $declarations->paginate(20);
+
+        return view('livewire.declaration.declaration-index', [
+            'declarations' => $paginatedDeclarations,
+        ]);
     }
+
+
 }

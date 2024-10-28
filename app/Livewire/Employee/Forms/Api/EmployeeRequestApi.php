@@ -61,18 +61,17 @@ class EmployeeRequestApi extends EmployeeApi
         return self::_dismissed($id);
     }
 
-    public static function getEmployeeRequestsList():array
+    /*
+     * @arg array $data
+     */
+    public static function getEmployeeRequestsList($data = []):array
     {
-        $data = [
-            'status' => 'APPROVED',
-        ];
         return self::_getRequestList($data);
-
     }
 
+    //Get employee request by id
     public static function getEmployeeRequestById($id):array
     {
-
         return self::_getRequestById($id);
 
     }

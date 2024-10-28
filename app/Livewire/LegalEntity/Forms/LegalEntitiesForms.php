@@ -5,6 +5,7 @@ namespace App\Livewire\LegalEntity\Forms;
 use App\Models\User;
 use App\Rules\AgeCheck;
 use App\Rules\Cyrillic;
+use App\Rules\UniqueEdrpou;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
@@ -14,7 +15,8 @@ class LegalEntitiesForms extends Form
 {
 
     public string $type = 'PRIMARY_CARE';
-    #[Validate(['required', 'integer','regex:/^\d{6}$|^\d{10}$/'])]
+
+    #[Validate(['required', 'regex:/^(\d{8,10}|[А-ЯЁЇІЄҐ]{2}\d{6})$/',new UniqueEdrpou()])]
     public string $edrpou = '';
 
     #[Validate(
@@ -37,6 +39,7 @@ class LegalEntitiesForms extends Form
         'owner.email.unique' => 'Поле :attribute вже зарееєстровано в системі.',
         ]
     )]
+
     public ?array $owner = [];
 
     #[Validate([
@@ -45,7 +48,7 @@ class LegalEntitiesForms extends Form
     ])]
     public ?array $phones = [];
 
-    #[Validate('url|regex:/^(https?:\/\/)?([a-zA-Z0-9\-_]+\.)+[a-zA-Z]{2,}$/')]
+//    #[Validate('url|regex:/^(https?:\/\/)?([a-zA-Z0-9\-_]+\.)+[a-zA-Z]{2,}$/')]
     public string $website = '';
 
     #[Validate('required|email|regex:/^([a-z0-9+-]+)(.[a-z0-9+-]+)*@([a-z0-9-]+.)+[a-z]{2,6}$/ix')]
@@ -56,7 +59,10 @@ class LegalEntitiesForms extends Form
         'accreditation.category'   => 'required|string',
         'accreditation.order_no'   => 'required|string:min:2',
         'accreditation.order_date' => 'required|date',
+        'accreditation.issued_date' => 'date',
+        'accreditation.expiry_date' => 'date',
     ])]
+
     public ?array $accreditation = [];
 
     #[Validate([
@@ -64,25 +70,31 @@ class LegalEntitiesForms extends Form
         'license.issued_by'        => 'required|string|min:3',
         'license.issued_date'      => 'required|date|min:3',
         'license.active_from_date' => 'required|date|min:3',
-        'license.order_no' => 'required|string',
+        'license.order_no'         => 'required|string',
+        'license.license_number'   => [
+            'nullable',
+            'string',
+            'regex:/^(?!.*[ЫЪЭЁыъэё@$^#])[a-zA-ZА-ЯҐЇІЄа-яґїіє0-9№\"!\^\*)\]\[(&._-].*$/'
+        ],
     ])]
-
-    public ?array $license = [];
+    public array|string $license = [];
 
     #[Validate([
         'archive.date'  => 'required_with:archive.place|date',
         'archive.place' => 'required_with:archive.date|string',
     ])]
     public ?array $archive = [];
+
+    #[Validate([
+        'receiver_funds_code' => 'nullable|string|regex:/^[0-9]+$/'
+    ])]
     public ?string $receiver_funds_code = '';
+
 
     #[Validate([  'min:3', new Cyrillic()])]
     public ?string $beneficiary = '';
 
-    #[Validate([
-//        'public_offer.consent' => 'required|on',
-//        'public_offer.digital_signature' => 'required|file|max:2048'
-    ])]
+
     public array $public_offer = [];
 
     public array $security = [
@@ -147,6 +159,7 @@ class LegalEntitiesForms extends Form
     {
         $this->validate($this->rulesForModel('archive')->toArray());
         $this->validate($this->rulesForModel('beneficiary')->toArray());
+        $this->validate($this->rulesForModel('receiver_funds_code')->toArray());
 
     }
 

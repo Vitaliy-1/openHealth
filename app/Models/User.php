@@ -83,7 +83,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isClientId(): bool
     {
-        return $this->legalEntity->client_id  ?? false;
+        return $this->legalEntity->client_id ?? false;
     }
 
     public function licenses(): HasMany
@@ -92,8 +92,5 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
-    public function hasToken(): bool
-    {
-        return $this->token !== null;
-    }
+
 }

@@ -75,26 +75,6 @@ class EmployeeIndex extends Component
     {
         $this->employees = Auth::user()->legalEntity->employees()->get();
 
-//            DB::table('legal_entities')
-//            ->join('users', 'legal_entities.id', '=', 'users.legal_entity_id')
-//            ->join('employees', 'legal_entities.id', '=', 'employees.legal_entity_id')
-//            ->join('persons', 'employees.person_id', '=', 'persons.id')
-//            ->where('users.id', Auth::id())
-//            ->select(
-//                'employees.id as id',
-//                'employees.uuid',
-//                'employees.start_date',
-//                'employees.end_date',
-//                'employees.status',
-//                DB::raw("CONCAT(persons.first_name, ' ', persons.last_name, ' ', persons.second_name) AS full_name"),
-//                'persons.email',
-//                'persons.phones',
-//
-//                'employees.position',
-//                'employees.employee_type',
-//            )
-//            ->get();
-
     }
 
     public function tableHeaders(): void
@@ -175,9 +155,9 @@ class EmployeeIndex extends Component
     }
 
     public function syncEmployees(){
-        $this->getEmployeeRequestsList();
         $requests = EmployeeRequestApi::getEmployees($this->legalEntity->uuid);
         foreach ($requests as $request) {
+            $request = EmployeeRequestApi::getEmployeeById($request['id']);
             $request['uuid'] = $request['id'];
             $request['legal_entity_uuid'] = $request['legal_entity']['id'];
             $email = $request['party']['email'] ?? '';

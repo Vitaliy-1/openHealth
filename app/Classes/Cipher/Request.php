@@ -47,6 +47,7 @@ class Request
             throw new ApiException($error);
         }
 
+        throw new ApiException(['code' => $response->status()], 'Unexpected response');
     }
 
 

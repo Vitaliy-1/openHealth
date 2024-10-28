@@ -1,9 +1,6 @@
-<x-slot name="title">
-    {{  __('Завершити реєстрацію') }}
-</x-slot>
-<div class="mb-4.5 flex flex-col gap-6 xl:flex-container">
 
-    <x-forms.form-group class="xl:w-1/2">
+<x-forms.form-row :cols="'flex-col'">
+    <x-forms.form-group class="xl:w-1/3">
         <x-slot name="label">
             <x-forms.label class="default-label" for="knedp"
                            name="label">
@@ -15,6 +12,7 @@
                             wire:model="knedp"
                             id="knedp">
                 <x-slot name="option">
+                    <option value="">{{__('forms.select')}}</option>
                     @foreach($getCertificateAuthority as $k =>$certificate_type)
                         <option   value="{{$certificate_type['id']}}">{{$certificate_type['name']}}</option>
                     @endforeach
@@ -31,7 +29,7 @@
         @enderror
     </x-forms.form-group>
 
-    <x-forms.form-group class="xl:w-1/2">
+    <x-forms.form-group class="xl:w-1/3">
         <x-slot name="label">
             <x-forms.label class="default-label" for="keyContainerUpload"
                            name="label">
@@ -39,10 +37,10 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="keyContainerUpload"
-                           type="file" id="keyContainerUpload"/>
+            <x-forms.file  wire:model="file"
+                           :id="'keyContainerUpload'"/>
         </x-slot>
-        @error('keyContainerUpload')
+        @error('file')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -51,7 +49,7 @@
         @enderror
     </x-forms.form-group>
 
-    <x-forms.form-group class="xl:w-1/2">
+    <x-forms.form-group class="xl:w-1/3">
         <x-slot name="label">
             <x-forms.label class="default-label" for="password"
                            name="label">
@@ -73,23 +71,20 @@
     </x-forms.form-group>
     <x-forms.form-group class="flex items-center mb-4 flex-row-reverse	justify-end	">
         <x-slot name="input">
-            <x-forms.input wire:model="legal_entity_form.public_offer.consent" value="true" type="checkbox"
+            <x-forms.checkbox wire:model="legal_entity_form.public_offer.consent" value="true" type="checkbox"
                            id="public_offer_consent" name="gender"/>
         </x-slot>
         <x-slot name="label">
             <x-forms.label class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                            name="label" for="public_offer_consent">
-                <a href="#">{{__('forms.agree')}}</a>
+                <a href="">{{__('forms.agree')}}</a>
                 @error("legal_entity_form.public_offer.consent")
                 <span class="flex items-center font-medium tracking-wide text-danger text-xs mt-1 ml-1">
                 {{$message}}
             </span>
-
                 @enderror
             </x-forms.label>
         </x-slot>
-
-
     </x-forms.form-group>
 
-</div>
+</x-forms.form-row>

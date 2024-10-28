@@ -1,6 +1,6 @@
 <div class="{{$class}}">
     <!-- Area -->
-    <x-forms.form-group class="">
+    <x-forms.form-group class="w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="area"
                            name="label">
@@ -36,7 +36,7 @@
         @enderror
     </x-forms.form-group>
     <!-- DISTRICT -->
-    <x-forms.form-group class=" relative" x-data="{ open: false }">
+    <x-forms.form-group class="w-1/4 relative" x-data="{ open: false }">
         <x-slot name="label">
             <x-forms.label class="default-label" for="district"
                            name="label">
@@ -97,7 +97,7 @@
         @enderror
     </x-forms.form-group>
     <!-- Type -->
-    <x-forms.form-group class="">
+    <x-forms.form-group class="w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="type"
                            name="label">
@@ -131,7 +131,7 @@
         @enderror
     </x-forms.form-group>
     <!-- Settlement -->
-    <x-forms.form-group class=" relative" x-data="{ open: false }">
+    <x-forms.form-group class="w-1/4 relative" x-data="{ open: false }">
         <x-slot name="label">
             <x-forms.label class="default-label" for="settlement"
                            name="label">
@@ -196,7 +196,7 @@
         @enderror
     </x-forms.form-group>
     <!-- Street_TYPE -->
-    <x-forms.form-group x-data="{ open: false }" class="">
+    <x-forms.form-group class="w-1/4" x-data="{ open: false }" >
         <x-slot name="label">
             <x-forms.label class="default-label" for="area"
                            name="label">
@@ -231,7 +231,7 @@
     </x-forms.form-group>
 
     <!-- Street -->
-    <x-forms.form-group class=" relative" x-data="{ open: false }">
+    <x-forms.form-group class="w-1/4 relative" x-data="{ open: false }">
         <x-slot name="label">
             <x-forms.label class="default-label" for="street"
                            name="label">
@@ -286,7 +286,7 @@
         @enderror
     </x-forms.form-group>
     <!-- Building -->
-    <x-forms.form-group class="">
+    <x-forms.form-group class="w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="building"
                            name="label">
@@ -308,7 +308,7 @@
         @enderror
     </x-forms.form-group>
     <!-- Apartment -->
-    <x-forms.form-group class="">
+    <x-forms.form-group class="w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="apartment"
                            name="label">
@@ -324,7 +324,7 @@
         </x-slot>
     </x-forms.form-group>
     <!-- Zip -->
-    <x-forms.form-group class="">
+    <x-forms.form-group class="w-1/4">
         <x-slot name="label">
             <x-forms.label class="default-label" for="zip"
                            name="label">
