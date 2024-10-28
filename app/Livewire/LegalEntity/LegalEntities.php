@@ -456,8 +456,11 @@ class LegalEntities extends Component
 
     public function stepAddress(): void
     {
+
         $this->fetchDataFromAddressesComponent();
         $this->dispatch('address-data-fetched');
+
+
     }
 
     public function checkAndProceedToNextStep(): void

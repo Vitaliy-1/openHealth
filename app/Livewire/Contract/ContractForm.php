@@ -10,6 +10,7 @@ use App\Models\Contract;
 use App\Models\Division;
 use App\Models\LegalEntity;
 use App\Services\LegalEntityService;
+use App\Traits\Cipher;
 use App\Traits\FormTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -20,7 +21,7 @@ use Livewire\WithFileUploads;
 
 class ContractForm extends Component
 {
-    use FormTrait, WithFileUploads;
+    use FormTrait, WithFileUploads,Cipher;
 
 
     const CACHE_PREFIX = 'register_contract_form';
@@ -37,9 +38,6 @@ class ContractForm extends Component
 
     public ContractFormRequest $contract_request;
 
-
-    public ?array $getCertificateAuthority;
-
     public array $legalEntityApi = [];
 
     public array $external_contractors = [];
@@ -47,11 +45,8 @@ class ContractForm extends Component
     public string $legalEntity_search = '';
     public string $contractCacheKey;
 
-    public string $knedp = '';
 
-    public $keyContainerUpload;
 
-    public string $password = '';
 
 
     public string $legalEntitySearch = '';
@@ -66,7 +61,6 @@ class ContractForm extends Component
         if ($id !== '') {
             $this->contract_request->previous_request_id = $id;
         }
-        $this->getCertificateAuthority = (new CipherApi())->getCertificateAuthority();
         $this->getDictionary();
         $this->getLegalEntity();
     }

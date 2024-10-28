@@ -6,10 +6,9 @@ use App\Models\Declaration;
 
 class DeclarationSeeder
 {
-    public function run()
+    public function run($count = 10)
     {
-
-        // generate 500 declarations
-        Declaration::factory()->count(10)->create();
+        // generate count declarations
+        Declaration::factory()->count($count)->create();
     }
 }

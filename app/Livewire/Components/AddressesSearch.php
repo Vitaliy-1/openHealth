@@ -59,6 +59,7 @@ class AddressesSearch extends Component
             ],
             'settlement' => 'required',
             'settlement_type' => 'required',
+            'settlement_id' => 'required',
             'street_type' => 'required',
         ];
     }

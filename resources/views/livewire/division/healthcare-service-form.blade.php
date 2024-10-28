@@ -116,7 +116,7 @@
             </x-slot>
         </x-tables.table>
 
-        <div class="footer border-b flex justify-start border-stroke px-7 py-2  flex justify-start">
+        <div class="footer border-b flex flex-start border-stroke px-7 py-2  flex flex-start">
             <a class="inline-flex items-center justify-center rounded-md border border-black  py-2 text-center font-medium text-black hover:bg-opacity-90 lg:px-8 xl:px-10"
                href="{{route('division.index')}}">{{__('Назад')}}</a>
         </div>

@@ -16,10 +16,11 @@ use App\Livewire\License\LicenseIndex;
 use App\Livewire\License\LicenseShow;
 use App\Livewire\License\Forms\LicenseForms;
 use App\Livewire\License\Forms\CreateNewLicense;
-use App\Livewire\Patient\PatientIndex;
+use App\Livewire\LegalEntity\EditLegalEntity;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EmailController;
+use App\Livewire\Patient\PatientIndex;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,7 +55,7 @@ Route::middleware([
 
     Route::group(['middleware' => ['role:OWNER|ADMIN'],'prefix' => 'dashboard'], function () {
         Route::prefix('legal-entities')->group(function () {
-            Route::get('/edit/{id?}', LegalEntities::class)->name('edit.legalEntities');
+            Route::get('/edit/{id?}', EditLegalEntity::class)->name('edit.legalEntities');
         });
         Route::prefix('division')->group(function () {
             Route::get('/', DivisionIndex::class)->name('division.index');

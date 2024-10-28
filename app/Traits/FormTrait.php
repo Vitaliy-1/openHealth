@@ -78,5 +78,9 @@ trait FormTrait
         }
     }
 
+    public function closeModalModel(): void
+    {
+        $this->showModal = false;
+    }
 }
 

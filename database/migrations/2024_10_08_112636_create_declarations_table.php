@@ -19,10 +19,10 @@ class CreateDeclarationsTable extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->dateTime('signed_at');
-            $table->json('person')->nullable();
-            $table->json('employee')->nullable();
-            $table->json('division')->nullable();
-            $table->json('legal_entity')->nullable();
+            $table->jsonb('person')->nullable();
+            $table->jsonb('employee')->nullable();
+            $table->jsonb('division')->nullable();
+            $table->jsonb('legal_entity')->nullable();
             $table->string('status');
             $table->string('scope');
             $table->uuid('declaration_request_id');
@@ -30,7 +30,7 @@ class CreateDeclarationsTable extends Migration
             $table->dateTime('updated_at')->nullable();
             $table->string('reason')->nullable();
             $table->string('reason_description')->nullable();
-            $table->foreignId('person_id');
+            $table->foreignId('person_id')->nullable();
             $table->foreignId('employee_id');
             $table->foreignId('division_id')->nullable();
             $table->foreign('person_id')->references('id')->on('persons');

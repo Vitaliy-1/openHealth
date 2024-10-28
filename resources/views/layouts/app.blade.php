@@ -26,15 +26,8 @@
     @livewire('components.sidebar')
     <div id="main-content" class="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 dark:bg-gray-900">
         <main>
-            <div class="flex flex-col">
-                <div class="overflow-x-auto">
-                    <div class="inline-block min-w-full align-middle">
-                        <div class="overflow-hidden shadow">
+
                             {{ $slot }}
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 </div>
@@ -79,6 +72,7 @@
     });
 </script>
 
+@yield('scripts')
 </body>
 
 
