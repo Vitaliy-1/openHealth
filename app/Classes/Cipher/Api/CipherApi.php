@@ -4,6 +4,8 @@ namespace App\Classes\Cipher\Api;
 
 use App\Classes\Cipher\Request;
 use App\Classes\Cipher\Exceptions\ApiException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class CipherApi
 {
@@ -12,6 +14,7 @@ class CipherApi
     private string $password = '';
     private string $dataSignature;
     private string $knedp;
+
 
     /**
      * Send request to create session and subsequently upload KEYP.

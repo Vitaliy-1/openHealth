@@ -95,6 +95,7 @@ class LegalEntitiesForms extends Form
     public ?string $beneficiary = '';
 
 
+
     public array $public_offer = [];
 
     public array $security = [
