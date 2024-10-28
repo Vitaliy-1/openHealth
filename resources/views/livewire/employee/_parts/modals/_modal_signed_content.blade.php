@@ -39,7 +39,7 @@
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">
-                    <x-forms.input class="default-input" wire:model="keyContainerUpload"
+                    <x-forms.input class="default-input" wire:model="file"
                                    type="file" id="keyContainerUpload"/>
                 </x-slot>
                 @error("keyContainerUpload")

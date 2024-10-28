@@ -56,12 +56,12 @@
     </x-forms.form-group>
     <x-forms.form-group class="xl:w-1/4">
         <x-slot name="label">
-            <x-forms.label :isRequired="true" for="owner_birth_date" class="default-label">
+            <x-forms.label  :isRequired="true" for="owner_birth_date" class="default-label">
                 {{__('forms.birth_date')}}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input-date  wire:model="legal_entity_form.owner.birth_date"
+            <x-forms.input-date :maxDate="now()->subYears(18)->format('Y-m-d')"  wire:model="legal_entity_form.owner.birth_date"
                            id="owner_birth_date"/>
         </x-slot>
         @error('legal_entity_form.owner.birth_date')
@@ -338,7 +338,7 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input class="default-input" type="date" wire:model="legal_entity_form.owner.documents.issued_at"
+                <x-forms.input-date  wire:model="legal_entity_form.owner.documents.issued_at"
                                id="owner_documents_issued_at"
                               />
             </x-slot>

@@ -2,15 +2,20 @@
 
 namespace App\Models;
 
+use App\Enums\Declaration\DeclarationStatus;
+use App\Helpers\JsonHelper;
+use App\Traits\FormTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 class Declaration extends Model
 {
-    use HasFactory;
+    use HasFactory,FormTrait;
 
     public $timestamps = false;
+
 
     protected $fillable = [
         'id',
@@ -41,9 +46,10 @@ class Declaration extends Model
         'person' => 'array',
         'employee' => 'array',
         'division' => 'array',
-        'legal_entity' => 'array',
+        'legal_entity' => 'object',
         'inserted_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
+        'status' => DeclarationStatus::class, // enum
     ];
 
     /**
@@ -80,13 +86,70 @@ class Declaration extends Model
 
 
     /**
-     * Get the full name attribute for the person.
+     * Get the FullNameAttribute for the Declaration person.
      *
      * @return string
      */
-    public function getFullNameAttribute()
+    public function getFullNameAttribute(): string
     {
+        // Use the 'person' array to get the first, middle, and last names
         return ($this->person['first_name'] ?? '') . ' ' . ($this->person['last_name'] ?? '') . ' ' . ($this->person['second_name'] ?? '');
     }
+
+    /**
+     * Get BirthDateAttribute for the Declaration person.
+     * @return string
+     */
+    public function getBirthDateAttribute(): string
+    {
+        return humanFormatDate($this->person['birth_date'] ?? '');
+    }
+
+    /**
+     * Get StartDateAttributeS for the Declaration person.
+     * @return string
+     */
+    public function getStartDateDeclarationAttribute()
+    {
+        return humanFormatDate($this->start_date ?? '');
+    }
+
+    /**
+     * Get EndDateAttribute for the Declaration person.
+     * @return string
+     */
+    public function getEndDateDeclarationAttribute(): string
+    {
+        return humanFormatDate($this->end_date ?? '');
+    }
+
+
+    /**
+     * Get Full name Doctor for the Declaration person.
+     * @return string
+     */
+
+    public function getDoctorFullNameAttribute(): string {
+        return ($this->employee['party']['first_name'] ?? '') . ' ' . ($this->employee['party']['last_name'] ?? '') . ' ' . ($this->employee['party']['second_name'] ?? '');
+    }
+
+
+
+    public function setStatus(DeclarationStatus $status): void
+    {
+        $this->status = $status;
+        $this->save();
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return ($this->status->label() ?? '');
+    }
+
+    public function getPhoneAttribute(): string
+    {
+        return ($this->person['phones'][0]['number'] ?? '');
+    }
+
 }
 

@@ -25,6 +25,10 @@ class License extends Model
         'is_primary',
     ];
 
+    protected $casts = [
+        'is_primary' => 'boolean',
+    ];
+
     public static function boot()
     {
         parent::boot();
@@ -72,5 +76,11 @@ class License extends Model
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'legal_entity_id', 'legal_entity_id');
+    }
+
+
+    public function legalEntity(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(LegalEntity::class, 'legal_entity_id', 'id');
     }
 }

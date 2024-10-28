@@ -23,9 +23,14 @@ const initializeDatepickers = () => {
 
     datepickerElements.forEach(element => {
         if (!element.classList.contains('datepicker-initialized')) {
+            const minDate = element.getAttribute('data-min') ? new Date(element.getAttribute('data-min')) : null;
+            const maxDate = element.getAttribute('data-max') ? new Date(element.getAttribute('data-max')) : null;
+
             const datepicker = new Datepicker(element, {
                 format: 'yyyy-mm-dd',
-                language: 'uk'
+                language: 'uk',
+                minDate: minDate,  // Мінімальна дата
+                maxDate: maxDate,  // Максимальна дата
             });
 
             element.classList.add('datepicker-initialized');
@@ -45,15 +50,18 @@ const initializeDatepickers = () => {
     });
 };
 
-document.addEventListener('livewire:initialRender', function() {
+document.addEventListener('livewire:load', () => {
     initializeDatepickers();
-    console.log('livewire:render');
-
 });
 
-document.addEventListener('livewire:render', function() {
+
+document.addEventListener("livewire:initialized", () => {
     initializeDatepickers();
-    console.log('livewire:update');
+
+    Livewire.hook('element.init', ({ component, el }) => {
+        initializeDatepickers();
+    })
+
 });
 import.meta.glob([
     '../images/**',
