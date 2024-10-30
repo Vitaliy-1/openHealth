@@ -17,6 +17,7 @@ use App\Livewire\License\LicenseShow;
 use App\Livewire\License\Forms\LicenseForms;
 use App\Livewire\License\Forms\CreateNewLicense;
 use App\Livewire\LegalEntity\EditLegalEntity;
+use App\Livewire\Patient\PatientForm;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EmailController;
@@ -53,7 +54,7 @@ Route::middleware([
 
     Route::get('/legal-entities/create', LegalEntities::class)->name('create.legalEntities');
 
-    Route::group(['middleware' => ['role:OWNER|ADMIN'],'prefix' => 'dashboard'], function () {
+    Route::group(['middleware' => ['role:OWNER|ADMIN|DOCTOR'],'prefix' => 'dashboard'], function () {
         Route::prefix('legal-entities')->group(function () {
             Route::get('/edit/{id?}', EditLegalEntity::class)->name('edit.legalEntities');
         });
@@ -93,6 +94,7 @@ Route::middleware([
     Route::group(['middleware' => ['role:OWNER|ADMIN|DOCTOR']], function () {
         Route::prefix('patient')->group(function () {
             Route::get('/', PatientIndex::class)->name('patient.index');
+            Route::get('/form/{id?}', PatientForm::class)->name('patient.form');
         });
     });
 });

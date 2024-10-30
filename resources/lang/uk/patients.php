@@ -12,7 +12,7 @@ return [
     |
     */
 
-    'patient_add' => 'Додати Пацієнта',
+    'add_patient' => 'Додати пацієнта',
     'patients' => 'Пацієнти',
     'firstName' => 'Ім’я',
     'lastName' => 'Прізвище',

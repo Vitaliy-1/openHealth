@@ -198,9 +198,21 @@ return [
             ],
 
         ],
+        'patient' => [
+            'first_name' => 'ім’я',
+            'last_name' => 'прізвище',
+            'second_name' => 'по батькові',
+            'birth_date' => 'дата народження',
+            'country_of_birth' => 'країна народження',
+            'city_of_birth' => 'місто народження',
+            'gender' => 'стать',
+            'tax_id' => 'номер РНОКПП',
+        ],
         'documents' => [
             'type' => 'Тип документа',
             'number' => 'Cерія/номер документа',
+            'issued_by' => 'Орган яким виданий документ',
+            'issued_at' => 'Дата видачі документа',
         ],
         'passport_data' => [
             'first_name' => 'Ім’я',
