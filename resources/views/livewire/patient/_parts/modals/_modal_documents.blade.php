@@ -7,7 +7,7 @@
         <x-forms.forms-section-modal
             submit="{!! $mode === 'edit' ? 'update(\'documents\',' . $key_property . ')' : 'store(\'documents\')' !!}">
             <x-slot name="form">
-                <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                <div class="mb-4 flex flex-col gap-6 xl:flex-row">
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="documents_type" class="default-label">
@@ -57,7 +57,7 @@
                     </x-forms.form-group>
                 </div>
 
-                <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                <div class="mb-4 flex flex-col gap-6 xl:flex-row">
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="documents_issued_by" class="default-label">
@@ -101,7 +101,7 @@
                     </x-forms.form-group>
                 </div>
 
-                <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                <div class="mb-4 flex flex-col gap-6 xl:flex-row">
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="valid_to" class="default-label">
@@ -145,7 +145,7 @@
                     </x-forms.form-group>
                 </div>
 
-                <div class="mb-4.5 mt-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center">
+                <div class="mb-4 flex flex-col xl:flex-row justify-between items-center">
                     <div class="xl:w-1/4 text-left">
                         <x-secondary-button wire:click="closeModalModel()">
                             {{ __('forms.close') }}

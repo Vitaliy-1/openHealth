@@ -206,7 +206,31 @@ return [
             'country_of_birth' => 'країна народження',
             'city_of_birth' => 'місто народження',
             'gender' => 'стать',
+        ],
+        'identity' => [
             'tax_id' => 'номер РНОКПП',
+        ],
+        'contact_data' => [
+            'email' => 'E-mail',
+            'codeword' => 'кодове слово',
+        ],
+        'contact_data.phones.*.type' => 'тип телефону',
+        'contact_data.phones.*.number' => 'номер телефону',
+        'emergency_contact' => [
+            'first_name' => 'ім’я',
+            'last_name' => 'прізвище',
+            'second_name' => 'по батькові',
+        ],
+        'patient.emergency_contact.phones.*.type' => 'тип телефону',
+        'patient.emergency_contact.phones.*.number' => 'номер телефону',
+        'address' => [
+            'region' => 'область',
+            'city' => 'місто',
+            'street_type' => 'тип вулиці',
+            'street_name' => 'назва вулиці',
+            'building' => 'будинок',
+            'apartment' => 'квартира',
+            'zip_code' => 'поштовий індекс',
         ],
         'documents' => [
             'type' => 'Тип документа',

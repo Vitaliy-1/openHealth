@@ -30,6 +30,9 @@ class PatientForm extends Component
     public ?array $dictionaries_field = [
         'GENDER',
         'DOCUMENT_TYPE',
+        'PHONE_TYPE',
+        'PREFERRED_WAY_COMMUNICATION',
+        'STREET_TYPE',
     ];
 
     public function boot(): void
@@ -92,7 +95,7 @@ class PatientForm extends Component
             $cacheData = $this->getCache();
         }
 
-        if ($model === 'patient') {
+        if ($model !== 'documents') {
             $cacheData[$this->request_id][$model] = $this->patient_request->{$model};
         } else {
             $cacheData[$this->request_id][$model][] = $this->patient_request->{$model};
@@ -114,6 +117,10 @@ class PatientForm extends Component
                         [
                             'patient' => $this->patient->patient,
                             'documents' => $this->patient->documents ?? [],
+                            'identity' => $this->patient->identity ?? [],
+                            'contact_data' => $this->patient->contact_data ?? [],
+                            'emergency_contact' => $this->patient->emergency_contact ?? [],
+                            'address' => $this->patient->address ?? [],
                         ]
                     );
                 }

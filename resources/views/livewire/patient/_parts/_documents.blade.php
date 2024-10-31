@@ -65,7 +65,7 @@
         @endisset
         </tbody>
     </table>
-    <div class="mb-6 mt-6 flex flex-wrap gap-5 xl:gap-7.5">
+    <div class="mb-6 mt-6 flex flex-wrap xl:gap-7.5">
         <a wire:click.prevent="create('documents')" class="text-primary" href="#">{{ __('forms.add_document') }}</a>
     </div>
 </div>

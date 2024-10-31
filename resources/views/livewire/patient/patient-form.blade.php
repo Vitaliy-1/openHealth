@@ -13,8 +13,11 @@
         @include('livewire.patient._parts._patient')
         @include('livewire.patient._parts._documents')
         @include('livewire.patient._parts._identity')
+        @include('livewire.patient._parts._contact_data')
+        @include('livewire.patient._parts._emergency_contact')
+        @include('livewire.patient._parts._address')
 
-        <div class="mb-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center">
+        <div class="mb-4 flex flex-col gap-6 xl:flex-row justify-between items-center">
             <div class="xl:w-1/4 text-left">
                 <x-secondary-button wire:click="closeModal()">
                     {{ __('Назад') }}

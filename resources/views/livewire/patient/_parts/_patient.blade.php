@@ -5,7 +5,7 @@
         </h3>
     </div>
 
-    <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+    <div class="mb-4 flex flex-col gap-6 xl:flex-row">
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
                 <x-forms.label for="first_name" class="default-label">
@@ -64,7 +64,7 @@
         </x-forms.form-group>
     </div>
 
-    <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+    <div class="mb-4 flex flex-col gap-6 xl:flex-row">
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
                 <x-forms.label for="birth_date" class="default-label">
@@ -124,7 +124,7 @@
         </x-forms.form-group>
     </div>
 
-    <div class="mb-4.5 flex flex-col gap-0">
+    <div class="mb-4 flex flex-col gap-0">
         <x-forms.form-group class="xl:w-1/3">
             <x-slot name="label">
                 <x-forms.label for="gender" class="default-label">
@@ -142,7 +142,6 @@
                         @endforeach
                     </x-slot>
                 </x-forms.select>
-
             </x-slot>
             @error('patient_request.patient.gender')
             <x-slot name="error">
@@ -154,7 +153,7 @@
         </x-forms.form-group>
     </div>
 
-    <div class="mb-4.5 mt-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center">
+    <div class="mb-4 flex flex-col xl:flex-row justify-between items-center">
         <div class="xl:w-1/4 text-left"></div>
         <div class="xl:w-1/4 text-right">
             <x-button wire:click="store('patient')" type="submit" class="btn-primary d-flex max-w-[150px]">
