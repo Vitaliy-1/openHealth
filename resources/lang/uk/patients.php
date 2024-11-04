@@ -19,4 +19,8 @@ return [
     'secondName' => 'По батькові',
     'patient_pib' => 'ПІБ пацієнта',
     'phone_number' => 'Номер телефону',
+    'relation_type' => [
+        'primary' => 'Основний',
+        'secondary' => 'Не основний',
+    ],
 ];

@@ -212,7 +212,7 @@ return [
         ],
         'contact_data' => [
             'email' => 'E-mail',
-            'codeword' => 'кодове слово',
+            'secret' => 'кодове слово',
         ],
         'contact_data.phones.*.type' => 'тип телефону',
         'contact_data.phones.*.number' => 'номер телефону',
@@ -232,11 +232,38 @@ return [
             'apartment' => 'квартира',
             'zip_code' => 'поштовий індекс',
         ],
+        'legal_representative' => [
+            'first_name' => 'ім’я',
+            'last_name' => 'прізвище',
+            'second_name' => 'по батькові',
+            'birth_date' => 'дата народження',
+            'country_of_birth' => 'країна народження',
+            'city_of_birth' => 'місто народження',
+        ],
+        'person_documents' => [
+            'type' => 'тип документа',
+            'number' => 'серія/номер документа',
+            'issued_by' => 'орган яким виданий документ',
+            'issued_at' => 'дата видачі документа',
+            'valid_to' => 'дійсний до',
+        ],
+        'legal_representation_documents' => [
+            'type' => 'тип документа',
+            'number' => 'серія/номер документа',
+            'issued_by' => 'орган яким виданий документ',
+            'issued_at' => 'дата видачі документа',
+        ],
+        'legal_representation_contact.phones.*.type' => 'тип телефону',
+        'legal_representation_contact.phones.*.number' => 'номер телефону',
+        'legal_representation_contact' => [
+            'email' => 'E-mail',
+        ],
         'documents' => [
             'type' => 'Тип документа',
-            'number' => 'Cерія/номер документа',
+            'number' => 'Серія/номер документа',
             'issued_by' => 'Орган яким виданий документ',
             'issued_at' => 'Дата видачі документа',
+            'valid_to' => 'дійсний до',
         ],
         'passport_data' => [
             'first_name' => 'Ім’я',

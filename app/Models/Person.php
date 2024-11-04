@@ -41,6 +41,10 @@ class Person extends Model
         'identity' => 'array',
         'contact_data' => 'array',
         'address' => 'array',
+        'legal_representative' => 'array',
+        'person_documents' => 'array',
+        'legal_representation_documents' => 'array',
+        'legal_representation_contact' => 'array',
         'phones' => 'array',
         'educations' => 'array',
         'specialities' => 'array',
@@ -57,6 +61,10 @@ class Person extends Model
         'contact_data' => '{}',
         'emergency_contact' => '{}',
         'address' => '{}',
+        'legal_representative' => '{}',
+        'person_documents' => '{}',
+        'legal_representation_documents' => '{}',
+        'legal_representation_contact' => '{}',
         'tax_id' => '',
     ];
 

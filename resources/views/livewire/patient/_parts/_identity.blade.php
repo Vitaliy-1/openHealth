@@ -6,18 +6,18 @@
     </div>
 
     <div class="mb-4 flex flex-col gap-6 xl:flex-row">
-        <x-forms.form-group class="xl:w-1/2">
+        <x-forms.form-group class="xl:w-1/2 flex items-center gap-3">
             <x-slot name="label">
-                <x-forms.label class="default-label" for="tax_id_missing">
+                <x-forms.label class="default-label" for="no_tax_id">
                     {{ __('forms.rnokpp_not_found') }}
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-checkbox class="default-checkbox"
-                            wire:model.live="tax_id_missing"
-                            id="tax_id_missing" name="tax_id_missing"/>
+                <x-checkbox class="default-checkbox mb-2"
+                            wire:model.live="no_tax_id"
+                            id="no_tax_id" name="no_tax_id"/>
             </x-slot>
-            @error('tax_id_missing')
+            @error('no_tax_id')
             <x-slot name="error">
                 <x-forms.error>
                     {{ $message }}
@@ -27,9 +27,9 @@
         </x-forms.form-group>
     </div>
 
-    @if(!$tax_id_missing)
+    @if(!$no_tax_id)
         <div class="mb-4 flex flex-col gap-6 xl:flex-row">
-            <x-forms.form-group class="xl:w-1/2">
+            <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label class="default-label" for="tax_id">
                         {{ __('forms.number') }} {{ __('forms.RNOCPP') }} *

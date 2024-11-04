@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Livewire\Patient;
 
 use App\Livewire\Patient\Forms\PatientFormRequest;
@@ -26,7 +24,8 @@ class PatientForm extends Component
     public string $patient_id;
     protected string $patientCacheKey;
     public mixed $key_property;
-    public bool $tax_id_missing = false;
+    public bool $no_tax_id = false;
+    public bool $is_incapable = false;
     public ?array $dictionaries_field = [
         'GENDER',
         'DOCUMENT_TYPE',
@@ -95,10 +94,10 @@ class PatientForm extends Component
             $cacheData = $this->getCache();
         }
 
-        if ($model !== 'documents') {
-            $cacheData[$this->request_id][$model] = $this->patient_request->{$model};
-        } else {
+        if ($model === 'documents' || $model === 'person_documents' || $model === 'legal_representation_documents') {
             $cacheData[$this->request_id][$model][] = $this->patient_request->{$model};
+        } else {
+            $cacheData[$this->request_id][$model] = $this->patient_request->{$model};
         }
 
         $this->putCache($cacheData);
@@ -121,6 +120,10 @@ class PatientForm extends Component
                             'contact_data' => $this->patient->contact_data ?? [],
                             'emergency_contact' => $this->patient->emergency_contact ?? [],
                             'address' => $this->patient->address ?? [],
+                            'legal_representative' => $this->patient->legal_representative ?? [],
+                            'person_documents' => $this->patient->person_documents ?? [],
+                            'legal_representation_documents' => $this->patient->legal_representation_documents ?? [],
+                            'legal_representation_contact' => $this->patient->legal_representation_contact ?? [],
                         ]
                     );
                 }
