@@ -78,7 +78,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function legalEntity(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(LegalEntity::class);
+        return $this->belongsTo(LegalEntity::class, 'legal_entity_id', 'id');
     }
 
     public function isClientId(): bool
@@ -90,7 +90,4 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(License::class, 'legal_entity_id', 'legal_entity_id');
     }
-
-
-
 }
