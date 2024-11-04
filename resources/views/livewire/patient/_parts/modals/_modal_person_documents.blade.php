@@ -5,7 +5,7 @@
 
     <x-slot name="content">
         <x-forms.forms-section-modal
-            submit="{!! $mode === 'edit' ? 'update(\'person_documents\', ' . $key_property . ')' : 'store(\'person_documents\')' !!}">
+            submit="{!! $mode === 'edit' ? 'update(\'confidant_person_documents\', ' . $key_property . ')' : 'store(\'confidant_person_documents\')' !!}">
             <x-slot name="form">
                 <div class="mb-4 flex flex-col gap-6 xl:flex-row">
                     <x-forms.form-group class="xl:w-1/2">
@@ -16,7 +16,7 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select id="documents_type"
-                                            wire:model.defer="patient_request.person_documents.type"
+                                            wire:model.defer="patient_request.confidant_person_documents.type"
                                             class="default-select">
                                 <x-slot name="option">
                                     <option>{{__('Обрати тип')}}</option>
@@ -26,7 +26,7 @@
                                 </x-slot>
                             </x-forms.select>
                         </x-slot>
-                        @error('patient_request.person_documents.type')
+                        @error('patient_request.confidant_person_documents.type')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
@@ -43,11 +43,11 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.input class="default-input" id="documents_number"
-                                           wire:model="patient_request.person_documents.number"
+                                           wire:model="patient_request.confidant_person_documents.number"
                                            type="text"
                             />
                         </x-slot>
-                        @error('patient_request.person_documents.number')
+                        @error('patient_request.confidant_person_documents.number')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
@@ -66,11 +66,11 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.input class="default-input" id="documents_issued_by"
-                                           wire:model="patient_request.person_documents.issued_by"
+                                           wire:model="patient_request.confidant_person_documents.issued_by"
                                            type="text"
                                            placeholder="{{ __('forms.document_issued_by') }}"/>
                         </x-slot>
-                        @error('patient_request.person_documents.issued_by')
+                        @error('patient_request.confidant_person_documents.issued_by')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
@@ -87,11 +87,11 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.input class="default-input" id="documents_issued_at"
-                                           wire:model="patient_request.person_documents.issued_at"
+                                           wire:model="patient_request.confidant_person_documents.issued_at"
                                            type="date"
                             />
                         </x-slot>
-                        @error('patient_request.person_documents.issued_at')
+                        @error('patient_request.confidant_person_documents.issued_at')
                         <x-slot name="message">
                             <x-forms.error>
                                 {{ $message }}
@@ -104,17 +104,17 @@
                 <div class="mb-4 flex flex-col gap-6 xl:flex-row">
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
-                            <x-forms.label for="valid_to" class="default-label">
-                                {{ __('forms.valid_to') }}
+                            <x-forms.label for="expiration_date" class="default-label">
+                                {{ __('forms.expiration_date') }}
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" id="valid_to"
-                                           wire:model="patient_request.person_documents.valid_to"
+                            <x-forms.input class="default-input" id="expiration_date"
+                                           wire:model="patient_request.confidant_person_documents.expiration_date"
                                            type="date"
                             />
                         </x-slot>
-                        @error('patient_request.person_documents.valid_to')
+                        @error('patient_request.confidant_person_documents.expiration_date')
                         <x-slot name="message">
                             <x-forms.error>
                                 {{ $message }}

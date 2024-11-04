@@ -15,8 +15,8 @@ class PatientFormRequest extends Form
         'patient.last_name' => ['required', 'min:3', new Cyrillic()],
         'patient.second_name' => ['nullable', 'min:3', new Cyrillic()],
         'patient.birth_date' => ['required', 'date', new AgeCheck()],
-        'patient.country_of_birth' => ['required', 'string'],
-        'patient.city_of_birth' => ['required', 'string'],
+        'patient.birth_country' => ['required', 'string'],
+        'patient.birth_settlement' => ['required', 'string'],
         'patient.gender' => ['required', 'string'],
     ])]
     public ?array $patient = [];
@@ -26,7 +26,7 @@ class PatientFormRequest extends Form
         'documents.number' => ['required', 'string'],
         'documents.issued_by' => ['required', 'string'],
         'documents.issued_at' => ['required', 'date'],
-        'documents.valid_to' => ['nullable', 'date'],
+        'documents.expiration_date' => ['nullable', 'date'],
         'documents.unzr' => ['nullable', 'string'],
     ])]
     public ?array $documents = [];
@@ -40,7 +40,7 @@ class PatientFormRequest extends Form
         'contact_data.phones.*.type' => ['nullable', 'string'],
         'contact_data.phones.*.number' => ['nullable', 'string', 'min:13', 'max:13'],
         'contact_data.email' => ['nullable', 'email', 'string'],
-        'contact_data.preferred_contact_method' => ['nullable', 'string'],
+        'contact_data.preferred_way_communication' => ['nullable', 'string'],
         'contact_data.secret' => ['required', 'string'],
     ])]
     public ?array $contact_data = [];
@@ -66,40 +66,40 @@ class PatientFormRequest extends Form
     public ?array $address = [];
 
     #[Validate([
-        'legal_representative.relation_type' => ['required', 'string'],
-        'legal_representative.first_name' => ['required', 'min:3', new Cyrillic()],
-        'legal_representative.last_name' => ['required', 'min:3', new Cyrillic()],
-        'legal_representative.second_name' => ['nullable', 'min:3', new Cyrillic()],
-        'legal_representative.birth_date' => ['required', 'date', new AgeCheck()],
-        'legal_representative.country_of_birth' => ['required', 'string'],
-        'legal_representative.city_of_birth' => ['required', 'string'],
-        'legal_representative.tax_id' => ['nullable', 'string', 'max:10'],
-        'legal_representative.unzr' => ['nullable', 'string'],
+        'confidant_person.relation_type' => ['required', 'string'],
+        'confidant_person.first_name' => ['required', 'min:3', new Cyrillic()],
+        'confidant_person.last_name' => ['required', 'min:3', new Cyrillic()],
+        'confidant_person.second_name' => ['nullable', 'min:3', new Cyrillic()],
+        'confidant_person.birth_date' => ['required', 'date', new AgeCheck()],
+        'confidant_person.birth_country' => ['required', 'string'],
+        'confidant_person.birth_settlement' => ['required', 'string'],
+        'confidant_person.tax_id' => ['nullable', 'string', 'max:10'],
+        'confidant_person.unzr' => ['nullable', 'string'],
     ])]
-    public ?array $legal_representative = [];
+    public ?array $confidant_person = [];
 
     #[Validate([
-        'person_documents.type' => ['required', 'string'],
-        'person_documents.number' => ['required', 'string'],
-        'person_documents.issued_by' => ['required', 'string'],
-        'person_documents.issued_at' => ['required', 'date'],
-        'person_documents.valid_to' => ['nullable', 'date'],
+        'confidant_person_documents.type' => ['required', 'string'],
+        'confidant_person_documents.number' => ['required', 'string'],
+        'confidant_person_documents.issued_by' => ['required', 'string'],
+        'confidant_person_documents.issued_at' => ['required', 'date'],
+        'confidant_person_documents.expiration_date' => ['nullable', 'date'],
     ])]
-    public ?array $person_documents = [];
+    public ?array $confidant_person_documents = [];
 
     #[Validate([
-        'legal_representation_documents.type' => ['required', 'string'],
-        'legal_representation_documents.number' => ['required', 'string'],
-        'legal_representation_documents.issued_by' => ['required', 'string'],
-        'legal_representation_documents.issued_at' => ['required', 'date'],
+        'confidant_person_documents_relationship.type' => ['required', 'string'],
+        'confidant_person_documents_relationship.number' => ['required', 'string'],
+        'confidant_person_documents_relationship.issued_by' => ['required', 'string'],
+        'confidant_person_documents_relationship.issued_at' => ['required', 'date'],
     ])]
-    public ?array $legal_representation_documents = [];
+    public ?array $confidant_person_documents_relationship = [];
 
     #[Validate([
         'legal_representation_contact.phones.*.type' => ['nullable', 'string'],
         'legal_representation_contact.phones.*.number' => ['nullable', 'string', 'min:13', 'max:13'],
         'legal_representation_contact.email' => ['nullable', 'email', 'string'],
-        'legal_representation_contact.preferred_contact_method' => ['nullable', 'string'],
+        'legal_representation_contact.preferred_way_communication' => ['nullable', 'string'],
     ])]
     public ?array $legal_representation_contact = [];
 

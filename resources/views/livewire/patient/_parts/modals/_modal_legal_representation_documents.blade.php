@@ -5,7 +5,7 @@
 
     <x-slot name="content">
         <x-forms.forms-section-modal
-            submit="{!! $mode === 'edit' ? 'update(\'legal_representation_documents\', ' . $key_property . ')' : 'store(\'legal_representation_documents\')' !!}">
+            submit="{!! $mode === 'edit' ? 'update(\'confidant_person_documents_relationship\', ' . $key_property . ')' : 'store(\'confidant_person_documents_relationship\')' !!}">
             <x-slot name="form">
                 <div class="mb-4 flex flex-col gap-6 xl:flex-row">
                     <x-forms.form-group class="xl:w-1/2">
@@ -16,7 +16,7 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select id="documents_type"
-                                            wire:model.defer="patient_request.legal_representation_documents.type"
+                                            wire:model.defer="patient_request.confidant_person_documents_relationship.type"
                                             class="default-select">
                                 <x-slot name="option">
                                     <option>{{__('Обрати тип')}}</option>
@@ -26,7 +26,7 @@
                                 </x-slot>
                             </x-forms.select>
                         </x-slot>
-                        @error('patient_request.legal_representation_documents.type')
+                        @error('patient_request.confidant_person_documents_relationship.type')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
@@ -43,11 +43,11 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.input class="default-input" id="documents_number"
-                                           wire:model="patient_request.legal_representation_documents.number"
+                                           wire:model="patient_request.confidant_person_documents_relationship.number"
                                            type="text"
                             />
                         </x-slot>
-                        @error('patient_request.legal_representation_documents.number')
+                        @error('patient_request.confidant_person_documents_relationship.number')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
@@ -66,11 +66,11 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.input class="default-input" id="documents_issued_by"
-                                           wire:model="patient_request.legal_representation_documents.issued_by"
+                                           wire:model="patient_request.confidant_person_documents_relationship.issued_by"
                                            type="text"
                                            placeholder="{{ __('forms.document_issued_by') }}"/>
                         </x-slot>
-                        @error('patient_request.legal_representation_documents.issued_by')
+                        @error('patient_request.confidant_person_documents_relationship.issued_by')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
@@ -87,11 +87,11 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.input class="default-input" id="documents_issued_at"
-                                           wire:model="patient_request.legal_representation_documents.issued_at"
+                                           wire:model="patient_request.confidant_person_documents_relationship.issued_at"
                                            type="date"
                             />
                         </x-slot>
-                        @error('patient_request.legal_representation_documents.issued_at')
+                        @error('patient_request.confidant_person_documents_relationship.issued_at')
                         <x-slot name="message">
                             <x-forms.error>
                                 {{ $message }}

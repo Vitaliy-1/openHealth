@@ -94,7 +94,7 @@ class PatientForm extends Component
             $cacheData = $this->getCache();
         }
 
-        if ($model === 'documents' || $model === 'person_documents' || $model === 'legal_representation_documents') {
+        if ($model === 'documents' || $model === 'confidant_person_documents' || $model === 'confidant_person_documents_relationship') {
             $cacheData[$this->request_id][$model][] = $this->patient_request->{$model};
         } else {
             $cacheData[$this->request_id][$model] = $this->patient_request->{$model};
@@ -120,9 +120,9 @@ class PatientForm extends Component
                             'contact_data' => $this->patient->contact_data ?? [],
                             'emergency_contact' => $this->patient->emergency_contact ?? [],
                             'address' => $this->patient->address ?? [],
-                            'legal_representative' => $this->patient->legal_representative ?? [],
-                            'person_documents' => $this->patient->person_documents ?? [],
-                            'legal_representation_documents' => $this->patient->legal_representation_documents ?? [],
+                            'confidant_person' => $this->patient->confidant_person ?? [],
+                            'confidant_person_documents' => $this->patient->confidant_person_documents ?? [],
+                            'confidant_person_documents_relationship' => $this->patient->confidant_person_documents_relationship ?? [],
                             'legal_representation_contact' => $this->patient->legal_representation_contact ?? [],
                         ]
                     );

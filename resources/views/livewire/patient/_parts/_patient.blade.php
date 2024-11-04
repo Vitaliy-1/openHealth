@@ -13,8 +13,11 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input class="default-input" wire:model="patient_request.patient.first_name" type="text"
-                               id="first_name"/>
+                <x-forms.input class="default-input"
+                               wire:model="patient_request.patient.first_name"
+                               type="text"
+                               id="first_name"
+                />
             </x-slot>
             @error('patient_request.patient.first_name')
             <x-slot name="error">
@@ -32,8 +35,11 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input class="default-input" wire:model="patient_request.patient.last_name" type="text"
-                               id="last_name"/>
+                <x-forms.input class="default-input"
+                               wire:model="patient_request.patient.last_name"
+                               type="text"
+                               id="last_name"
+                />
             </x-slot>
             @error('patient_request.patient.last_name')
             <x-slot name="error">
@@ -51,8 +57,11 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input class="default-input" wire:model="patient_request.patient.second_name" type="text"
-                               id="second_name"/>
+                <x-forms.input class="default-input"
+                               wire:model="patient_request.patient.second_name"
+                               type="text"
+                               id="second_name"
+                />
             </x-slot>
             @error('patient_request.patient.second_name')
             <x-slot name="error">
@@ -73,8 +82,11 @@
             </x-slot>
 
             <x-slot name="input">
-                <x-forms.input class="default-input" type="date" id="birth_date"
-                               wire:model="patient_request.patient.birth_date"/>
+                <x-forms.input class="default-input"
+                               wire:model="patient_request.patient.birth_date"
+                               type="date"
+                               id="birth_date"
+                />
             </x-slot>
             @error('patient_request.patient.birth_date')
             <x-slot name="error">
@@ -88,14 +100,17 @@
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
                 <x-forms.label for="last_name" class="default-label">
-                    {{ __('forms.country_of_birth') }} *
+                    {{ __('forms.birth_country') }} *
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input class="default-input" wire:model="patient_request.patient.country_of_birth" type="text"
-                               id="country_of_birth"/>
+                <x-forms.input class="default-input"
+                               wire:model="patient_request.patient.birth_country"
+                               type="text"
+                               id="birth_country"
+                />
             </x-slot>
-            @error('patient_request.patient.country_of_birth')
+            @error('patient_request.patient.birth_country')
             <x-slot name="error">
                 <x-forms.error>
                     {{ $message }}
@@ -106,15 +121,18 @@
 
         <x-forms.form-group class="xl:w-1/2">
             <x-slot name="label">
-                <x-forms.label for="city_of_birth" class="default-label">
-                    {{ __('forms.city_of_birth') }} *
+                <x-forms.label for="birth_settlement" class="default-label">
+                    {{ __('forms.birth_settlement') }} *
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input class="default-input" wire:model="patient_request.patient.city_of_birth" type="text"
-                               id="city_of_birth"/>
+                <x-forms.input class="default-input"
+                               wire:model="patient_request.patient.birth_settlement"
+                               type="text"
+                               id="birth_settlement"
+                />
             </x-slot>
-            @error('patient_request.patient.city_of_birth')
+            @error('patient_request.patient.birth_settlement')
             <x-slot name="error">
                 <x-forms.error>
                     {{ $message }}
@@ -132,9 +150,8 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.select
-                    class="default-input" wire:model="patient_request.patient.gender" type="text"
-                    id="gender">
+                <x-forms.select class="default-input" wire:model="patient_request.patient.gender" type="text"
+                                id="gender">
                     <x-slot name="option">
                         <option> {{ __('forms.select') }} {{ __('forms.gender') }}</option>
                         @foreach($this->dictionaries['GENDER'] as $k => $gender)

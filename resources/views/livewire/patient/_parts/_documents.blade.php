@@ -20,7 +20,7 @@
                 {{ __('forms.issued_at') }}
             </th>
             <th class="px-4 py-4 font-medium text-black dark:text-white">
-                {{ __('forms.valid_to') }}
+                {{ __('forms.expiration_date') }}
             </th>
             <th class="px-4 py-4 font-medium text-black dark:text-white">
                 {{ __('forms.UNZR') }}
@@ -45,7 +45,7 @@
                         {{ $document['issued_at'] ?? '' }}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {{ $document['valid_to'] ?? '' }}
+                        {{ $document['expiration_date'] ?? '' }}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                         {{ $document['unzr'] ?? '' }}

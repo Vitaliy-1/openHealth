@@ -1,7 +1,7 @@
 <div wire:after="initializeFlatpickr" class="mb-4" x-data="{show_document: false}">
     <div class="border-b border-stroke py-4 dark:border-strokedark">
         <h3 class="font-medium text-2xl	text-black dark:text-white">
-            {{ __('forms.person_documents') }}
+            {{ __('forms.confidant_person_documents') }}
         </h3>
     </div>
     <table class="w-full table-auto">
@@ -20,33 +20,33 @@
                 {{ __('forms.issued_at') }}
             </th>
             <th class="px-4 py-4 font-medium text-black dark:text-white">
-                {{ __('forms.valid_to') }}
+                {{ __('forms.expiration_date') }}
             </th>
             <th class="px-4 py-4 font-medium text-black dark:text-white"></th>
         </tr>
         </thead>
         <tbody>
-        @isset($patient->person_documents)
-            @foreach($patient->person_documents as $k => $person_documents)
+        @isset($patient->confidant_person_documents)
+            @foreach($patient->confidant_person_documents as $k => $confidant_person_document)
                 <tr>
                     <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                        {{ $person_documents['type'] ?? '' }}
+                        {{ $confidant_person_document['type'] ?? '' }}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {{ $person_documents['number'] ?? '' }}
+                        {{ $confidant_person_document['number'] ?? '' }}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {{ $person_documents['issued_by'] ?? '' }}
+                        {{ $confidant_person_document['issued_by'] ?? '' }}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {{ $person_documents['issued_at'] ?? '' }}
+                        {{ $confidant_person_document['issued_at'] ?? '' }}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {{ $person_documents['valid_to'] ?? '' }}
+                        {{ $confidant_person_document['expiration_date'] ?? '' }}
                     </td>
 
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        <a wire:click.prevent="edit('person_documents', {{ $k }})" href="#">
+                        <a wire:click.prevent="edit('confidant_person_documents', {{ $k }})" href="#">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                  stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -60,6 +60,6 @@
         </tbody>
     </table>
     <div class="mb-6 mt-6 flex flex-wrap xl:gap-7.5">
-        <a wire:click.prevent="create('person_documents')" class="text-primary" href="#">{{ __('forms.add_document') }}</a>
+        <a wire:click.prevent="create('confidant_person_documents')" class="text-primary" href="#">{{ __('forms.add_document') }}</a>
     </div>
 </div>

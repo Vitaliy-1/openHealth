@@ -104,17 +104,17 @@
                 <div class="mb-4 flex flex-col gap-6 xl:flex-row">
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
-                            <x-forms.label for="valid_to" class="default-label">
-                                {{ __('forms.valid_to') }}
+                            <x-forms.label for="expiration_date" class="default-label">
+                                {{ __('forms.expiration_date') }}
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" id="valid_to"
-                                           wire:model="patient_request.documents.valid_to"
+                            <x-forms.input class="default-input" id="expiration_date"
+                                           wire:model="patient_request.documents.expiration_date"
                                            type="date"
                             />
                         </x-slot>
-                        @error('patient_request.documents.valid_to')
+                        @error('patient_request.documents.expiration_date')
                         <x-slot name="message">
                             <x-forms.error>
                                 {{ $message }}

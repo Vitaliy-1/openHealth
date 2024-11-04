@@ -47,7 +47,7 @@
         </div>
 
         @if($is_incapable)
-            @include('livewire.patient._parts._legal_representative')
+            @include('livewire.patient._parts._confidant_person')
             @include('livewire.patient._parts._person_documents')
             @include('livewire.patient._parts._legal_representative_documents')
             @include('livewire.patient._parts._legal_representation_contact')
@@ -82,9 +82,9 @@
 
     @if($showModal === 'documents')
         @include('livewire.patient._parts.modals._modal_documents')
-    @elseif($showModal === 'person_documents')
+    @elseif($showModal === 'confidant_person_documents')
         @include('livewire.patient._parts.modals._modal_person_documents')
-    @elseif($showModal === 'legal_representation_documents')
+    @elseif($showModal === 'confidant_person_documents_relationship')
         @include('livewire.patient._parts.modals._modal_legal_representation_documents')
     @endif
 </div>

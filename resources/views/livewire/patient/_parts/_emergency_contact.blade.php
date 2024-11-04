@@ -13,9 +13,11 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input class="default-input" wire:model="patient_request.emergency_contact.first_name"
+                <x-forms.input class="default-input"
+                               wire:model="patient_request.emergency_contact.first_name"
                                type="text"
-                               id="emergency_contact.first_name"/>
+                               id="emergency_contact.first_name"
+                />
             </x-slot>
             @error('patient_request.emergency_contact.first_name')
             <x-slot name="error">
@@ -33,9 +35,11 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input class="default-input" wire:model="patient_request.emergency_contact.last_name"
+                <x-forms.input class="default-input"
+                               wire:model="patient_request.emergency_contact.last_name"
                                type="text"
-                               id="emergency_contact.last_name"/>
+                               id="emergency_contact.last_name"
+                />
             </x-slot>
             @error('patient_request.emergency_contact.last_name')
             <x-slot name="error">
@@ -53,9 +57,11 @@
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
-                <x-forms.input class="default-input" wire:model="patient_request.emergency_contact.second_name"
+                <x-forms.input class="default-input"
+                               wire:model="patient_request.emergency_contact.second_name"
                                type="text"
-                               id="emergency_contact.second_name"/>
+                               id="emergency_contact.second_name"
+                />
             </x-slot>
             @error('patient_request.emergency_contact.second_name')
             <x-slot name="error">

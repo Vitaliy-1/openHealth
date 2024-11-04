@@ -77,23 +77,23 @@
 
         <x-forms.form-group class="xl:w-1/3">
             <x-slot name="label">
-                <x-forms.label for="preferred_contact_method" class="default-label">
-                    {{ __('forms.preferred_contact_method') }}
+                <x-forms.label for="preferred_way_communication" class="default-label">
+                    {{ __('forms.preferred_way_communication') }}
                 </x-forms.label>
             </x-slot>
             <x-slot name="input">
                 <x-forms.select
-                    class="default-input" wire:model="patient_request.legal_representation_contact.preferred_contact_method" type="text"
-                    id="preferred_contact_method">
+                    class="default-input" wire:model="patient_request.legal_representation_contact.preferred_way_communication" type="text"
+                    id="preferred_way_communication">
                     <x-slot name="option">
-                        <option> {{ __('forms.select') }} {{ __('forms.preferred_contact_method') }}</option>
+                        <option> {{ __('forms.select') }} {{ __('forms.preferred_way_communication') }}</option>
                         @foreach($this->dictionaries['PREFERRED_WAY_COMMUNICATION'] as $k => $preferred_way_communication)
                             <option value="{{ $k }}">{{ $preferred_way_communication }}</option>
                         @endforeach
                     </x-slot>
                 </x-forms.select>
             </x-slot>
-            @error('patient_request.legal_representation_contact.preferred_contact_method')
+            @error('patient_request.legal_representation_contact.preferred_way_communication')
             <x-slot name="error">
                 <x-forms.error>
                     {{ $message }}

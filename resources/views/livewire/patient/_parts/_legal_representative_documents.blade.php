@@ -1,7 +1,7 @@
 <div wire:after="initializeFlatpickr" class="mb-4" x-data="{show_document: false}">
     <div class="border-b border-stroke py-4 dark:border-strokedark">
         <h3 class="font-medium text-2xl	text-black dark:text-white">
-            {{ __('forms.legal_representation_documents') }}
+            {{ __('forms.confidant_person_documents_relationship') }}
         </h3>
     </div>
     <table class="w-full table-auto">
@@ -23,24 +23,24 @@
         </tr>
         </thead>
         <tbody>
-        @isset($patient->legal_representation_documents)
-            @foreach($patient->legal_representation_documents as $k => $legal_representation_documents)
+        @isset($patient->confidant_person_documents_relationship)
+            @foreach($patient->confidant_person_documents_relationship as $k => $confidant_person_documents_relationship)
                 <tr>
                     <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                        {{ $legal_representation_documents['type'] ?? '' }}
+                        {{ $confidant_person_documents_relationship['type'] ?? '' }}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {{ $legal_representation_documents['number'] ?? '' }}
+                        {{ $confidant_person_documents_relationship['number'] ?? '' }}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {{ $legal_representation_documents['issued_by'] ?? '' }}
+                        {{ $confidant_person_documents_relationship['issued_by'] ?? '' }}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {{ $legal_representation_documents['issued_at'] ?? '' }}
+                        {{ $confidant_person_documents_relationship['issued_at'] ?? '' }}
                     </td>
 
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        <a wire:click.prevent="edit('legal_representation_documents', {{ $k }})" href="#">
+                        <a wire:click.prevent="edit('confidant_person_documents_relationship', {{ $k }})" href="#">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                  stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -54,6 +54,6 @@
         </tbody>
     </table>
     <div class="mb-6 mt-6 flex flex-wrap xl:gap-7.5">
-        <a wire:click.prevent="create('legal_representation_documents')" class="text-primary" href="#">{{ __('forms.add_document') }}</a>
+        <a wire:click.prevent="create('confidant_person_documents_relationship')" class="text-primary" href="#">{{ __('forms.add_document') }}</a>
     </div>
 </div>
