@@ -17,6 +17,7 @@ use App\Livewire\License\LicenseShow;
 use App\Livewire\License\Forms\LicenseForms;
 use App\Livewire\License\Forms\CreateNewLicense;
 use App\Livewire\LegalEntity\EditLegalEntity;
+use App\Livewire\Patient\PatientForm;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EmailController;
@@ -93,6 +94,7 @@ Route::middleware([
     Route::group(['middleware' => ['role:OWNER|ADMIN|DOCTOR']], function () {
         Route::prefix('patient')->group(function () {
             Route::get('/', PatientIndex::class)->name('patient.index');
+            Route::get('/form/{id?}', PatientForm::class)->name('patient.form');
         });
     });
 });

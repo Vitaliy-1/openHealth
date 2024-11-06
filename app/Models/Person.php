@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Person extends Model
 {
@@ -37,6 +38,12 @@ class Person extends Model
 
     protected $casts = [
         'documents' => 'array',
+        'identity' => 'array',
+        'contact_data' => 'array',
+        'address' => 'array',
+        'confidant_person_documents' => 'array',
+        'confidant_person_documents_relationship' => 'array',
+        'legal_representation_contact' => 'array',
         'phones' => 'array',
         'educations' => 'array',
         'specialities' => 'array',
@@ -47,24 +54,25 @@ class Person extends Model
         'authentication_methods' => 'array',
     ];
 
-
     protected $attributes = [
         'documents' => '{}',
+        'identity' => '{}',
+        'contact_data' => '{}',
+        'emergency_contact' => '{}',
+        'address' => '{}',
+        'confidant_person_documents' => '{}',
+        'confidant_person_documents_relationship' => '{}',
+        'legal_representation_contact' => '{}',
         'tax_id' => '',
     ];
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\hasOne
+    public function user(): HasOne
     {
         return $this->hasOne(User::class);
     }
 
-    public function employee(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function employee(): HasOne
     {
         return $this->hasOne(Employee::class);
     }
-
-
-
-
-
 }
