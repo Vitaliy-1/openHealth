@@ -11,7 +11,7 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="documents_type" class="default-label">
-                                {{__('forms.document_type')}} *
+                                {{ __('forms.document_type') }} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
@@ -19,8 +19,8 @@
                                             wire:model.defer="patient_request.confidant_person_documents_relationship.type"
                                             class="default-select">
                                 <x-slot name="option">
-                                    <option>{{__('Обрати тип')}}</option>
-                                    @foreach($this->dictionaries['DOCUMENT_TYPE'] as $k => $document)
+                                    <option>{{  __('Обрати тип') }}</option>
+                                    @foreach($this->dictionaries['DOCUMENT_RELATIONSHIP_TYPE'] as $k => $document)
                                         <option value="{{ $k }}">{{ $document }}</option>
                                     @endforeach
                                 </x-slot>

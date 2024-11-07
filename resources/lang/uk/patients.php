@@ -23,4 +23,9 @@ return [
         'primary' => 'Основний',
         'secondary' => 'Не основний',
     ],
+    'authentication_method' => [
+        'otp' => 'через СМС',
+        'offline' => 'через документи',
+        'third_person' => 'через законного представника',
+    ],
 ];

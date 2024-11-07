@@ -15,7 +15,7 @@
         @include('livewire.patient._parts._identity')
         @include('livewire.patient._parts._contact_data')
         @include('livewire.patient._parts._emergency_contact')
-        @include('livewire.patient._parts._address')
+        @include('livewire.patient._parts._addresses')
 
         <div class="py-4">
             <h3 class="font-medium text-2xl	text-black dark:text-white">
@@ -48,10 +48,12 @@
 
         @if($is_incapable)
             @include('livewire.patient._parts._confidant_person')
-            @include('livewire.patient._parts._person_documents')
-            @include('livewire.patient._parts._legal_representative_documents')
+            @include('livewire.patient._parts._confidant_person_document')
+            @include('livewire.patient._parts._confidant_person_documents_relationship')
             @include('livewire.patient._parts._legal_representation_contact')
         @endif
+
+        @include('livewire.patient._parts._authentication_methods')
 
         <div class="mb-4 flex flex-col gap-6 xl:flex-row justify-between items-center">
             <div class="xl:w-1/4 text-left">
@@ -60,7 +62,7 @@
                 </x-secondary-button>
             </div>
             <div class="xl:w-1/4 text-right">
-                <button wire:click="signedComplete('signed_content')" type="button" class="btn-primary">
+                <button wire:click="signedComplete" type="button" class="btn-primary">
                     {{ __('Відправити на затвердження') }}
                 </button>
             </div>
@@ -85,6 +87,6 @@
     @elseif($showModal === 'confidant_person_documents')
         @include('livewire.patient._parts.modals._modal_person_documents')
     @elseif($showModal === 'confidant_person_documents_relationship')
-        @include('livewire.patient._parts.modals._modal_legal_representation_documents')
+        @include('livewire.patient._parts.modals._modal_confidant_person_documents_relationship')
     @endif
 </div>

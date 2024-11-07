@@ -4,6 +4,8 @@ namespace App\Livewire\Patient\Forms;
 
 use App\Rules\AgeCheck;
 use App\Rules\Cyrillic;
+use App\Rules\Unzr;
+use App\Rules\Zip;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -23,16 +25,16 @@ class PatientFormRequest extends Form
 
     #[Validate([
         'documents.type' => ['required', 'string'],
-        'documents.number' => ['required', 'string'],
+        'documents.number' => ['required', 'string', 'max:255'],
         'documents.issued_by' => ['required', 'string'],
-        'documents.issued_at' => ['required', 'date'],
-        'documents.expiration_date' => ['nullable', 'date'],
-        'documents.unzr' => ['nullable', 'string'],
+        'documents.issued_at' => ['required', 'date', 'before:today'],
+        'documents.expiration_date' => ['nullable', 'date', 'after:today'],
+        'documents.unzr' => ['nullable', 'string', new Unzr()],
     ])]
     public ?array $documents = [];
 
     #[Validate([
-        'identity.tax_id' => ['required', 'string', 'max:10'],
+        'identity.tax_id' => ['required', 'string', 'numeric', 'digits:10'],
     ])]
     public ?array $identity = [];
 
@@ -41,7 +43,7 @@ class PatientFormRequest extends Form
         'contact_data.phones.*.number' => ['nullable', 'string', 'min:13', 'max:13'],
         'contact_data.email' => ['nullable', 'email', 'string'],
         'contact_data.preferred_way_communication' => ['nullable', 'string'],
-        'contact_data.secret' => ['required', 'string'],
+        'contact_data.secret' => ['required', 'string', 'min:6'],
     ])]
     public ?array $contact_data = [];
 
@@ -49,21 +51,21 @@ class PatientFormRequest extends Form
         'emergency_contact.first_name' => ['required', 'min:3', new Cyrillic()],
         'emergency_contact.last_name' => ['required', 'min:3', new Cyrillic()],
         'emergency_contact.second_name' => ['nullable', 'min:3', new Cyrillic()],
-        'emergency_contact.phones.*.type' => ['required', 'string'],
-        'emergency_contact.phones.*.number' => ['required', 'string', 'min:13', 'max:13'],
+        'emergency_contact.phones.type' => ['required', 'string'],
+        'emergency_contact.phones.number' => ['required', 'string', 'min:13', 'max:13'],
     ])]
     public ?array $emergency_contact = [];
 
     #[Validate([
-        'address.region' => ['required', 'string'],
-        'address.city' => ['required', 'string'],
-        'address.street_type' => ['required', 'string'],
-        'address.street_name' => ['required', 'string'],
-        'address.building' => ['required', 'string'],
-        'address.apartment' => ['required', 'string'],
-        'address.zip_code' => ['nullable', 'string'],
+        'addresses.area' => ['required', 'string'],
+        'addresses.settlement' => ['required', 'string'],
+        'addresses.street_type' => ['required', 'string'],
+        'addresses.street' => ['required', 'string'],
+        'addresses.building' => ['required', 'string'],
+        'addresses.apartment' => ['required', 'string'],
+        'addresses.zip' => ['nullable', 'string', new Zip()],
     ])]
-    public ?array $address = [];
+    public ?array $addresses = [];
 
     #[Validate([
         'confidant_person.relation_type' => ['required', 'string'],
@@ -73,8 +75,8 @@ class PatientFormRequest extends Form
         'confidant_person.birth_date' => ['required', 'date', new AgeCheck()],
         'confidant_person.birth_country' => ['required', 'string'],
         'confidant_person.birth_settlement' => ['required', 'string'],
-        'confidant_person.tax_id' => ['nullable', 'string', 'max:10'],
-        'confidant_person.unzr' => ['nullable', 'string'],
+        'confidant_person.tax_id' => ['nullable', 'string', 'numeric', 'digits:10'],
+        'confidant_person.unzr' => ['nullable', 'string', new Unzr()],
     ])]
     public ?array $confidant_person = [];
 
@@ -103,11 +105,40 @@ class PatientFormRequest extends Form
     ])]
     public ?array $legal_representation_contact = [];
 
+    #[Validate([
+        'authentication_methods.type' => ['required', 'string'],
+        'authentication_methods.phone_number' => ['required', 'string', 'min:13', 'max:13'],
+    ])]
+    public ?array $authentication_methods = [];
+
     /**
      * @throws ValidationException
      */
     public function rulesForModelValidate(string $model): array
     {
         return $this->validate($this->rulesForModel($model)->toArray());
+    }
+
+    public function validateBeforeSendApi(): array
+    {
+
+        if (empty($this->patient)) {
+            return [
+                'error' => true,
+                'message' => __('validation.custom.documents_empty'),
+            ];
+        }
+
+        if (isset($this->patient['tax_id']) && empty($this->patient['tax_id'])) {
+            return [
+                'error' => true,
+                'message' => __('validation.custom.documents_empty'),
+            ];
+        }
+
+        return [
+            'error' => false,
+            'message' => '',
+        ];
     }
 }

@@ -220,17 +220,17 @@ return [
             'first_name' => 'ім’я',
             'last_name' => 'прізвище',
             'second_name' => 'по батькові',
+            'phones.type' => 'тип телефону',
+            'phones.number' => 'номер телефону',
         ],
-        'patient.emergency_contact.phones.*.type' => 'тип телефону',
-        'patient.emergency_contact.phones.*.number' => 'номер телефону',
-        'address' => [
-            'region' => 'область',
-            'city' => 'місто',
+        'addresses' => [
+            'area' => 'область',
+            'settlement' => 'місто',
             'street_type' => 'тип вулиці',
-            'street_name' => 'назва вулиці',
+            'street' => 'назва вулиці',
             'building' => 'будинок',
             'apartment' => 'квартира',
-            'zip_code' => 'поштовий індекс',
+            'zip' => 'поштовий індекс',
         ],
         'confidant_person' => [
             'first_name' => 'ім’я',
@@ -257,6 +257,10 @@ return [
         'legal_representation_contact.phones.*.number' => 'номер телефону',
         'legal_representation_contact' => [
             'email' => 'E-mail',
+        ],
+        'authentication_methods' => [
+            'type' => 'метод автентифікації',
+            'phones.number' => 'номер телефону',
         ],
         'documents' => [
             'type' => 'Тип документа',
