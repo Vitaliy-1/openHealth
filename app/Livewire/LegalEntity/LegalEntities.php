@@ -2,6 +2,7 @@
 
 namespace App\Livewire\LegalEntity;
 
+use App\Classes\Cipher\Api\CipherApi;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesForms;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesRequestApi;
 use App\Mail\OwnerCredentialsMail;
@@ -138,20 +139,6 @@ class LegalEntities extends Component
      */
     public ?object $file = null;
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules(): array
-    {
-        return [
-            'knedp'                                  => 'required|string',
-            'file'                                   => 'required|file|mimes:dat,zs2,sk,jks,pk8,pfx',
-            'password'                               => 'required|string|max:255',
-            'legal_entity_form.public_offer.consent' => 'required|accepted',
-        ];
-    }
 
     /**
      * @var array|string[] Get dictionaries keys
@@ -499,7 +486,7 @@ class LegalEntities extends Component
     public function stepEdrpou(): void
     {
         $this->legal_entity_form->rulesForEdrpou();
-        //TODO: Метод для перевырки ЕДРПОУ getLegalEntity
+        //TODO: Метод для перевірки ЕДРПОУ getLegalEntity
         $getLegalEntity = [];
 
         if (!empty($getLegalEntity)) {
@@ -585,7 +572,6 @@ class LegalEntities extends Component
         }
     }
 
-
     /**
      * Step for handling sing legal entity  submission.
      *
@@ -593,17 +579,12 @@ class LegalEntities extends Component
      */
     public function signLegalEntity(): void
     {
-
-
         // Final Validate the legal entity form data
         $this->legal_entity_form->validate();
+
         if ($this->getErrorBag()->isNotEmpty()) {
-            // Відправляємо подію для скролу
             $this->dispatchBrowserEvent('scroll-to-error');
         }
-        // Validate the form data based on defined rules
-        $this->validate($this->rules());
-
 
         // Prepare data for public offer
         $this->legal_entity_form->public_offer = $this->preparePublicOffer();
@@ -614,8 +595,8 @@ class LegalEntities extends Component
         // Convert form data to an array
         $data = $this->prepareDataForRequest($this->legal_entity_form->toArray());
 
-        // Send encrypted data
-        $base64Data = $this->sendEncryptedData($data);
+        // Sending encrypted data
+        $base64Data = $this->sendEncryptedData($data, CipherApi::SIGNATORY_INITIATOR_BUSINESS);
 
         // Handle errors from encrypted data
         if (isset($base64Data['errors'])) {
@@ -628,6 +609,7 @@ class LegalEntities extends Component
             'signed_legal_entity_request' => $base64Data,
             'signed_content_encoding'     => 'base64',
         ]);
+
         // Handle errors from API request
         if (isset($request['errors']) && is_array($request['errors'])) {
             $this->dispatchErrorMessage(__('Запис не було збережено'), $request['errors']);
@@ -638,6 +620,7 @@ class LegalEntities extends Component
         if (!empty($request['data'])) {
             $this->handleSuccessResponse($request);
         }
+
         // Dispatch error message for unknown errors
         $this->dispatchErrorMessage(__('Не вдалося отримати відповідь'));
     }

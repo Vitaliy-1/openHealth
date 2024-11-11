@@ -11,7 +11,6 @@ use Livewire\WithFileUploads;
 
 trait Cipher
 {
-
     // КНЕДП
     public ?string $knedp;
 
@@ -21,15 +20,32 @@ trait Cipher
 
     public mixed $getCertificateAuthority;
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules(): array
+    {
+        return [
+            'knedp'                                  => 'required|string',
+            'keyContainerUpload'                     => 'required|file',
+            'password'                               => 'required|string|max:255',
+            'legal_entity_form.public_offer.consent' => 'required|accepted',
+        ];
+    }
 
     //Send Encrypted Data
-    protected function sendEncryptedData(array $data): string|array
+    protected function sendEncryptedData(array $data, string $signatoryInitiator = CipherApi::SIGNATORY_INITIATOR_PERSON): string|array
     {
+        $this->validate($this->rules());
+
         return (new CipherApi())->sendSession(
             json_encode($data),
             $this->password,
             $this->convertFileToBase64(),
             $this->knedp,
+            $signatoryInitiator
         );
     }
 
@@ -67,5 +83,4 @@ trait Cipher
         }
         return $this->getCertificateAuthority = Cache::get('knedp_certificate_authority');
     }
-
 }
