@@ -52,6 +52,17 @@ const initializeDatepickers = () => {
 
 document.addEventListener('livewire:load', () => {
     initializeDatepickers();
+
+    Livewire.hook('message.sent', (message) => {
+        if (message.actionQueue[0].payload.method === 'update') {
+            document.getElementById('preloader').style.display = 'block';
+        }
+    });
+    Livewire.hook('message.processed', (message) => {
+        if (message.actionQueue[0].payload.method === 'update') {
+            document.getElementById('preloader').style.display = 'none';
+        }
+    });
 });
 
 
@@ -63,6 +74,8 @@ document.addEventListener("livewire:initialized", () => {
     })
 
 });
+
+
 import.meta.glob([
     '../images/**',
 ]);

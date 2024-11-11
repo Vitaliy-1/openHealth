@@ -12,7 +12,7 @@
                 class="default-input"
                 wire:model.live="area"
                 id="area">
-                <x-slot name="option">
+                <x-slot name="option"    >
                     <option value="">{{__('forms.select')}}</option>
                     @if($regions)
                         @foreach($regions as $region_item)
@@ -69,7 +69,7 @@
                                             open = false;"
                                            href="#"
                                            class="pointer
-                                   block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                   block normal-case px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                             {{$district['name']}}
                                         </a>
                                     </li>
@@ -115,7 +115,7 @@
                     <option value="">{{__('forms.select')}}</option>
                     @isset($dictionaries['SETTLEMENT_TYPE'])
                         @foreach($dictionaries['SETTLEMENT_TYPE'] as $k=>$type)
-                            <option
+                            <option class="normal-case"
                                 {{ isset($addresseses['type']) == $k ? 'selected': ''}} value="{{$k}}">{{$type}}</option>
                         @endforeach
                     @endif
@@ -168,7 +168,7 @@
                                               $wire.set('settlement_id', '{{$settlement['id']}}');
 
                                              open = false; "
-                                           class="pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                           class="pointer block normal-case px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                             {{$settlement['name']}}
                                         </a>
                                     </li>
@@ -214,7 +214,7 @@
                     <option value="">{{__('forms.select')}}</option>
                     @if($dictionaries['STREET_TYPE'])
                         @foreach($dictionaries['STREET_TYPE'] as $k=>$type)
-                            <option
+                            <option class="normal-case"
                                 {{ isset($addresseses['street_type']) == $k ? 'selected': ''}} value="{{$k}}">{{$type}}</option>
                         @endforeach
                     @endif
@@ -266,7 +266,7 @@
                                         <a href="#" x-on:click.prevent="
                                               $wire.set('street', '{{$street['name']}}');
                                              open = false; "
-                                             class="pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                             class="pointer normal-case block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                             {{$street['name']}}
                                         </a>
                                     </li>

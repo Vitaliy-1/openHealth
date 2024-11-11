@@ -133,19 +133,6 @@ class Declaration extends Model
         return ($this->employee['party']['first_name'] ?? '') . ' ' . ($this->employee['party']['last_name'] ?? '') . ' ' . ($this->employee['party']['second_name'] ?? '');
     }
 
-
-
-    public function setStatus(DeclarationStatus $status): void
-    {
-        $this->status = $status;
-        $this->save();
-    }
-
-    public function getStatusLabelAttribute(): string
-    {
-        return ($this->status->label() ?? '');
-    }
-
     public function getPhoneAttribute(): string
     {
         return ($this->person['phones'][0]['number'] ?? '');

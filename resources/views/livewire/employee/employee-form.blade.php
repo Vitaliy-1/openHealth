@@ -27,7 +27,7 @@
                 </x-secondary-button>
             </div>
             <div class="xl:w-1/4 text-right">
-                <button wire:click="signdeComplete('signed_content')" type="button" class="btn-primary">
+                <button wire:click="signdeComplete('signed_content')" type="button" class="default-button">
                     {{__('Відправити на затвердження')}}
                 </button>
             </div>

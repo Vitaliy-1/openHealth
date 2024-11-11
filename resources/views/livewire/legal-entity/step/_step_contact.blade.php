@@ -62,7 +62,7 @@
                                 </x-slot>
                             </x-forms.select>
                             @error("legal_entity_form.phones.{$key}.type")
-                            <x-forms.error>
+                            <x-forms.error class="absolute">
                                 {{$message}}
                             </x-forms.error>
                             @enderror
@@ -74,7 +74,7 @@
                                            wire:model="legal_entity_form.phones.{{$key}}.number" type="text"
                             />
                             @error("legal_entity_form.phones.{$key}.number")
-                            <x-forms.error>
+                            <x-forms.error class="absolute">
                                 {{ $message }}
                             </x-forms.error>
                             @enderror
