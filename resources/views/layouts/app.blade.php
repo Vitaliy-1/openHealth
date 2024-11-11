@@ -15,7 +15,7 @@
     @livewireScripts
     <!-- Scripts -->
     @vite([ 'resources/js/index.js','resources/css/app.css', 'resources/js/app.js'])
-    {{--        @vite([ 'resources/css/style.css'])--}}
+{{--            @vite([ 'resources/css/style.css'])--}}
 </head>
 
 
@@ -36,42 +36,6 @@
 
 @stack('scripts')
 @livewire('components.flash-message')
-<div id="preloader" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.8); z-index: 9999;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-        <div class="spinner"></div> <!-- Можете додати тут свій анімований прелоадер -->
-        Завантаження...
-    </div>
-</div>
-
-<style>
-    .spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid rgba(0,0,0,.1);
-        border-top-color: #007bff;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-</style>
-
-<script>
-    document.addEventListener('livewire:load', function () {
-        Livewire.hook('message.sent', () => {
-            document.getElementById('preloader').style.display = 'block';
-        });
-
-        Livewire.hook('message.processed', () => {
-            document.getElementById('preloader').style.display = 'none';
-        });
-    });
-</script>
-
 @yield('scripts')
 </body>
 

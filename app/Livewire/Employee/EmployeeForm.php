@@ -29,8 +29,6 @@ class EmployeeForm extends Component
     const CACHE_PREFIX = 'register_employee_form';
 
     public EmployeeFormRequest $employee_request;
-
-
     protected string $employeeCacheKey;
 
     public Employee $employee;
@@ -130,7 +128,6 @@ class EmployeeForm extends Component
         return $this->dictionaries = $dictionaries;
     }
 
-
     public function getEmployee(): void
     {
 
@@ -185,8 +182,6 @@ class EmployeeForm extends Component
         }
 
     }
-
-
 
     public function updatedFile(): void{
         $this->keyContainerUpload = $this->file;
@@ -246,8 +241,6 @@ class EmployeeForm extends Component
         else{
             $this->openModal($model);
         }
-
-
     }
     public function updated($field)
     {
@@ -353,9 +346,7 @@ class EmployeeForm extends Component
 
         if (empty($key_property) && $key_property !== 0) {
             $this->employee_request->{$model} = $cacheData[$this->request_id][$model];
-
         } else {
-
             $this->employee_request->{$model} = $cacheData[$this->request_id][$model][$key_property];
         }
     }
@@ -423,13 +414,11 @@ class EmployeeForm extends Component
             $party[$model][$key_property] = $this->employee_request->{$model};
             $this->employee->party = $party;
         }
-
         else {
             $doctor = $this->employee->doctor;
             $doctor[$model][$key_property] = $this->employee_request->{$model};
             $this->employee->doctor = $doctor;
         }
-
         $this->employee->save();
 
     }
@@ -553,8 +542,6 @@ class EmployeeForm extends Component
         $employee->legal_entity_id = $this->legalEntity->getId();
         return $employee;
     }
-
-
 
     public function buildEmployeeRequest(): array
     {

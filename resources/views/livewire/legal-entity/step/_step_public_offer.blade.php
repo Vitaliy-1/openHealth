@@ -72,16 +72,18 @@
             <div class="flex items-center mb-4">
                 <x-forms.checkbox wire:model="legal_entity_form.public_offer.consent" value="true" type="checkbox"
                                   id="public_offer_consent" name="gender"/>
-                <label for="default-checkbox"
+                <label for="public_offer_consent"
                        class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
                     {{__('forms.agree')}}
                 </label>
             </div>
         </x-slot>
-        @error("legal_entity_form.public_offer.consent")
-        <x-forms.error>
+        @error('legal_entity_form.public_offer.consent')
+        <x-slot name="error">
+            <x-forms.error>
                 {{$message}}
-        </x-forms.error>
+            </x-forms.error>
+        </x-slot>
         @enderror
     </x-forms.form-group>
 

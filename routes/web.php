@@ -52,12 +52,14 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    Route::get('/legal-entities/create', LegalEntities::class)->name('create.legalEntities');
+    Route::get('/dashboard/legal-entities/create', LegalEntities::class)->name('create.legalEntities');
 
     Route::group(['middleware' => ['role:OWNER|ADMIN'],'prefix' => 'dashboard'], function () {
+
         Route::prefix('legal-entities')->group(function () {
             Route::get('/edit/{id?}', EditLegalEntity::class)->name('edit.legalEntities');
         });
+
         Route::prefix('division')->group(function () {
             Route::get('/', DivisionIndex::class)->name('division.index');
             Route::get('/form/{id?}', DivisionForm::class)->name('division.form');
@@ -83,11 +85,9 @@ Route::middleware([
 
         Route::prefix('declaration')->group(function () {
             Route::get('/', DeclarationIndex::class)->name('declaration.index');
-
         });
 
         Route::get('/test-license', [HomeController::class, 'test']);
-
 
     });
 

@@ -2,7 +2,6 @@
 
 namespace App\Livewire\LegalEntity;
 
-use App\Classes\Cipher\Api\CipherApi;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesForms;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesRequestApi;
 use App\Mail\OwnerCredentialsMail;
@@ -29,25 +28,54 @@ class LegalEntities extends Component
 
     use FormTrait, Cipher, WithFileUploads;
 
+    /**
+     * @var string
+     */
     const CACHE_PREFIX = 'register_legal_entity_form';
 
+    /**
+     * @var LegalEntitiesForms The Form
+     */
     public LegalEntitiesForms $legal_entity_form;
 
+    /**
+     * @var LegalEntity|null The Legal Entity being filled
+     */
     public ?LegalEntity $legalEntity;
 
+    /**
+     * @var Employee
+     */
     public Employee $employee;
 
+    /**
+     * @var int The total number of steps
+     */
     public int $totalSteps = 8;
 
+    /**
+     * @var int The current step
+     */
     public int $currentStep = 1;
+
     /**
      * @var string The Cache ID to store Legal Entity being filled by the current user
      */
     protected string $entityCacheKey;
+
+    /**
+     * @var string The Cache ID to store Owner being filled by the current user
+     */
     protected string $ownerCacheKey;
 
+    /**
+     * @var string[]
+     */
     protected $listeners = ['addressDataFetched'];
 
+    /**
+     * @var array|array[]|null
+     */
     public ?array $steps = [
         'edrpou'        => [
             'title'    => 'ЄДРПОУ',
@@ -100,24 +128,34 @@ class LegalEntities extends Component
         ],
     ];
 
+    /**
+     * @var array|null
+     */
     public ?array $addresses;
 
-    public ?object  $file = null;
     /**
-     * @var array|bool|mixed
+     * @var object|null
      */
+    public ?object $file = null;
 
-
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
     public function rules(): array
     {
         return [
             'knedp'                                  => 'required|string',
-            'file'                     => 'required|file|mimes:dat,zs2,sk,jks,pk8,pfx',
+            'file'                                   => 'required|file|mimes:dat,zs2,sk,jks,pk8,pfx',
             'password'                               => 'required|string|max:255',
-            'legal_entity_form.public_offer.consent' => 'accepted',
+            'legal_entity_form.public_offer.consent' => 'required|accepted',
         ];
     }
 
+    /**
+     * @var array|string[] Get dictionaries keys
+     */
     public array $dictionaries_field = [
         'PHONE_TYPE',
         'POSITION',
@@ -128,6 +166,10 @@ class LegalEntities extends Component
         'ACCREDITATION_CATEGORY',
         'DOCUMENT_TYPE'
     ];
+
+    /**
+     * @return void set cache keys
+     */
 
     public function boot(): void
     {
@@ -146,13 +188,18 @@ class LegalEntities extends Component
     }
 
 
+    /**
+     * @return void
+     */
     public function getOwnerFields(): void
     {
+        // Get owner dictionary fields
         $fields = [
             'POSITION'      => ['P1', 'P2', 'P3', 'P32', 'P4', 'P6', 'P5'],
             'DOCUMENT_TYPE' => ['PASSPORT', 'NATIONAL_ID']
         ];
 
+        // Get dictionaries
         foreach ($fields as $type => $keys) {
             $this->getDictionariesFields($keys, $type);
         }
@@ -161,8 +208,10 @@ class LegalEntities extends Component
 
     public function getLegalEntity(): void
     {
+
         // Try to get the LegalEntity from the cache
         $this->legalEntity = $this->getLegalEntityFromAuth() ?? $this->getLegalEntityFromCache();
+
         // If a LegalEntity is found, fill the form with its data
         if ($this->legalEntity) {
             $this->legal_entity_form->fill($this->legalEntity->toArray());
@@ -185,20 +234,26 @@ class LegalEntities extends Component
         return null; // Return null if not found
     }
 
-    private function getLegalEntityFromAuth(): LegalEntity
+    /**
+     * Get the legal entity associated with the currently authenticated user.
+     *
+     * @return LegalEntity|null
+     */
+    private function getLegalEntityFromAuth(): ?LegalEntity
     {
-        // Return the authenticated user's LegalEntity or a new instance if it doesn't exist
-        return Auth::user()->legalEntity ?: new LegalEntity();
+        return auth()->user()->legalEntity ?? null;
     }
 
+    /**
+     * Set the owner information from the cache if available.
+     */
     private function setOwnerFromCache(): void
     {
-        // Check if the owner information is available in the cache
+        // Check if the owner information is available in the cache and the user is not a legal entity
         if (Cache::has($this->ownerCacheKey) && !Auth::user()->legalEntity) {
-            $this->legal_entity_form->owner = Cache::get($this->ownerCacheKey); // Set the owner
+            $this->legal_entity_form->owner = Cache::get($this->ownerCacheKey); // Set the owner information from cache
         }
     }
-
 
     public function addRowPhone($property): array
     {
@@ -218,10 +273,15 @@ class LegalEntities extends Component
             unset($this->legal_entity_form->{$property}['phones'][$key]);
 
         }
-
     }
 
+
+
     /**
+     * Increases the current step of the process.
+     * Resets the error bag, validates the data, increments the current step, puts the legal entity in cache,
+     * and ensures the current step does not exceed the total steps.
+     *
      * @throws ValidationException
      */
     public function increaseStep(): void
@@ -229,28 +289,32 @@ class LegalEntities extends Component
         $this->resetErrorBag();
         $this->validateData();
         $this->currentStep++;
-
         $this->putLegalEntityInCache();
-
         if ($this->currentStep > $this->totalSteps) {
             $this->currentStep = $this->totalSteps;
         }
-
     }
 
     /**
-     * @param int $currentStep
-     * @return string
+     * Get the title based on the current step number.
+     *
+     * @param int $currentStep The current step number
+     * @return string The title of the step
      */
     public function getTitleByStep(int $currentStep): string
     {
+        // Iterate through each step
         foreach ($this->steps as $step) {
+            // Check if the step number matches the current step
             if ($step['step'] === $currentStep) {
+                // Return the title of the step
                 return $step['title'];
             }
         }
+        // Return an empty string if no matching step is found
         return '';
     }
+
 
     public function setCertificateAuthority(): array|null
     {
@@ -276,8 +340,12 @@ class LegalEntities extends Component
      * @param int $step
      * @return void
      */
-    public function changeStep(int $step): void
+    public function changeStep(int $step, $property): void
     {
+
+        if (is_array($this->legal_entity_form->{$property}) && empty(removeEmptyKeys($this->legal_entity_form->{$property}))) {
+            return;
+        }
         if (!$this->arePreviousStepsFilled($step)) {
             return;
         }
@@ -340,10 +408,6 @@ class LegalEntities extends Component
         };
     }
 
-    public function register()
-    {
-        $this->stepPublicOffer();
-    }
 
     public function saveLegalEntityFromExistingData($data): void
     {
@@ -376,46 +440,66 @@ class LegalEntities extends Component
         }
     }
 
+    /**
+     * Update the legal entity in the cache if changes are detected or it doesn't exist already.
+     */
     public function putLegalEntityInCache(): void
     {
+        // Fill the legal entity model with data from the form
         $this->legalEntity->fill($this->legal_entity_form->toArray());
 
+        // Check if the entity is not in the cache or if changes are detected
         if (!Cache::has($this->entityCacheKey) || $this->checkChanges()) {
+            // Put the legal entity in the cache with a 90-day expiration
             Cache::put($this->entityCacheKey, $this->legalEntity, now()->days(90));
         }
     }
 
+    /**
+     * Check if there are changes in the Legal Entity attributes by comparing with cached data.
+     *
+     * @return bool Returns true if Legal Entity attributes have changed, false otherwise.
+     */
     public function checkChanges(): bool
     {
+        // Check if entity cache exists
         if (Cache::has($this->entityCacheKey)) {
             // If the Legal Entity has not changed, return false
             if (empty(array_diff_assoc($this->legalEntity->getAttributes(),
                 Cache::get($this->entityCacheKey)->getAttributes()))) {
-                return false; // If
+                return false; // Legal Entity has not changed
             }
         }
-        return true; // Return true if the Legal Entity has changed
+
+        return true; // Legal Entity has changed
     }
 
+    /**
+     * Check if the Legal Entity owner has changed.
+     *
+     * @return bool Returns true if the Legal Entity owner has changed, false otherwise.
+     */
     public function checkOwnerChanges(): bool
     {
+        // Check if the owner information is cached
         if (Cache::has($this->ownerCacheKey)) {
             $cachedOwner = Cache::get($this->ownerCacheKey);
-
             $legalEntityOwner = $this->legal_entity_form->owner;
 
+            // Compare the cached owner with the current owner
             if (serialize($cachedOwner) === serialize($legalEntityOwner)) {
-                return false;
+                return false; // No change in Legal Entity owner
             }
         }
-        return true; // Return true if the Legal Entity has changed
+
+        return true; // Return true if the Legal Entity owner has changed
     }
 
-
-    // #Step  1 Request to Ehealth API get Legal Entity
+    // #Step  1 Create Legal Entity
     public function stepEdrpou(): void
     {
         $this->legal_entity_form->rulesForEdrpou();
+        //TODO: Метод для перевырки ЕДРПОУ getLegalEntity
         $getLegalEntity = [];
 
         if (!empty($getLegalEntity)) {
@@ -431,13 +515,12 @@ class LegalEntities extends Component
     {
 
         $this->legal_entity_form->rulesForOwner();
-
+        // Check if the owner information is available in the cache
         $personData = $this->legal_entity_form->owner;
-
+        // Store the owner information in the cache
         if ($this->checkOwnerChanges()) {
             Cache::put($this->ownerCacheKey, $personData, now()->days(90));
         }
-
         if (isset($this->legalEntity->phones) && !empty($this->legalEntity->phones)) {
             $this->phones = $this->legalEntity->phones;
         }
@@ -445,24 +528,23 @@ class LegalEntities extends Component
     }
 
     // Step  3 Create/Update Contact[Phones, Email,beneficiary,receiver_funds_code]
-
     public function stepContact(): void
     {
         $this->legal_entity_form->rulesForContact();
     }
 
-
     // Step  4 Create/Update Address
-
     public function stepAddress(): void
     {
-
         $this->fetchDataFromAddressesComponent();
         $this->dispatch('address-data-fetched');
 
-
     }
 
+    /**
+     * Checks if the residence address in the legal entity form is an array and not empty.
+     * If it is, increment the current step and put the legal entity in the cache.
+     */
     public function checkAndProceedToNextStep(): void
     {
         if (is_array($this->legal_entity_form->residence_address) && !empty($this->legal_entity_form->residence_address)) {
@@ -493,64 +575,92 @@ class LegalEntities extends Component
         $this->legal_entity_form->rulesForAdditionalInformation();
     }
 
-    public function updatedFile(): void{
-        $this->validate($this->rules());
-        $this->keyContainerUpload = $this->file;
+    /**
+     * Updates the keyContainerUpload property with the value of the file property.
+     */
+    public function updatedFile(): void
+    {
+        if (!empty($this->file)) {
+            $this->keyContainerUpload = $this->file;
+        }
     }
 
 
-    //Final Step
-    public function stepPublicOffer(): void
+    /**
+     * Step for handling sing legal entity  submission.
+     *
+     * @throws ValidationException
+     */
+    public function signLegalEntity(): void
     {
-        //TODO: Upload Files with Traits
 
+
+        // Final Validate the legal entity form data
+        $this->legal_entity_form->validate();
+        if ($this->getErrorBag()->isNotEmpty()) {
+            // Відправляємо подію для скролу
+            $this->dispatchBrowserEvent('scroll-to-error');
+        }
+        // Validate the form data based on defined rules
         $this->validate($this->rules());
 
-        // Preparing data for public offer and security fields
+
+        // Prepare data for public offer
         $this->legal_entity_form->public_offer = $this->preparePublicOffer();
 
+        // Prepare security data
         $this->legal_entity_form->security = $this->prepareSecurityData();
 
-        // Converting the form data to an array
+        // Convert form data to an array
         $data = $this->prepareDataForRequest($this->legal_entity_form->toArray());
 
-        // Sending encrypted data
+        // Send encrypted data
         $base64Data = $this->sendEncryptedData($data);
 
+        // Handle errors from encrypted data
         if (isset($base64Data['errors'])) {
             $this->dispatchErrorMessage($base64Data['errors']);
             return;
         }
 
-        // Preparing data for API request
+        // Prepare data for API request
         $request = LegalEntitiesRequestApi::_createOrUpdate([
             'signed_legal_entity_request' => $base64Data,
             'signed_content_encoding'     => 'base64',
         ]);
-
-        // Handling request errors
+        // Handle errors from API request
         if (isset($request['errors']) && is_array($request['errors'])) {
-            $this->dispatchErrorMessage(__('Сталася невідома помилка'), $request['errors']);
+            $this->dispatchErrorMessage(__('Запис не було збережено'), $request['errors']);
             return;
         }
 
-        // Successful request handling
-        if (!empty($request)) {
+        // Handle successful API request
+        if (!empty($request['data'])) {
             $this->handleSuccessResponse($request);
         }
-
-        $this->dispatchErrorMessage(__('Сталася невідома помилка'), $request['errors']);
-
+        // Dispatch error message for unknown errors
+        $this->dispatchErrorMessage(__('Не вдалося отримати відповідь'));
     }
 
+    /**
+     * Prepares a public offer array with consent text and consent status.
+     *
+     * @return array
+     */
     private function preparePublicOffer(): array
     {
+        // Define an array with consent text and consent status
         return [
             'consent_text' => 'Sample consent_text',
             'consent'      => true
         ];
     }
 
+    /**
+     * Prepares security data for authentication.
+     *
+     * @return array
+     */
     private function prepareSecurityData(): array
     {
         return [
@@ -558,20 +668,35 @@ class LegalEntities extends Component
         ];
     }
 
+    /**
+     * Prepares the data for the request by converting documents to an array, tax_id to no_tax_id, and archive to an array.
+     *
+     * @param array $data The data to be prepared for the request
+     * @return array The prepared data for the request
+     */
     private function prepareDataForRequest(array $data): array
     {
-
+        // Converting documents to array
         if (isset($data['owner']['documents'])) {
             $data['owner']['documents'] = [$data['owner']['documents']];
         }
 
+        // Converting tax_id to no_tax_id
         $data['owner']['no_tax_id'] = empty($data['owner']['tax_id']);
+
+        // Converting archive to array
         $data['archive'] = [$data['archive'] ?? []];
 
         return removeEmptyKeys($data);
     }
 
-
+    /**
+     * Dispatches an error message with optional errors array.
+     *
+     * @param string $message The error message to dispatch
+     * @param array $errors Additional errors to include
+     * @return void
+     */
     private function dispatchErrorMessage(string $message, array $errors = []): void
     {
         $this->dispatch('flashMessage', [
@@ -581,16 +706,38 @@ class LegalEntities extends Component
         ]);
     }
 
+
+    /**
+     * Handle success response from API request.
+     *
+     * @param array $request The response from the API request
+     * @return void
+     */
     private function handleSuccessResponse(array $request): void
     {
-        $this->createLegalEntity($request);
-        $this->createUser();
-        $this->createLicense($request['data']['license']);
 
-        Cache::forget($this->entityCacheKey);
-        Cache::forget($this->ownerCacheKey);
-
-        $this->redirect('/legal-entities/edit');
+        try {
+            $this->createOrUpdateLegalEntity($request);
+            if (!\auth()->user()->legalEntity->getOwner()->exists()) {
+                $this->createUser();
+            }
+            if (isset($request['data']['license'])) {
+                $this->createLicense($request['data']['license']);
+            } else {
+                $this->dispatchErrorMessage(__('Ліцензійні дані відсутні'));
+                return;
+            }
+            if (Cache::has($this->entityCacheKey)) {
+                Cache::forget($this->entityCacheKey);
+            }
+            if (Cache::has($this->ownerCacheKey)) {
+                Cache::forget($this->ownerCacheKey);
+            }
+            $this->redirect('/legal-entities/edit');
+        } catch (\Exception $e) {
+            $this->dispatchErrorMessage(__('Сталася помилка під час обробки запиту'), ['error' => $e->getMessage()]);
+            return;
+        }
     }
 
 
@@ -600,10 +747,22 @@ class LegalEntities extends Component
      * @param array $data  data needed to create the legal entity.
      * @return void
      */
-    public function createLegalEntity(array $data): void
+    public function createOrUpdateLegalEntity(array $data): void
     {
-        // Fill the legal entity with the data
-        $this->legalEntity->fill($data['data']);
+        // Get the UUID from the data, if it exists
+        $uuid = $data['data']['id'] ?? '';
+
+        if (empty($uuid)) {
+            $this->dispatchErrorMessage(__('Невдалось створити Юридичну особу'), ['errors' => 'No UUID found in data']);
+            return;
+        }
+        // Find or create a new LegalEntity object by UUID
+        $this->legalEntity = LegalEntity::firstOrNew(['uuid' => $uuid]);
+
+        // Fill the object with data
+        if (isset($data['data']) && is_array($data['data'])) {
+            $this->legalEntity->fill($data['data']);
+        }
 
         // Set UUID from data or default to empty string
         $this->legalEntity->uuid = $data['data']['id'] ?? '';
@@ -613,55 +772,50 @@ class LegalEntities extends Component
 
         // Set client id from data or default to null
         $this->legalEntity->client_id = $data['urgent']['security']['client_id'] ?? null;
-        // Save the legal entity
+
+        // Save or update the object in the database
         $this->legalEntity->save();
     }
 
-    /**
-     * Create a new user with provided email and assign them as the owner of a legal entity.
-     * If the user already exists, associate them with the legal entity.
-     * If the user does not exist, create a new user with a random password.
-     *
-     * @return User The created or updated user
-     */
+
     public function createUser(): User
     {
         // Get the currently authenticated user
-        $user = Auth::user();
+        $authenticatedUser = Auth::user();
 
-        // Get the email address of the legal entity owner from the form or set it to null
+        // Retrieve the email address of the legal entity owner from the form or set it to null
         $email = $this->legal_entity_form->owner['email'] ?? null;
 
         // Generate a random password
         $password = Str::random(10);
 
-        // Check if a user with the same email as the legal entity owner already exists
-        if ($user->email === $email) {
-            $user->legalEntity()->associate($this->legalEntity);
-            $user->save();
-        } elseif (User::where('email', $email)->exists()) {
-            // If user exists, get the user and associate them with the legal entity
-            $user = User::where('email', $email)->first();
-            $user->legalEntity()->associate($this->legalEntity);
-            $user->save();
-        } else {
-            // If user does not exist, create a new user and assign them to the legal entity
+        // Check if a user with the provided email already exists
+        $user = User::where('email', $email)->first();
+
+        // If the authenticated user is the owner, use them as the user
+        if (isset($authenticatedUser->email) && strtolower($authenticatedUser->email) === $email) {
+            // If the authenticated user is the owner, use them as the user
+            $user = $authenticatedUser;
+        } elseif (!$user) {
+            // If no user exists with that email, create a new user
             $user = User::create([
                 'email'    => $email,
                 'password' => Hash::make($password),
             ]);
-            $user->legalEntity()->associate($this->legalEntity);
-            $user->save();
         }
+        // Associate the legal entity with the user
+        $user->legalEntity()->associate($this->legalEntity);
+        $user->save();
 
         // Assign the 'OWNER' role to the user
         $user->assignRole('OWNER');
 
-        // Send an email with owner credentials to the user
+        // Send an email with the owner credentials to the user
         Mail::to($user->email)->send(new OwnerCredentialsMail($user->email));
 
         return $user;
     }
+
 
     /**
      * Create a new license with the provided data.
@@ -670,22 +824,23 @@ class LegalEntities extends Component
      */
     public function createLicense(array $data): void
     {
-        $license = new License();
-
+        $license = License::firstOrNew(['uuid' => $data['id']]);
         $license->fill($data);
-        $license->legal_entity_id = $this->legalEntity->id;
+        $license->uuid = $data['id'];
         $license->is_primary = true;
-        $license->save();
-        $license->legalEntity()->associate($this->legalEntity);
+        if (isset($this->legalEntity)) {
+            $this->legalEntity->licenses()->save($license);
+        }
     }
 
 
+    // Fetch data from Addresses component
     public function fetchDataFromAddressesComponent(): void
     {
-
         $this->dispatch('fetchAddressData');
     }
 
+    // Address data fetched
     public function addressDataFetched($addressData): void
     {
         $this->legal_entity_form->residence_address = $addressData;

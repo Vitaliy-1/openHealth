@@ -22,19 +22,18 @@ class EmployeeIndex extends Component
     const CACHE_PREFIX = 'register_employee_form';
 
     public object $employees;
-    public array $tableHeaders = [];
 
+    public array $tableHeaders = [];
     protected string $employeeCacheKey;
     public int $storeId = 0;
     public \Illuminate\Support\Collection $employeesCache;
     public string $dismiss_text;
-
     public int $dismissed_id;
+
     private LegalEntity $legalEntity;
 
-    /**
-     * @var false
-     */
+    public string $email = '';
+    public string $selectedOption = 'is_active';
 
 
     public function boot(Employee $employee): void
@@ -74,7 +73,6 @@ class EmployeeIndex extends Component
     public function getEmployees($status = ''): void
     {
         $this->employees = Auth::user()->legalEntity->employees()->get();
-
     }
 
     public function tableHeaders(): void
@@ -89,18 +87,6 @@ class EmployeeIndex extends Component
             __('Дія'),
         ];
     }
-
-
-
-    // TODO: remove method
-    public function create()
-    {
-
-        return redirect()->route('employee.form', ['store_id' => $this->storeId]);
-
-    }
-
-    public string $selectedOption = 'is_active';
 
     public function sortEmployees():void
     {

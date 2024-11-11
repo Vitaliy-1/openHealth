@@ -54,7 +54,7 @@
                         </div>
                         <div class="xl:w-1/4  flex justify-end">
                             @if($currentStep == $totalSteps)
-                                <x-button type="click" class="default-button" wire:click="stepPublicOffer">
+                                <x-button type="click" class="default-button" wire:click="signLegalEntity">
                                     {{__('forms.send_request')}}
                                 </x-button>
                             @elseif($currentStep == 4 )
@@ -73,4 +73,5 @@
         </x-slot>
     </x-forms.forms-section>
     </div>
+    <x-forms.loading />
 </div>

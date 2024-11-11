@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
+use App\Traits\HasPersonalAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Employee extends Model
 {
     use HasFactory;
+    use HasPersonalAttributes;
 
 
     protected $fillable = [
@@ -31,6 +34,7 @@ class Employee extends Model
         'party' => 'array',
         'doctor' => 'array',
         'speciality' => 'array',
+        'status' => Status::class,
     ];
 
     protected $attributes = [
@@ -63,22 +67,10 @@ class Employee extends Model
         return $this->hasMany(Declaration::class);
     }
 
-
-    public function getUuid()
-    {
-        return $this->uuid;
-    }
-
-
     //Scopes for employees type
     public function scopeDoctor($query)
     {
         return $query->where('employee_type', 'DOCTOR');
     }
 
-    //Get employee full name Split
-    public function getFullNameAttribute(): string
-    {
-        return ($this->party['first_name'] ?? '') . ' ' . ($this->party['last_name'] ?? '') . ' ' . ($this->party['second_name'] ?? '');
-    }
 }

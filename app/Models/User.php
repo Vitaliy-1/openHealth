@@ -4,7 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -13,8 +13,12 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\License;
 
+
+/**
+ * @property LegalEntity|null $legalEntity
+ *
+ */
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
@@ -68,17 +72,26 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_photo_url',
     ];
 
+
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['legalEntity', 'person'];
+
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\belongsTo
      */
-    public function person(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function person(): BelongsTo
     {
         return $this->belongsTo(Person::class);
     }
 
-    public function legalEntity(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function legalEntity(): BelongsTo
     {
-        return $this->belongsTo(LegalEntity::class, 'legal_entity_id', 'id');
+        return $this->belongsTo(LegalEntity::class);
     }
 
     public function isClientId(): bool
@@ -90,4 +103,5 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(License::class, 'legal_entity_id', 'legal_entity_id');
     }
+
 }

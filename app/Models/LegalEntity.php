@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Ramsey\Uuid\Uuid;
@@ -76,17 +77,20 @@ class LegalEntity extends Model
     }
 
 
-    public function division(): \Illuminate\Database\Eloquent\Relations\hasMany
+    public function division(): HasMany
     {
         return $this->hasMany(Division::class);
     }
 
-    public function contract(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function contract(): HasMany
     {
         return $this->hasMany(Contract::class,'legal_entity_id','id');
     }
 
-
+    public function licenses(): HasMany
+    {
+        return $this->hasMany(License::class);
+    }
 
     public function getId():int
     {
@@ -107,9 +111,9 @@ class LegalEntity extends Model
 
 
     // Get Owner Legal Entity
-    public function getOwner():object
+    public function getOwner():?object
     {
-       return $this->employees->where('employee_type', 'OWNER')->first();
+        return $this->employees()->where('employee_type', 'OWNER')->first();
     }
 
     public function getActiveDivisions():Collection

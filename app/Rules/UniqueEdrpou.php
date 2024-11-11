@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use App\Models\LegalEntity;
@@ -10,10 +11,16 @@ class UniqueEdrpou implements ValidationRule
 {
     protected ?int $legalEntityId;
 
-    public function __construct(?int $legalEntityId = null)
+
+    public function __construct()
     {
-        // Set legal entity id for current user
-        $this->legalEntityId = auth()->check() ? auth()->user()->legalEntity->id : null;
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        $this->legalEntityId = $user && $user->legalEntity
+            ? $user->legalEntity->id
+            : null;
+
     }
 
     /**
@@ -25,12 +32,13 @@ class UniqueEdrpou implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        // Check if value already exists
-        $exists = LegalEntity::where('edrpou',  $this->legalEntityId)
-            ->where('id', '<>', $this->legalEntityId) // Exclude current legal entity
+        // Check if value already exists in another legal entity, excluding the current entity
+        $exists = LegalEntity::where('edrpou', $value)
+            ->when($this->legalEntityId !== null, function ($query) {
+                $query->where('id', '<>', $this->legalEntityId); //Exclude the current entity
+            })
             ->exists();
-
-        // If exists
+        // If it exists, fail the validation
         if ($exists) {
             $fail('Поле :attribute вже зареєстровано в системі.'); // Message for validation
         }

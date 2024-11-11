@@ -1,3 +1,3 @@
-@props(['disabled' => false])
+@props(['disabled' => false,'autocomplete' => 'off-all'])
 
-<input {{ $disabled ? 'disabled' : '' }} {!! $attributes->merge(['class' => 'default-input']) !!}>
+<input autocomplete="{{ $autocomplete }}" {{ $disabled ? 'disabled' : '' }} {!! $attributes->merge(['class' => 'default-input']) !!}>
