@@ -133,17 +133,15 @@ class EmployeeForm extends Component
     {
 
         if (isset($this->employee_id)) {
-             $employeeData = Employee::find($this->employee_id);
+            $employeeData = Employee::find($this->employee_id);
             if (empty($employeeData)) {
                 abort(404);
             }
-
             $this->employee = $employeeData;
             $this->employee->educations = $this->employee->doctor['educations'] ?? [];
             $this->employee->specialities = $this->employee->doctor['specialities'] ?? [];
             $this->employee->qualifications = $this->employee->doctor['qualifications'] ?? [];
             $this->employee->science_degree = $this->employee->doctor['science_degree'] ?? [];
-
             $this->employee->documents = $this->employee->party['documents'] ?? [];
             if (!empty($this->employee)) {
                 $this->employee_request->fill(

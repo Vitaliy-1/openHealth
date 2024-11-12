@@ -1,20 +1,18 @@
 <div>
 
-    <x-section-title>
-        <x-slot name="title">
-            {{$mode === 'edit' ? __('Редагувати співробітника') : __('Додати співробітника')}}
+    <x-section-navigation class="">
+        <x-slot name="title">{{ __('Співробітники') }}</x-slot>
+        <x-slot name="navigation">
+
         </x-slot>
-        <x-slot name="description">
-            {{$mode === 'edit' ? __('Редагувати співробітника') : __('Додати співробітника')}}
-        </x-slot>
-    </x-section-title>
+    </x-section-navigation>
 
     <div class="flex bg-white  p-6 flex-col ">
 
 
         @include('livewire.employee._parts._employee')
         @include('livewire.employee._parts._documents')
-        @if( isset($employee['employee']['employee_type']) && $employee['employee']['employee_type'] === 'DOCTOR')
+        @if( isset($employee['employee']['employee_type']) && $employee['employee']['employee_type'] === 'DOCTOR' && isset($employee['employee_type']) && $employee['employee_type'] === 'DOCTOR')
             @include('livewire.employee._parts._education')
             @include('livewire.employee._parts._specialities')
             @include('livewire.employee._parts._science_degree')
