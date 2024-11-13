@@ -12,6 +12,8 @@ class Doctor extends Model
     use HasFactory;
 
 
+
+
     public function employee()
     {
         return $this->belongsTo(Employee::class);
@@ -36,4 +38,6 @@ class Doctor extends Model
     {
         return $this->morphMany(Speciality::class, 'specialityable');
     }
+
+
 }

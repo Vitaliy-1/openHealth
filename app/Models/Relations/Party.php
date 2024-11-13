@@ -6,6 +6,8 @@ use App\Models\Employee;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Party extends Model
@@ -13,6 +15,7 @@ class Party extends Model
     use HasFactory;
 
     protected $fillable = [
+        'uuid',
         'last_name',
         'first_name',
         'second_name',
@@ -25,10 +28,11 @@ class Party extends Model
         'working_experience',
     ];
 
+    public $timestamps = false;
 
-    public function employee(): BelongsTo
+    public function employees(): HasMany
     {
-        return $this->belongsTo(Employee::class);
+        return $this->hasMany(Employee::class);
     }
 
     public function documents(): MorphMany

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('phones', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['MOBILE', 'LANDLINE']);
+            $table->string('type');
             $table->string('number');
             $table->morphs('phoneable');
             $table->timestamps();

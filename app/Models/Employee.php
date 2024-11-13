@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use App\Enums\Status;
+use App\Models\Relations\Party;
 use App\Traits\HasPersonalAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Employee extends Model
 {
@@ -26,22 +28,13 @@ class Employee extends Model
         'start_date',
         'end_date',
         'employee_type',
-        'party',
-        'doctor',
     ];
 
     protected $casts = [
-        'party' => 'array',
-        'doctor' => 'array',
-        'speciality' => 'array',
         'status' => Status::class,
     ];
 
-    protected $attributes = [
-        'doctor' => '{}',
-    ];
-
-
+    //TODO: Подивитись чи використовувати person в Employee
     public function person(): BelongsTo
     {
         return $this->belongsTo(Person::class);
@@ -67,7 +60,6 @@ class Employee extends Model
         return $this->hasMany(Declaration::class);
     }
 
-    //Scopes for employees type
     public function scopeDoctor($query)
     {
         return $query->where('employee_type', 'DOCTOR');

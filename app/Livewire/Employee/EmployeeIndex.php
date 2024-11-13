@@ -6,7 +6,11 @@ use App\Classes\eHealth\Api\PersonApi;
 use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
 use App\Models\Employee;
 use App\Models\LegalEntity;
+use App\Models\Relations\Document;
+use App\Models\Relations\Party;
+use App\Models\Relations\Phone;
 use App\Models\User;
+use App\Services\EmployeeService;
 use App\Traits\FormTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +23,7 @@ class EmployeeIndex extends Component
 {
 
     use FormTrait;
+
     const CACHE_PREFIX = 'register_employee_form';
 
     public object $employees;
@@ -34,12 +39,16 @@ class EmployeeIndex extends Component
 
     public string $email = '';
     public string $selectedOption = 'is_active';
+    protected  $employeeSyncService ; // nullable
 
 
-    public function boot(Employee $employee): void
+
+
+    //TODO: Подивитись через що можна викликати Сервіс окрім boot
+    public function boot(EmployeeService $employeeSyncService): void
     {
-        $this->employeeCacheKey = self::CACHE_PREFIX . '-'. Auth::user()->legalEntity->uuid;
-
+        $this->employeeCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->legalEntity->uuid;
+        $this->employeeSyncService = $employeeSyncService;
         $this->legalEntity = Auth::user()->legalEntity;
     }
 
@@ -57,8 +66,7 @@ class EmployeeIndex extends Component
         if (Cache::has($this->employeeCacheKey) && !empty(Cache::get($this->employeeCacheKey)) && is_array(Cache::get($this->employeeCacheKey))) {
             $this->storeId = array_key_last(Cache::get($this->employeeCacheKey));
         }
-
-        $this->storeId ++;
+        $this->storeId++;
     }
 
     public function getEmployeesCache(): void
@@ -72,7 +80,7 @@ class EmployeeIndex extends Component
 
     public function getEmployees($status = ''): void
     {
-        $this->employees = Auth::user()->legalEntity->employees()->get();
+        $this->employees = Auth::user()->legalEntity->employees()->with('party')->get();
     }
 
     public function tableHeaders(): void
@@ -88,7 +96,7 @@ class EmployeeIndex extends Component
         ];
     }
 
-    public function sortEmployees():void
+    public function sortEmployees(): void
     {
         if ($this->selectedOption === 'is_active') {
             $this->getEmployees();
@@ -103,68 +111,48 @@ class EmployeeIndex extends Component
         }
     }
 
-    public function dismissed(Employee $employee){
+    public function dismissed(Employee $employee)
+    {
         $dismissed = EmployeeRequestApi::dismissedEmployeeRequest($employee->uuid);
 
-        if (!empty($dismissed)){
+        if (!empty($dismissed)) {
             $employee->update([
-                'status' => 'DISMISSED',
+                'status'   => 'DISMISSED',
                 'end_date' => Carbon::now()->format('Y-m-d'),
             ]);
         }
-
         $this->closeModal();
         $this->getEmployees();
-
     }
 
-    public function showModalDismissed($id){
+    public function showModalDismissed($id)
+    {
         $employee = Employee::find($id);
         if ($employee->employee_type === 'DOCTOR') {
             $this->dismiss_text = __('forms.dismissed_text_doctor');
-        }
-        else{
+        } else {
             $this->dismiss_text = __('forms.dismissed_textr');
-
         }
         $this->dismissed_id = $employee->id;
 
         $this->openModal();
     }
 
-
+    //TODO: Створити багато співробітників в статусі не підтверджено, створювати таблицю EmployeeRequest? перевірити Rate Limit
     public function getEmployeeRequestsList()
     {
         return EmployeeRequestApi::getEmployeeRequestsList();
-
     }
 
-    public function syncEmployees(){
+    public function syncEmployees()
+    {
         $requests = EmployeeRequestApi::getEmployees($this->legalEntity->uuid);
+
         foreach ($requests as $request) {
             $request = EmployeeRequestApi::getEmployeeById($request['id']);
             $request['uuid'] = $request['id'];
             $request['legal_entity_uuid'] = $request['legal_entity']['id'];
-            $email = $request['party']['email'] ?? '';
-
-            if (!empty($email)) {
-                if (!User::where('email', $request['party']['email'])->exists()) {
-                    $user = User::create(
-                        ['email' => $request['party']['email'],
-                         'password' => Hash::make(\Illuminate\Support\Str::random(8))
-                        ]
-                    );
-                    $user->legalEntity()->associate($this->legalEntity);
-                    $user->assignRole($request['employee_type']);
-                    $user->save();
-                }
-            }
-            $employee =  Employee::updateOrCreate(
-                ['uuid'=> $request['id']],
-                $request
-          );
-          $employee->legalEntity()->associate($this->legalEntity);
-          $employee->save();
+            $this->employeeSyncService->saveEmployeeData($request, $this->legalEntity);
         }
 
         $this->getEmployees();

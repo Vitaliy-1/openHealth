@@ -22,10 +22,9 @@ return new class extends Migration
             $table->string('employee_type');
             $table->date('inserted_at')->nullable();
             $table->string('status')->nullable();
-            $table->foreignId('legal_entity_id')->nullable();
-            $table->foreignId('division_id')->nullable();
-            $table->foreign('legal_entity_id')->references('id')->on('legal_entities')->onDelete('cascade');
-            $table->foreign('division_id')->references('id')->on('divisions')->onDelete('cascade');
+            $table->foreignId('legal_entity_id')->nullable()->constrained('legal_entities')->onDelete('cascade');
+            $table->foreignId('division_id')->nullable()->constrained('divisions')->onDelete('cascade');
+            $table->foreignId('party_id')->nullable()->constrained('parties')->onDelete('cascade');
             $table->timestamps();
         });
     }
