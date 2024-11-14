@@ -194,7 +194,7 @@ return [
             'employee_type' => 'Роль',
             'documents' => [
                 'type' => 'Тип документа',
-                'number' => 'Cерія/номер документа',
+                'number' => 'Серія/номер документа',
             ],
 
         ],
@@ -206,22 +206,29 @@ return [
             'birth_country' => 'країна народження',
             'birth_settlement' => 'місто народження',
             'gender' => 'стать',
-        ],
-        'identity' => [
-            'tax_id' => 'номер РНОКПП',
-        ],
-        'contact_data' => [
             'email' => 'E-mail',
+            'tax_id' => 'номер РНОКПП',
             'secret' => 'кодове слово',
-        ],
-        'contact_data.phones.*.type' => 'тип телефону',
-        'contact_data.phones.*.number' => 'номер телефону',
-        'emergency_contact' => [
-            'first_name' => 'ім’я',
-            'last_name' => 'прізвище',
-            'second_name' => 'по батькові',
-            'phones.type' => 'тип телефону',
-            'phones.number' => 'номер телефону',
+
+            'phones' => [
+                'type' => 'тип телефону',
+                'number' => 'номер телефону',
+            ],
+
+            'emergency_contact' => [
+                'first_name' => 'ім’я',
+                'last_name' => 'прізвище',
+                'second_name' => 'по батькові',
+                'phones' => [
+                    'type' => 'тип телефону',
+                    'number' => 'номер телефону',
+                ],
+            ],
+
+            'authentication_methods' => [
+                'type' => 'метод автентифікації',
+                'phone_number' => 'номер телефону',
+            ],
         ],
         'addresses' => [
             'area' => 'область',
@@ -232,35 +239,11 @@ return [
             'apartment' => 'квартира',
             'zip' => 'поштовий індекс',
         ],
-        'confidant_person' => [
-            'first_name' => 'ім’я',
-            'last_name' => 'прізвище',
-            'second_name' => 'по батькові',
-            'birth_date' => 'дата народження',
-            'birth_country' => 'країна народження',
-            'birth_settlement' => 'місто народження',
-        ],
-        'confidant_person_documents' => [
+        'documents_relationship' => [
             'type' => 'тип документа',
             'number' => 'серія/номер документа',
             'issued_by' => 'орган яким виданий документ',
             'issued_at' => 'дата видачі документа',
-            'expiration_date' => 'дійсний до',
-        ],
-        'confidant_person_documents_relationship' => [
-            'type' => 'тип документа',
-            'number' => 'серія/номер документа',
-            'issued_by' => 'орган яким виданий документ',
-            'issued_at' => 'дата видачі документа',
-        ],
-        'legal_representation_contact.phones.*.type' => 'тип телефону',
-        'legal_representation_contact.phones.*.number' => 'номер телефону',
-        'legal_representation_contact' => [
-            'email' => 'E-mail',
-        ],
-        'authentication_methods' => [
-            'type' => 'метод автентифікації',
-            'phones.number' => 'номер телефону',
         ],
         'documents' => [
             'type' => 'Тип документа',

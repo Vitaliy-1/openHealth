@@ -38,7 +38,7 @@
     <!-- DISTRICT -->
     <x-forms.form-group class="w-1/4 relative" x-data="{ open: false }">
         <x-slot name="label">
-            <x-forms.label class="default-label" for="district"
+            <x-forms.label class="default-label" for="region"
                            name="label">
                 {{__('forms.area')}} *
             </x-forms.label>
@@ -55,7 +55,7 @@
                     }
                 " class="default-input"
                     autocomplete="off"
-                    type="text" id="area"/>
+                    type="text" id="region"/>
                 <div x-show="open" x-ref="dropdown">
                     <div
                         class="z-10 max-h-96 overflow-auto w-full	 absolute  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
@@ -79,7 +79,7 @@
                                     <a
                                         href="#"
                                         class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                        Немае записів
+                                        Немає записів
                                     </a>
                                 </li>
                             @endif
@@ -135,8 +135,7 @@
         <x-slot name="label">
             <x-forms.label class="default-label" for="settlement"
                            name="label">
-                {{__('forms.settlement')}}
-                *
+                {{__('forms.settlement')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -178,7 +177,7 @@
                                     <a
                                         href="#"
                                         class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                        Немае записів
+                                        Немає записів
                                     </a>
                                 </li>
                             @endif
