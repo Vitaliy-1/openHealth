@@ -3,13 +3,18 @@
 namespace App\Models;
 
 use App\Enums\Status;
+use App\Models\Relations\Education;
 use App\Models\Relations\Party;
+use App\Models\Relations\Qualification;
+use App\Models\Relations\ScienceDegree;
+use App\Models\Relations\Speciality;
 use App\Traits\HasPersonalAttributes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Employee extends Model
 {
@@ -59,6 +64,28 @@ class Employee extends Model
     {
         return $this->hasMany(Declaration::class);
     }
+
+    public function educations(): morphMany
+    {
+        return $this->morphMany(Education::class, 'educationable');
+    }
+
+    public function scienceDegrees():morphMany
+    {
+        return $this->morphMany(ScienceDegree::class, 'science_degreeable');
+    }
+
+
+    public function qualifications(): morphMany
+    {
+        return $this->morphMany(Qualification::class, 'qualificationable');
+    }
+
+    public function specialities(): morphMany
+    {
+        return $this->morphMany(Speciality::class, 'specialityable');
+    }
+
 
     public function scopeDoctor($query)
     {

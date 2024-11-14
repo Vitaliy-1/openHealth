@@ -7,7 +7,11 @@ use App\Models\Employee;
 class EmployeeRepository
 {
 
-    public function createOrUpdate($data)
+    /**
+     * @param $data
+     * @return Employee
+     */
+    public function createOrUpdate($data): Employee
     {
         return Employee::updateOrCreate(
             [

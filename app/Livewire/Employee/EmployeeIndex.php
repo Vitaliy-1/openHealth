@@ -39,9 +39,7 @@ class EmployeeIndex extends Component
 
     public string $email = '';
     public string $selectedOption = 'is_active';
-    protected  $employeeSyncService ; // nullable
-
-
+    protected ?EmployeeService $employeeSyncService; // nullable
 
 
     //TODO: Подивитись через що можна викликати Сервіс окрім boot
@@ -52,13 +50,11 @@ class EmployeeIndex extends Component
         $this->legalEntity = Auth::user()->legalEntity;
     }
 
-
     public function mount()
     {
         $this->tableHeaders();
         $this->getLastStoreId();
         $this->getEmployees();
-//        $this->employees =auth()->user()->legalEntity-;
     }
 
     public function getLastStoreId()
@@ -144,7 +140,12 @@ class EmployeeIndex extends Component
         return EmployeeRequestApi::getEmployeeRequestsList();
     }
 
-    public function syncEmployees()
+    /**
+     * Syncs employees by fetching data from the EmployeeRequestApi and saving it using the employeeSyncService.
+     *
+     */
+
+    public function syncEmployees(): void
     {
         $requests = EmployeeRequestApi::getEmployees($this->legalEntity->uuid);
 
@@ -155,8 +156,21 @@ class EmployeeIndex extends Component
             $this->employeeSyncService->saveEmployeeData($request, $this->legalEntity);
         }
 
+        $this->dispatchErrorMessage(__('Співробітники успішно синхронізовано'));
+
         $this->getEmployees();
     }
+
+
+    private function dispatchErrorMessage(string $message, array $errors = [], string $type = 'success'): void
+    {
+        $this->dispatch('flashMessage', [
+            'message' => $message,
+            'type'    => $type,
+            'errors'  => $errors
+        ]);
+    }
+
 
     public function render()
     {

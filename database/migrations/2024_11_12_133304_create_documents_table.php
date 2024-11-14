@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('number');
             $table->string('issued_by')->nullable();
             $table->date('issued_at')->nullable();
+            $table->date('expiration_date')->nullable();
             $table->morphs('documentable');
             $table->timestamps();
         });

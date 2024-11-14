@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('diploma_number');
             $table->string('degree');
             $table->string('speciality');
-            $table->morphs('educatable');
+            $table->morphs('educationable');
             $table->timestamps();
         });
     }

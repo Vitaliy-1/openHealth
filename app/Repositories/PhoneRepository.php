@@ -10,8 +10,9 @@ class PhoneRepository
 
 
     /**
-     * @param object $party
+     * @param object $model
      * @param array $phones
+     * @return void
      */
     public function addPartyPhones(object $model, array $phones): void
     {

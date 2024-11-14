@@ -53,9 +53,6 @@ class EmployeeRequestApi extends EmployeeApi
 
     }
 
-
-
-
     public static function dismissedEmployeeRequest($id):array
     {
         return self::_dismissed($id);

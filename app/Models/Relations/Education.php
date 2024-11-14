@@ -10,11 +10,20 @@ class Education extends Model
     use HasFactory;
 
     protected $fillable = [
-        ''
+        'country',
+        'city',
+        'institution_name',
+        'issued_date',
+        'diploma_number',
+        'degree',
+        'speciality',
     ];
 
-    public function educatable()
+    protected $table = 'educations';//TODO: Перевірити чому laravel підтягую назву таблиці education
+
+    public function educationable()
     {
         return $this->morphTo();
     }
+
 }
