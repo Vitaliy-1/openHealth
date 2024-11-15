@@ -94,10 +94,10 @@ class EmployeeService
             $party = $this->partyRepository->createOrUpdate($request['party']);
 
             // Add documents for Party
-            $this->documentRepository->addPartyDocuments($party, $request['party']['documents'] ?? []);
+            $this->documentRepository->addDocuments($party, $request['party']['documents'] ?? []);
 
             // Add phones for Party
-            $this->phoneRepository->addPartyPhones($party, $request['party']['phones'] ?? []);
+            $this->phoneRepository->addPhones($party, $request['party']['phones'] ?? []);
 
             // Add educations
             $this->educationRepository->addEducations($employee, $request['doctor']['educations'] ?? []);

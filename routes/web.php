@@ -2,7 +2,6 @@
 
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Http\Controllers\Auth\LoginController;
-use App\Livewire\Auth\Login;
 use App\Livewire\Contract\ContractForm;
 use App\Livewire\Contract\ContractIndex;
 use App\Livewire\Declaration\DeclarationIndex;
@@ -96,4 +95,8 @@ Route::middleware([
             Route::get('/form/{id?}', PatientForm::class)->name('patient.form');
         });
     });
+
+    Route::get('/{any}', function () {
+        return view('errors.404');
+    })->where('any', '.*');
 });

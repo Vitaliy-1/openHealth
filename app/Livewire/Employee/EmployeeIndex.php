@@ -30,7 +30,7 @@ class EmployeeIndex extends Component
 
     public array $tableHeaders = [];
     protected string $employeeCacheKey;
-    public int $storeId = 0;
+    public int $storeId = 1;
     public \Illuminate\Support\Collection $employeesCache;
     public string $dismiss_text;
     public int $dismissed_id;
@@ -162,7 +162,7 @@ class EmployeeIndex extends Component
     }
 
 
-    private function dispatchErrorMessage(string $message, array $errors = [], string $type = 'success'): void
+    private function dispatchErrorMessage(string $message, string $type = 'success', array $errors = [] ): void
     {
         $this->dispatch('flashMessage', [
             'message' => $message,

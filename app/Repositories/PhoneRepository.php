@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Models\Relations\Party;
 use App\Models\Relations\Phone;
 
 class PhoneRepository
@@ -14,7 +13,7 @@ class PhoneRepository
      * @param array $phones
      * @return void
      */
-    public function addPartyPhones(object $model, array $phones): void
+    public function addPhones(object $model, array $phones): void
     {
         if (!empty($phones)) {
             foreach ($phones as $phoneData) {

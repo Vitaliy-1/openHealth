@@ -13,7 +13,7 @@ class DocumentRepository
      * @return void
      */
 
-    public function addPartyDocuments( object $model, array $documents): void
+    public function addDocuments( object $model, array $documents): void
     {
         if (!empty($documents)) {
             foreach ($documents as $documentData) {

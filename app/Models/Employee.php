@@ -87,6 +87,11 @@ class Employee extends Model
     }
 
 
+    public function scopeRelated($query){
+        $query->with([ 'party', 'legalEntity', 'division', 'educations', 'scienceDegrees', 'qualifications', 'specialities']);
+    }
+
+
     public function scopeDoctor($query)
     {
         return $query->where('employee_type', 'DOCTOR');
