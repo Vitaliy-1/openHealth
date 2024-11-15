@@ -27,10 +27,11 @@
                 </x-slot>
             </x-forms.select>
         </x-slot>
+
         @error('area')
         <x-slot name="error">
             <x-forms.error>
-                {{$message}}
+                {{ $message }}
             </x-forms.error>
         </x-slot>
         @enderror
@@ -88,6 +89,7 @@
                 </div>
             </div>
         </x-slot>
+
         @error('region')
         <x-slot name="error">
             <x-forms.error>
@@ -122,10 +124,11 @@
                 </x-slot>
             </x-forms.select>
         </x-slot>
+
         @error('settlement_type')
         <x-slot name="error">
             <x-forms.error>
-                {{$message}}
+                {{ $message }}
             </x-forms.error>
         </x-slot>
         @enderror
@@ -186,10 +189,11 @@
                 </div>
             </div>
         </x-slot>
+
         @error('settlement')
         <x-slot name="error">
             <x-forms.error>
-                {{$message}}
+                {{ $message }}
             </x-forms.error>
         </x-slot>
         @enderror
@@ -220,6 +224,7 @@
                 </x-slot>
             </x-forms.select>
         </x-slot>
+
         @error('street_type')
         <x-slot name="error">
             <x-forms.error>
@@ -256,7 +261,7 @@
                                id="street"/>
                 <div x-show="open">
                     <div
-                        class="z-10 max-h-96 overflow-auto w-full	 absolute  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                        class="z-10 max-h-96 overflow-auto w-full absolute  bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                             aria-labelledby="dropdownHoverButton">
                             @if($streets)
@@ -276,10 +281,11 @@
                 </div>
             </div>
         </x-slot>
+
         @error('settlement')
         <x-slot name="error">
             <x-forms.error>
-                {{$message}}
+                {{ $message }}
             </x-forms.error>
         </x-slot>
         @enderror
@@ -298,10 +304,11 @@
                            x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
                            type="text" id="building"/>
         </x-slot>
+
         @error('building')
         <x-slot name="error">
             <x-forms.error>
-                {{$message}}
+                {{ $message }}
             </x-forms.error>
         </x-slot>
         @enderror
@@ -321,6 +328,14 @@
                 x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
                 type="text" id="apartment"/>
         </x-slot>
+
+        @error('apartment')
+        <x-slot name="error">
+            <x-forms.error>
+                {{ $message }}
+            </x-forms.error>
+        </x-slot>
+        @enderror
     </x-forms.form-group>
     <!-- Zip -->
     <x-forms.form-group class="w-1/4">
@@ -337,10 +352,16 @@
                            x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
                            type="text" id="zip"/>
         </x-slot>
+
+        @error('zip')
+        <x-slot name="error">
+            <x-forms.error>
+                {{ $message }}
+            </x-forms.error>
+        </x-slot>
+        @enderror
     </x-forms.form-group>
 </div>
-
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -349,4 +370,3 @@
         });
     });
 </script>
-

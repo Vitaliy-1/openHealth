@@ -12,6 +12,7 @@ class PersonApi extends Request
 
     /**
      * Create Person Request v2 (as part of Person creation w/o declaration process)
+     *
      * @param array $params
      * @return array
      * @throws ApiException
@@ -23,6 +24,7 @@ class PersonApi extends Request
 
     /**
      * Approve previously created Person Request.
+     *
      * @param string $personId
      * @param array $params
      * @return array
@@ -35,6 +37,7 @@ class PersonApi extends Request
 
     /**
      * Obtains patient details by setting parameters like status, page, and page size.
+     *
      * @param array $params
      * @return array
      * @throws ApiException
@@ -46,6 +49,7 @@ class PersonApi extends Request
 
     /**
      * Obtains patient details by ID.
+     *
      * @param string $personId
      * @param array $params
      * @return array
@@ -58,6 +62,7 @@ class PersonApi extends Request
 
     /**
      * Re-send SMS to a person who approve creating or updating data about himself.
+     *
      * @param string $personId
      * @param array $params
      * @return array

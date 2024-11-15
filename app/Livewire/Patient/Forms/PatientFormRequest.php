@@ -5,7 +5,6 @@ namespace App\Livewire\Patient\Forms;
 use App\Rules\AgeCheck;
 use App\Rules\Cyrillic;
 use App\Rules\Unzr;
-use App\Rules\Zip;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -37,7 +36,7 @@ class PatientFormRequest extends Form
         'patient.authentication_methods.type' => ['required', 'string'],
         'patient.authentication_methods.phone_number' => ['required', 'string', 'min:13', 'max:13'],
     ])]
-    public ?array $patient = [];
+    public array $patient = [];
 
     #[Validate([
         'documents.type' => ['required', 'string'],
@@ -47,18 +46,9 @@ class PatientFormRequest extends Form
         'documents.expiration_date' => ['nullable', 'date', 'after:today'],
         'documents.unzr' => ['nullable', 'string', new Unzr()],
     ])]
-    public ?array $documents = [];
+    public array $documents = [];
 
-    #[Validate([
-        'addresses.area' => ['required', 'string'],
-        'addresses.settlement' => ['required', 'string'],
-        'addresses.street_type' => ['required', 'string'],
-        'addresses.street' => ['required', 'string'],
-        'addresses.building' => ['required', 'string'],
-        'addresses.apartment' => ['required', 'string'],
-        'addresses.zip' => ['nullable', 'string', new Zip()],
-    ])]
-    public ?array $addresses = [];
+    public array $addresses = [];
 
     #[Validate([
         'documents_relationship.type' => ['required', 'string'],
@@ -67,7 +57,7 @@ class PatientFormRequest extends Form
         'documents_relationship.issued_at' => ['required', 'date'],
 //        'documents_relationship.active_to' => ['nullable', 'date'],
     ])]
-    public ?array $documents_relationship = [];
+    public array $documents_relationship = [];
 
     /**
      * @throws ValidationException
