@@ -8,9 +8,13 @@ use App\Classes\Cipher\Exceptions\ApiException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class CipherApi
 {
+    const SIGNATORY_INITIATOR_BUSINESS = 'Business';
+    const SIGNATORY_INITIATOR_PERSON = 'Person';
+
     private string $ticketUuid = '';
     private string $base64File = '';
     private string $password = '';
@@ -28,7 +32,7 @@ class CipherApi
      * @return string Returns KEYP in base64 format.
      * @throws array ApiException
      */
-    public function sendSession(string $dataSignature, string $password, string $base64File, string $knedp): array|string
+    public function sendSession(string $dataSignature, string $password, string $base64File, string $knedp, string $initiator): array|string
     {
         $this->dataSignature = base64_encode($dataSignature);
         $this->password = $password;
@@ -40,7 +44,7 @@ class CipherApi
             $this->loadData();
             $this->setSessionParameters();
             $this->uploadFile();
-            $this->verifyWithFileContainer($dataSignature);
+            $this->verifyWithFileContainer($dataSignature, $initiator);
             $this->createKeyp();
             $this->getKeypCreator();
             return $this->getKeyp();
@@ -150,24 +154,76 @@ class CipherApi
      *
      * @return void
      */
-    public function verifyWithFileContainer(string $dataSignature): void
+    public function verifyWithFileContainer(string $dataSignature, string $initiator): void
     {
-        // Get all data stored into the key
-        $response = $this->getFileContainerInfo($this->password);
+        // Get needed data contains into the key
+        $cipherResponse = $this->getFileContainerInfo($this->password)['signature'];
+
+        // If KEP key is not valid (ex. very old one)
+        if (!$cipherResponse['canBeUsed']) {
+            ErrorHandler::throwError([
+                'message' => __('validation.custom.cipher.kep_not_valid'),
+                'failureCause' => ''
+            ]);
+        }
+
+        $keyData = Arr::get($cipherResponse, 'certificateInfo.extensionsCertificateInfo.value.personalData.value');
 
         // Get value of 'edrpou' field for key's owner {string|null}
-        $inKeyEdrpou = Arr::get($response, 'signature.certificateInfo.extensionsCertificateInfo.value.personalData.value.edrpou.value', '');
+        $inKeyEdrpou = $keyData['edrpou']['value'] ?? '';
+
+        // Check if the certificate belongs to the organization
+        $isBusinessKey = !empty($inKeyEdrpou);
+
+        // Get value of 'drfou' (IPN) field for key's owner {string|null}
+        $inKeyDrfou = $keyData['drfou']['value'] ?? '';
+
+        // Get last date when validity period is valid
+        $endDate = $cipherResponse['certificateInfo']['notAfter']['value'];
+        $expirationDate = Carbon::parse($endDate);
+
+        if ($expirationDate <= Carbon::now()) {
+            ErrorHandler::throwError([
+                'message' => __('validation.custom.cipher.kep_time_expired'),
+                'failureCause' => ''
+            ]);
+        }
 
         // Get from data as object. Here 'edrpou' just object's field.
         $legalEntityFormData = json_decode($dataSignature);
 
-        if ($inKeyEdrpou !== $legalEntityFormData->edrpou) {
-            $error = ErrorHandler::handleError([
-                'message' => __('validation.custom.edrpou_differ'),
-                'failureCause' => ''
-            ]);
+        if ($initiator === self::SIGNATORY_INITIATOR_BUSINESS) {
+            // Check if key is not a personal key
+            if (!$isBusinessKey) {
+                ErrorHandler::throwError([
+                    'message' => __('validation.custom.cipher.initiator_differ_business'),
+                    'failureCause' => ''
+                ]);
+            }
 
-            throw new ApiException($error);
+            // Check for EDRPOU value match between key and form ones
+            if ($inKeyEdrpou !== $legalEntityFormData->edrpou) {
+                ErrorHandler::throwError([
+                    'message' => __('validation.custom.cipher.edrpou_differ'),
+                    'failureCause' => ''
+                ]);
+            }
+        } else {
+            // Check if key is a personal key
+            if ($isBusinessKey) {
+                ErrorHandler::throwError([
+                    'message' => __('validation.custom.cipher.initiator_differ_person'),
+                    'failureCause' => ''
+                ]);
+            }
+
+            // Check for DRFOU value match between key and form ones
+            if ($inKeyDrfou !== $legalEntityFormData->owner->tax_id) {
+                ErrorHandler::throwError([
+                    'message' => __('validation.custom.cipher.drfou_differ'),
+                    'failureCause' => ''
+                ]);
+            }
         }
     }
 }

@@ -21,10 +21,10 @@ use Livewire\WithFileUploads;
 
 class ContractForm extends Component
 {
-    use FormTrait, WithFileUploads,Cipher;
-
+    use FormTrait, WithFileUploads, Cipher;
 
     const CACHE_PREFIX = 'register_contract_form';
+
     public ?array $dictionaries_field = [
         'CONTRACT_TYPE',
         'CAPITATION_CONTRACT_CONSENT_TEXT',
@@ -158,14 +158,14 @@ class ContractForm extends Component
 
     public function sendApiRequest()
     {
-
         $this->contract_request->rulesForModelValidate();
         $removeKeyEmpty = removeEmptyKeys($this->requestBuilder());
         $base64Data = (new CipherApi())->sendSession(
             json_encode($removeKeyEmpty),
             $this->password,
             $this->keyContainerUpload,
-            $this->knedp
+            $this->knedp,
+            CipherApi::SIGNATORY_INITIATOR_BUSINESS
         );
         if (isset($base64Data['errors'])) {
             $this->dispatch('flashMessage', [

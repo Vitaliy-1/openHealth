@@ -39,7 +39,7 @@
             <x-forms.file wire:model="file"
                           :id="'keyContainerUpload'"/>
         </x-slot>
-        @error('file')
+        @error('keyContainerUpload')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -71,7 +71,7 @@
         <x-slot name="input">
             <div class="flex items-center mb-4">
                 <x-forms.checkbox wire:model="legal_entity_form.public_offer.consent" value="true" type="checkbox"
-                                  id="public_offer_consent" name="gender"/>
+                                  id="public_offer_consent"/>
                 <label for="public_offer_consent"
                        class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
                     {{__('forms.agree')}}
