@@ -214,7 +214,7 @@ return [
     'payment_details' => 'Платіжні реквізити',
     'places_of_service' => 'Місця надання послуг',
     'involved_persons' => 'Залученні особи',
-    'add_involved_person' => 'Додати залученого особи',
+    'add_involved_person' => 'Додати залучену особу',
     'add_involved_persons' => 'Додати залучені особи',
     'send_for_approval' => 'Надіслати на затвердження',
     'back' => 'Назад',

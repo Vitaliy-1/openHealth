@@ -1,25 +1,23 @@
-<div class="{{$class}}">
+<div class="{{ $class }}">
     <!-- Area -->
     <x-forms.form-group class="w-1/4">
         <x-slot name="label">
-            <x-forms.label class="default-label" for="area"
-                           name="label">
-                {{__('forms.region')}} *
+            <x-forms.label
+                class="default-label"
+                for="area"
+                name="label"
+            >
+                {{ __('forms.region') }} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.select
-                class="default-input"
-                wire:model.live="area"
-                id="area">
-                <x-slot name="option"    >
-                    <option value="">{{__('forms.select')}}</option>
-                    @if($regions)
-                        @foreach($regions as $region_item)
-                            <option
-                                value="{{$region_item['name']}}"
-                                {{ isset($addresseses['area']) && stripos($region_item['name'], $addresseses['area'])  ? 'selected' : '' }}
-                            >
+            <x-forms.select class="default-input" wire:model.live="area" id="area">
+                <x-slot name="option">
+                    <option value="">{{ __('forms.select') }}</option>
+                    @if ($regions)
+                        @foreach ($regions as $region_item)
+                            <option value="{{ $region_item['name'] }}"
+                                {{ isset($addresseses['area']) && stripos($region_item['name'], $addresseses['area']) ? 'selected' : '' }}>
                                 {{ $region_item['name'] }}
                             </option>
                         @endforeach
@@ -28,19 +26,22 @@
             </x-forms.select>
         </x-slot>
         @error('area')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
+            <x-slot name="error">
+                <x-forms.error>
+                    {{ $message }}
+                </x-forms.error>
+            </x-slot>
         @enderror
     </x-forms.form-group>
     <!-- DISTRICT -->
     <x-forms.form-group class="w-1/4 relative" x-data="{ open: false }">
         <x-slot name="label">
-            <x-forms.label class="default-label" for="district"
-                           name="label">
-                {{__('forms.area')}} *
+            <x-forms.label
+                class="default-label"
+                for="district"
+                name="label"
+            >
+                {{ __('forms.area') }} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -49,20 +50,21 @@
                     wire:model.live="region"
                     x-bind:disabled="{{ empty($area) || $area == 'М.КИЇВ' ? 'true' : 'false' }}"
                     x-on:keyup.debounce.500ms="
-                    if ($event.target.value.length >= 3) {
-                        $wire.call('getDisstricts');
-                        open = true;
-                    }
-                " class="default-input"
+                        if ($event.target.value.length >= 3) {
+                            $wire.call('getDisstricts');
+                            open = true;
+                        }
+                    "
+                    class="default-input"
                     autocomplete="off"
-                    type="text" id="area"/>
+                    type="text"
+                    id="area"
+                />
                 <div x-show="open" x-ref="dropdown">
-                    <div
-                        class="z-10 max-h-96 overflow-auto w-full	 absolute  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                            aria-labelledby="dropdownHoverButton">
-                            @if($districts)
-                                @foreach($districts as $district)
+                    <div class="z-10 max-h-96 overflow-auto w-full absolute bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHoverButton">
+                            @if ($districts)
+                                @foreach ($districts as $district)
                                     <li>
                                         <a x-on:click.prevent="
                                             $wire.set('region', '{{$district['name']}}');
@@ -76,10 +78,10 @@
                                 @endforeach
                             @else
                                 <li>
-                                    <a
-                                        href="#"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                        Немае записів
+                                    <a href="#"
+                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                    >
+                                        {{ __('Немає записів') }}
                                     </a>
                                 </li>
                             @endif
@@ -89,19 +91,22 @@
             </div>
         </x-slot>
         @error('region')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
+            <x-slot name="error">
+                <x-forms.error>
+                    {{ $message }}
+                </x-forms.error>
+            </x-slot>
         @enderror
     </x-forms.form-group>
     <!-- Type -->
     <x-forms.form-group class="w-1/4">
         <x-slot name="label">
-            <x-forms.label class="default-label" for="type"
-                           name="label">
-                {{__('forms.settlement_type')}} *
+            <x-forms.label
+                class="default-label"
+                for="type"
+                name="label"
+            >
+                {{ __('forms.settlement_type') }} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -112,7 +117,7 @@
                 id="type"
             >
                 <x-slot name="option">
-                    <option value="">{{__('forms.select')}}</option>
+                    <option value="">{{ __('forms.select') }}</option>
                     @isset($dictionaries['SETTLEMENT_TYPE'])
                         @foreach($dictionaries['SETTLEMENT_TYPE'] as $k=>$type)
                             <option class="normal-case"
@@ -343,11 +348,10 @@
 
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        Livewire.on('address-data-fetched', function () {
-            Livewire.emit('checkAndProceedToNextStep');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Livewire.on('address-data-fetched', function() {
+                Livewire.emit('checkAndProceedToNextStep');
+            });
         });
-    });
-</script>
-
+    </script>
