@@ -23,7 +23,9 @@ class EmployeeFormRequest extends Form
         'employee.employee_type' => 'required|string',
     ])]
 
-    public ?array $employee = [];
+    public ?array $employee = [
+        'position' => null,
+    ];
 
     #[Validate([
         'documents.type' => 'required|string',

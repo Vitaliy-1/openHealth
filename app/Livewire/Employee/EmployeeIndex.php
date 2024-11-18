@@ -10,6 +10,7 @@ use App\Models\Relations\Document;
 use App\Models\Relations\Party;
 use App\Models\Relations\Phone;
 use App\Models\User;
+use App\Repositories\EmployeeRepository;
 use App\Services\EmployeeService;
 use App\Traits\FormTrait;
 use Carbon\Carbon;
@@ -39,14 +40,14 @@ class EmployeeIndex extends Component
 
     public string $email = '';
     public string $selectedOption = 'is_active';
-    protected ?EmployeeService $employeeSyncService; // nullable
+    protected ?EmployeeRepository $employeeRepository; // nullable
 
 
     //TODO: Подивитись через що можна викликати Сервіс окрім boot
-    public function boot(EmployeeService $employeeSyncService): void
+    public function boot(EmployeeRepository $employeeRepository): void
     {
         $this->employeeCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->legalEntity->uuid;
-        $this->employeeSyncService = $employeeSyncService;
+        $this->employeeRepository = $employeeRepository;
         $this->legalEntity = Auth::user()->legalEntity;
     }
 
@@ -153,7 +154,7 @@ class EmployeeIndex extends Component
             $request = EmployeeRequestApi::getEmployeeById($request['id']);
             $request['uuid'] = $request['id'];
             $request['legal_entity_uuid'] = $request['legal_entity']['id'];
-            $this->employeeSyncService->saveEmployeeData($request, $this->legalEntity);
+            $this->employeeRepository->saveEmployeeData($request, $this->legalEntity);
         }
 
         $this->dispatchErrorMessage(__('Співробітники успішно синхронізовано'));

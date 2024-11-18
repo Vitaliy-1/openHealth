@@ -12,7 +12,7 @@
 
         @include('livewire.employee._parts._employee')
         @include('livewire.employee._parts._documents')
-        @if( isset($employee['employee']['employee_type']) && $employee['employee']['employee_type'] === 'DOCTOR' && isset($employee['employee_type']) && $employee['employee_type'] === 'DOCTOR')
+        @if( isset($employee['employee']['employee_type']) && $employee['employee']['employee_type'] === 'DOCTOR')
             @include('livewire.employee._parts._education')
             @include('livewire.employee._parts._specialities')
             @include('livewire.employee._parts._science_degree')

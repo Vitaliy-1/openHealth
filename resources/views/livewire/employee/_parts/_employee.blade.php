@@ -120,7 +120,7 @@
                 @enderror
             </x-forms.form-group>
         </x-forms.form-row>
-        <x-forms.form-row class=" ">
+        <x-forms.form-row class="">
 
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
@@ -129,17 +129,7 @@
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">
-                    <x-forms.select
-                        class="default-input" wire:model="employee_request.employee.position" type="text"
-                        id="position"
-                    >
-                        <x-slot name="option">
-                            <option>{{__('forms.select')}} {{__('forms.position')}}</option>
-                            @foreach($this->dictionaries['POSITION'] as $k=>$position )
-                                <option value="{{$k}}">{{$position}}</option>
-                            @endforeach
-                        </x-slot>
-                    </x-forms.select>
+                    <x-forms.dynamic-select :options="$dictionaries['POSITION']" property="employee_request.employee.position" />
                 </x-slot>
                 @error('employee_request.employee.position')
                 <x-slot name="error">
