@@ -12,6 +12,7 @@ use App\Models\Person;
 use App\Models\User;
 use App\Traits\Cipher;
 use App\Traits\FormTrait;
+use App\Traits\InteractsWithCache;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,7 @@ use Livewire\WithFileUploads;
 
 class EmployeeForm extends Component
 {
-    use FormTrait,Cipher,WithFileUploads;
+    use FormTrait,Cipher,WithFileUploads, InteractsWithCache;
 
     const CACHE_PREFIX = 'register_employee_form';
 
@@ -70,7 +71,7 @@ class EmployeeForm extends Component
     public \Illuminate\Database\Eloquent\Collection $healthcareServices;
 
     public array $tableHeaders;
-    public string $request_id;
+    public string $requestId;
     public string $employee_id;
     /**
      * @var mixed|string
@@ -92,7 +93,7 @@ class EmployeeForm extends Component
         $this->getLegalEntity();
         $this->getDivisions();
         if ($request->has('store_id')) {
-            $this->request_id = $request->input('store_id');
+            $this->requestId = $request->input('store_id');
         }
         if (!empty($id)) {
 
@@ -160,11 +161,11 @@ class EmployeeForm extends Component
             }
         }
 
-        if ($this->hasCache() && isset($this->request_id)) {
-            $employeeData = $this->getCache();
+        if ($this->hasCache($this->employeeCacheKey) && isset($this->requestId)) {
+            $employeeData = $this->getCache($this->employeeCacheKey);
 
-            if (isset($employeeData[$this->request_id])) {
-                $this->employee = (new Employee())->forceFill($employeeData[$this->request_id]);
+            if (isset($employeeData[$this->requestId])) {
+                $this->employee = (new Employee())->forceFill($employeeData[$this->requestId]);
 
                 if (!empty($this->employee->employee)) {
                     $this->employee_request->fill(
@@ -257,7 +258,7 @@ class EmployeeForm extends Component
 
         $this->resetErrorBag();
 
-        if (isset($this->request_id)) {
+        if (isset($this->requestId)) {
             $this->storeCacheEmployee($model);
         }
         if (isset($this->employee_id)) {
@@ -272,19 +273,9 @@ class EmployeeForm extends Component
 
     }
 
-
-    public function storeCacheEmployee($model)
+    public function storeCacheEmployee(string $model): void
     {
-        $cacheData = [];
-        if ($this->hasCache()) {
-            $cacheData = $this->getCache();
-        }
-        if ($model == 'employee' || $model == 'science_degree' || $model == 'positions') {
-            $cacheData[$this->request_id][$model] = $this->employee_request->{$model};
-        } else {
-            $cacheData[$this->request_id][$model][] = $this->employee_request->{$model};
-        }
-        $this->putCache($cacheData);
+        $this->storeCacheData($this->employeeCacheKey, $model, 'employee_request', ['employee', 'science_degree', 'positions']);
     }
 
     public function storeEmployee($model)
@@ -328,7 +319,7 @@ class EmployeeForm extends Component
         $this->key_property = $key_property;
         $this->mode = 'edit';
         $this->openModal($model);
-        if (isset($this->request_id)) {
+        if (isset($this->requestId)) {
             $this->editCacheEmployee($model, $key_property);
         }
         if (isset($this->employee_id)) {
@@ -342,12 +333,12 @@ class EmployeeForm extends Component
 
     public function editCacheEmployee($model, $key_property = '')
     {
-        $cacheData = $this->getCache();
+        $cacheData = $this->getCache($this->employeeCacheKey);
 
         if (empty($key_property) && $key_property !== 0) {
-            $this->employee_request->{$model} = $cacheData[$this->request_id][$model];
+            $this->employee_request->{$model} = $cacheData[$this->requestId][$model];
         } else {
-            $this->employee_request->{$model} = $cacheData[$this->request_id][$model][$key_property];
+            $this->employee_request->{$model} = $cacheData[$this->requestId][$model][$key_property];
         }
     }
 
@@ -366,28 +357,12 @@ class EmployeeForm extends Component
 
     }
 
-
-    public function getCache()
-    {
-        return Cache::get($this->employeeCacheKey, []);
-    }
-
-    public function putCache($cacheData)
-    {
-        Cache::put($this->employeeCacheKey, $cacheData, now()->days(90));
-    }
-
-    public function hasCache()
-    {
-        return Cache::has($this->employeeCacheKey);
-    }
-
     public function update($model, $key_property)
     {
 
         $this->employee_request->rulesForModelValidate($model);
         $this->resetErrorBag();
-        if (isset($this->request_id)) {
+        if (isset($this->requestId)) {
             $this->updateCacheEmployee($model, $key_property);
         }
         if (isset($this->employee_id)) {
@@ -398,10 +373,10 @@ class EmployeeForm extends Component
 
     public function updateCacheEmployee($model, $key_property)
     {
-        if ($this->hasCache()) {
-            $cacheData = $this->getCache();
-            $cacheData[$this->request_id][$model][$key_property] = $this->employee_request->{$model};
-            $this->putCache($cacheData);
+        if ($this->hasCache($this->employeeCacheKey)) {
+            $cacheData = $this->getCache($this->employeeCacheKey);
+            $cacheData[$this->requestId][$model][$key_property] = $this->employee_request->{$model};
+            $this->putCache($this->employeeCacheKey, $cacheData);
         }
 
     }
@@ -438,10 +413,10 @@ class EmployeeForm extends Component
     public function sendApiRequest()
     {
 
-        $cacheData = $this->getCache();
+        $cacheData = $this->getCache($this->employeeCacheKey);
 
-        if (isset($this->request_id) && isset($cacheData[$this->request_id])) {
-            $this->employee_request->fill($cacheData[$this->request_id]);
+        if (isset($this->requestId) && isset($cacheData[$this->requestId])) {
+            $this->employee_request->fill($cacheData[$this->requestId]);
         }
 
         if (isset($this->employee_id)) {
@@ -475,7 +450,7 @@ class EmployeeForm extends Component
             ];
             $employeeRequest = EmployeeRequestApi::createEmployeeRequest($data);
 
-            if (isset($this->request_id)) {
+            if (isset($this->requestId)) {
                 $this->saveUser($employeeRequest);
                 $this->saveEmployee($employeeRequest);
                 $this->forgetCacheIndex();
@@ -496,10 +471,10 @@ class EmployeeForm extends Component
 
     private function forgetCacheIndex()
     {
-        $cacheData = $this->getCache();
-        if (isset($cacheData[$this->request_id])) {
-            unset($cacheData[$this->request_id]);
-            $this->putCache($cacheData);
+        $cacheData = $this->getCache($this->employeeCacheKey);
+        if (isset($cacheData[$this->requestId])) {
+            unset($cacheData[$this->requestId]);
+            $this->putCache($this->employeeCacheKey, $cacheData);
         }
     }
 

@@ -1,5 +1,4 @@
 <div>
-
     <x-section-navigation x-data="{ showFilter: false }" class="">
         <x-slot name="title">{{ __('patients.patients') }}</x-slot>
         <x-slot name="navigation">
@@ -16,7 +15,7 @@
                                                x-on:keydown.escape="showDropdown = false"
                                                x-on:click.away="showDropdown = false"
                                                id="employee_name"
-                                               placeholder="{{__('patients.phone_number')}}"
+                                               placeholder="{{ __('patients.phone_number') }}"
                                                autocomplete="off"/>
                                 <x-dropdown-list x-show="showDropdown" class="absolute z-10">
                                     <x-slot name="lists">
@@ -25,7 +24,7 @@
                                                 <li class="mb-3 cursor-pointer"
                                                     x-on:click.prevent="
                                 $wire.set('employee_filter.employee_uuid', '{{ $patient['uuid'] }}');
-                                $wire.set('employee_filter.full_name', '{{$patient->fullName}}');
+                                $wire.set('employee_filter.full_name', '{{ $patient->fullName }}');
                                 showDropdown = false;
                             ">
                                                     {{ $patient->fullName }}
@@ -47,7 +46,7 @@
                                         <path
                                                 d="M1 5h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 1 0 0-2H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2Zm18 4h-1.424a3.228 3.228 0 0 0-6.152 0H1a1 1 0 1 0 0 2h10.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Zm0 6H8.576a3.228 3.228 0 0 0-6.152 0H1a1 1 0 0 0 0 2h1.424a3.228 3.228 0 0 0 6.152 0H19a1 1 0 0 0 0-2Z"/>
                                     </svg>
-                                    <span class="ml-1.5 txt-sm:hidden">{{__('Параметри пошуку')}}</span>
+                                    <span class="ml-1.5 txt-sm:hidden">{{ __('Параметри пошуку') }}</span>
                                 </a>
                             </div>
                         </div>
@@ -56,7 +55,7 @@
                 <div class="button-group">
                     <button type="button"
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                        <a href="{{ route('patient.form', ['store_id' => 0]) }}">
+                        <a href="{{ route('patient.form', ['store_id' => $storeId]) }}">
                             {{ __('patients.add_patient') }}
                         </a>
                     </button>
@@ -67,7 +66,6 @@
                 </div>
             </div>
             <livewire:components.declaration.declarations-filter />
-
         </x-slot>
     </x-section-navigation>
 
@@ -80,26 +78,26 @@
                             <x-slot name="headers" :list="$tableHeaders"></x-slot>
 
                             <x-slot name="tbody">
-                                @foreach($patients as  $patient)
+                                @foreach($patients as $patient)
                                     <tr>
                                         <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400 ">
                                             <p class="text-base font-semibold text-gray-900 dark:text-white">
-                                                {{$patient->fullName}}
+                                                {{ $patient->fullName }}
                                             </p>
                                         </td>
                                         <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400 ">
-                                            <a href="tel:{{$patient->phone}}" class="inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                                {{$patient->phone}}
+                                            <a href="tel:{{ $patient->phone }}" class="inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                                                {{ $patient->phone }}
                                             </a>
                                         </td>
                                         <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400 ">
                                             <p class="text-black dark:text-white">
-                                                {{$patient->birthDate}}
+                                                {{ $patient->birthDate }}
                                             </p>
                                         </td>
                                         <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400 ">
                                             <p class="text-base font-semibold text-gray-900 dark:text-white">
-                                                {{$patient->declaration_number}}
+                                                {{ $patient->declaration_number }}
                                             </p>
                                         </td>
                                         <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400 ">
@@ -108,12 +106,12 @@
                                         </td>
                                         <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400 ">
                                             <p class="text-black dark:text-white">
-                                                {{$patient->startDateDeclaration}}
+                                                {{ $patient->startDateDeclaration }}
                                             </p>
                                         </td>
                                         <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400 ">
                                             <p class="text-base font-semibold text-gray-900 dark:text-white">
-                                                {{$patient->doctorFullName ?? ''}}
+                                                {{ $patient->doctorFullName ?? '' }}
                                             </p>
                                         </td>
                                         <td>
@@ -127,7 +125,6 @@
                                         </td>
                                     </tr>
                                 @endforeach
-
                             </x-slot>
                         </x-tables.table>
                         <div
@@ -138,7 +135,7 @@
                         <div
                                 class=" bottom-0 right-0 items-center w-full p-4 bg-white border-t border-gray-200 sm:flex sm:justify-between dark:bg-gray-800 dark:border-gray-700">
                             <p class="text-black dark:text-white">
-                                {{__('Нічого не знайдено')}}
+                                {{ __('Нічого не знайдено') }}
                             </p>
                         </div>
                     @endif

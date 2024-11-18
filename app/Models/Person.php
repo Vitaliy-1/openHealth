@@ -38,12 +38,6 @@ class Person extends Model
 
     protected $casts = [
         'documents' => 'array',
-        'identity' => 'array',
-        'contact_data' => 'array',
-        'address' => 'array',
-        'confidant_person_documents' => 'array',
-        'confidant_person_documents_relationship' => 'array',
-        'legal_representation_contact' => 'array',
         'phones' => 'array',
         'educations' => 'array',
         'specialities' => 'array',
@@ -51,18 +45,10 @@ class Person extends Model
         'science_degree' => 'array',
         'emergency_contact' => 'array',
         'confidant_person' => 'array',
-        'authentication_methods' => 'array',
     ];
 
     protected $attributes = [
         'documents' => '{}',
-        'identity' => '{}',
-        'contact_data' => '{}',
-        'emergency_contact' => '{}',
-        'address' => '{}',
-        'confidant_person_documents' => '{}',
-        'confidant_person_documents_relationship' => '{}',
-        'legal_representation_contact' => '{}',
         'tax_id' => '',
     ];
 

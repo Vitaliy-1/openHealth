@@ -201,7 +201,7 @@ return [
             'employee_type' => 'Роль',
             'documents' => [
                 'type' => 'Тип документа',
-                'number' => 'Cерія/номер документа',
+                'number' => 'Серія/номер документа',
             ],
 
         ],
@@ -213,57 +213,44 @@ return [
             'birth_country' => 'країна народження',
             'birth_settlement' => 'місто народження',
             'gender' => 'стать',
-        ],
-        'identity' => [
-            'tax_id' => 'номер РНОКПП',
-        ],
-        'contact_data' => [
             'email' => 'E-mail',
+            'tax_id' => 'номер РНОКПП',
             'secret' => 'кодове слово',
+
+            'phones' => [
+                'type' => 'тип телефону',
+                'number' => 'номер телефону',
+            ],
+
+            'emergency_contact' => [
+                'first_name' => 'ім’я',
+                'last_name' => 'прізвище',
+                'second_name' => 'по батькові',
+                'phones' => [
+                    'type' => 'тип телефону',
+                    'number' => 'номер телефону',
+                ],
+            ],
+
+            'authentication_methods' => [
+                'type' => 'метод автентифікації',
+                'phone_number' => 'номер телефону',
+            ],
         ],
-        'contact_data.phones.*.type' => 'тип телефону',
-        'contact_data.phones.*.number' => 'номер телефону',
-        'emergency_contact' => [
-            'first_name' => 'ім’я',
-            'last_name' => 'прізвище',
-            'second_name' => 'по батькові',
-        ],
-        'patient.emergency_contact.phones.*.type' => 'тип телефону',
-        'patient.emergency_contact.phones.*.number' => 'номер телефону',
-        'address' => [
-            'region' => 'область',
-            'city' => 'місто',
+        'addresses' => [
+            'area' => 'область',
+            'settlement' => 'місто',
             'street_type' => 'тип вулиці',
-            'street_name' => 'назва вулиці',
+            'street' => 'назва вулиці',
             'building' => 'будинок',
             'apartment' => 'квартира',
-            'zip_code' => 'поштовий індекс',
+            'zip' => 'поштовий індекс',
         ],
-        'confidant_person' => [
-            'first_name' => 'ім’я',
-            'last_name' => 'прізвище',
-            'second_name' => 'по батькові',
-            'birth_date' => 'дата народження',
-            'birth_country' => 'країна народження',
-            'birth_settlement' => 'місто народження',
-        ],
-        'confidant_person_documents' => [
+        'documents_relationship' => [
             'type' => 'тип документа',
             'number' => 'серія/номер документа',
             'issued_by' => 'орган яким виданий документ',
             'issued_at' => 'дата видачі документа',
-            'expiration_date' => 'дійсний до',
-        ],
-        'confidant_person_documents_relationship' => [
-            'type' => 'тип документа',
-            'number' => 'серія/номер документа',
-            'issued_by' => 'орган яким виданий документ',
-            'issued_at' => 'дата видачі документа',
-        ],
-        'legal_representation_contact.phones.*.type' => 'тип телефону',
-        'legal_representation_contact.phones.*.number' => 'номер телефону',
-        'legal_representation_contact' => [
-            'email' => 'E-mail',
         ],
         'documents' => [
             'type' => 'Тип документа',
