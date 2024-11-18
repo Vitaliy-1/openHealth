@@ -24,7 +24,8 @@
 >
     <!-- Overlay -->
     <div x-show="show" class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-         x-transition:enter="ease-out duration-300"
+        @click.self="show = false"
+        x-transition:enter="ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
          x-transition:leave="ease-in duration-200"
