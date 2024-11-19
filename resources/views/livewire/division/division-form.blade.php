@@ -35,7 +35,7 @@
                         <x-slot name="tbody">
                             @if ($divisions)
                                 @foreach ($divisions as $item)
-                                    <tr>
+                                    <tr x-data="{ divisionTypes: @entangle('dictionaries.DIVISION_TYPE') }">
                                         <td class="border-b border-[#eee] py-5 px-4 ">
                                             <p class="text-black dark:text-white">
                                                 {{ $item->uuid ?? '' }}
@@ -46,10 +46,8 @@
                                                 {{ $item->name ?? '' }}
                                             </p>
                                         </td>
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            <p class="text-black dark:text-white">
-                                                {{ $item->type ?? '' }}
-                                            </p>
+                                        <td x-text="divisionTypes['{{ $item->type }}']" class="border-b border-[#eee] py-5 px-4 ">
+                                            <p class="text-black dark:text-white"></p>
                                         </td>
                                         <td class="border-b border-[#eee] py-5 px-4 ">
                                             <p class="text-black dark:text-white">

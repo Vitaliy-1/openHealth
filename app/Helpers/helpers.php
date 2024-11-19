@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\JsonHelper;
+use App\Services\DictionaryService;
 use Carbon\Carbon;
 
 if (!function_exists("all_day")) {
@@ -135,21 +136,19 @@ if (!function_exists("not_available")) {
             return $dateTime->format("Y-m-d\TH:i:s.v\Z"); // Используем .v для миллисекунд
         }
     }
-
 }
 if (!function_exists('replacePhone')) {
     function removeSpacePhones($phones): array
     {
         return collect($phones)->map(function ($phone) {
-            $phone['number'] ='+'. str_replace(' ', '', $phone['number']);
+            $phone['number'] = '+' . str_replace(' ', '', $phone['number']);
             return $phone;
         })->toArray();
-
     }
 }
 
-if (!function_exists('hisBirthDate')){
-     function humanFormatDate($data = ''): string
+if (!function_exists('hisBirthDate')) {
+    function humanFormatDate($data = ''): string
     {
         // Check if 'person' and 'birth_date' exist
         if (isset($data) && !empty($data)) {
@@ -160,5 +159,12 @@ if (!function_exists('hisBirthDate')){
         }
         // Return an empty string if the birth_date is missing or invalid
         return '';
+    }
+}
+
+if (!function_exists('dictionary')) {
+    function dictionary()
+    {
+        return app(DictionaryService::class);
     }
 }

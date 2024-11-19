@@ -28,16 +28,16 @@ class JsonHelper
             $response = file_get_contents(self::DICTIONARIES_API_URL);
             if ($response === false) {
                 // Handle error when fetching data from the API
-                throw new \RuntimeException('Failed to fetch data from the API.');
+                throw new \RuntimeException('Failed to fetch dictionaries data from the API.');
             }
             $dictionaries = json_decode($response, true);
+
             if ($dictionaries === null) {
                 // Handle error when decoding JSON data
-                throw new \RuntimeException('Failed to decode JSON data.');
+                throw new \RuntimeException('Failed to decode dictionaries JSON data.');
             }
 
             Cache::put('json_path', $dictionaries['data'], now()->addDays(7));
-
         }
         self::$json_path = Cache::get('json_path');
     }
@@ -52,10 +52,7 @@ class JsonHelper
      */
     public static function searchValue(string $pathKey, array $searchKeys): ?array
     {
-
-
         static::handle();
-
 
         $path = self::getPath();
 
@@ -113,11 +110,4 @@ class JsonHelper
     {
         return static::$json_path ?? null;
     }
-
-
-
-    public static function getDictionaries(){
-
-    }
-
 }

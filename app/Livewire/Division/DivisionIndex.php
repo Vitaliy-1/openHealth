@@ -41,30 +41,18 @@ class DivisionIndex extends Component
         $this->tableHeaders();
         $this->getLegalEntity();
         $this->getDivisions();
-        $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', [
-            'PHONE_TYPE',
-            'SETTLEMENT_TYPE',
-            'DIVISION_TYPE',
-        ]);
+
+        $this->dictionaries = [
+            'PHONE_TYPE' => dictionary()->getDictionary('PHONE_TYPE')->getValue('values')->toArray(),
+            'SETTLEMENT_TYPE' => dictionary()->getDictionary('SETTLEMENT_TYPE', true)['values'],
+            'DIVISION_TYPE' => dictionary()->getDictionary('DIVISION_TYPE', true)['values'],
+        ];
     }
 
     public function getLegalEntity()
     {
         $this->legalEntity = auth()->user()->legalEntity;
     }
-
-//    public function openModal()
-//    {
-//        $this->showModal = true;
-//    }
-//
-//    public function closeModal()
-//    {
-//        $this->showModal = false;
-//        $this->getDivisions();
-//        $this->resetErrorBag();
-//        $this->division = [];
-//    }
 
     public function tableHeaders(): void
     {
@@ -85,21 +73,21 @@ class DivisionIndex extends Component
         return $this->divisions = $this->legalEntity->division()->get();
     }
 
-    public function syncDivisions(){
+    public function syncDivisions()
+    {
 
         $syncDivisions = DivisionRequestApi::syncDivisionRequest($this->legalEntity->uuid);
         $this->syncDivisionsSave($syncDivisions);
 
         $this->getDivisions();
         $this->dispatch('flashMessage', ['message' => __('Інформацію успішно оновлено'), 'type' => 'success']);
-
-
     }
 
 
-    public function syncDivisionsSave($responses){
+    public function syncDivisionsSave($responses)
+    {
 
-        foreach ($responses as $response){
+        foreach ($responses as $response) {
             $division = Division::firstOrNew(['uuid' => $response['id']]);
             $division->fill($response);
             $division->setAttribute('uuid', $response['id']);
@@ -127,8 +115,6 @@ class DivisionIndex extends Component
 
     public function render()
     {
-
         return view('livewire.division.division-form');
     }
-
 }
