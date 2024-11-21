@@ -10,7 +10,7 @@ use App\Models\Employee;
 use App\Models\LegalEntity;
 use App\Models\License;
 use App\Models\User;
-use App\Traits\Cipher;
+use App\Classes\Cipher\Traits\Cipher;
 use App\Traits\FormTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -595,8 +595,10 @@ class LegalEntities extends Component
         // Convert form data to an array
         $data = $this->prepareDataForRequest($this->legal_entity_form->toArray());
 
+        $taxId = $this->legal_entity_form->owner['tax_id'];
+
         // Sending encrypted data
-        $base64Data = $this->sendEncryptedData($data, CipherApi::SIGNATORY_INITIATOR_BUSINESS);
+        $base64Data = $this->sendEncryptedData($data, $taxId, CipherApi::SIGNATORY_INITIATOR_BUSINESS);
 
         // Handle errors from encrypted data
         if (isset($base64Data['errors'])) {
@@ -736,7 +738,7 @@ class LegalEntities extends Component
         $uuid = $data['data']['id'] ?? '';
 
         if (empty($uuid)) {
-            $this->dispatchErrorMessage(__('Невдалось створити Юридичну особу'), ['errors' => 'No UUID found in data']);
+            $this->dispatchErrorMessage(__('Не вдалось створити Юридичну особу'), ['errors' => 'No UUID found in data']);
             return;
         }
         // Find or create a new LegalEntity object by UUID

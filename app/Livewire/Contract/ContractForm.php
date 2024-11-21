@@ -10,7 +10,7 @@ use App\Models\Contract;
 use App\Models\Division;
 use App\Models\LegalEntity;
 use App\Services\LegalEntityService;
-use App\Traits\Cipher;
+use App\Classes\Cipher\Traits\Cipher;
 use App\Traits\FormTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -160,12 +160,15 @@ class ContractForm extends Component
     {
         $this->contract_request->rulesForModelValidate();
         $removeKeyEmpty = removeEmptyKeys($this->requestBuilder());
+        $taxId = '';
+
         $base64Data = (new CipherApi())->sendSession(
             json_encode($removeKeyEmpty),
             $this->password,
             $this->keyContainerUpload,
             $this->knedp,
-            CipherApi::SIGNATORY_INITIATOR_BUSINESS
+            CipherApi::SIGNATORY_INITIATOR_BUSINESS,
+            $taxId
         );
         if (isset($base64Data['errors'])) {
             $this->dispatch('flashMessage', [

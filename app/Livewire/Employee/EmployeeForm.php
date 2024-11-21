@@ -10,7 +10,7 @@ use App\Models\Employee;
 use App\Models\LegalEntity;
 use App\Models\Person;
 use App\Models\User;
-use App\Traits\Cipher;
+use App\Classes\Cipher\Traits\Cipher;
 use App\Traits\FormTrait;
 use App\Traits\InteractsWithCache;
 use Carbon\Carbon;
@@ -330,7 +330,6 @@ class EmployeeForm extends Component
 
     }
 
-
     public function editCacheEmployee($model, $key_property = '')
     {
         $cacheData = $this->getCache($this->employeeCacheKey);
@@ -353,8 +352,6 @@ class EmployeeForm extends Component
         else{
             $this->employee_request->{$model} = $this->employee->doctor[$model][$key_property];
         }
-
-
     }
 
     public function update($model, $key_property)
@@ -381,7 +378,6 @@ class EmployeeForm extends Component
 
     }
 
-
     public function updateEmployee($model, $key_property)
     {
         if ($model === 'documents') {
@@ -395,7 +391,6 @@ class EmployeeForm extends Component
             $this->employee->doctor = $doctor;
         }
         $this->employee->save();
-
     }
 
     public function closeModalModel($model = null): void
@@ -406,13 +401,11 @@ class EmployeeForm extends Component
 
         $this->closeModal();
         $this->getEmployee();
-
     }
 
 
     public function sendApiRequest()
     {
-
         $cacheData = $this->getCache($this->employeeCacheKey);
 
         if (isset($this->requestId) && isset($cacheData[$this->requestId])) {
@@ -429,12 +422,13 @@ class EmployeeForm extends Component
 
         }
 
-
         $error = $this->employee_request->validateBeforeSendApi();
 
+        if (!$error['error']) {
+            // TODO: need more testing for correctness receiving 'tax_id' value from the form
+            $taxId =$this->employee_request->employee['tax_id'] ?? '';
 
-         if (!$error['error']) {
-            $base64Data =  $this->sendEncryptedData($this->buildEmployeeRequest());
+            $base64Data =  $this->sendEncryptedData($this->buildEmployeeRequest(), $taxId);
 
              if (isset($base64Data['errors'])) {
                  $this->dispatch('flashMessage', [
@@ -550,7 +544,6 @@ class EmployeeForm extends Component
             ],
         ];
 
-
         return removeEmptyKeys($data);
     }
 
@@ -582,8 +575,6 @@ class EmployeeForm extends Component
 
     public function render()
     {
-
-
         return view('livewire.employee.employee-form');
     }
 

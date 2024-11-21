@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Traits;
+namespace App\Classes\Cipher\Traits;
 
 use App\Classes\Cipher\Api\CipherApi;
 use App\Classes\Cipher\Exceptions\ApiException;
@@ -30,13 +30,12 @@ trait Cipher
         return [
             'knedp'                                  => 'required|string',
             'keyContainerUpload'                     => 'required|file',
-            'password'                               => 'required|string|max:255',
-            'legal_entity_form.public_offer.consent' => 'required|accepted',
+            'password'                               => 'required|string|max:255'
         ];
     }
 
     //Send Encrypted Data
-    protected function sendEncryptedData(array $data, string $signatoryInitiator = CipherApi::SIGNATORY_INITIATOR_PERSON): string|array
+    protected function sendEncryptedData(array $data, string $taxId, string $signatoryInitiator = CipherApi::SIGNATORY_INITIATOR_PERSON): string|array
     {
         $this->validate($this->rules());
 
@@ -45,7 +44,8 @@ trait Cipher
             $this->password,
             $this->convertFileToBase64(),
             $this->knedp,
-            $signatoryInitiator
+            $signatoryInitiator,
+            $taxId
         );
     }
 
