@@ -45,10 +45,6 @@ class ContractForm extends Component
     public string $legalEntity_search = '';
     public string $contractCacheKey;
 
-
-
-
-
     public string $legalEntitySearch = '';
 
     public function boot()
@@ -156,11 +152,20 @@ class ContractForm extends Component
 
     }
 
+    /**
+     * Try to get tax ID from legal entity owner depends on authorized user
+     * @return string
+     */
+    protected function getTaxIdFromOwner(): string
+    {
+        return $this->legalEntity->employees()->where('employee_type', 'OWNER')->first()->party['tax_id'] ?? '';
+    }
+
     public function sendApiRequest()
     {
         $this->contract_request->rulesForModelValidate();
         $removeKeyEmpty = removeEmptyKeys($this->requestBuilder());
-        $taxId = '';
+        $taxId = $this->getTaxIdFromOwner();
 
         $base64Data = (new CipherApi())->sendSession(
             json_encode($removeKeyEmpty),
