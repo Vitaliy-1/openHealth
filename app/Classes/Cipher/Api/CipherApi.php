@@ -2,12 +2,10 @@
 
 namespace App\Classes\Cipher\Api;
 
+use App\Classes\Cipher\Exceptions\ApiException;
 use App\Classes\Cipher\Errors\ErrorHandler;
 use App\Classes\Cipher\Request;
-use App\Classes\Cipher\Exceptions\ApiException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class CipherApi
@@ -32,7 +30,14 @@ class CipherApi
      * @return string Returns KEYP in base64 format.
      * @throws array ApiException
      */
-    public function sendSession(string $dataSignature, string $password, string $base64File, string $knedp, string $initiator): array|string
+    public function sendSession(
+        string $dataSignature,
+        string $password,
+        string $base64File,
+        string $knedp,
+        string $initiator,
+        string $taxId
+    ): array|string
     {
         $this->dataSignature = base64_encode($dataSignature);
         $this->password = $password;
@@ -44,7 +49,7 @@ class CipherApi
             $this->loadData();
             $this->setSessionParameters();
             $this->uploadFile();
-            $this->verifyWithFileContainer($dataSignature, $initiator);
+            $this->verifyWithFileContainer($taxId, $initiator);
             $this->createKeyp();
             $this->getKeypCreator();
             return $this->getKeyp();
@@ -154,7 +159,7 @@ class CipherApi
      *
      * @return void
      */
-    public function verifyWithFileContainer(string $dataSignature, string $initiator): void
+    public function verifyWithFileContainer(string $taxId, string $initiator): void
     {
         // Get needed data contains into the key
         $cipherResponse = $this->getFileContainerInfo($this->password)['signature'];
@@ -189,9 +194,6 @@ class CipherApi
             ]);
         }
 
-        // Get from data as object. Here 'edrpou' just object's field.
-        $legalEntityFormData = json_decode($dataSignature);
-
         if ($initiator === self::SIGNATORY_INITIATOR_BUSINESS) {
             // Check if key is not a personal key
             if (!$isBusinessKey) {
@@ -202,7 +204,7 @@ class CipherApi
             }
 
             // Check for EDRPOU value match between key and form ones
-            if ($inKeyEdrpou !== $legalEntityFormData->edrpou) {
+            if ($inKeyEdrpou !== $taxId) {
                 ErrorHandler::throwError([
                     'message' => __('validation.custom.cipher.edrpou_differ'),
                     'failureCause' => ''
@@ -218,7 +220,7 @@ class CipherApi
             }
 
             // Check for DRFOU value match between key and form ones
-            if ($inKeyDrfou !== $legalEntityFormData->owner->tax_id) {
+            if ($inKeyDrfou !== $taxId) {
                 ErrorHandler::throwError([
                     'message' => __('validation.custom.cipher.drfou_differ'),
                     'failureCause' => ''
