@@ -4,22 +4,22 @@
     </h5>
 
     <x-tables.table>
-        <x-slot name="headers" :list="[__('forms.document_type'),__('forms.number'),__('forms.issued_by'),__('forms.issued_at'),__('forms.actions')]"></x-slot>
+        <x-slot name="headers" :list="[__('forms.documentType'),__('forms.number'),__('forms.issuedBy'),__('forms.issuedAt'),__('forms.actions')]"></x-slot>
         <x-slot name="tbody">
             @isset($employee->documents)
                 @foreach($employee->documents as $k=>$document)
                     <tr>
                         <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                            {{$dictionaries['DOCUMENT_TYPE'][$document['type']] ?? ''}}
+                            {{$dictionaries['DOCUMENTTYPE'][$document['type']] ?? ''}}
                         </td>
                         <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                             {{$document['number'] ?? ''}}
                         </td>
                         <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                            {{$document['issued_by'] ?? ''}}
+                            {{$document['issuedBy'] ?? ''}}
                         </td>
                         <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                            {{$document['issued_at'] ?? ''}}
+                            {{$document['issuedAt'] ?? ''}}
                         </td>
                         <td class="border-b border-[#eee] flex px-4 py-5 dark:border-strokedark">
                             <a wire:click.prevent="edit('documents',{{$k}})" href="#">
@@ -32,7 +32,6 @@
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
                                 </svg>
                             </a>
-
                         </td>
                     </tr>
                 @endforeach
@@ -40,6 +39,6 @@
         </x-slot>
     </x-tables.table>
     <div class="mb-6 mt-6 flex flex-wrap gap-5 xl:gap-7.5">
-        <a wire:click.prevent="create('documents')" class="text-sm inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline" href="">{{__('forms.add_document')}}</a>
+        <a wire:click.prevent="create('documents')" class="text-sm inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline" href="">{{__('forms.addDocument')}}</a>
     </div>
 </div>

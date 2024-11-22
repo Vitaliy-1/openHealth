@@ -1,0 +1,172 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "meta": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "number"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "object",
+                        "list"
+                    ]
+                },
+                "request_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "data": {
+            "type": "object",
+            "properties": {
+                "division_id": {
+                    "type": "string"
+                },
+                "legal_entity_id": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "enum": [
+                        "NEW",
+                        "REJECTED",
+                        "APPROVED"
+                    ]
+                },
+                "employee_type": {
+                    "type": "string"
+                },
+                "party": {
+                    "type": "object",
+                    "properties": {
+                        "first_name": {
+                            "type": "string"
+                        },
+                        "last_name": {
+                            "type": "string"
+                        },
+                        "second_name": {
+                            "type": "string"
+                        },
+                        "birth_date": {
+                            "type": "string"
+                        },
+                        "gender": {
+                            "type": "string"
+                        },
+                        "no_tax_id": {
+                            "type": "boolean"
+                        },
+                        "tax_id: 3126509816 (string, required) - if no_tax_id=true then passport number, otherwise tax_id": {
+                            "type": "string"
+                        },
+                        "email": {
+                            "type": "string"
+                        },
+                        "documents": {
+                            "type": "array"
+                        },
+                        "phones": {
+                            "type": "array"
+                        },
+                        "working_experience": {
+                            "type": "number"
+                        },
+                        "about_myself": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "first_name",
+                        "last_name",
+                        "birth_date",
+                        "gender"
+                    ]
+                },
+                "doctor": {
+                    "type": "object",
+                    "properties": {
+                        "educations": {
+                            "type": "array"
+                        },
+                        "qualifications": {
+                            "type": "array"
+                        },
+                        "specialities": {
+                            "type": "array"
+                        },
+                        "science_degree": {
+                            "type": "object",
+                            "properties": {
+                                "country": {
+                                    "type": "string"
+                                },
+                                "city": {
+                                    "type": "string"
+                                },
+                                "degree": {
+                                    "type": "string"
+                                },
+                                "institution_name": {
+                                    "type": "string"
+                                },
+                                "diploma_number": {
+                                    "type": "string"
+                                },
+                                "speciality": {
+                                    "type": "string"
+                                },
+                                "issued_date": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "country",
+                                "city",
+                                "degree",
+                                "institution_name",
+                                "diploma_number",
+                                "speciality"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "educations",
+                        "specialities"
+                    ]
+                },
+                "id": {
+                    "type": "string"
+                },
+                "inserted_at": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "position",
+                "status",
+                "employee_type",
+                "id",
+                "inserted_at",
+                "updated_at"
+            ]
+        }
+    }
+}

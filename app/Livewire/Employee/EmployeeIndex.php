@@ -31,7 +31,8 @@ class EmployeeIndex extends Component
 
     public array $tableHeaders = [];
     protected string $employeeCacheKey;
-    public int $storeId = 1;
+
+    public int $storeId = 0;
     public \Illuminate\Support\Collection $employeesCache;
     public string $dismiss_text;
     public int $dismissed_id;

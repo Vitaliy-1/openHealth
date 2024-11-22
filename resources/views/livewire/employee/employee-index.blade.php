@@ -7,7 +7,7 @@
                 <div class="flex items-center mb-4 sm:mb-0">
                     <x-forms.form-group class="sm:pr-3 о">
                         <x-slot name="label">
-                            <x-forms.label for="owner_position" class="default-label">
+                            <x-forms.label for="ownerPosition" class="default-label">
                                 {{__('Статус Співробітника')}}
                             </x-forms.label>
                         </x-slot>
@@ -15,12 +15,12 @@
                             <x-forms.select
                                 class="default-input" wire:model="selectedOption" wire:change="sortEmployees()"
                                 type="text"
-                                id="owner_position"
+                                id="ownerPosition"
                             >
                                 <x-slot name="option">
-                                    <option selected value="is_active" class="text-body">Активні</option>
-                                    <option value="is_inactive" class="text-body">Не активні</option>
-                                    <option value="is_cache" class="text-body">Не завешені</option>
+                                    <option selected value="isActive" class="text-body">Активні</option>
+                                    <option value="isInactive" class="text-body">Не активні</option>
+                                    <option value="isCache" class="text-body">Не завешені</option>
                                 </x-slot>
                             </x-forms.select>
                         </x-slot>
@@ -170,9 +170,9 @@
     {{--                                <p class="text-black dark:text-white">{{ ''}}</p>--}}
     {{--                            </td>--}}
     {{--                            <td class="border-b border-[#eee] py-5 px-4 ">--}}
-    {{--                                <p class="text-black dark:text-white">{{$item->employee->party['first_name'] ?? ''}}--}}
-    {{--                                    {{$item->employee->party['last_name'] ?? ' '}}--}}
-    {{--                                    {{$item->employee->party['second_name'] ?? ' '}}--}}
+    {{--                                <p class="text-black dark:text-white">{{$item->employee->party['firstName'] ?? ''}}--}}
+    {{--                                    {{$item->employee->party['lastName'] ?? ' '}}--}}
+    {{--                                    {{$item->employee->party['secondName'] ?? ' '}}--}}
     {{--                                </p>--}}
     {{--                            </td>--}}
 
@@ -237,7 +237,7 @@
     {{--                                            style="display: none;"--}}
     {{--                                            class="absolute right-0 mt-2 w-40 rounded-md bg-white shadow-md z-50">--}}
 
-    {{--                                            <a href="{{route('employee.form',['store_id'=>$k])}}"--}}
+    {{--                                            <a href="{{route('employee.form',['storeId'=>$k])}}"--}}
     {{--                                               class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">--}}
     {{--                                                {{__('forms.edit')}}--}}
     {{--                                            </a>--}}
@@ -266,14 +266,14 @@
                 {{__('forms.dismissed')}}
             </x-slot>
             <x-slot name="text">
-                {{$dismiss_text}}
+                {{$dismissText}}
             </x-slot>
             <x-slot name="button">
                 <div class="justify-between items-center pt-0 space-y-4 sm:flex sm:space-y-0">
                     <button wire:click="closeModal" type="button"
                             class="py-2 px-4 w-full text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 sm:w-auto hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
                         {{__('forms.cansel')}}</button>
-                    <button wire:click="dismissed({{$dismissed_id}})" type="button"
+                    <button wire:click="dismissed({{$dismissedId}})" type="button"
                             class="py-2 bg-primary px-4 w-full text-sm font-medium text-center text-white rounded-lg bg-primary-700 sm:w-auto hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
                         {{__('forms.confirm')}}
                     </button>
@@ -283,7 +283,7 @@
         </x-alert-modal>
 
     @endif
-    {{--    @include('livewire.employee._parts._employee_form')--}}
+    {{--    @include('livewire.employee.Parts.EmployeeForm')--}}
 </div>
 
 

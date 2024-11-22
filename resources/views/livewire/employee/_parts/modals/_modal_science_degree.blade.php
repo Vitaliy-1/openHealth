@@ -3,21 +3,21 @@
         {{__('Науковий ступінь')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="store('science_degree')">
+        <x-forms.forms-section-modal submit="store('scienceDegree')">
             <x-slot name="form">
                 <div class="pt-4 grid grid gap-4 grid-cols-2">
                     <x-forms.form-group class="">
                         <x-slot name="label">
                             <x-forms.label for="degree" class="default-label">
-                                {{__('forms.institution_name')}} *
+                                {{__('forms.institutionName')}} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.input class="default-input"
-                                           wire:model="employee_request.science_degree.institution_name" type="text"
-                                           id="institution_name"/>
+                                           wire:model="employeeRequest.scienceDegree.institutionName" type="text"
+                                           id="institutionName"/>
                         </x-slot>
-                        @error('employee_request.science_degree.institution_name')
+                        @error('employeeRequest.scienceDegree.institutionName')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -32,11 +32,11 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.science_degree.speciality"
+                            <x-forms.input class="default-input" wire:model="employeeRequest.scienceDegree.speciality"
                                            type="text"
                                            id="speciality"/>
                         </x-slot>
-                        @error('employee_request.science_degree.speciality')
+                        @error('employeeRequest.scienceDegree.speciality')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -47,15 +47,15 @@
                     <x-forms.form-group class="">
                         <x-slot name="label">
                             <x-forms.label for="speciality" class="default-label">
-                                {{__('forms.diploma_number')}} *
+                                {{__('forms.diplomaNumber')}} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.input class="default-input"
-                                           wire:model="employee_request.science_degree.diploma_number" type="text"
+                                           wire:model="employeeRequest.scienceDegree.diplomaNumber" type="text"
                                            id="speciality"/>
                         </x-slot>
-                        @error('employee_request.science_degree.diploma_number')
+                        @error('employeeRequest.scienceDegree.diplomaNumber')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -65,16 +65,16 @@
                     </x-forms.form-group>
                     <x-forms.form-group class="">
                         <x-slot name="label">
-                            <x-forms.label for="issued_date" class="default-label">
-                                {{__('forms.issued_date')}}
+                            <x-forms.label for="issuedDate" class="default-label">
+                                {{__('forms.issuedDate')}}
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.input class="default-input"
-                                           wire:model="employee_request.science_degree.issued_date" type="date"
-                                           id="issued_date"/>
+                                           wire:model="employeeRequest.scienceDegree.issuedDate" type="date"
+                                           id="issuedDate"/>
                         </x-slot>
-                        @error('employee_request.science_degree.issued_date')
+                        @error('employeeRequest.scienceDegree.issuedDate')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -84,25 +84,25 @@
                     </x-forms.form-group>
                     <x-forms.form-group class="">
                         <x-slot name="label">
-                            <x-forms.label for="education_country" class="default-label">
+                            <x-forms.label for="educationCountry" class="default-label">
                                 {{__('forms.degree')}}*
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select
-                                class="default-input" wire:model="employee_request.science_degree.degree" type="text"
-                                id="education_country"
+                                class="default-input" wire:model="employeeRequest.scienceDegree.degree" type="text"
+                                id="educationCountry"
                             >
                                 <x-slot name="option">
                                     <option>{{__('forms.degree')}}</option>
-                                    @foreach($this->dictionaries['SCIENCE_DEGREE'] as $k=>$science_degree)
-                                        <option value="{{$k}}">{{$science_degree}}</option>
+                                    @foreach($this->dictionaries['SCIENCE_DEGREE'] as $k=>$scienceDegree)
+                                        <option value="{{$k}}">{{$scienceDegree}}</option>
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>
 
                         </x-slot>
-                        @error('employee_request.science_degree.degree')
+                        @error('employeeRequest.scienceDegree.degree')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -113,14 +113,14 @@
 
                     <x-forms.form-group class="">
                         <x-slot name="label">
-                            <x-forms.label for="education_country" class="default-label">
+                            <x-forms.label for="educationCountry" class="default-label">
                                 {{__('forms.country')}}*
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select
-                                class="default-input" wire:model="employee_request.science_degree.country" type="text"
-                                id="education_country"
+                                class="default-input" wire:model="employeeRequest.scienceDegree.country" type="text"
+                                id="educationCountry"
                             >
                                 <x-slot name="option">
                                     <option>{{__('forms.country')}}</option>
@@ -131,7 +131,7 @@
                             </x-forms.select>
 
                         </x-slot>
-                        @error('employee_request.science_degree.country')
+                        @error('employeeRequest.scienceDegree.country')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -147,11 +147,11 @@
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.science_degree.city"
+                            <x-forms.input class="default-input" wire:model="employeeRequest.scienceDegree.city"
                                            type="text"
                                            id="city"/>
                         </x-slot>
-                        @error('employee_request.science_degree.city')
+                        @error('employeeRequest.scienceDegree.city')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}

@@ -5,7 +5,7 @@
         {{__('Додати Посаду')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'positions\',' . $key_property . ')' : 'store(\'positions\')' !!}">
+        <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'positions\',' . $keyProperty . ')' : 'store(\'positions\')' !!}">
             <x-slot name="form">
                 <div  class="pt-4 grid grid gap-4 grid-cols-2">
                     <x-forms.form-group class="">
@@ -16,7 +16,7 @@
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select
-                                class="default-input" wire:model="employee_request.positions.position" type="text"
+                                class="default-input" wire:model="employeeRequest.positions.position" type="text"
                                 id="position"
                             >
                                 <x-slot name="option">
@@ -28,7 +28,7 @@
                             </x-forms.select>
 
                         </x-slot>
-                        @error('employee_request.positions.position')
+                        @error('employeeRequest.positions.position')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -38,15 +38,15 @@
                     </x-forms.form-group>
                     <x-forms.form-group class="">
                         <x-slot name="label">
-                            <x-forms.label for="start_date" class="default-label">
-                                {{__('forms.start_date_work')}} *
+                            <x-forms.label for="startDate" class="default-label">
+                                {{__('forms.startDateWork')}} *
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
-                            <x-forms.input class="default-input" wire:model="employee_request.positions.start_date" type="date"
-                                           id="start_date"/>
+                            <x-forms.input class="default-input" wire:model="employeeRequest.positions.startDate" type="date"
+                                           id="startDate"/>
                         </x-slot>
-                        @error('employee_request.positions.start_date')
+                        @error('employeeRequest.positions.startDate')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}

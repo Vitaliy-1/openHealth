@@ -3,6 +3,7 @@
 namespace App\Livewire\Employee\Forms\Api;
 
 use App\Classes\eHealth\Api\EmployeeApi;
+use App\Classes\eHealth\Schema\ApiSchemaValidator;
 use Carbon\Carbon;
 
 class EmployeeRequestApi extends EmployeeApi
@@ -22,6 +23,11 @@ class EmployeeRequestApi extends EmployeeApi
 
     public static function createEmployeeRequest($data):array
     {
+        $validator = new ApiSchemaValidator(public_path('apiSchema/employee/employee_request_schema.json'));
+
+        $validator->validate($data);
+        dd($validator);
+
         return self::_create($data);
     }
 

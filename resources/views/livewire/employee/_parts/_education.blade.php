@@ -5,7 +5,7 @@
         {{__('forms.education')}}
     </h5>
     <x-tables.table>
-        <x-slot name="headers" :list="[__('forms.institution_name'),__('forms.speciality'),__('forms.issued_date'),__('forms.certificate'),__('forms.actions')]"></x-slot>
+        <x-slot name="headers" :list="[__('forms.institutionName'),__('forms.speciality'),__('forms.issuedDate'),__('forms.certificate'),__('forms.actions')]"></x-slot>
         <x-slot name="tbody">
             @isset($employee->educations)
                 @foreach($employee->educations as $k=>$education)
@@ -17,7 +17,7 @@
                             {{$education['speciality'] ?? ''}}
                         </td>
                         <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                            {{$education['issued_date'] ?? ''}}
+                            {{$education['issuedDate'] ?? ''}}
                         </td>
                         <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                             {{$education['degree'] ?? ''}}
@@ -35,7 +35,7 @@
         </x-slot>
     </x-tables.table>
     <div class="mb-6 mt-6 flex flex-wrap gap-5 xl:gap-7.5">
-        <a wire:click.prevent="create('educations')" class="text-sm inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline" href="">{{__('forms.add_education')}}</a>
+        <a wire:click.prevent="create('educations')" class="text-sm inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline" href="">{{__('forms.addEducation')}}</a>
     </div>
 </div>
 

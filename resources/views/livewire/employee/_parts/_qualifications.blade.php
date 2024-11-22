@@ -8,13 +8,13 @@
         <thead>
         <tr class="bg-gray-2 text-left dark:bg-meta-4">
             <th class="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11">
-                {{ __('forms.certificate_number') }}
+                {{ __('forms.certificateNumber') }}
             </th>
             <th class="min-w-[150px] px-4 py-4 font-medium text-black dark:text-white">
-                {{ __('forms.institution_name') }}
+                {{ __('forms.institutionName') }}
             </th>
             <th class="min-w-[120px] px-4 py-4 font-medium text-black dark:text-white">
-                {{ __('forms.issued_date') }}
+                {{ __('forms.issuedDate') }}
             </th>
             <th class="px-4 py-4 font-medium text-black dark:text-white">
                 {{ __('forms.certificate') }}
@@ -25,19 +25,19 @@
         </thead>
         <tbody>
         @isset($employee->qualifications)
-            @foreach($employee->qualifications as $k=>$science_degree)
+            @foreach($employee->qualifications as $k=>$scienceDegree)
                 <tr>
                     <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                        {{$science_degree['certificate_number'] ?? ''}}
+                        {{$scienceDegree['certificateNumber'] ?? ''}}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                        {{$science_degree['institution_name'] ?? ''}}
+                        {{$scienceDegree['institutionName'] ?? ''}}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                        {{$science_degree['issued_date'] ?? ''}}
+                        {{$scienceDegree['issuedDate'] ?? ''}}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                        {{$science_degree['certificate_number'] ?? ''}}
+                        {{$scienceDegree['certificateNumber'] ?? ''}}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                         <a wire:click.prevent="edit('qualifications',{{$k}})" href="">

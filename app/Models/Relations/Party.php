@@ -28,6 +28,8 @@ class Party extends Model
         'working_experience',
     ];
 
+
+
     public $timestamps = false;
 
     public function employees(): HasMany
@@ -44,4 +46,12 @@ class Party extends Model
     {
         return $this->morphMany(Phone::class, 'phoneable');
     }
+
+    public function getAttribute($key)
+    {
+        $camelKey = lcfirst(str_replace('_', '', ucwords($key, '_')));
+
+        return parent::getAttribute($camelKey) ?? parent::getAttribute($key);
+    }
+
 }

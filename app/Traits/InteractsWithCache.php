@@ -19,7 +19,6 @@ trait InteractsWithCache
     public function storeCacheData(string $cacheKey, string $model, string $requestProperty, array $singleModels = []): void
     {
         $cacheData = [];
-
         // Load existing cache if available
         if ($this->hasCache($cacheKey)) {
             $cacheData = $this->getCache($cacheKey);
@@ -33,7 +32,15 @@ trait InteractsWithCache
         // Determine if the model should be a single item or an array of items
         if (in_array($model, $singleModels, true)) {
             // Assign directly if model should be a single entry
-            $cacheData[$this->requestId][$model] = $this->{$requestProperty}->{$model};
+            if (is_array($singleModels) && count($singleModels) > 1) {//TODO: перевірити на паціентах
+                foreach ($singleModels as $singleModel) {
+                    if (isset($this->{$requestProperty}->{$singleModel}) && !empty($this->{$requestProperty}->{$singleModel})) {
+                        $cacheData[$this->requestId][$singleModel] = $this->{$requestProperty}->{$singleModel};
+                    }
+                }
+            }
+//            $cacheData[$this->requestId][$model] = $this->{$requestProperty}->{$model};
+
         } else {
             // Initialize the array if not already an array
             if (!isset($cacheData[$this->requestId][$model]) || !is_array($cacheData[$this->requestId][$model])) {
@@ -42,7 +49,6 @@ trait InteractsWithCache
             // Append to the array if model allows multiple entries
             $cacheData[$this->requestId][$model][] = $this->{$requestProperty}->{$model};
         }
-
         $this->putCache($cacheKey, $cacheData);
     }
 

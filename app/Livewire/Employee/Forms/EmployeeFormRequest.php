@@ -8,136 +8,132 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
+use function Livewire\of;
+
 class EmployeeFormRequest extends Form
 {
-    #[Validate([
-        'employee.last_name' => ['required', 'min:3', new Cyrillic()],
-        'employee.first_name' => ['required', 'min:3', new Cyrillic()],
-        'employee.gender' => 'required|string',
-        'employee.birth_date' => ['required', 'date', new AgeCheck()] ,
-        'employee.phones.*.number' => 'required|string:digits:13',
-        'employee.phones.*.type' => 'required|string',
-        'employee.email' => 'required|unique:users,email',
-        'employee.position' => 'required|string',
-        'employee.tax_id' => 'required|min:8|max:10',
-        'employee.employee_type' => 'required|string',
-    ])]
+    public string $position = '';
+    public string $employeeType = '';
 
-    public ?array $employee = [
-        'position' => null,
-    ];
+    public string $startDate = '';
+
+    public ?array $party = [];
 
     #[Validate([
-        'documents.type' => 'required|string',
-        'documents.number' => 'required|string',
+        'educations.country'          => 'required|string',
+        'educations.city'             => 'required|string|min:3',
+        'educations.institutionName' => 'required|string|min:3',
+        'educations.diplomaNumber'   => 'required|string|min:3',
+        'educations.degree'           => 'required|string|min:3',
+        'educations.speciality'       => 'required|string|min:3',
     ])]
-
-    public ?array $documents = [];
-
-    #[Validate([
-        'educations.country' => 'required|string',
-        'educations.city' => 'required|string|min:3',
-        'educations.institution_name' => 'required|string|min:3',
-        'educations.diploma_number' => 'required|string|min:3',
-        'educations.degree' => 'required|string|min:3',
-        'educations.speciality' => 'required|string|min:3',
-    ])]
-
     public ?array $educations = [];
 
     #[Validate([
-        'specialities.speciality' => 'required|string|min:3',
-        'specialities.level' => 'required|string|min:3',
-        'specialities.qualification_type' => 'required|string|min:3',
-        'specialities.attestation_name' => 'required|string|min:3',
-        'specialities.attestation_date' => 'required|date',
-        'specialities.certificate_number' => 'required|string|min:3',
+        'specialities.speciality'         => 'required|string|min:3',
+        'specialities.level'              => 'required|string|min:3',
+        'specialities.qualificationType' => 'required|string|min:3',
+        'specialities.attestationName'   => 'required|string|min:3',
+        'specialities.attestationDate'   => 'required|date',
+        'specialities.certificateNumber' => 'required|string|min:3',
 
     ])]
-    public ?array  $specialities = [];
+    public ?array $specialities = [];
 
     #[Validate([
         'positions.position' => 'required|string',
     ])]
-
     public ?array $positions = [];
 
-   #[Validate([
-        'role.employee_type' => 'required|string',
-        'role.division_id' => 'required|integer',
-        'role.healthcare_service_id' => 'required|uuid',
+    #[Validate([
+        'role.employeeType'         => 'required|string',
+        'role.divisionId'           => 'required|integer',
+        'role.healthcareServiceId' => 'required|uuid',
     ])]
-
     public ?array $role = [];
 
     #[Validate([
-        'science_degree.country' => 'required|string',
-        'science_degree.city' => 'required|string',
-        'science_degree.degree' => 'required|string',
-        'science_degree.institution_name' => 'required|string',
-        'science_degree.diploma_number' => 'required|string',
-        'science_degree.speciality' => 'required|string',
+        'science_degree.country'          => 'required|string',
+        'science_degree.city'             => 'required|string',
+        'science_degree.degree'           => 'required|string',
+        'science_degree.institutionName' => 'required|string',
+        'science_degree.diplomaNumber'   => 'required|string',
+        'science_degree.speciality'       => 'required|string',
 
     ])]
-
-    public ?array $science_degree = [];
+    public ?array $scienceDegree = [];
 
     #[Validate([
-        'qualifications.type' => 'required|string',
-        'qualifications.institution_name' => 'required|string',
-        'qualifications.speciality' => 'required|string',
-        'qualifications.issued_date' => 'required|date',
-        'qualifications.certificate_number' => 'required|string',
+        'qualifications.type'               => 'required|string',
+        'qualifications.institutionName'   => 'required|string',
+        'qualifications.speciality'         => 'required|string',
+        'qualifications.issuedDate'        => 'required|date',
+        'qualifications.certificateNumber' => 'required|string',
     ])]
+    public ?array $qualifications = [];
 
-    public ?array  $qualifications = [];
-
+    public function rulesParty(): array
+    {
+        return [
+//            'party.lastName'       => ['required', 'min:3', new Cyrillic()],
+            'party.firstName'      => ['required', 'min:3', new Cyrillic()],
+            'party.gender'          => 'required|string',
+            'party.birthDate'      => ['required', 'date', new AgeCheck()],
+            'party.phones.*.number' => 'required|string:digits:13',
+            'party.phones.*.type'   => 'required|string',
+            'party.email'           => 'required|email',
+            'party.taxId'          => 'required|min:8|max:10',
+            'position'              => 'required|string',
+            'employeeType'         => 'required|string',
+            'startDate'            => 'date',
+        ];
+    }
 
     /**
      * @throws ValidationException
      */
     public function rulesForModelValidate(string $model): array
     {
+        if ($model == 'party') {
+            return $this->validate($this->rulesParty());
+        }
         return $this->validate($this->rulesForModel($model)->toArray());
     }
 
 
     public function validateBeforeSendApi(): array
     {
-
-        if (empty($this->employee)){
+        if (empty($this->party['documents'])) {
             return [
-                'error'=> true,
+                'error'   => true,
                 'message' => __('validation.custom.documents_empty'),
             ];
         }
 
-        if (isset($this->employee['tax_id']) && empty($this->employee['tax_id'])){
-           return [
-               'error'=> true,
-               'message' => __('validation.custom.documents_empty'),
-           ];
+        if (isset($this->employee['tax_id']) && empty($this->employee['tax_id'])) {
+            return [
+                'error'   => true,
+                'message' => __('validation.custom.documents_empty'),
+            ];
         }
-        if ( isset($this->employee['employee_type']) && $this->employee['employee_type'] == 'DOCTOR' && empty($this->specialities)){
+        if (isset($this->employee['employee_type']) && $this->employee['employee_type'] == 'DOCTOR' && empty($this->specialities)) {
             return [
-                'error'=> true,
+                'error'   => true,
                 'message' => __('validation.custom.specialities_table'),
-            ];        }
+            ];
+        }
 
-        if (isset($this->employee['employee_type'])  && $this->employee['employee_type'] == 'DOCTOR' && empty($this->educations) ){
+        if (isset($this->employee['employee_type']) && $this->employee['employee_type'] == 'DOCTOR' && empty($this->educations)) {
             return [
-                'error'=> true,
+                'error'   => true,
                 'message' => __('validation.custom.educations_table'),
             ];
         }
         return [
-            'error'=> false,
+            'error'   => false,
             'message' => '',
         ];
-
     }
-
-
 
 
 }

@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Employee;
 use App\Models\LegalEntity;
 use Exception;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
 
 class EmployeeRepository
@@ -12,16 +13,16 @@ class EmployeeRepository
 
 
     /**
-     * @param LegalEntity $legalEntity
-     * @param UserRepository $userRepository
-     * @param EmployeeRepository $employeeRepository
-     * @param PartyRepository $partyRepository
-     * @param PhoneRepository $phoneRepository
-     * @param DocumentRepository $documentRepository
-     * @param EducationRepository $educationRepository
-     * @param ScienceDegreeRepository $scienceDegreeRepository
-     * @param QualificationRepository $qualificationRepository
-     * @param SpecialityRepository $specialityRepository
+     * @param  LegalEntity  $legalEntity
+     * @param  UserRepository  $userRepository
+     * @param  EmployeeRepository  $employeeRepository
+     * @param  PartyRepository  $partyRepository
+     * @param  PhoneRepository  $phoneRepository
+     * @param  DocumentRepository  $documentRepository
+     * @param  EducationRepository  $educationRepository
+     * @param  ScienceDegreeRepository  $scienceDegreeRepository
+     * @param  QualificationRepository  $qualificationRepository
+     * @param  SpecialityRepository  $specialityRepository
      */
 
     protected ?UserRepository $userRepository;
@@ -36,16 +37,15 @@ class EmployeeRepository
 
 
     public function __construct(
-        UserRepository          $userRepository,
-        PartyRepository         $partyRepository,
-        PhoneRepository         $phoneRepository,
-        DocumentRepository      $documentRepository,
-        EducationRepository     $educationRepository,
+        UserRepository $userRepository,
+        PartyRepository $partyRepository,
+        PhoneRepository $phoneRepository,
+        DocumentRepository $documentRepository,
+        EducationRepository $educationRepository,
         ScienceDegreeRepository $scienceDegreeRepository,
         QualificationRepository $qualificationRepository,
-        SpecialityRepository    $specialityRepository
-    )
-    {
+        SpecialityRepository $specialityRepository
+    ) {
         $this->userRepository = $userRepository;
         $this->partyRepository = $partyRepository;
         $this->phoneRepository = $phoneRepository;
@@ -55,8 +55,6 @@ class EmployeeRepository
         $this->qualificationRepository = $qualificationRepository;
         $this->specialityRepository = $specialityRepository;
     }
-
-
 
 
     /**
@@ -72,8 +70,6 @@ class EmployeeRepository
             $data
         );
     }
-
-
 
     public function saveEmployeeData($request, LegalEntity $legalEntity): ?Employee //TODO: Global LegalEntity model
     {
@@ -119,7 +115,6 @@ class EmployeeRepository
             DB::commit();
 
             return $employee;
-
         } catch (Exception $e) {
             // Rollback the transaction on error
             DB::rollBack();
@@ -127,6 +122,5 @@ class EmployeeRepository
             return null;
         }
     }
-
 
 }

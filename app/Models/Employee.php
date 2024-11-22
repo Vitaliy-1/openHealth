@@ -22,6 +22,8 @@ class Employee extends Model
     use HasPersonalAttributes;
 
 
+
+
     protected $fillable = [
         'uuid',
         'legal_entity_uuid',
@@ -38,6 +40,24 @@ class Employee extends Model
     protected $casts = [
         'status' => Status::class,
     ];
+
+
+    protected $with = [
+        'party',
+        'party.phones',
+        'party.documents',
+        'qualifications',
+        'educations',
+        'specialities',
+        'scienceDegrees',
+    ];
+
+    public function getAttribute($key)
+    {
+        $camelKey = lcfirst(str_replace('_', '', ucwords($key, '_')));
+        return parent::getAttribute($camelKey) ?? parent::getAttribute($key);
+    }
+
 
     //TODO: Подивитись чи використовувати person в Employee
     public function person(): BelongsTo

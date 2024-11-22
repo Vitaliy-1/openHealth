@@ -32,13 +32,13 @@
                         {{$speciality['speciality'] ?? ''}}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {{$speciality['attestation_name'] ?? '' }}
+                        {{$speciality['attestationName'] ?? '' }}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                         {{$speciality['level'] ?? ''}}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                        {{$speciality['certificate_number'] ?? ''}}
+                        {{$speciality['certificateNumber'] ?? ''}}
                     </td>
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                         <a wire:click.prevent="edit('specialities',{{$k}})" href="">

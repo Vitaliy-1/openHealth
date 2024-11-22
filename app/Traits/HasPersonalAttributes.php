@@ -9,9 +9,9 @@ trait HasPersonalAttributes
     public function getFullNameAttribute(): string
     {
         return implode(' ', array_filter([
-            optional($this->party)->first_name ?? '',
-            optional($this->party)->last_name ?? '',
-            optional($this->party)->second_name?? '',
+            optional($this->party)->firstFname ?? '',
+            optional($this->party)->lastName ?? '',
+            optional($this->party)->secondName?? '',
         ]));
     }
 
