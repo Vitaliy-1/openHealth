@@ -222,7 +222,7 @@ return [
                 'number' => 'номер телефону',
             ],
 
-            'emergencyContact' => [
+            'emergency_contact' => [
                 'firstName' => 'ім’я',
                 'lastName' => 'прізвище',
                 'secondName' => 'по батькові',

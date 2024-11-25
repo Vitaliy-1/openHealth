@@ -57,13 +57,13 @@
                             <div class="w-1/3">
                                 <x-forms.input class="default-input"
                                                x-mask="+380999999999"
-                                               wire:model="patientRequest.patient.authentication_methods.phone_number"
+                                               wire:model="patientRequest.patient.authentication_methods.phoneNumber"
                                                type="text"
                                                id="phone_number"
                                                placeholder="{{ __('+ 3(80)00 000 00 00 ') }}"
                                 />
 
-                                @error("patientRequest.patient.authentication_methods.phone_number")
+                                @error("patientRequest.patient.authentication_methods.phoneNumber")
                                 <x-forms.error>
                                     {{ $message }}
                                 </x-forms.error>
