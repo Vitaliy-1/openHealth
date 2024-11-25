@@ -9,9 +9,10 @@ class PatientRequestApi extends PersonApi
     /**
      * Build a create patient request array based on the provided cache data and flags.
      *
-     * @param array $cacheData The cache data containing patient information.
-     * @param bool $noTaxId Flag indicating whether the patient has no tax ID.
-     * @param bool $isIncapable Flag indicating whether the patient is incapable.
+     * @param  array  $cacheData  The cache data containing patient information.
+     * @param  bool  $noTaxId  Flag indicating whether the patient has no tax ID.
+     * @param  bool  $isIncapable  Flag indicating whether the patient is incapable.
+     * @return array
      */
     public static function buildCreatePersonRequest(array $cacheData, bool $noTaxId, bool $isIncapable): array
     {
@@ -24,13 +25,12 @@ class PatientRequestApi extends PersonApi
         $documents_relationship = $cacheData['documents_relationship'][0] ?? null;
 
         $patientData = [
-//            'id' => '13001c60-45a0-4b5a-b425-9505e1de18bd',
-            'first_name' => $patient['first_name'],
-            'last_name' => $patient['last_name'],
-            'second_name' => $patient['second_name'] ?? '',
-            'birth_date' => $patient['birth_date'],
-            'birth_country' => $patient['birth_country'],
-            'birth_settlement' => $patient['birth_settlement'],
+            'first_name' => $patient['firstName'],
+            'last_name' => $patient['lastName'],
+            'second_name' => $patient['secondName'] ?? '',
+            'birth_date' => $patient['birthDate'],
+            'birth_country' => $patient['birthCountry'],
+            'birth_settlement' => $patient['birthSettlement'],
             'gender' => $patient['gender'],
             'email' => $patient['email'] ?? '',
             'no_tax_id' => $noTaxId,
@@ -40,9 +40,9 @@ class PatientRequestApi extends PersonApi
                 [
                     'type' => $documents['type'],
                     'number' => $documents['number'],
-                    'issued_by' => $documents['issued_by'],
-                    'issued_at' => $documents['issued_at'],
-                    'expiration_date' => $documents['expiration_date'] ?? '',
+                    'issued_by' => $documents['issuedBy'],
+                    'issued_at' => $documents['issuedAt'],
+                    'expiration_date' => $documents['expirationDate'] ?? '',
                 ]
             ],
 
@@ -74,7 +74,7 @@ class PatientRequestApi extends PersonApi
                 [
                     'type' => $authentication_methods['type'],
                     // required for type = OTP
-                    'phone_number' => $authentication_methods['phone_number'] ?? '',
+                    'phone_number' => $authentication_methods['phoneNumber'] ?? '',
                     // required for type = THIRD_PERSON
                     'value' => $authentication_methods['value'] ?? '',
                     // required it type = THIRD_PERSON, and optional for type = OTP or OFFLINE
@@ -82,13 +82,13 @@ class PatientRequestApi extends PersonApi
                 ]
             ],
 
-            'unzr' => $documents['unzr'] ?? '',
+            'unzr' => $patient['unzr'] ?? '',
 
             'emergency_contact' => (object)
             [
-                'first_name' => $emergency_contact['first_name'],
-                'last_name' => $emergency_contact['last_name'],
-                'second_name' => $emergency_contact['second_name'] ?? '',
+                'first_name' => $emergency_contact['firstName'],
+                'last_name' => $emergency_contact['lastName'],
+                'second_name' => $emergency_contact['secondName'] ?? '',
 
                 'phones' => [
                     [
@@ -100,7 +100,7 @@ class PatientRequestApi extends PersonApi
         ];
 
         if (!$noTaxId) {
-            $patientData['tax_id'] = $patient['tax_id'];
+            $patientData['tax_id'] = $patient['taxId'];
         }
 
         if ($isIncapable) {
@@ -124,7 +124,7 @@ class PatientRequestApi extends PersonApi
         self::removeEmptyKeys($patientData);
 
         return [
-            'person' => (object)$patientData,
+            'person' => (object) $patientData,
             'patient_signed' => false,
             'process_disclosure_data_consent' => true,
         ];
@@ -133,7 +133,7 @@ class PatientRequestApi extends PersonApi
     /**
      * Build an array of parameters for approving a patient request.
      *
-     * @param int $verificationCode The verification code used to approve the patient request.
+     * @param  int  $verificationCode  The verification code used to approve the patient request.
      * @return int[]
      */
     public static function buildApprovePersonRequest(int $verificationCode): array
@@ -142,11 +142,41 @@ class PatientRequestApi extends PersonApi
     }
 
     /**
+     * Build an array of parameters for signing a patient request.
+     *
+     * @param $cacheData
+     * @return array
+     */
+    public static function buildSignPersonRequest($cacheData): array
+    {
+        return ['signed_content' => $cacheData];
+    }
+
+    /**
+     * Build an array of parameters for encrypting a patient request.
+     *
+     * @param  array  $cacheData
+     * @return array
+     */
+    public static function buildEncryptedSignPersonRequest(array $cacheData): array
+    {
+        return [
+            'status' => $cacheData['data']['status'],
+            'id' => $cacheData['data']['id'],
+            'person' => (object) $cacheData['data']['person'],
+            'patient_signed' => true,
+            'process_disclosure_data_consent' => $cacheData['data']['process_disclosure_data_consent'],
+            'content' => $cacheData['data']['content'],
+            'channel' => $cacheData['data']['channel'],
+        ];
+    }
+
+    /**
      * Build an array of parameters for a patient request list.
      *
-     * @param string $status The status of the patient requests to fetch (NEW, APPROVED, SIGNED, REJECTED, CANCELLED).
-     * @param int $page The page number of the results to fetch.
-     * @param int $pageSize A limit on the number of objects to be returned, between 1 and 300. Default: 50.
+     * @param  string  $status  The status of the patient requests to fetch (NEW, APPROVED, SIGNED, REJECTED, CANCELLED).
+     * @param  int  $page  The page number of the results to fetch.
+     * @param  int  $pageSize  A limit on the number of objects to be returned, between 1 and 300. Default: 50.
      * @return array
      */
     public static function buildGetPersonRequestList(string $status, int $page, int $pageSize = 50): array
@@ -161,7 +191,7 @@ class PatientRequestApi extends PersonApi
     /**
      * Remove keys from an array if their values are empty strings.
      *
-     * @param array $data
+     * @param  array  $data
      * @return void
      */
     protected static function removeEmptyKeys(array &$data): void
@@ -169,10 +199,10 @@ class PatientRequestApi extends PersonApi
         foreach ($data as $key => &$value) {
             if (is_object($value)) {
                 // Convert object to array
-                $value = (array)$value;
+                $value = (array) $value;
                 self::removeEmptyKeys($value);
                 // Convert array back to object
-                $value = (object)$value;
+                $value = (object) $value;
             } elseif (is_array($value)) {
                 self::removeEmptyKeys($value);
             } elseif ($value === '') {
