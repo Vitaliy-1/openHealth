@@ -35,13 +35,13 @@
                         <x-forms.input class="default-input"
                                        checked
                                        maxlength="10"
-                                       wire:model="patientRequest.patient.tax_id"
+                                       wire:model="patientRequest.patient.taxId"
                                        type="text"
                                        id="tax_id"
                         />
                     </x-slot>
 
-                    @error('patientRequest.patient.tax_id')
+                    @error('patientRequest.patient.taxId')
                     <x-slot name="error">
                         <x-forms.error>
                             {{ $message }}

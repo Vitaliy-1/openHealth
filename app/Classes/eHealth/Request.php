@@ -6,42 +6,26 @@ use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealthInterface;
 use App\Classes\eHealth\Errors\ErrorHandler;
 use App\Classes\eHealth\Exceptions\ApiException;
-use App\Livewire\Components\FlashMessage;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use mysql_xdevapi\Exception;
 
 class Request
 {
-    private string $method;
-
-    private string $url;
-
-    private array $params;
-    private bool $isToken;
-
     private oAuthEhealthInterface $oAuthEhealth;
-
     private array $headers = [];
 
     //TODO Check use of API key
     //private bool $isApiKey;
 
-
     public function __construct(
-        string $method,
-        string $url,
-        array  $params,
-        bool   $isToken = true,
-    )
-    {
-        $this->method = $method;
-        $this->url = $url;
-        $this->params = $params;
-        $this->isToken = $isToken;
+        private string $method,
+        private string $url,
+        private array $params,
+        private bool $isToken = true,
+        private ?string $mspDrfo = null,
+    ) {
         $this->oAuthEhealth = new oAuthEhealth();
-
+        $this->mspDrfo = $mspDrfo ?? '';
     }
 
     protected function makeApiUrl(): string
@@ -58,9 +42,9 @@ class Request
         if (config('ehealth.api.key') == null && empty(config('ehealth.api.key'))) {
             $data = [
                 'method' => $this->method,
-                'url'    => self::makeApiUrl(),
+                'url' => self::makeApiUrl(),
                 'params' => $this->params,
-                'token'  => $this->oAuthEhealth->getToken(),
+                'token' => $this->oAuthEhealth->getToken(),
                 'isToken' => $this->isToken
             ];
             $response = Http::acceptJson()
@@ -73,11 +57,14 @@ class Request
 
         if ($response->successful()) {
             $data = json_decode($response->body(), true);
+
             if (isset($data['urgent']) && !empty($data['urgent'])) {
                 return $data ?? [];
             }
+
             return $data['data'] ?? [];
         }
+
         if ($response->status() === 401) {
             $this->oAuthEhealth->forgetToken();
         }
@@ -87,28 +74,31 @@ class Request
             dd($errors);
 
             Log::channel('api_errors')->error('API request failed', [
-                'url'    => self::makeApiUrl(),
+                'url' => self::makeApiUrl(),
                 'status' => $response->status(),
                 'errors' => $errors
             ]);
+
             return (new ErrorHandler())->handleError($errors);
         }
-
-
     }
-
 
     public function getHeaders(): array
     {
         $headers = [
             'X-Custom-PSK' => config('ehealth.api.token'),
             //TODO Check use of API key
-            'API-key'      => $this->oAuthEhealth->getApikey(),
+            'API-key' => $this->oAuthEhealth->getApikey(),
         ];
+
+        if (!empty($this->mspDrfo)) {
+            $headers['msp_drfo'] = $this->mspDrfo;
+        }
 
         if ($this->isToken) {
             $headers['Authorization'] = 'Bearer ' . $this->oAuthEhealth->getToken();
         }
+
         return array_merge($headers, $this->headers);
     }
 //
