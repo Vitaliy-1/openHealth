@@ -206,15 +206,15 @@ return [
 
         ],
         'patient' => [
-            'first_name' => 'ім’я',
-            'last_name' => 'прізвище',
-            'second_name' => 'по батькові',
-            'birth_date' => 'дата народження',
-            'birth_country' => 'країна народження',
-            'birth_settlement' => 'місто народження',
+            'firstName' => 'ім’я',
+            'lastName' => 'прізвище',
+            'secondName' => 'по батькові',
+            'birthDate' => 'дата народження',
+            'birthCountry' => 'країна народження',
+            'birthSettlement' => 'місто народження',
             'gender' => 'стать',
             'email' => 'E-mail',
-            'tax_id' => 'номер РНОКПП',
+            'taxId' => 'номер РНОКПП',
             'secret' => 'кодове слово',
 
             'phones' => [
@@ -223,9 +223,9 @@ return [
             ],
 
             'emergency_contact' => [
-                'first_name' => 'ім’я',
-                'last_name' => 'прізвище',
-                'second_name' => 'по батькові',
+                'firstName' => 'ім’я',
+                'lastName' => 'прізвище',
+                'secondName' => 'по батькові',
                 'phones' => [
                     'type' => 'тип телефону',
                     'number' => 'номер телефону',
@@ -234,7 +234,7 @@ return [
 
             'authentication_methods' => [
                 'type' => 'метод автентифікації',
-                'phone_number' => 'номер телефону',
+                'phoneNumber' => 'номер телефону',
             ],
         ],
         'addresses' => [
@@ -255,9 +255,9 @@ return [
         'documents' => [
             'type' => 'Тип документа',
             'number' => 'Серія/номер документа',
-            'issued_by' => 'Орган яким виданий документ',
-            'issued_at' => 'Дата видачі документа',
-            'expiration_date' => 'дійсний до',
+            'issuedBy' => 'Орган яким виданий документ',
+            'issuedAt' => 'Дата видачі документа',
+            'expirationDate' => 'дійсний до',
         ],
         'passport_data' => [
             'first_name' => 'Ім’я',

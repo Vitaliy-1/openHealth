@@ -83,7 +83,7 @@
 
                 <x-slot name="input">
                     <x-forms.select class="default-input"
-                                    wire:model="patientRequest.patient.preferred_way_communication"
+                                    wire:model="patientRequest.patient.preferredWayCommunication"
                                     type="text"
                                     id="preferred_way_communication"
                     >
@@ -96,7 +96,7 @@
                     </x-forms.select>
                 </x-slot>
 
-                @error('patientRequest.patient.preferred_way_communication')
+                @error('patientRequest.patient.preferredWayCommunication')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
