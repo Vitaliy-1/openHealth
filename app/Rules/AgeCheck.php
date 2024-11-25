@@ -5,27 +5,25 @@ namespace App\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Carbon\Carbon;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class AgeCheck implements ValidationRule
 {
-    protected $minAge;
-
     /**
      * Create a new rule instance.
      *
-     * @param int $minAge The minimum age required
+     * @param  int  $minAge  The minimum age required
      */
-    public function __construct(int $minAge = 18)
+    public function __construct(protected int $minAge = 18)
     {
-        $this->minAge = $minAge;
     }
 
     /**
      * Run the validation rule.
      *
-     * @param  string  $attribute The name of the attribute being validated
-     * @param  mixed  $value The value of the attribute being validated
-     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail The callback to invoke if validation fails
+     * @param  string  $attribute  The name of the attribute being validated
+     * @param  mixed  $value  The value of the attribute being validated
+     * @param  Closure(string): PotentiallyTranslatedString  $fail  The callback to invoke if validation fails
      * @return void
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
@@ -43,7 +41,7 @@ class AgeCheck implements ValidationRule
 
         // Check if the age meets the minimum requirement
         if ($age < $this->minAge) {
-            $fail(':attribute повина бути не менше ' . $this->minAge . ' років');
+            $fail(':attribute повинна бути не менше ' . $this->minAge . ' років');
         }
     }
 }
