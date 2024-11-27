@@ -1,7 +1,7 @@
 <div>
     <x-section-navigation x-data="{ showFilter: false }" class="">
         <x-slot name="title">{{ __('Ліцензії') }}</x-slot>
-        <x-slot name="description">{{ __('Ліцензії') }}</x-slot>
+        {{-- <x-slot name="description">{{ __('Ліцензії') }}</x-slot> --}}
 
         <x-slot name="navigation">
             <div class="rounded-sm border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -39,24 +39,24 @@
         </x-slot>
     </x-section-navigation>
 
-    <div class="flex flex-col h-screen -mt-4 border-t">
-        <div class="inline-block min-w-full align-middle">
+    {{-- <div class="flex flex-col h-screen -mt-4 border-t"> --}}
+        {{-- <div class="inline-block min-w-full align-middle"> --}}
+        <div class="overflow-x-auto pb-20">
             <div class="shadow">
-
-                @if (count($licenses) > 0)
+                @nonempty($licensesPagination->items())
                     <x-tables.table>
                         <x-slot name="headers" :list="$tableHeaders"></x-slot>
                         <x-slot name="tbody">
-                            @foreach ($licenses as $k => $license)
+                            @foreach ($licensesPagination  as $k => $license)
                                 <tr>
-                                    <td class="border-b border-[#eee] py-5 px-4 ">
-                                        <p class="text-black dark:text-white">{{ $license->type ?? '' }}</p>
+                                    <td class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                        <p class="font-semibold text-gray-900 dark:text-white">{{ $license->type ?? '' }}</p>
                                     </td>
-                                    <td class="border-b border-[#eee] py-5 px-4 ">
+                                    <td class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400">
                                         <p class="text-black dark:text-white">{{ $license->issued_date ?? '' }}</p>
                                     </td>
-                                    <td class="border-b border-[#eee] py-5 px-4 ">
-                                        <p class="text-black dark:text-white">{{ $license->what_licensed ?? '' }}
+                                    <td class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400 ">
+                                        <p class="text-gray-900 dark:text-white">{{ $license->what_licensed ?? '' }}
                                         </p>
                                     </td>
 
@@ -114,7 +114,7 @@
                                                     x-on:click.outside="close($refs.button)"
                                                     :id="$id('dropdown-button')"
                                                     style="display: none;"
-                                                    class="absolute right-0 mt-2 w-40 rounded-md bg-white shadow-md z-50"
+                                                    class="absolute right-0 mt-2 w-60 rounded-md bg-white shadow-md z-50"
                                                 >
                                                     <a href="{{ route('license.show', $license->id) }}"
                                                         class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
@@ -125,7 +125,7 @@
                                                     <a href="{{ route('license.form', $license->id) }}"
                                                         class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
                                                     >
-                                                        {{ __('forms.update_info') }}
+                                                        {{ __('forms.updateInfo') }}
                                                     </a>
                                                 </div>
                                             </div>
@@ -137,19 +137,20 @@
 
                         </x-slot>
                     </x-tables.table>
-                @else
-                    <div class="border-b items-center flex justify-between border-stroke px-7 py-4 dark:border-strokedark">
-                        <div class="flex">
-                            <div>
-                                <label class="mb-3 block text-sm font-medium text-black dark:text-white">
-                                    {{ __('Немає ліцензій') }}
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                @endif
+                @elsenonempty
+                <tr>
+                    <td class="text-black w-full p-4 border-gray-200 text-center dark:bg-gray-800 dark:border-gray-700 dark:text-white" colspan="4">
+                        <p >
+                            {{ __('Нічого не знайдено') }}
+                        </p>
+                    </td>
+                </tr>
+                @endnonempty
 
             </div>
         </div>
-    </div>
+    {{-- </div> --}}
+
+    <x-pagination :pagination="$licensesPagination" class="pagination" :style="'margin-block-start: -80px;'" />
+
 </div>

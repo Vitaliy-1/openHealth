@@ -2,7 +2,7 @@
 
     <x-section-navigation x-data="{ showFilter: false }" class="">
         <x-slot name="title">{{ __('Місця надання послуг') }}</x-slot>
-        <x-slot name="description">{{ __('Місця надання послуг') }}</x-slot>
+        {{-- <x-slot name="description">{{ __('Місця надання послуг') }}</x-slot> --}}
 
         <x-slot name="navigation">
             <div class="rounded-sm border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -26,55 +26,54 @@
         </x-slot>
     </x-section-navigation>
 
-    <div class="flex flex-col h-screen -mt-4 border-t">
+    {{-- <div class="flex flex-col h-screen -mt-4 border-t"> --}}
         <div class="overflow-x-auto">
             <div class="inline-block min-w-full align-middle">
-                <div class="overflow-hidden shadow">
-                    <x-tables.table>
+                <div class="shadow">
+                    <x-tables.table class="mb-20">
                         <x-slot name="headers" :list="$tableHeaders"></x-slot>
                         <x-slot name="tbody">
-                            @if ($divisions)
-                                @foreach ($divisions as $item)
+                            @nonempty($divisions->items())
+                                @foreach ($divisions as $division)
                                     <tr x-data="{ divisionTypes: @entangle('dictionaries.DIVISION_TYPE') }">
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            <p class="text-black dark:text-white">
-                                                {{ $item->uuid ?? '' }}
+                                        <td class="p-4 text-sm text-center font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                            <p class="font-semibold text-gray-900 dark:text-white">
+                                                {{ $division->uuid ?? '' }}
                                             </p>
                                         </td>
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            <p class="text-black dark:text-white">
-                                                {{ $item->name ?? '' }}
+                                        <td class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                            <p class="text-gray-900 dark:text-white">
+                                                {{ $division->name ?? '' }}
                                             </p>
                                         </td>
-                                        <td x-text="divisionTypes['{{ $item->type }}']" class="border-b border-[#eee] py-5 px-4 ">
-                                            <p class="text-black dark:text-white"></p>
+                                        <td x-text="divisionTypes['{{ $division->type }}']" class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                            <p class="text-gray-900 dark:text-white"></p>
                                         </td>
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            <p class="text-black dark:text-white">
-                                                {{ $item->phones['number'] ?? '' }}
+                                        <td class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                            <p class="inline-flex items-center font-medium text-blue-600 dark:text-blue-500">
+                                                {{ $division->phones['number'] ?? '' }}
                                             </p>
                                         </td>
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            <p class="text-black dark:text-white">
-                                                {{ $item->email ?? '' }}
+                                        <td class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                            <p class="inline-flex items-center font-medium text-gray-600 dark:text-gray-500">
+                                                {{ $division->email ?? '' }}
                                             </p>
                                         </td>
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            @if ($item->status == 'INACTIVE')
-                                                <span class="text-meta-1">{{ __('Не активний') }}</span>
+                                        <td class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                            @if ($division->status == 'INACTIVE')
+                                                <span class="rejected text-meta-1">{{ __('Не активний') }}</span>
                                             @else
-                                                <span class="text-meta-3">{{ __('Активний') }}</span>
+                                                <span class="approved text-meta-3">{{ __('Активний') }}</span>
                                             @endif
                                         </td>
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            <div class="flex justify-center">
+                                        <td class="border-b border-[#eee] py-5 px-4">
+                                            <div class="flex justify-center relative">
                                                 <div x-data="{
                                                         open: false,
                                                         toggle() {
                                                             if (this.open) {
                                                                 return this.close()
                                                             }
-
                                                             this.$refs.button.focus()
 
                                                             this.open = true
@@ -122,52 +121,62 @@
                                                         x-transition.origin.top.left
                                                         x-on:click.outside="close($refs.button)"
                                                         :id="$id('dropdown-button')"
-                                                        style="display: none;"
                                                         class="absolute right-0 mt-2 w-40 rounded-md bg-white shadow-md z-50"
                                                     >
-                                                        <a
-                                                            href="{{ route('division.form', $item) }}"
-                                                            class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
-                                                        >
-                                                            {{ __('forms.edit') }}
-                                                        </a>
-                                                        @if ($item->status == 'ACTIVE')
+                                                        @if ($division->status == 'ACTIVE')
                                                             <a
-                                                                wire:click="deactivate({{ $item }}); open = !open"
+                                                                href="{{ route('division.form', $division) }}"
+                                                                class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
+                                                            >
+                                                                {{ __('forms.edit') }}
+                                                            </a>
+                                                            <a
+                                                                wire:click="deactivate({{ $division }}); open = !open"
                                                                 href="#"
                                                                 class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
                                                             >
                                                                 {{ __('forms.deactivate') }}
                                                             </a>
+                                                            <a
+                                                            href="{{ route('healthcare_service.index', $division) }}"
+                                                            class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
+                                                            >
+                                                                {{ __('forms.services') }}
+                                                            </a>
                                                         @else
                                                             <a
-                                                                wire:click="activate({{ $item }}); open = !open"
+                                                                wire:click="activate({{ $division }}); open = !open"
                                                                 href="#"
                                                                 class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
                                                             >
                                                                 {{ __('forms.activate') }}
                                                             </a>
                                                         @endif
-
-                                                        <a
-                                                            href="{{ route('healthcare_service.index', $item) }}"
-                                                            class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
-                                                        >
-                                                            {{ __('forms.services') }}
-                                                        </a>
-                                                    </divx-ref=>
+                                                    </div>
                                                 </div>
+                                            </div>
                                             </div>
                                         </td>
                                     </tr>
                                 @endforeach
-                            @endif
+                            @elsenonempty
+                            <tr>
+                                <td class="text-black w-full p-4 border-gray-200 text-center dark:bg-gray-800 dark:border-gray-700 dark:text-white" colspan="7">
+                                    <p >
+                                        {{ __('Нічого не знайдено') }}
+                                    </p>
+                                </td>
+                            </tr>
+                            @endnonempty
                         </x-slot>
                     </x-tables.table>
+                    <x-pagination :pagination="$divisions" class="pagination" style="margin-block-start: -80px;"/>
+
                 </div>
             </div>
         </div>
-    </div>
+
+    {{-- </div> --}}
 
     @include('livewire.division._parts._division_form')
 </div>

@@ -8,6 +8,7 @@ use App\Rules\Zip;
 use Livewire\Component;
 use Illuminate\Validation\Rule;
 
+
 class AddressesSearch extends Component
 {
     public ?array $regions;
@@ -26,6 +27,18 @@ class AddressesSearch extends Component
     public string $zip = '';
     public string $class = '';
     public ?array $dictionaries;
+
+    /**
+     * TODO:
+     *  - remove listeners;
+     *  - add Modelable property to connect with the parent's data;
+     *  - remove/change all data/method depends on them;
+     *  - change the way for to do validation;
+     *  - change the way concerning initial settings of the data;
+     *  - change the way concerning resetting the form fields depend on choosing steps;
+     *  - modify the data passed to the get{Districts|Settlements|Streets} methods;
+     *  - change the linked form's wire:model associations
+     */
 
     protected $listeners = ['fetchAddressData' => 'provideAddressData', 'setAddressesFields'];
 
@@ -115,6 +128,7 @@ class AddressesSearch extends Component
         }
     }
 
+
     public function provideAddressData()
     {
         $this->validate();
@@ -137,7 +151,7 @@ class AddressesSearch extends Component
         $this->dispatch('addressDataFetched', $addresses);
     }
 
-    public function getDisstricts(): void
+    public function getDistricts(): void
     {
         if (empty($this->area)) {
             return;
