@@ -2,7 +2,7 @@
     <x-section-navigation x-data="{ showFilter: false }" class="">
         <x-slot name='title'>{{ __('forms.contract') }}</x-slot>
 
-        <x-slot name='description'>{{ __('forms.contract') }}</x-slot>
+        {{-- <x-slot name='description'>{{ __('forms.contract') }}</x-slot> --}}
 
         <x-slot name='navigation'>
             <div class='rounded-sm border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark'>
@@ -20,16 +20,16 @@
         </x-slot>
     </x-section-navigation>
 
-    <div class='flex flex-col h-screen -mt-4 border-t'>
+    {{-- <div class='flex flex-col h-screen -mt-4 border-t'> --}}
         <div class='overflow-x-auto'>
             <div class='inline-block min-w-full align-middle'>
-                <div class='overflow-hidden shadow'>
-                    <x-tables.table>
+                <div class='shadow'>
+                    <x-tables.table class="mb-20">
                         <x-slot name='headers' :list="$tableHeaders"></x-slot>
-
+                        
                         <x-slot name='tbody'>
-                            @if ($legalEntity->contract)
-                                @foreach ($legalEntity->contract as $contract)
+                            @nonempty($contracts->items())
+                                @foreach ($contracts as $contract)
                                     <tr>
                                         <td class='border-b border-[#eee] py-5 px-4'>
                                             <p class='text-black dark:text-white'>
@@ -140,13 +140,22 @@
                                         </td>
                                     </tr>
                                 @endforeach
-                            @endif
+                            @elsenonempty
+                            <tr>
+                                <td class="text-black w-full p-4 border-gray-200 text-center dark:bg-gray-800 dark:border-gray-700 dark:text-white" colspan="6">
+                                    <p >
+                                        {{ __('Нічого не знайдено') }}
+                                    </p>
+                                </td>
+                            </tr>
+                            @endnonempty
                         </x-slot>
                     </x-tables.table>
+                    <x-pagination :pagination="$contracts" class="pagination" style="margin-block-start: -80px;"/>
                 </div>
             </div>
         </div>
-    </div>
+    {{-- </div> --}}
 
     @if ($showModal == 'intialization_contract')
         <x-alert-modal

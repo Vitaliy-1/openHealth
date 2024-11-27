@@ -7,6 +7,7 @@ use App\Helpers\JsonHelper;
 use App\Rules\Zip;
 use Livewire\Component;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\On;
 
 class AddressesSearch extends Component
 {
@@ -73,6 +74,8 @@ class AddressesSearch extends Component
         }
     }
 
+
+
     public function updatedArea($value)
     {
         if ($value === 'М.КИЇВ') {
@@ -83,6 +86,7 @@ class AddressesSearch extends Component
         }
     }
 
+ 
     public function setAddressesFields($addresses)
     {
         $this->updatedFields($addresses);
@@ -115,10 +119,13 @@ class AddressesSearch extends Component
         }
     }
 
+
+ 
     public function provideAddressData()
     {
+        // dd('provideAddressData', $this->apartment);
         $this->validate();
-
+        
         $addresses = [
             'country' => 'UA',
             'type' => 'RESIDENCE',
@@ -137,7 +144,7 @@ class AddressesSearch extends Component
         $this->dispatch('addressDataFetched', $addresses);
     }
 
-    public function getDisstricts(): void
+    public function getDistricts(): void
     {
         if (empty($this->area)) {
             return;
@@ -170,6 +177,7 @@ class AddressesSearch extends Component
             $this->street_type,
             $this->street
         );
+        // dump('in Streets', $this->settlement_id, $this->streets);
     }
 
     public function render()

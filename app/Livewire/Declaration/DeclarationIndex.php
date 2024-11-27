@@ -14,7 +14,6 @@ class DeclarationIndex extends Component
 
     use WithPagination;
 
-
     public array $tableHeaders = [];
 
     /**
@@ -215,12 +214,12 @@ class DeclarationIndex extends Component
         if (!$declarations) {
             $declarations = [];
         }
-        $paginatedDeclarations = !$declarations ? [] : $declarations->paginate(20);
+
+        $perPage = config('pagination.per_page');
+        $paginatedDeclarations = !$declarations ? [] : $declarations->paginate($perPage);
 
         return view('livewire.declaration.declaration-index', [
             'declarations' => $paginatedDeclarations,
         ]);
     }
-
-
 }
