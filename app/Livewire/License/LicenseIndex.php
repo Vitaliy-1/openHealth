@@ -6,18 +6,24 @@ use Carbon\Carbon;
 use App\Models\License;
 use App\Traits\FormTrait;
 use App\Helpers\JsonHelper;
+// use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class LicenseIndex extends Component
 {
-    use FormTrait;
+    use FormTrait,
+        WithPagination;
 
     const CACHE_PREFIX = 'licenses_user_id';
 
     public object $licenses;
+
     public array $tableHeaders = [];
     public string $selectedLicenseTypeOption = 'all';
     public string $selectedStatusOption = 'all';
@@ -40,6 +46,12 @@ class LicenseIndex extends Component
         $this->getLicenseTypes();
     }
 
+    #[On('refreshPage')]
+    public function refreshPage()
+    {
+        $this->dispatch('$refresh');
+    }
+
     protected function generateCacheKey(): string
     {
         $userId = Auth::id();
@@ -57,16 +69,11 @@ class LicenseIndex extends Component
         $this->storeId++;
     }
 
-    public function getLicenses(): void
+    protected function getQuery(): Builder
     {
-        $cacheKey = $this->generateCacheKey();
+        $legal_entity_id = Auth::user()->legal_entity_id;
 
-        if (Cache::has($cacheKey)) {
-            $this->licenses = collect(Cache::get($cacheKey));
-        } else {
-            $legal_entity_id = Auth::user()->legal_entity_id;
-
-            $query = DB::table('licenses')
+        $query = DB::table('licenses')
                 ->join('users', 'licenses.legal_entity_id', '=', 'users.legal_entity_id')
                 ->where('users.legal_entity_id', $legal_entity_id)
                 ->select(
@@ -90,6 +97,18 @@ class LicenseIndex extends Component
             if ($this->selectedLicenseTypeOption !== 'all') {
                 $query->where('licenses.type', $this->selectedLicenseTypeOption);
             }
+
+            return $query;
+    }
+
+    public function getLicenses(): void
+    {
+        $cacheKey = $this->generateCacheKey();
+
+        if (Cache::has($cacheKey)) {
+            $this->licenses = collect(Cache::get($cacheKey));
+        } else {
+            $query = $this->getQuery();
 
             $this->licenses = $query->distinct()->get();
 
@@ -133,6 +152,16 @@ class LicenseIndex extends Component
 
     public function render()
     {
-        return view('livewire.license.license-index', ['licenseTypes' => $this->licenseTypes]);
+        $query = $this->getQuery();
+        $perPage = config('pagination.per_page');
+
+        // TODO: check for correctness when total amount of items in collection returned by $query will become more than $perPage
+        /**
+         * This need because $query must returns unique records only. If so the LengthAwarePaginator will contain wrong total amount.
+         * To fix it 'groupBy' method rather used to. In this case  total will contain proper amount of items.
+         */
+        $licensesPagination = $query->distinct()->groupBy('licenses.id')->paginate($perPage);
+
+        return view('livewire.license.license-index', ['licenseTypes' => $this->licenseTypes, 'licensesPagination' => $licensesPagination]);
     }
 }
