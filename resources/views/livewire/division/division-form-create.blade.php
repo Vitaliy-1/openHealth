@@ -222,6 +222,7 @@
                         </div>
                     </div>
 
+                    {{-- ADDRESS --}}
                     <div class='w-full mb-4 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700'>
                         <div class='py-4'>
                             <h3 class='font-medium text-2xl text-black dark:text-white'>
@@ -229,10 +230,16 @@
                             </h3>
                         </div>
 
-                        {{-- <livewire:components.addresses-search :addresses="$division['addresses'] ?? []" :class="'mb-4 flex justify-between wrap flex-col flex-wrap gap-6 xl:flex-row'"/> --}}
-                        <livewire:components.addresses-search key="addresses-1902382387463726" :addresses="$formService->division['addresses'] ?? []" :class="'mb-4 flex justify-between wrap flex-col flex-wrap gap-6 xl:flex-row'"/>
+                        <x-forms.addresses-search
+                            :address="$address"
+                            :districts="$districts"
+                            :settlements="$settlements"
+                            :streets="$streets"
+                            class='mb-4 flex justify-between wrap flex-col flex-wrap gap-6 xl:flex-row'
+                        />
                     </div>
 
+                    {{-- WORKING HOURS --}}
                     <div x-data="{ working: false }" class='w-full mb-4 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700'>
                         <div class='py-4'>
                             <h3 class='font-medium text-2xl text-black dark:text-white'>
@@ -250,9 +257,9 @@
                             @endif
                         </div>
 
-                        @if ($working_hours)
+                        @if ($weekdays)
                             <div x-show='working' class='grid grid-cols-2 gap-6 w-full'>
-                                @foreach ($working_hours as $key => $working_hour)
+                                @foreach ($weekdays as $key => $day)
                                     <div :key={{ $key }} x-data="{
                                             shift: @json(count($formService->getDivisionParam('working_hours')[$key]) > 1),
                                             show_work: @json(!empty($formService->getDivisionParam('working_hours')[$key][0]) || $mode === 'store'),
@@ -263,7 +270,7 @@
                                         class="col-6"
                                     >
                                         <label class='text-lg w-full text-black-2 mb-2 pb-2'>
-                                            {{ $working_hour }}
+                                            {{ $day }}
                                         </label>
                                         <div class="flex mt-4 mb-1 flex-col gap-x-6 gap-y-1 xl:flex-row align-center" x-data="{ '{{ $key }}': false }">
                                             <x-forms.form-group class='min-w-fit'>
