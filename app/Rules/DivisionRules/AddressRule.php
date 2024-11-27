@@ -125,9 +125,9 @@ class AddressRule implements ValidationRule
      */
     protected function checkZipCode(): bool
     {
-        $zipCode= $this->division['addresses']['zip'];
+        $zipCode = $this->division['addresses']['zip'];
 
-        if (!preg_match('/^[0-9]{5}$/', $zipCode)) {
+        if (!empty($zipCode) && !preg_match('/^[0-9]{5}$/', $zipCode)) {
             $this->setMessage(__('validation.attributes.healthcareService.error.division.address.zip'));
 
             return false;
