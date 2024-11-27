@@ -70,12 +70,12 @@ if (!function_exists("available_time")) {
                     $value["days_of_week"]
                 ),
                 "all_day"              => $value["all_day"],
-                "available_start_time" => addSecondsToTime(
-                    $value["available_start_time"]
-                ),
-                "available_end_time"   => addSecondsToTime(
-                    $value["available_end_time"]
-                ),
+                "available_start_time" => empty($value["all_day"])
+                    ? addSecondsToTime($value["available_start_time"])
+                    : '',
+                "available_end_time"   => empty($value["all_day"])
+                    ? addSecondsToTime($value["available_end_time"])
+                    : '',
             ];
         }
 

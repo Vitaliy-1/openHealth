@@ -1,0 +1,161 @@
+<?php
+
+namespace App\Livewire\Division\Forms;
+
+use App\Rules\DivisionRules\DivisionStatusRule;
+use App\Rules\DivisionRules\HealthcareRules\CategoryRule;
+use Livewire\Attributes\Validate;
+use Livewire\Features\SupportFormObjects\Form;
+use App\Exceptions\CustomValidationException;
+use App\Rules\DivisionRules\HealthcareRules\CategoryInDictionaryRule;
+use App\Rules\DivisionRules\HealthcareRules\ProvidingConditionRule;
+use App\Rules\DivisionRules\HealthcareRules\SpecialityTypeInDictionaryRule;
+use App\Rules\DivisionRules\LegalEntityStatusRule;
+use Exception;
+
+class HealthCareFormRequest extends Form
+{
+    const HEALTHCARE_SERVICE_LEGAL_ENTITIES_ALLOWED_TYPE = 'MSP';
+    const LEGAL_ENTITY_PRIMARY_CARE_PROVIDING_CONDITIONS = 'OUTPATIENT';
+
+    const HEALTHCARE_SERVICE_FORM_CLEANUP = [
+        'speciality_type',
+        'comment',
+        'available_time',
+        'not_available'
+    ];
+
+    #[Validate([
+        'healthcare_service.providing_condition' => 'required',
+        'healthcare_service.speciality_type' => 'required',
+//        'healthcare_service.type' => 'required_if:healthcare_service.category,PHARMACY_DRUGS',
+//        'healthcare_service.license_id' => 'required_if:healthcare_service.category,PHARMACY_DRUGS',
+    ])]
+    public ?array $healthcare_service = [] ;
+
+    /**
+     * Property for custom rules (not used really).
+     * Need for custom rules working.
+     */
+    public ?string $customRule;
+
+    public ?string $comment = '';
+
+    public function getHealthcareService(): array
+    {
+        return $this->healthcare_service;
+    }
+
+    public function setHelathcareService(array $hcs)
+    {
+        $this->healthcare_service = $hcs;
+    }
+
+    public function healthcareServiceClean(string $category): void
+    {
+        $formCleanup = self::HEALTHCARE_SERVICE_FORM_CLEANUP;
+
+        if (
+            $category === self::HEALTHCARE_SERVICE_LEGAL_ENTITIES_ALLOWED_TYPE &&
+            $this->healthcare_service['providing_condition'] == self::LEGAL_ENTITY_PRIMARY_CARE_PROVIDING_CONDITIONS
+        ) {
+            $this->healthcare_service = array_filter($this->healthcare_service,
+            function($key) use($formCleanup) {
+                return !in_array($key, $formCleanup);
+            },
+            ARRAY_FILTER_USE_KEY);
+        } else {
+            $this->healthcare_service = [];
+        }
+    }
+
+    public function getHealthcareServiceParam(string $param): mixed
+    {
+        return $this->healthcare_service[$param] ?? '';
+    }
+
+    public function setHealthcareServiceParam(string $param, mixed $value): void
+    {
+        $this->healthcare_service[$param] = $value;
+    }
+
+    protected function customRulesValidation(): string
+    {
+        foreach ($this->customRules() as $rule) {
+            try {
+                $rule->validate('', '', fn() => null);
+            } catch (CustomValidationException $e) {
+                return $e->getMessage();
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Do form's validation (correctness of filling the form fields)
+     *
+     * @return mixed
+     */
+    public function doValidation()
+    {
+        $this->validate();
+
+        $failMessage = $this->customRulesValidation();
+
+        return $failMessage;
+    }
+
+    public function addAvailableTime($k = 0): void
+    {
+         $this->healthcare_service['available_time'][] = [
+            'days_of_week' => get_day_key($k),
+            'all_day' => false,
+            'available_start_time' =>'',
+            'available_end_time' =>'',
+        ];
+    }
+
+    public function addNotAvailableTime(): void
+    {
+        $this->healthcare_service['not_available'][] = [
+            'description' => '',
+            'during' => [
+                'start' => '',
+                'end' => '',
+            ],
+        ];
+    }
+
+    public function removeNotAvailable($k): void
+    {
+        unset($this->healthcare_service['not_available'][$k]);
+    }
+
+    public function removeAvailableTime($k): void
+    {
+        unset($this->healthcare_service['available_time'][$k]);
+    }
+
+    protected function customRules()
+    {
+        $division = $this->component->division;
+
+        return [
+            new LegalEntityStatusRule($division),
+            new DivisionStatusRule($division),
+            new CategoryInDictionaryRule($division, $this->healthcare_service),
+            new SpecialityTypeInDictionaryRule($division, $this->healthcare_service),
+            new CategoryRule($division, $this->healthcare_service),
+            new ProvidingConditionRule($division, $this->healthcare_service)
+        ];
+    }
+
+    public function rules()
+    {
+        return [
+            'healthcare_service.category' => 'required|max:255',
+            'healthcare_service.comment' => 'sometimes|string|nullable',
+         ];
+    }
+}

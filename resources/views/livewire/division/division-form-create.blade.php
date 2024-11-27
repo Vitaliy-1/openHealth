@@ -1,12 +1,16 @@
 <div>
+    @php
+        $mode = $mode === 'edit' ? 'update' : 'store';
+    @endphp
+
     <x-section-navigation x-data="{ showFilter: false }" class=''>
         <x-slot name='title'>
-            {{ __('Додати місце надання послуг') }}
+            {{ $mode === 'store' ? __('Додати місце надання послуг') : __('Редагувати місце надання послуг') }}
         </x-slot>
     </x-section-navigation>
 
     <div class='inline-block min-w-full align-middle'>
-        <x-forms.forms-section submit="{{ $mode === 'edit' ? 'update' : 'store' }}">
+        <x-forms.forms-section submit="{{ $mode }}">
             <x-slot name='form'>
                 <div class='flex bg-white p-6 flex-col'>
                     <div class='w-full mb-4 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700'>
@@ -311,7 +315,11 @@
                         </x-secondary-button>
                         <div class='xl:w-1/4 text-right'>
                             <x-button type='submit' class='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>
-                                {{ __('Створити') }}
+                                @if($mode === 'store')
+                                    {{ __('Створити') }}
+                                @else
+                                    {{ __('Оновити') }}
+                                @endif
                             </x-button>
                         </div>
                     </div>
