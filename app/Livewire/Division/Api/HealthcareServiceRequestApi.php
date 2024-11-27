@@ -39,11 +39,18 @@ class HealthcareServiceRequestApi extends HealthcareServiceApi
             $params['comment'] = $data['comment'];
         }
 
-        if (isset($data['available_time']) && !empty($data['available_time'])) {
+        if (!empty($data['available_time'])) {
+            foreach ($data['available_time'] as $index => $dayTime) {
+                if (!empty($dayTime['all_day'])) {
+                    $data['available_time'][$index]['available_start_time'] = '';
+                    $data['available_time'][$index]['available_end_time'] = '';
+                }
+            }
+
             $params['available_time'] =  available_time($data['available_time']);
         }
 
-        if (isset($data['not_available']) && !empty($data['not_available'])) {
+        if (!empty($data['not_available'])) {
             $params['not_available'] = not_available($data['not_available']);
         }
 
@@ -54,14 +61,22 @@ class HealthcareServiceRequestApi extends HealthcareServiceApi
     {
         $params = [];
 
-        if (isset($data['comment']) && !empty($data['comment'])) {
+        if (!empty($data['comment'])) {
             $params['comment'] = $data['comment'];
         }
 
-        if (isset($data['available_time']) && !empty($data['available_time'])) {
-            $params['available_time'] = available_time($data['available_time']);
+        if (!empty($data['available_time'])) {
+            foreach ($data['available_time'] as $index => $dayTime) {
+                if (!empty($dayTime['all_day'])) {
+                    $data['available_time'][$index]['available_start_time'] = '';
+                    $data['available_time'][$index]['available_end_time'] = '';
+                }
+            }
+
+            $params['available_time'] =  available_time($data['available_time']);
         }
-        if (isset($data['not_available']) && !empty($data['not_available'])) {
+
+        if (!empty($data['not_available'])) {
             $params['not_available'] = not_available($data['not_available']);
         }
 
