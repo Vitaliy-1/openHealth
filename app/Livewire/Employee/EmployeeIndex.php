@@ -13,15 +13,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class EmployeeIndex extends Component
 {
 
-    use FormTrait;
+    use FormTrait,
+        WithPagination;
+
     const CACHE_PREFIX = 'register_employee_form';
 
-    public object $employees;
+    // public object $employees;
 
     public array $tableHeaders = [];
     protected string $employeeCacheKey;
@@ -48,8 +52,15 @@ class EmployeeIndex extends Component
     {
         $this->tableHeaders();
         $this->getLastStoreId();
-        $this->getEmployees();
+        // $this->getEmployees();
 //        $this->employees =auth()->user()->legalEntity-;
+    }
+
+
+    #[On('refreshPage')]
+    public function refreshPage()
+    {
+        $this->dispatch('$refresh');
     }
 
     public function getLastStoreId()
@@ -70,10 +81,10 @@ class EmployeeIndex extends Component
         }
     }
 
-    public function getEmployees($status = ''): void
-    {
-        $this->employees = Auth::user()->legalEntity->employees()->get();
-    }
+    // public function getEmployees($status = ''): void
+    // {
+    //     $this->employees = Auth::user()->legalEntity->employees()->get();
+    // }
 
     public function tableHeaders(): void
     {
@@ -91,15 +102,16 @@ class EmployeeIndex extends Component
     public function sortEmployees():void
     {
         if ($this->selectedOption === 'is_active') {
-            $this->getEmployees();
+            // $this->getEmployees();
+            $this->dispatch('refreshPage');
             $this->employeesCache = collect();
         } elseif ($this->selectedOption === 'is_inactive') {
             $this->employeesCache = collect();
-            $this->employees = collect();
+            /* $this->employees = collect(); */ // TODO: check it
 
         } elseif ($this->selectedOption === 'is_cache') {
             $this->getEmployeesCache();
-            $this->employees = collect();
+            /* $this->employees = collect(); */ // TODO: check it
         }
     }
 
@@ -114,7 +126,8 @@ class EmployeeIndex extends Component
         }
 
         $this->closeModal();
-        $this->getEmployees();
+        // $this->getEmployees();
+        $this->dispatch('refreshPage');
 
     }
 
@@ -167,13 +180,15 @@ class EmployeeIndex extends Component
           $employee->save();
         }
 
-        $this->getEmployees();
+        // $this->getEmployees();
+        $this->dispatch('refreshPage');
     }
 
     public function render()
     {
-        return view('livewire.employee.employee-index');
+        $perPage = config('pagination.per_page');
+        $employees = Auth::user()->legalEntity->employees()->paginate($perPage);
+
+        return view('livewire.employee.employee-index', compact('employees'));
     }
-
-
 }

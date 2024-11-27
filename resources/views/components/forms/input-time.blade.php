@@ -1,6 +1,6 @@
 @props(['disabled' => false, 'time' => ''])
 
-<div class="relative">
+<div class="relative" x-bind:class="{ 'opacity-50' : typeof disabled !== 'undefined' && disabled }">
     <input type="time" {{ $disabled ? 'disabled' : '' }} value="{{ $time }}" {!! $attributes->merge(['class' => 'default-input']) !!}>
     <div class="inset-y-0 flex items-center ps-3.5 pointer-events-none">
         <svg class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
