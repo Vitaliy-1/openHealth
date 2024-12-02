@@ -13,7 +13,10 @@ use function Livewire\of;
 class EmployeeFormRequest extends Form
 {
     public string $position = '';
+
     public string $employeeType = '';
+
+    public string $status = 'NEW';
 
     public string $startDate = '';
 
@@ -27,6 +30,7 @@ class EmployeeFormRequest extends Form
         'educations.degree'           => 'required|string|min:3',
         'educations.speciality'       => 'required|string|min:3',
     ])]
+
     public ?array $educations = [];
 
     #[Validate([
@@ -38,29 +42,19 @@ class EmployeeFormRequest extends Form
         'specialities.certificateNumber' => 'required|string|min:3',
 
     ])]
+
     public ?array $specialities = [];
 
     #[Validate([
-        'positions.position' => 'required|string',
-    ])]
-    public ?array $positions = [];
-
-    #[Validate([
-        'role.employeeType'         => 'required|string',
-        'role.divisionId'           => 'required|integer',
-        'role.healthcareServiceId' => 'required|uuid',
-    ])]
-    public ?array $role = [];
-
-    #[Validate([
-        'science_degree.country'          => 'required|string',
-        'science_degree.city'             => 'required|string',
-        'science_degree.degree'           => 'required|string',
-        'science_degree.institutionName' => 'required|string',
-        'science_degree.diplomaNumber'   => 'required|string',
-        'science_degree.speciality'       => 'required|string',
+        'scienceDegree.country'          => 'required|string',
+        'scienceDegree.city'             => 'required|string',
+        'scienceDegree.degree'           => 'required|string',
+        'scienceDegree.institutionName' => 'required|string',
+        'scienceDegree.diplomaNumber'   => 'required|string',
+        'scienceDegree.speciality'       => 'required|string',
 
     ])]
+
     public ?array $scienceDegree = [];
 
     #[Validate([
@@ -106,29 +100,31 @@ class EmployeeFormRequest extends Form
         if (empty($this->party['documents'])) {
             return [
                 'error'   => true,
-                'message' => __('validation.custom.documents_empty'),
+                'message' => __('validation.custom.documentsEmpty'),
             ];
         }
 
-        if (isset($this->employee['tax_id']) && empty($this->employee['tax_id'])) {
+        if (isset($this->party['taxId']) && empty($this->party['taxId'])) {
             return [
                 'error'   => true,
-                'message' => __('validation.custom.documents_empty'),
-            ];
-        }
-        if (isset($this->employee['employee_type']) && $this->employee['employee_type'] == 'DOCTOR' && empty($this->specialities)) {
-            return [
-                'error'   => true,
-                'message' => __('validation.custom.specialities_table'),
+                'message' => __('validation.custom.documentsEmpty'),
             ];
         }
 
-        if (isset($this->employee['employee_type']) && $this->employee['employee_type'] == 'DOCTOR' && empty($this->educations)) {
+        if (isset($this->employeeType) && $this->employeeType == 'DOCTOR' && empty($this->specialities)) {
             return [
                 'error'   => true,
-                'message' => __('validation.custom.educations_table'),
+                'message' => __('validation.custom.specialitiesTable'),
             ];
         }
+
+        if (isset($this->employeeType) && $this->employeeType == 'DOCTOR' && empty($this->educations)) {
+            return [
+                'error'   => true,
+                'message' => __('validation.custom.educationsTable'),
+            ];
+        }
+
         return [
             'error'   => false,
             'message' => '',

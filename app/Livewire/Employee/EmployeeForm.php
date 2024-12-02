@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Employee;
 
+use App\Classes\eHealth\Api\EmployeeApi;
+use App\Classes\eHealth\Services\SchemaService;
 use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
 use App\Livewire\Employee\Forms\EmployeeFormRequest;
 use App\Models\Division;
@@ -27,7 +29,6 @@ class EmployeeForm extends Component
     const CACHE_PREFIX = 'register_employee_form';
 
     public EmployeeFormRequest $employeeRequest;
-
 
     protected string $employeeCacheKey;
 
@@ -134,7 +135,6 @@ class EmployeeForm extends Component
     {
         if (isset($this->employeeId)) {
             $employeeData = Employee::findOrFail($this->employeeId);
-
             $this->employeeRequest->fill($employeeData->toArray());
         }
         if ($this->hasCache($this->employeeCacheKey) && isset($this->requestId)) {
@@ -358,58 +358,34 @@ class EmployeeForm extends Component
 
     public function sendApiRequest()
     {
-        $cacheData = $this->getCache($this->employeeCacheKey);
-        $employeeRequest = EmployeeRequestApi::createEmployeeRequest($this->employeeRequest->toArray());
-
-        if (isset($this->requestId) && isset($cacheData[$this->requestId])) {
-            $this->employeeRequest->fill($cacheData[$this->requestId]);
+        $preRequest = $this->employeeRequest->toArray();
+        $preRequest['doctor'] = [
+            'educations'     => $this->employeeRequest->educations,
+            'specialities'   => $this->employeeRequest->specialities,
+            'scienceDegree'  => $this->employeeRequest->scienceDegree,
+            'qualifications' => $this->employeeRequest->qualifications
+        ];
+        $data = ['employee_request' => $preRequest];
+        $employeeRequest = schemaService()->requestSchemaNormalize($data, app(EmployeeApi::class));
+        $base64Data = $this->sendEncryptedData($employeeRequest);
+        if (isset($base64Data['errors'])) {
+            $this->dispatch('flashMessage', [
+                'message' => $base64Data['errors'],
+                'type'    => 'error'
+            ]);
+            return;
         }
+        $data = [
+            'signed_content'          => $base64Data,
+            'signed_content_encoding' => 'base64',
+        ];
 
-        if (isset($this->employeeId)) {
-            $this->employeeRequest->fill($this->employee->toArray());
-            $this->employeeRequest->documents = $this->employee->party['documents'];
-            $this->employeeRequest->science_degree = $this->employee->doctor['science_degree'] ?? [];
-            $this->employeeRequest->specialities = $this->employee->doctor['specialities'] ?? [];
-            $this->employeeRequest->educations = $this->employee->doctor['educations'] ?? [];
-            $this->employeeRequest->qualifications = $this->employee->doctor['qualifications'] ?? [];
+        $employeeRequest = EmployeeRequestApi::createEmployeeRequest($data);
+
+        if (isset($this->requestId)) {
+            $this->forgetCacheIndex();
         }
-
-
-        $error = $this->employeeRequest->validateBeforeSendApi();
-
-
-        if (!$error['error']) {
-            $base64Data = $this->sendEncryptedData($this->buildEmployeeRequest());
-
-            if (isset($base64Data['errors'])) {
-                $this->dispatch('flashMessage', [
-                    'message' => $base64Data['errors'],
-                    'type'    => 'error'
-                ]);
-                return;
-            }
-
-            $data = [
-                'signed_content'          => $base64Data,
-                'signed_content_encoding' => 'base64',
-            ];
-            $employeeRequest = EmployeeRequestApi::createEmployeeRequest($data);
-
-            if (isset($this->requestId)) {
-                $this->saveUser($employeeRequest);
-                $this->saveEmployee($employeeRequest);
-                $this->forgetCacheIndex();
-            }
-            unset($employeeRequest['id']);
-            unset($employeeRequest['legal_entity_id']);
-            unset($employeeRequest['division_id']);
-            $this->employee->update($employeeRequest);
-            return redirect(route('employee.index'));
-        } else {
-            $this->error['status'] = $error['status'];
-            $this->error['message'] = $error['message'];
-        }
-        $this->getEmployee();
+        return redirect(route('employee.index'));
     }
 
 
@@ -422,11 +398,6 @@ class EmployeeForm extends Component
         }
     }
 
-
-    public function savePerson($data)
-    {
-        return Person::create($data['party']);
-    }
 
     /**
      * Save a new user with the provided data.
@@ -444,82 +415,6 @@ class EmployeeForm extends Component
         $user->legalEntity()->associate($this->legalEntity);
         $user->save();
     }
-
-    /**
-     * Save an employee record based on the provided data.
-     *
-     * @param  array  $data  The data to fill the employee record with.
-     * @return Employee The saved employee record.
-     */
-    public function saveEmployee(array $data)
-    {
-        $employee = new Employee();
-        $employee->fill($data);
-        $employee->uuid = $data['id'];
-        $employee->division_uuid = $data['division_id'] ?? null;
-        $employee->legal_entity_uuid = $data['legal_entity_id'] ?? null;
-        $employee->legal_entity_id = $this->legalEntity->getId();
-        return $employee;
-    }
-
-    public function buildEmployeeRequest(): array
-    {
-        $employeeRequest = $this->employeeRequest->toArray();
-
-        $data['employee_request'] = [
-            'employee_type'   => $employeeRequest['employeeType'] ?? '',
-            'employeeId'      => $this->employee->uuid ?? '',
-            'legal_entity_id' => $this->legalEntity->uuid ?? '',
-            'position'        => $employeeRequest['position'] ?? '',
-            'status'          => 'NEW',
-            'start_date'      => isset($employeeRequest['startDate']) ? Carbon::parse($employeeRequest['startDate'])->format('Y-m-d') : '',
-            'party'           => [
-                'email'              => $employeeRequest['party']['email'] ?? '',
-                'first_name'         => $employeeRequest['party']['firstName'] ?? '',
-                'last_name'          => $employeeRequest['party']['lastName'] ?? '',
-                'phones'             => $employeeRequest['party']['phones'] ?? '',
-                'tax_id'             => $employeeRequest['party']['taxId'] ?? '',
-                'no_tax_id'          => $employeeRequest['party']['no_tax_id'] ?? false,
-                'gender'             => $employeeRequest['party']['gender'] ?? '',
-                'documents'          =>[ $employeeRequest['party']['documents']] ?? '',
-                'birth_date'         => isset($employeeRequest['party']['birthDate']) ? Carbon::parse($employeeRequest['party']['birthDate'])->format('Y-m-d') : '',
-                'working_experience' => (int) $employeeRequest['party']['workingExperience'] ?? '',
-                'about_myself'       => $employeeRequest['party']['aboutMyself'] ?? '',
-            ],
-//            'doctor'          => [
-//                'educations'     => [$employeeRequest['educations'] ]?? [],
-//                'specialities'   => [$employeeRequest['specialities']] ?? [],
-//                'qualifications' => [$employeeRequest['qualifications']] ?? [],
-//                'science_degree' => [$employeeRequest['scienceDegree']] ?? [],
-//            ],
-            'doctor'          => [
-                'specialities'   => [[
-                    'speciality'=>'THERAPIST',
-                    'speciality_officio'=>true,
-                    'level'=>'FIRST',
-                    'qualification_type'=>'AWARDING',
-                    'attestation_name'=>'Академія Богомольця',
-                    'attestation_date'=>'2017-02-28',
-                    'valid_to_date'=>'2037-02-28',
-                    'certificate_number'=>'AB/21331'
-                ]],
-                'educations' => [
-                    [
-                        'country' => 'UA',
-                        'city' => 'Київ',
-                        'institution_name' => 'Академія Богомольця',
-                        'issued_date' => '2017-02-28',
-                        'diploma_number' => 'DD123543',
-                        'degree' => 'MASTER',
-                        'speciality' => 'Педіатр'
-                    ]
-                ],
-            ],
-        ];
-
-        return removeEmptyKeys($data);
-    }
-
 
     /*
      * Include functions after  getDictionary

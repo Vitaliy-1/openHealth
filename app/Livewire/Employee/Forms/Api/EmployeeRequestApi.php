@@ -3,12 +3,12 @@
 namespace App\Livewire\Employee\Forms\Api;
 
 use App\Classes\eHealth\Api\EmployeeApi;
-use App\Classes\eHealth\Schema\ApiSchemaValidator;
+use App\Classes\eHealth\Services\SchemaService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeRequestApi extends EmployeeApi
 {
-
 
     public static function getEmployees($legal_entity_id):array
     {
@@ -17,17 +17,11 @@ class EmployeeRequestApi extends EmployeeApi
             'page' => 1,
             'page_size' => 300
         ];
-
         return self::_get($params);
     }
 
     public static function createEmployeeRequest($data):array
     {
-        $validator = new ApiSchemaValidator(public_path('apiSchema/employee/employee_request_schema.json'));
-
-        $validator->validate($data);
-        dd($validator);
-
         return self::_create($data);
     }
 
@@ -36,34 +30,10 @@ class EmployeeRequestApi extends EmployeeApi
         return self::_getById($id);
     }
 
-
-    public static function createEmployeeRequestBuilder($uuid,$data):array
-    {
-        if (!isset($data['employee']['tax_id'])) {
-            $data['employee']['no_tax_id'] = true;
-        }
-        return [
-            'legal_entity_id' => $uuid,
-            'position'=> $data['employee']['position'],
-            'start_date'=> $data['employee']['start_date'],
-            'employee_type'=> $data['employee']['employee_type'],
-            'party'=> $data['employee'],
-            'doctor'=> [
-                 'educations'=> $data['educations'] ?? [],
-                 'specialities'=> $data['specialities'] ?? [],
-                 'qualifications'=> $data['qualifications'] ?? [],
-                 'science_degree'=> $data['science_degree'] ?? [],
-             ],
-            'inserted_at'=> Carbon::now()->format('Y-m-d H:i:s'),
-        ];
-
-    }
-
     public static function dismissedEmployeeRequest($id):array
     {
         return self::_dismissed($id);
     }
-
     /*
      * @arg array $data
      */
@@ -76,10 +46,7 @@ class EmployeeRequestApi extends EmployeeApi
     public static function getEmployeeRequestById($id):array
     {
         return self::_getRequestById($id);
-
     }
-
-
 
 
 }

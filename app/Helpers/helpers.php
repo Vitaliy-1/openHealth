@@ -1,5 +1,6 @@
 <?php
 
+use App\Classes\eHealth\Services\SchemaService;
 use App\Helpers\JsonHelper;
 use App\Services\DictionaryService;
 use Carbon\Carbon;
@@ -159,6 +160,15 @@ if (!function_exists('hisBirthDate')) {
         }
         // Return an empty string if the birth_date is missing or invalid
         return '';
+    }
+
+
+
+    if (!function_exists('schemaService')){
+        function schemaService(): SchemaService
+        {
+           return  app(SchemaService::class);
+        }
     }
 }
 
