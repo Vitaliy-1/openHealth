@@ -78,7 +78,7 @@ class EmployeeForm extends Component
     /**
      * @var mixed|string
      */
-    public mixed $key_property;
+    public mixed $keyProperty;
 
 
     public ?object $file = null;
@@ -137,12 +137,14 @@ class EmployeeForm extends Component
             $employeeData = Employee::findOrFail($this->employeeId);
             $this->employeeRequest->fill($employeeData->toArray());
         }
+
         if ($this->hasCache($this->employeeCacheKey) && isset($this->requestId)) {
             $employeeData = $this->getCache($this->employeeCacheKey);
             if (isset($employeeData[$this->requestId])) {
                 $this->employeeRequest->fill($employeeData[$this->requestId]);
             }
         }
+
     }
 
     public function updatedFile(): void
@@ -218,15 +220,13 @@ class EmployeeForm extends Component
         $this->employeeRequest->rulesForModelValidate($model);
 
         $this->resetErrorBag();
+
         if (isset($this->requestId)) {
             $this->storeCacheEmployee($model);
         }
-        if (isset($this->employeeId)) {
-            $this->storeEmployee($model);
-        }
+
 
         $this->closeModalModel();
-
         $this->dispatch('flashMessage', ['message' => __('Інформацію успішно оновлено'), 'type' => 'success']);
 
         $this->getEmployee();
@@ -242,104 +242,75 @@ class EmployeeForm extends Component
         );
     }
 
-    public function storeEmployee($model)
+
+    public function edit($model, $keyProperty = '')
     {
-        if ($model == 'employee') {
-            $this->employee->position = $this->employeeRequest->employee['position'];
-            $this->employee->employee_type = $this->employeeRequest->employee['employee_type'];
-            $this->employee->start_date = $this->employeeRequest->employee['start_date'];
-            $this->employee->party = $this->employeeRequest->employee;
-        } elseif ($model == 'documents') {
-            $party = $this->employee->party;
-            $party['documents'][] = $this->employeeRequest->documents;
-            $this->employee->party = $party;
-        } elseif ($model == 'science_degree') {
-            $doctor = $this->employee->doctor;
-            $doctor['science_degree'] = $this->employeeRequest->science_degree;
-            $this->employee->doctor = $doctor;
-        } else {
-            $doctor = $this->employee->doctor;
-            $doctor[$model][] = $this->employeeRequest->{$model};
-            $this->employee->doctor = $doctor;
-        }
-        unset($this->employee->educations,
-            $this->employee->specialities,
-            $this->employee->qualifications,
-            $this->employee->science_degree,
-            $this->employee->documents,
-        );
-
-        $this->employee->save();
-    }
-
-
-    public function edit($model, $key_property = '')
-    {
-        $this->key_property = $key_property;
+        $this->keyProperty = $keyProperty;
         $this->mode = 'edit';
         $this->openModal($model);
         if (isset($this->requestId)) {
-            $this->editCacheEmployee($model, $key_property);
+            $this->editCacheEmployee($model, $keyProperty);
         }
         if (isset($this->employeeId)) {
-            $this->editEmployee($model, $key_property);
+            $this->editEmployee($model, $keyProperty);
         }
     }
 
 
-    public function editCacheEmployee($model, $key_property = '')
+    public function editCacheEmployee( string $model,  string $keyProperty = '')
     {
         $cacheData = $this->getCache($this->employeeCacheKey);
-
-        if (empty($key_property) && $key_property !== 0) {
+        if (empty($keyProperty) && $keyProperty !== 0) {
             $this->employeeRequest->{$model} = $cacheData[$this->requestId][$model];
         } else {
-            $this->employeeRequest->{$model} = $cacheData[$this->requestId][$model][$key_property];
+            $this->employeeRequest->{$model} = $cacheData[$this->requestId][$model];
         }
     }
 
-    public function editEmployee($model, $key_property = '')
+    public function editEmployee($model, $keyProperty = '')
     {
         if ($model == 'documents') {
-            $this->employeeRequest->{$model} = $this->employee->party[$model][$key_property];
+            $this->employeeRequest->{$model} = $this->employee->party[$model][$keyProperty];
         } elseif ($model == 'science_degree') {
             $this->employeeRequest->{$model} = $this->employee->doctor[$model];
         } else {
-            $this->employeeRequest->{$model} = $this->employee->doctor[$model][$key_property];
+            $this->employeeRequest->{$model} = $this->employee->doctor[$model][$keyProperty];
         }
     }
 
-    public function update($model, $key_property)
+    public function update($model, $keyProperty)
     {
         $this->employeeRequest->rulesForModelValidate($model);
         $this->resetErrorBag();
+
         if (isset($this->requestId)) {
-            $this->updateCacheEmployee($model, $key_property);
+            $this->updateCacheEmployee($model, $keyProperty);
         }
         if (isset($this->employeeId)) {
-            $this->updateEmployee($model, $key_property);
+            $this->updateEmployee($model, $keyProperty);
         }
         $this->closeModalModel($model);
     }
 
-    public function updateCacheEmployee($model, $key_property)
+    public function updateCacheEmployee($model,$keyProperty)
     {
         if ($this->hasCache($this->employeeCacheKey)) {
             $cacheData = $this->getCache($this->employeeCacheKey);
-            $cacheData[$this->requestId][$model][$key_property] = $this->employeeRequest->{$model};
+            $cacheData[$this->requestId][$model][$keyProperty] = $this->employeeRequest->{$model};
             $this->putCache($this->employeeCacheKey, $cacheData);
         }
     }
 
-    public function updateEmployee($model, $key_property)
+
+    public function updateEmployee($model, $keyProperty)
     {
         if ($model === 'documents') {
             $party = $this->employee->party;
-            $party[$model][$key_property] = $this->employeeRequest->{$model};
+            $party[$model][$keyProperty] = $this->employeeRequest->{$model};
             $this->employee->party = $party;
         } else {
             $doctor = $this->employee->doctor;
-            $doctor[$model][$key_property] = $this->employeeRequest->{$model};
+            $doctor[$model][$keyProperty] = $this->employeeRequest->{$model};
             $this->employee->doctor = $doctor;
         }
         $this->employee->save();
@@ -360,13 +331,17 @@ class EmployeeForm extends Component
     {
         $preRequest = $this->employeeRequest->toArray();
         $preRequest['doctor'] = [
-            'educations'     => $this->employeeRequest->educations,
-            'specialities'   => $this->employeeRequest->specialities,
-            'scienceDegree'  => $this->employeeRequest->scienceDegree,
-            'qualifications' => $this->employeeRequest->qualifications
+            'specialities'   => $preRequest['specialities'],
+            'qualifications' => $preRequest['qualifications'],
+            'educations'     => $preRequest['educations'],
+            'scienceDegree'  => $preRequest['scienceDegree']
         ];
-        $data = ['employee_request' => $preRequest];
-        $employeeRequest = schemaService()->requestSchemaNormalize($data, app(EmployeeApi::class));
+        $employeeRequest = schemaService()->requestSchemaNormalize(
+            ['employee_request' => $preRequest],
+            app(EmployeeApi::class),
+        );
+
+        dd($employeeRequest);
         $base64Data = $this->sendEncryptedData($employeeRequest);
         if (isset($base64Data['errors'])) {
             $this->dispatch('flashMessage', [
@@ -381,7 +356,7 @@ class EmployeeForm extends Component
         ];
 
         $employeeRequest = EmployeeRequestApi::createEmployeeRequest($data);
-
+        $this->employeeRepository->saveEmployeeData($employeeRequest, $this->legalEntity);
         if (isset($this->requestId)) {
             $this->forgetCacheIndex();
         }

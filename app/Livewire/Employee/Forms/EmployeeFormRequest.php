@@ -23,6 +23,12 @@ class EmployeeFormRequest extends Form
     public ?array $party = [];
 
     #[Validate([
+        'documents.type' => 'required|string|min:3',
+        'documents.number' => 'required|string|min:3',
+    ])]
+    public ?array $documents = [];
+
+    #[Validate([
         'educations.country'          => 'required|string',
         'educations.city'             => 'required|string|min:3',
         'educations.institutionName' => 'required|string|min:3',
@@ -69,7 +75,7 @@ class EmployeeFormRequest extends Form
     public function rulesParty(): array
     {
         return [
-//            'party.lastName'       => ['required', 'min:3', new Cyrillic()],
+            'party.lastName'       => ['required', 'min:3', new Cyrillic()],
             'party.firstName'      => ['required', 'min:3', new Cyrillic()],
             'party.gender'          => 'required|string',
             'party.birthDate'      => ['required', 'date', new AgeCheck()],
@@ -83,6 +89,8 @@ class EmployeeFormRequest extends Form
         ];
     }
 
+
+
     /**
      * @throws ValidationException
      */
@@ -91,9 +99,9 @@ class EmployeeFormRequest extends Form
         if ($model == 'party') {
             return $this->validate($this->rulesParty());
         }
+
         return $this->validate($this->rulesForModel($model)->toArray());
     }
-
 
     public function validateBeforeSendApi(): array
     {

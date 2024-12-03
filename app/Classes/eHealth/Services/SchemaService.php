@@ -12,13 +12,14 @@ class SchemaService
     /**
      * A function that normalizes data by a given schema.
      *
-     * @param array $data description
-     * @param object $schema description
+     * @param  array  $data  description
+     * @param  object  $schema  description
      * @return array
      */
     public function requestSchemaNormalize(array $data, object $schema): array
     {
         $this->schema = $this->arrayToCollection(json_decode($schema->schemaRequest(), true));
+
         // Convert keys to snake_case
         $data = $this->convertKeysToSnakeCase($data);
         // Normalize data (validate, typecast, and autofill defaults)
@@ -29,17 +30,19 @@ class SchemaService
     /**
      * A function that maps data by a given schema.
      *
-     * @param Collection $data The data collection to map.
-     * @param Collection $schema The schema collection to use for mapping.
-     * @param mixed $definitions (Optional) The definitions to use for mapping.
+     * @param  Collection  $data  The data collection to map.
+     * @param  Collection  $schema  The schema collection to use for mapping.
+     * @param  mixed|null  $definitions  (Optional) The definitions to use for mapping.
      * @return array The mapped data as an array.
      */
-    public function mapDataBySchema(Collection $data, Collection $schema, $definitions = null): array
+    public function mapDataBySchema(Collection $data, Collection $schema, mixed $definitions = null): array
     {
         $definitions = $definitions ?: $this->schema->get('definitions');
-        return $this->removeItemsKey(collect($schema->get('properties'))->map(function ($property, $key) use (
+        $schema = collect($schema->get('properties'));
+        return $this->removeItemsKey(collect($schema)->map(function ($property, $key) use (
             $data,
-            $definitions
+            $definitions,
+            $schema
         ) {
             if (isset($property['$ref'])) {
                 $this->handleRefProperty($data, $property, $definitions, $key);
@@ -54,12 +57,9 @@ class SchemaService
         })->filter()->toArray());
     }
 
-
     /**
-     *
-     *
-     * @param Collection $data The data collection to handle.
-     * @param string $key The key to handle in the data collection.
+     * @param  Collection  $data  The data collection to handle.
+     * @param  string  $key  The key to handle in the data collection.
      */
 
     protected function handleDataKey(
@@ -74,22 +74,17 @@ class SchemaService
         }
     }
 
-
     /**
      * A description of the entire PHP function.
      *
-     * @param Collection $data description
-     * @param array $property description
-     * @param Collection $definitions description
-     * @param string $key description
+     * @param  Collection  $data  description
+     * @param  array  $property  description
+     * @param  Collection  $definitions  description
+     * @param  string  $key  description
      */
 
-    protected function handleProperty(
-        Collection $data,
-        array $property,
-        Collection $definitions,
-        string $key
-    ): void {
+    protected function handleProperty(Collection $data, array $property, Collection $definitions, string $key): void
+    {
         // Check if the key exists in the data
         if ($data->has($key)) {
             $data->put($key,
@@ -99,12 +94,8 @@ class SchemaService
 
 
     // Handle $ref property
-    protected function handleRefProperty(
-        Collection $data,
-        array $property,
-        Collection $definitions,
-        string $key
-    ): void {
+    protected function handleRefProperty(Collection $data, array $property, Collection $definitions, string $key): void
+    {
         // Check if the key exists in the data
         $refPath = $property['$ref'];
         // Extract the definition key from the $ref path

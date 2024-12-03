@@ -3,7 +3,7 @@
         {{__('forms.documents')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'party\',' . $keyProperty . ')' : 'store(\'party\')' !!}">
+        <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'documents\',' . $keyProperty . ')' : 'store(\'documents\')' !!}">
                         <x-slot name="form">
                             <x-forms.form-row class="mb-4.5 flex flex-col gap-6   xl:flex-row">
                                 <x-forms.form-group class="xl:w-1/2">
@@ -14,7 +14,7 @@
                                     </x-slot>
                                     <x-slot name="input">
                                         <x-forms.select id="documentsType"
-                                                        wire:model.defer="employeeRequest.party.documents.type"
+                                                        wire:model.defer="employeeRequest.documents.type"
                                                         class="default-select">
                                             <x-slot name="option">
                                                 <option>{{__('Обрати тип')}}</option>
@@ -24,7 +24,7 @@
                                             </x-slot>
                                         </x-forms.select>
                                     </x-slot>
-                                    @error('employeeRequest.party.documents.type')
+                                    @error('employeeRequest.documents.type')
                                     <x-slot name="error">
                                         <x-forms.error>
                                             {{$message}}
@@ -40,11 +40,11 @@
                                     </x-slot>
                                     <x-slot name="input">
                                         <x-forms.input class="default-input"
-                                                       wire:model="employeeRequest.party.documents.number"
+                                                       wire:model="employeeRequest.documents.number"
                                                        type="text" id="documentsNumber"
                                         />
                                     </x-slot>
-                                    @error('employeeRequest.party.documents.number')
+                                    @error('employeeRequest.documents.number')
                                     <x-slot name="error">
                                         <x-forms.error>
                                             {{$message}}
@@ -62,11 +62,11 @@
                                     </x-slot>
                                     <x-slot name="input">
                                         <x-forms.input class="default-input"
-                                                       wire:model="employeeRequest.party.documents.issuedBy"
+                                                       wire:model="employeeRequest.documents.issuedBy"
                                                        type="text" id="documentsIssuedBy"
                                                        placeholder="{{__('Орган яким виданий документ')}}"/>
                                     </x-slot>
-                                    @error('employeeRequest.party.documents.issuedBy')
+                                    @error('employeeRequest.documents.issuedBy')
                                     <x-slot name="error">
                                         <x-forms.error>
                                             {{$message}}
@@ -81,10 +81,10 @@
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name="input">
-                                        <x-forms.input-date  id="documentIssuedAt"  wire:model="employeeRequest.party.documents.issuedAt"
+                                        <x-forms.input-date  id="documentIssuedAt"  wire:model="employeeRequest.documents.issuedAt"
                                                        />
                                     </x-slot>
-                                    @error('employeeRequest.party.documents.issuedAt')
+                                    @error('employeeRequest.documents.issuedAt')
                                     <x-slot name="message">
                                         <x-forms.error>
                                             {{$message}}

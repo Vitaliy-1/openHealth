@@ -6,11 +6,11 @@
     <x-tables.table>
         <x-slot name="headers" :list="[__('forms.documentType'),__('forms.number'),__('forms.issuedBy'),__('forms.issuedAt'),__('forms.actions')]"></x-slot>
         <x-slot name="tbody">
-            @isset($employee->documents)
-                @foreach($employee->documents as $k=>$document)
+            @isset($employeeRequest->documents)
+                @foreach($employeeRequest->documents as $k=>$document)
                     <tr>
                         <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                            {{$dictionaries['DOCUMENTTYPE'][$document['type']] ?? ''}}
+                            {{$document['type'] ?? ''}}
                         </td>
                         <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
                             {{$document['number'] ?? ''}}
