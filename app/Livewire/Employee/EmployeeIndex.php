@@ -14,6 +14,7 @@ use App\Repositories\EmployeeRepository;
 use App\Services\EmployeeService;
 use App\Traits\FormTrait;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -33,21 +34,24 @@ class EmployeeIndex extends Component
     protected string $employeeCacheKey;
 
     public int $storeId = 0;
-    public \Illuminate\Support\Collection $employeesCache;
     public string $dismiss_text;
     public int $dismissed_id;
 
     private LegalEntity $legalEntity;
 
     public string $email = '';
-    public string $selectedOption = 'is_active';
     protected ?EmployeeRepository $employeeRepository; // nullable
 
+    public array $dictionaries_field = [
+        'POSITION',
+    ];
 
-    //TODO: Подивитись через що можна викликати Сервіс окрім boot
+    public string $status = 'APPROVED';
+
+
     public function boot(EmployeeRepository $employeeRepository): void
     {
-        $this->employeeCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->legalEntity->uuid;
+        $this->employeeCacheKey = self::CACHE_PREFIX.'-'.Auth::user()->legalEntity->uuid;
         $this->employeeRepository = $employeeRepository;
         $this->legalEntity = Auth::user()->legalEntity;
     }
@@ -57,6 +61,7 @@ class EmployeeIndex extends Component
         $this->tableHeaders();
         $this->getLastStoreId();
         $this->getEmployees();
+        $this->getDictionary();
     }
 
     public function getLastStoreId()
@@ -67,18 +72,22 @@ class EmployeeIndex extends Component
         $this->storeId++;
     }
 
-    public function getEmployeesCache(): void
+    public function getEmployeesCache(): \Illuminate\Support\Collection
     {
         if (Cache::has($this->employeeCacheKey)) {
-            $this->employeesCache = collect(Cache::get($this->employeeCacheKey))->map(function ($data) {
+            return collect(Cache::get($this->employeeCacheKey))->map(function ($data) {
                 return (new Employee())->forceFill($data);
             });
         }
+        return collect();
     }
 
-    public function getEmployees($status = ''): void
+    public function getEmployees(): void
     {
-        $this->employees = Auth::user()->legalEntity->employees()->with('party')->get();
+      $this->employees = $this->status === 'APPROVED' && 'NEW' ?
+          $this->legalEntity->employees()->with('party')->where('status', $this->status)->get()
+      : $this->getEmployeesCache();
+
     }
 
     public function tableHeaders(): void
@@ -94,19 +103,10 @@ class EmployeeIndex extends Component
         ];
     }
 
-    public function sortEmployees(): void
+    public function sortEmployees($status): void
     {
-        if ($this->selectedOption === 'is_active') {
-            $this->getEmployees();
-            $this->employeesCache = collect();
-        } elseif ($this->selectedOption === 'is_inactive') {
-            $this->employeesCache = collect();
-            $this->employees = collect();
-
-        } elseif ($this->selectedOption === 'is_cache') {
-            $this->getEmployeesCache();
-            $this->employees = collect();
-        }
+        dd($status);
+        $this->status = $status;
     }
 
     public function dismissed(Employee $employee)
@@ -164,7 +164,7 @@ class EmployeeIndex extends Component
     }
 
 
-    private function dispatchErrorMessage(string $message, string $type = 'success', array $errors = [] ): void
+    private function dispatchErrorMessage(string $message, string $type = 'success', array $errors = []): void
     {
         $this->dispatch('flashMessage', [
             'message' => $message,

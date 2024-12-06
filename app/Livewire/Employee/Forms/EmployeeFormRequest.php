@@ -12,94 +12,85 @@ use function Livewire\of;
 
 class EmployeeFormRequest extends Form
 {
-    public string $position = '';
 
-    public string $employeeType = '';
 
     public string $status = 'NEW';
 
-    public string $startDate = '';
+    #[Validate([
+        'party.lastName'        => ['required', 'min:3', new Cyrillic()],
+        'party.firstName'       => ['required', 'min:3', new Cyrillic()],
+        'party.gender'          => 'required|string',
+        'party.birthDate'       => ['required', 'date', new AgeCheck()],
+        'party.phones.*.number' => 'required|string:digits:13',
+        'party.phones.*.type'   => 'required|string',
+        'party.email'           => 'required|email',
+        'party.taxId'           => 'required|min:8|max:10',
+        'party.employeeType'    => 'required|string',
+        'party.position'        => 'required|string',
+        'party.startDate'       => 'date',
+    ])]
 
-    public ?array $party = [];
+    public ?array $party = [
+        'position' => '',
+    ];
 
     #[Validate([
-        'documents.type' => 'required|string|min:3',
+        'documents.type'   => 'required|string|min:3',
         'documents.number' => 'required|string|min:3',
     ])]
     public ?array $documents = [];
 
     #[Validate([
-        'educations.country'          => 'required|string',
-        'educations.city'             => 'required|string|min:3',
+        'educations.country'         => 'required|string',
+        'educations.city'            => 'required|string|min:3',
         'educations.institutionName' => 'required|string|min:3',
         'educations.diplomaNumber'   => 'required|string|min:3',
-        'educations.degree'           => 'required|string|min:3',
-        'educations.speciality'       => 'required|string|min:3',
+        'educations.degree'          => 'required|string|min:3',
+        'educations.speciality'      => 'required|string|min:3',
     ])]
 
-    public ?array $educations = [];
+    public ?array $educations = [
+        'country'         => '',
+    ];
 
     #[Validate([
-        'specialities.speciality'         => 'required|string|min:3',
-        'specialities.level'              => 'required|string|min:3',
+        'specialities.speciality'        => 'required|string|min:3',
+        'specialities.level'             => 'required|string|min:3',
         'specialities.qualificationType' => 'required|string|min:3',
         'specialities.attestationName'   => 'required|string|min:3',
         'specialities.attestationDate'   => 'required|date',
         'specialities.certificateNumber' => 'required|string|min:3',
 
     ])]
-
     public ?array $specialities = [];
 
     #[Validate([
-        'scienceDegree.country'          => 'required|string',
-        'scienceDegree.city'             => 'required|string',
-        'scienceDegree.degree'           => 'required|string',
+        'scienceDegree.country'         => 'required|string',
+        'scienceDegree.city'            => 'required|string',
+        'scienceDegree.degree'          => 'required|string',
         'scienceDegree.institutionName' => 'required|string',
         'scienceDegree.diplomaNumber'   => 'required|string',
-        'scienceDegree.speciality'       => 'required|string',
+        'scienceDegree.speciality'      => 'required|string',
 
     ])]
-
-    public ?array $scienceDegree = [];
+    public ?array $scienceDegree = [
+        'country' => '',
+    ];
 
     #[Validate([
-        'qualifications.type'               => 'required|string',
+        'qualifications.type'              => 'required|string',
         'qualifications.institutionName'   => 'required|string',
-        'qualifications.speciality'         => 'required|string',
+        'qualifications.speciality'        => 'required|string',
         'qualifications.issuedDate'        => 'required|date',
         'qualifications.certificateNumber' => 'required|string',
     ])]
     public ?array $qualifications = [];
-
-    public function rulesParty(): array
-    {
-        return [
-            'party.lastName'       => ['required', 'min:3', new Cyrillic()],
-            'party.firstName'      => ['required', 'min:3', new Cyrillic()],
-            'party.gender'          => 'required|string',
-            'party.birthDate'      => ['required', 'date', new AgeCheck()],
-            'party.phones.*.number' => 'required|string:digits:13',
-            'party.phones.*.type'   => 'required|string',
-            'party.email'           => 'required|email',
-            'party.taxId'          => 'required|min:8|max:10',
-            'position'              => 'required|string',
-            'employeeType'         => 'required|string',
-            'startDate'            => 'date',
-        ];
-    }
-
-
 
     /**
      * @throws ValidationException
      */
     public function rulesForModelValidate(string $model): array
     {
-        if ($model == 'party') {
-            return $this->validate($this->rulesParty());
-        }
-
         return $this->validate($this->rulesForModel($model)->toArray());
     }
 

@@ -1,4 +1,4 @@
-@props(['options', 'property'])
+@props(['options', 'property' => ''])
 
 <div x-data="{
         open: false,
@@ -37,7 +37,7 @@
              class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg">
             <input type="text" x-model="search" placeholder="Пошук..." class="default-input">
             <ul class="max-h-60 overflow-auto">
-                <template x-for="(option, index) in filteredOptions" :key="index">
+                <template x-for="(option, index) in filteredOptions">
                     <li @click="selectOption(option, index)"
                         class="cursor-pointer select-none py-2 pl-3 pr-9 hover:bg-gray-100 hover:text-gray-800"
                         :class="{'bg-sky-600 text-white': selectedId === index}">

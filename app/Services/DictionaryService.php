@@ -87,7 +87,7 @@ class DictionaryService
     * Get all founded Dictionaries and return it as associative array.
     * The key pointed to the dictionary is it's name.
     *
-    * return array
+    * @ return array
     */
     public function getAll(): array
     {
@@ -127,7 +127,7 @@ class DictionaryService
     * @param array $searchArray Name of Dictionary
     * @param bool $isArray Flag indicates to return Dictionary as Array
     *
-    * @param array
+    * @param @array
     */
     public function getDictionaries(array $searchArray, bool $isArray = false): array
     {
@@ -135,12 +135,14 @@ class DictionaryService
 
         foreach ($searchArray as $key) {
             $dictionary = $this->getDictionary($key, $isArray);
-
             // Skip wrong result
             if (is_null($dictionary)) {
                 continue;
             }
 
+            if ($isArray) {
+                $dictionary = $dictionary['values'];
+            }
             $dictionaries[$key] = $dictionary;
         }
 

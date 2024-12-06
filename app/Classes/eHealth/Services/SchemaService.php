@@ -3,6 +3,7 @@
 namespace App\Classes\eHealth\Services;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class SchemaService
 {
@@ -157,11 +158,10 @@ class SchemaService
     protected function convertKeysToSnakeCase(array $data): array
     {
         return collect($data)->mapWithKeys(function ($value, $key) {
-            $snakeKey = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $key));
+            $snakeKey = Str::snake($key);
             return [$snakeKey => is_array($value) ? $this->convertKeysToSnakeCase($value) : $value];
         })->all();
     }
-
 
     // Convert array to collection
     protected static function arrayToCollection(string|array $array): Collection

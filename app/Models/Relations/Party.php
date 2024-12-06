@@ -3,32 +3,34 @@
 namespace App\Models\Relations;
 
 use App\Models\Employee;
+use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Str;
 
 class Party extends Model
 {
     use HasFactory;
+    use HasCamelCasing;
+
 
     protected $fillable = [
         'uuid',
-        'last_name',
-        'first_name',
-        'second_name',
+        'lasName',
+        'firstName',
+        'secondName',
         'email',
-        'birth_date',
+        'birthDate',
         'gender',
-        'tax_id',
-        'no_tax_id',
-        'about_myself',
-        'working_experience',
+        'taxId',
+        'noТaxId',
+        'aboutMyself',
+        'workingExperience',
     ];
-
-
 
     public $timestamps = false;
 
@@ -45,13 +47,6 @@ class Party extends Model
     public function phones(): MorphMany
     {
         return $this->morphMany(Phone::class, 'phoneable');
-    }
-
-    public function getAttribute($key)
-    {
-        $camelKey = lcfirst(str_replace('_', '', ucwords($key, '_')));
-
-        return parent::getAttribute($camelKey) ?? parent::getAttribute($key);
     }
 
 }

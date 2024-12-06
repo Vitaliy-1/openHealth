@@ -1,22 +1,16 @@
-<div>
+<div x-data="{ employeeId: @entangle('employeeId') }">
 
     <x-section-navigation class="">
-        <x-slot name="title">{{ __('Співробітники') }}</x-slot>
-        <x-slot name="navigation">
-
-        </x-slot>
+        <x-slot name="title">{{ __('Додати співробітника') }}</x-slot>
     </x-section-navigation>
-
     <div class="flex bg-white  p-6 flex-col ">
-
-
         @include('livewire.employee._parts._employee')
         @include('livewire.employee._parts._documents')
-        @if( isset($employeeRequest->employeeType) && $employeeRequest->employeeType === 'DOCTOR')
+        @if(isset($employeeRequest->party['employeeType']) && $employeeRequest->party['employeeType'] === 'DOCTOR')
             @include('livewire.employee._parts._education')
             @include('livewire.employee._parts._specialities')
             @include('livewire.employee._parts._science_degree')
-            @include('livewire.employee._parts._specialities')
+            @include('livewire.employee._parts._qualifications')
         @endif
         <div class="mb-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center ">
             <div class="xl:w-1/4 text-left">
@@ -31,19 +25,25 @@
             </div>
         </div>
     </div>
-    @if($showModal === 'educations' )
-        @include('livewire.employee._parts.modals._modal_education')
-    @elseif($showModal === 'documents')
-        @include('livewire.employee._parts.modals._modal_documents')
-    @elseif($showModal === 'specialities' )
-        @include('livewire.employee._parts.modals._modal_specialities')
-    @elseif($showModal === 'signedContent' )
-        @include('livewire.employee._parts.modals._modal_signed_content')
-    @elseif($showModal === 'scienceDegree' )
-        @include('livewire.employee._parts.modals._modal_science_degree')
-    @elseif($showModal === 'qualifications')
-        @include('livewire.employee._parts.modals._modal_qualifications')
-    @endif
+    <x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model="showModal">
+        <x-slot name="title">
+            {{__('forms.'.$showModal)}}
+        </x-slot>
+        <x-slot name="content">
+            <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update('.$showModal.',' . $keyProperty . ')' : 'store(\''.$showModal.'\')' !!}">
+                <x-slot name="form">
+                    @if(view()->exists('livewire.employee._parts.modals._modal_'.$showModal))
+                        @include('livewire.employee._parts.modals._modal_'.$showModal)
+                    @else
+                        <p>{{ __('Invalid modal type') }}</p>
+                    @endif
+                </x-slot>
+            </x-forms.forms-section-modal>
+        </x-slot>
+    </x-dialog-modal>
+
+
+
 
     <x-forms.loading/>
 

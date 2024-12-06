@@ -9,38 +9,58 @@ use App\Models\Relations\Qualification;
 use App\Models\Relations\ScienceDegree;
 use App\Models\Relations\Speciality;
 use App\Traits\HasPersonalAttributes;
+use Carbon\Carbon;
+use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
+/**
+ * @property string $uuid
+ * @property string $legal_entity_uuid
+ * @property string $division_uuid
+ * @property int $person_id
+ * @property Status $status
+ * @property string $position
+ * @property Carbon $start_date
+ * @property Carbon $end_date
+ * @property string $employee_type
+ */
 class Employee extends Model
 {
     use HasFactory;
     use HasPersonalAttributes;
-
-
+    use HasCamelCasing;
 
 
     protected $fillable = [
         'uuid',
-        'legal_entity_uuid',
-        'division_uuid',
-        'person_id',
-        'legal_entity_id',
+        'legalEntityUuid',
+        'divisionUuid',
+        'legalEntityId',
         'status',
         'position',
-        'start_date',
-        'end_date',
-        'employee_type',
+        'startDate',
+        'endDate',
+        'partyId',
+        'employeeType',
     ];
 
     protected $casts = [
-        'status' => Status::class,
+        'status'    => Status::class,
+        'startDate' => 'datetime',
+        'endDate'   => 'datetime',
     ];
 
+    protected array $prettyAttributes = [
+        'startDate',
+        'endDate',
+        'status',
+        'position',
+        'employeeType',
+    ];
 
     protected $with = [
         'party',
@@ -49,21 +69,9 @@ class Employee extends Model
         'qualifications',
         'educations',
         'specialities',
-        'scienceDegrees',
+        'scienceDegrees'
     ];
 
-    public function getAttribute($key)
-    {
-        $camelKey = lcfirst(str_replace('_', '', ucwords($key, '_')));
-        return parent::getAttribute($camelKey) ?? parent::getAttribute($key);
-    }
-
-
-    //TODO: Подивитись чи використовувати person в Employee
-    public function person(): BelongsTo
-    {
-        return $this->belongsTo(Person::class);
-    }
 
     public function legalEntity(): BelongsTo
     {
@@ -85,36 +93,39 @@ class Employee extends Model
         return $this->hasMany(Declaration::class);
     }
 
-    public function educations(): morphMany
+    public function educations(): MorphMany
     {
         return $this->morphMany(Education::class, 'educationable');
     }
 
-    public function scienceDegrees():morphMany
+    public function scienceDegrees(): MorphMany
     {
         return $this->morphMany(ScienceDegree::class, 'science_degreeable');
     }
 
-
-    public function qualifications(): morphMany
+    public function qualifications(): MorphMany
     {
         return $this->morphMany(Qualification::class, 'qualificationable');
     }
 
-    public function specialities(): morphMany
+    public function specialities(): MorphMany
     {
         return $this->morphMany(Speciality::class, 'specialityable');
     }
 
-
-    public function scopeRelated($query){
-        $query->with([ 'party', 'legalEntity', 'division', 'educations', 'scienceDegrees', 'qualifications', 'specialities']);
-    }
-
-
     public function scopeDoctor($query)
     {
         return $query->where('employee_type', 'DOCTOR');
+    }
+
+    public function scopeShowEmployee($query, $id)
+    {
+        $employeeData = $query->findOrFail($id);
+        foreach ($this->prettyAttributes as $attribute) {
+            $employeeData->party->{$attribute} = $employeeData->{$attribute} ?? '';
+        }
+        $employeeData->documents = $employeeData->party->documents()->get()->toArray() ?? [];
+        return $employeeData->toArray();
     }
 
 }

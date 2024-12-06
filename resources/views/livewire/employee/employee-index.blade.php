@@ -13,14 +13,14 @@
                         </x-slot>
                         <x-slot name="input" class="max-w-2xs">
                             <x-forms.select
-                                class="default-input" wire:model="selectedOption" wire:change="sortEmployees()"
+                                class="default-input" wire:model.live="status" wire:change="sortEmployees()"
                                 type="text"
                                 id="ownerPosition"
                             >
                                 <x-slot name="option">
-                                    <option selected value="isActive" class="text-body">Активні</option>
-                                    <option value="isInactive" class="text-body">Не активні</option>
-                                    <option value="isCache" class="text-body">Не завешені</option>
+                                    <option selected value="APPROVED" class="text-body">Активні</option>
+                                    <option value="NEW" class="text-body">Нові</option>
+                                    <option value="CACHE" class="text-body">Не завешені</option>
                                 </x-slot>
                             </x-forms.select>
                         </x-slot>
@@ -74,7 +74,9 @@
                                     <p class="text-black dark:text-white">{{$employee->position ?? ''}}</p>
                                 </td>
                                 <td class="border-b border-[#eee] py-5 px-4 ">
-                                    <x-status-label :status="$employee->status"></x-status-label>
+                                    @if(isset($employee->status))
+                                        <x-status-label :status="$employee->status"></x-status-label>
+                                    @endif
                                 </td>
                                 <td class="border-b border-[#eee] py-5 px-4 ">
                                     <div class="flex justify-center">

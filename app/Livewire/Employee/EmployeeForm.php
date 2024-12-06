@@ -3,19 +3,16 @@
 namespace App\Livewire\Employee;
 
 use App\Classes\eHealth\Api\EmployeeApi;
-use App\Classes\eHealth\Services\SchemaService;
 use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
 use App\Livewire\Employee\Forms\EmployeeFormRequest;
 use App\Models\Division;
 use App\Models\Employee;
 use App\Models\LegalEntity;
-use App\Models\Person;
 use App\Models\User;
 use App\Classes\Cipher\Traits\Cipher;
 use App\Repositories\EmployeeRepository;
 use App\Traits\FormTrait;
 use App\Traits\InteractsWithCache;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -24,7 +21,10 @@ use Livewire\WithFileUploads;
 
 class EmployeeForm extends Component
 {
-    use FormTrait, Cipher, WithFileUploads, InteractsWithCache;
+    use FormTrait;
+    use Cipher;
+    use WithFileUploads;
+    use InteractsWithCache;
 
     const CACHE_PREFIX = 'register_employee_form';
 
@@ -65,10 +65,11 @@ class EmployeeForm extends Component
         'EMPLOYEE_TYPE',
         'POSITION',
         'EDUCATION_DEGREE',
+        'EMPLOYEE_TYPE'
     ];
 
-    public ?Division $divisions;
-    public ?HealthcareService $healthcareServices;
+    public ?object $divisions;
+    public ?object $healthcareServices;
 
     protected ?EmployeeRepository $employeeRepository;
 
@@ -92,7 +93,6 @@ class EmployeeForm extends Component
 
     public function mount(Request $request, $id = '')
     {
-        $this->setTableHeaders();
         $this->getLegalEntity();
 //        $this->getDivisions();
         if ($request->has('storeId')) {
@@ -134,10 +134,9 @@ class EmployeeForm extends Component
     public function getEmployee(): void
     {
         if (isset($this->employeeId)) {
-            $employeeData = Employee::findOrFail($this->employeeId);
-            $this->employeeRequest->fill($employeeData->toArray());
+            $employeeData = Employee::showEmployee($this->employeeId);
+            $this->employeeRequest->fill($employeeData);
         }
-
         if ($this->hasCache($this->employeeCacheKey) && isset($this->requestId)) {
             $employeeData = $this->getCache($this->employeeCacheKey);
             if (isset($employeeData[$this->requestId])) {
@@ -155,31 +154,19 @@ class EmployeeForm extends Component
     /**
      * Set the table headers for the E-health table.
      */
-    public function setTableHeaders(): void
-    {
-        // Define the table headers
-        $this->tableHeaders = [
-            __('ID E-health'),
-            __('ПІБ'),
-            __('Телефон'),
-            __('Email'),
-            __('Посада'),
-            __('Статус'),
-            __('Дія'),
-        ];
-    }
+
 
     public function getLegalEntity()
     {
         $this->legalEntity = auth()->user()->legalEntity;
     }
 
-//    public function getDivisions()
-//    {
-//        $this->divisions = $this->legalEntity->division()
-//            ->where('status', 'ACTIVE')
-//            ->get();
-//    }
+    public function getDivisions()
+    {
+        $this->divisions = $this->legalEntity->division()
+            ->where('status', 'ACTIVE')
+            ->get();
+    }
 
     public function openModalModel($model)
     {
@@ -209,14 +196,16 @@ class EmployeeForm extends Component
 
     public function updated($field)
     {
+
         if ($field === 'keyContainerUpload') {
             $this->getEmployee();
         }
     }
 
 
-    public function store($model)
+    public function store($model) : void
     {
+        
         $this->employeeRequest->rulesForModelValidate($model);
 
         $this->resetErrorBag();
@@ -224,8 +213,6 @@ class EmployeeForm extends Component
         if (isset($this->requestId)) {
             $this->storeCacheEmployee($model);
         }
-
-
         $this->closeModalModel();
         $this->dispatch('flashMessage', ['message' => __('Інформацію успішно оновлено'), 'type' => 'success']);
 
@@ -238,32 +225,36 @@ class EmployeeForm extends Component
             $this->employeeCacheKey,
             $model,
             'employeeRequest',
-            array_keys($this->employeeRequest->toArray()) //
+            ['party','scienceDegree']
         );
+
     }
+
 
 
     public function edit($model, $keyProperty = '')
     {
+
         $this->keyProperty = $keyProperty;
         $this->mode = 'edit';
         $this->openModal($model);
+
         if (isset($this->requestId)) {
             $this->editCacheEmployee($model, $keyProperty);
         }
-        if (isset($this->employeeId)) {
-            $this->editEmployee($model, $keyProperty);
-        }
+
     }
 
 
     public function editCacheEmployee( string $model,  string $keyProperty = '')
     {
         $cacheData = $this->getCache($this->employeeCacheKey);
-        if (empty($keyProperty) && $keyProperty !== 0) {
-            $this->employeeRequest->{$model} = $cacheData[$this->requestId][$model];
+
+        if ($keyProperty !== '') {
+            $this->employeeRequest->{$model} = $cacheData[$this->requestId][$model][$keyProperty];
         } else {
             $this->employeeRequest->{$model} = $cacheData[$this->requestId][$model];
+
         }
     }
 
@@ -427,6 +418,7 @@ class EmployeeForm extends Component
             "P207", "P255", "P119", "P90", "P86", "P27", "P199", "P108", "P163", "P157", "P277", "P11"
         ];
 
+
         $filterPosition = array_filter($this->dictionaries['POSITION'], function ($key) use ($validPositions) {
             return in_array($key, $validPositions);
         }, ARRAY_FILTER_USE_KEY);
@@ -436,6 +428,8 @@ class EmployeeForm extends Component
 
     public function render()
     {
+         $this->getDictionary();
+
         return view('livewire.employee.employee-form');
     }
 

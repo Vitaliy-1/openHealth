@@ -110,9 +110,14 @@ trait FormTrait
      *
      * @return void
      */
-    public function getDictionary(): void
-    {
-        $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', $this->dictionaries_field ?? []);
+//    public function getDictionary(): void
+//    {
+//        $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', $this->dictionaries_field ?? []);
+//    }
+
+    public function getDictionary() {
+
+        $this->dictionaries = dictionary()->getDictionaries( $this->dictionaries_field ?? [], true);
     }
 
     /**
