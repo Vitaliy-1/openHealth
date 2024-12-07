@@ -2,7 +2,6 @@
 
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Http\Controllers\Auth\LoginController;
-use App\Livewire\Auth\Login;
 use App\Livewire\Contract\ContractForm;
 use App\Livewire\Contract\ContractIndex;
 use App\Livewire\Declaration\DeclarationIndex;
@@ -54,7 +53,7 @@ Route::middleware([
 
     Route::get('/dashboard/legal-entities/create', LegalEntities::class)->name('create.legalEntities');
 
-    Route::group(['middleware' => ['role:OWNER|ADMIN'],'prefix' => 'dashboard'], function () {
+    Route::group(['middleware' => ['role:OWNER|ADMIN'], 'prefix' => 'dashboard'], function () {
         Route::prefix('legal-entities')->group(function () {
             Route::get('/edit/{id?}', EditLegalEntity::class)->name('edit.legalEntities');
         });
@@ -87,7 +86,6 @@ Route::middleware([
         });
 
         Route::get('/test-license', [HomeController::class, 'test']);
-
     });
 
     Route::group(['middleware' => ['role:OWNER|ADMIN|DOCTOR']], function () {

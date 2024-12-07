@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Patient;
 
+use App\Classes\Cipher\Traits\Cipher;
 use App\Classes\eHealth\Api\PersonApi;
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Livewire\Patient\Forms\Api\PatientRequestApi;
@@ -13,10 +14,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class PatientForm extends Component
 {
-    use FormTrait, InteractsWithCache;
+    use FormTrait, InteractsWithCache, WithFileUploads, Cipher;
 
     private const string CACHE_PREFIX = 'register_patient_form';
 
@@ -27,8 +29,43 @@ class PatientForm extends Component
     public string $patientId;
     protected string $patientCacheKey;
     public int $keyProperty;
+
+    public string $viewState = 'default';
+    /**
+     * Mark 'information from the leaflet was communicated to the patient'
+     * @var bool
+     */
+    public bool $isInformed = false;
+
+    /**
+     * MPI id of the person
+     * @var string|null
+     */
+    public ?string $id = null;
+
+    /**
+     * Check is patient refused to provide РНОКПП/ІПН
+     * @var bool
+     */
     public bool $noTaxId = false;
+
+    /**
+     * Is patient incapable
+     * @var bool
+     */
     public bool $isIncapable = false;
+
+    /**
+     * Check is person approved
+     * @var bool
+     */
+    public bool $isApproved = false;
+
+    /**
+     * KEP key
+     * @var object|null
+     */
+    public ?object $file = null;
 
     protected $listeners = ['addressDataFetched'];
     public array $dictionaries_field = [
@@ -56,6 +93,7 @@ class PatientForm extends Component
         }
 
         $this->getPatient();
+        $this->setCertificateAuthority();
         $this->getDictionary();
     }
 
@@ -66,7 +104,7 @@ class PatientForm extends Component
 
     public function hydrate(): void
     {
-        if ($this->patientRequest->documents && $this->patientRequest->documents_relationship) {
+        if ($this->mode !== 'edit' && ($this->patientRequest->documents || $this->patientRequest->documents_relationship)) {
             $this->getPatient();
         }
     }
@@ -74,7 +112,7 @@ class PatientForm extends Component
     /**
      * Initialize the creation mode for a specific model.
      *
-     * @param string $model The model type to initialize for creation.
+     * @param  string  $model  The model type to initialize for creation.
      * @return void
      */
     public function create(string $model): void
@@ -88,7 +126,7 @@ class PatientForm extends Component
     /**
      * Store valid data for a specific model.
      *
-     * @param string $model The model type to store data for.
+     * @param  string  $model  The model type to store data for.
      * @return void
      * @throws ValidationException
      */
@@ -114,7 +152,7 @@ class PatientForm extends Component
     /**
      * Store patient data in cache for a specific model.
      *
-     * @param string $model The model type to store data for.
+     * @param  string  $model  The model type to store data for.
      * @return void
      */
     protected function storeCachePatient(string $model): void
@@ -122,34 +160,111 @@ class PatientForm extends Component
         $this->storeCacheData($this->patientCacheKey, $model, 'patientRequest', ['patient']);
     }
 
-    public function signedComplete(string $model): void
+    /**
+     * Build and send API request 'Approve Person v2' and show the next page if data is validated.
+     *
+     * @param  string  $model
+     * @return void
+     * @throws ApiException
+     * @throws ValidationException
+     */
+    public function approvePerson(string $model): void
     {
-        $open = $this->patientRequest->validateBeforeSendApi();
-        if ($open['error'] ) {
-            $this->dispatch('flashMessage', ['message' => $open['message'], 'type' => 'error']);
-        }
-        else{
-            $this->openModal($model);
-        }
+        $this->patientRequest->rulesForModelValidate($model);
 
-        $this->sendApiRequest();
+        $confirmationCode = $this->patientRequest->confirmation_code;
+
+        $requestData = PatientRequestApi::buildApprovePersonRequest($confirmationCode);
+        $response = PersonApi::approvePersonRequest($this->id, $requestData);
+
+        if ($response['status'] === 'APPROVED') {
+            $this->isApproved = true;
+        }
     }
 
     /**
+     * Build and send API request 'Sign Person v2' and redirect to page if data is validated.
+     *
+     * @return void
      * @throws ApiException
      */
-    protected function sendApiRequest(): void
+    public function signPerson(): void
     {
-        $cacheData = $this->getCache($this->patientCacheKey);
+        $getPatientById = PersonApi::getCreatedPersonById($this->id);
+        unset($getPatientById['meta'], $getPatientById['urgent']);
 
-        if (isset($this->requestId, $cacheData[$this->requestId])) {
-            $this->patientRequest->fill($cacheData[$this->requestId]);
+        $encryptedRequestData = PatientRequestApi::buildEncryptedSignPersonRequest($getPatientById);
+        $base64EncryptedData = $this->sendEncryptedData($encryptedRequestData, $this->patientRequest->patient['taxId']);
+
+        $signRequestData = PatientRequestApi::buildSignPersonRequest($base64EncryptedData);
+        $signResponse = PersonApi::singPersonRequest($this->id, $signRequestData, Auth::user()->tax_id);
+
+        if ($signResponse['status'] === 'SIGNED') {
+            to_route('patient.form');
+        }
+    }
+
+    /**
+     * @throws \App\Classes\Cipher\Exceptions\ApiException
+     */
+    public function setCertificateAuthority(): array|null
+    {
+        return $this->getCertificateAuthority = $this->getCertificateAuthority();
+    }
+
+    public function updatedFile(): void
+    {
+        $this->keyContainerUpload = $this->file;
+    }
+
+    /**
+     * Set empty string to taxId if patient refused to provide РНОКПП/ІПН
+     *
+     * @param  bool  $noTaxId
+     * @return void
+     */
+    public function updatedNoTaxId(bool $noTaxId): void
+    {
+        if ($noTaxId) {
+            $this->patientRequest->patient['taxId'] = '';
+        }
+    }
+
+    /**
+     * Send API request 'Create Person v2' and show the next page if data is validated.
+     *
+     * @return void
+     * @throws ApiException
+     */
+    public function createPerson(): void
+    {
+        $open = $this->patientRequest->validateBeforeSendApi();
+
+        if ($open['error']) {
+            $this->dispatch('flashMessage', ['message' => $open['message'], 'type' => 'error']);
         }
 
-        $requestData = PatientRequestApi::buildCreatePersonRequest($cacheData[$this->requestId], $this->noTaxId, $this->isIncapable);
-        PersonApi::createPersonRequest($requestData);
+        $response = $this->sendPersonRequest($this->patientRequest->toArray());
 
-        $this->getPatient();
+        if ($response['meta']['code'] === 201) {
+            // Show next view page
+            $this->id = $response['data']['id'];
+            $this->viewState = 'new';
+        }
+    }
+
+    /**
+     * Build and send API request for create person
+     *
+     * @param  array  $patientData
+     * @return array
+     * @throws ApiException
+     */
+    protected function sendPersonRequest(array $patientData): array
+    {
+        $requestData = PatientRequestApi::buildCreatePersonRequest($patientData, $this->noTaxId, $this->isIncapable);
+
+        return PersonApi::createPersonRequest($requestData);
     }
 
     /**
@@ -182,8 +297,8 @@ class PatientForm extends Component
     /**
      * Initialize the edit mode for a specific model.
      *
-     * @param string $model The model type to initialize for editing.
-     * @param int $keyProperty The key property used to identify the specific item to edit (optional).
+     * @param  string  $model  The model type to initialize for editing.
+     * @param  int  $keyProperty  The key property used to identify the specific item to edit (optional).
      * @return void
      */
     public function edit(string $model, int $keyProperty): void
@@ -200,8 +315,8 @@ class PatientForm extends Component
     /**
      * Update the patient request data with cached data for a specific model.
      *
-     * @param string $model The model type to update the data for.
-     * @param int $keyProperty The key property used to identify the specific item to update (optional).
+     * @param  string  $model  The model type to update the data for.
+     * @param  int  $keyProperty  The key property used to identify the specific item to update (optional).
      * @return void
      */
     protected function editCachePatient(string $model, int $keyProperty): void
@@ -228,7 +343,7 @@ class PatientForm extends Component
     /**
      * Updates the patient request with fetched address data and stores it in the cache.
      *
-     * @param array $addressData An associative array containing address data for the patient.
+     * @param  array  $addressData  An associative array containing address data for the patient.
      * @return void
      */
     public function addressDataFetched(array $addressData): void
@@ -240,8 +355,8 @@ class PatientForm extends Component
     /**
      * Updates the cache with the provided data under a specific key for the current request ID.
      *
-     * @param string $key The key under which the data should be stored in the cache (e.g., 'addresses').
-     * @param array $data The data to be stored in the cache.
+     * @param  string  $key  The key under which the data should be stored in the cache (e.g., 'addresses').
+     * @param  array  $data  The data to be stored in the cache.
      * @return void
      */
     private function putAddressesInCache(string $key, array $data): void
@@ -255,8 +370,8 @@ class PatientForm extends Component
     /**
      * Update the data for a specific model and key property.
      *
-     * @param string $model The model type to update the data for.
-     * @param int $keyProperty The key property used to identify the specific item to update.
+     * @param  string  $model  The model type to update the data for.
+     * @param  int  $keyProperty  The key property used to identify the specific item to update.
      * @return void
      * @throws ValidationException
      */
@@ -275,8 +390,8 @@ class PatientForm extends Component
     /**
      * Update the cached data for a specific model and key property.
      *
-     * @param string $model The model type to update the data for.
-     * @param int $keyProperty The key property used to identify the specific item to update.
+     * @param  string  $model  The model type to update the data for.
+     * @param  int  $keyProperty  The key property used to identify the specific item to update.
      * @return void
      */
     protected function updateCachePatient(string $model, int $keyProperty): void
@@ -292,7 +407,7 @@ class PatientForm extends Component
     /**
      * Close the modal and optionally reset the data for a specific model.
      *
-     * @param string|null $model The model type to reset the data for (optional).
+     * @param  string|null  $model  The model type to reset the data for (optional).
      * @return void
      */
     public function closeModalModel(string $model = null): void

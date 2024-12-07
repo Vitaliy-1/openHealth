@@ -5,7 +5,7 @@
 
     <x-tables.table>
         <x-slot name="headers"
-                :list="[__('forms.document_type'),__('forms.number'),__('forms.issued_by'),__('forms.issued_at'),__('forms.expiration_date'),__('forms.unzr'),__('forms.actions')]">
+                :list="[__('forms.document_type'),__('forms.number'),__('forms.issued_by'),__('forms.issued_at'),__('forms.expiration_date'),__('forms.actions')]">
         </x-slot>
         <x-slot name="tbody">
             @isset($patient->documents)
@@ -18,16 +18,13 @@
                             {{ $document['number'] ?? '' }}
                         </td>
                         <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                            {{ $document['issued_by'] ?? '' }}
+                            {{ $document['issuedBy'] ?? '' }}
                         </td>
                         <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                            {{ $document['issued_at'] ?? '' }}
+                            {{ $document['issuedAt'] ?? '' }}
                         </td>
                         <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                            {{ $document['expiration_date'] ?? '' }}
-                        </td>
-                        <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                            {{ $document['unzr'] ?? '' }}
+                            {{ $document['expirationDate'] ?? '' }}
                         </td>
 
                         <td class="border-b border-[#eee] flex px-4 py-5 dark:border-strokedark">
