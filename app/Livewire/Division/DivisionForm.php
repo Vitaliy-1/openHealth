@@ -177,6 +177,7 @@ class DivisionForm extends Component
 
     public function render()
     {
+
     return view('livewire.division.division-form-create');
 
     }

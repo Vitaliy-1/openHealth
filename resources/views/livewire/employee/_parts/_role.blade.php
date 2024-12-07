@@ -20,7 +20,7 @@
             @foreach($employee->role as $k=>$role)
                 <tr>
                     <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
-                        {{$role['employee_type'] ?? ''}}
+                        {{$role['employeeType'] ?? ''}}
                     </td>
 
                     <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">

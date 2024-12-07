@@ -9,26 +9,26 @@ trait HasPersonalAttributes
     public function getFullNameAttribute(): string
     {
         return implode(' ', array_filter([
-            $this->party['first_name'] ?? '',
-            $this->party['last_name'] ?? '',
-            $this->party['second_name']
+            optional($this->party)->first_name ?? '',
+            optional($this->party)->last_name ?? '',
+            optional($this->party)->second_name?? '',
         ]));
     }
 
     public function getPhoneAttribute(): string
     {
-        return $this->party['phones'][0]['number'] ?? '';
+        return optional(optional($this->party)->phones)->first()->number ?? '';
     }
 
-    public function getBirthDateAttribute($property = 'party'): string
+    public function getBirthDateAttribute(): string
     {
-        return humanFormatDate($this->party['birth_date'] ?? '');
+        return humanFormatDate(optional($this->party)->birth_date ?? '');
     }
 
 
-    public function getEmailAttribute($property = 'party'): string
+    public function getEmailAttribute(): string
     {
-        return $this->party['email'] ?? '';
+        return optional($this->party)->email ?? '';
     }
 
 }

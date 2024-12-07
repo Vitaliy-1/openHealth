@@ -5,7 +5,7 @@
         {{__('Додати Роль')}}
     </x-slot>
     <x-slot name="content">
-        <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'role\',' . $key_property . ')' : 'store(\'role\')' !!}">
+        <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update(\'role\',' . $keyProperty . ')' : 'store(\'role\')' !!}">
             <x-slot name="form">
                 <div  class="pt-4 grid grid gap-4 grid-cols-2">
                     <x-forms.form-group class="">
@@ -17,12 +17,12 @@
                         <x-slot name="input">
                             @if($divisions)
                             <x-forms.select
-                                class="default-input" wire:model="employee_request.role.division_id" type="text"
+                                class="default-input" wire:model="employeeRequest.role.divisionId" type="text"
                                 id="division"
                                 wire:change="getHealthcareServices($event.target.value)"
                             >
                                 <x-slot name="option">
-                                    <option>{{__('forms.select_division')}}</option>
+                                    <option>{{__('forms.selectDivision')}}</option>
                                     @foreach($divisions as $k=>$division)
                                         <option value="{{$division->id}}">{{$division->name}}</option>
                                     @endforeach
@@ -30,7 +30,7 @@
                             </x-forms.select>
                             @endif
                         </x-slot>
-                        @error('employee_request.role.division_id')
+                        @error('employeeRequest.role.divisionId')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -42,24 +42,24 @@
                     <x-forms.form-group class="">
                         <x-slot name="label">
                             <x-forms.label for="position" class="default-label">
-                                {{__('forms.healthcare_service')}}*
+                                {{__('forms.healthcareService')}}*
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
                                 <x-forms.select
                                     class="default-input"
-                                    wire:model="employee_request.role.healthcare_service_id" type="text"
+                                    wire:model="employeeRequest.role.healthcareServiceId" type="text"
                                     id="position"
                                 >
                                     <x-slot name="option">
-                                        <option>{{__('forms.healthcare_service_select')}}</option>
+                                        <option>{{__('forms.healthcareServiceSelect')}}</option>
                                         @foreach($healthcareServices as $k=>$healthcareService)
                                             <option value="{{$healthcareService->uuid}}">{{$healthcareService->category}}</option>
                                         @endforeach
                                     </x-slot>
                                 </x-forms.select>
                         </x-slot>
-                        @error('employee_request.role.healthcare_service_id')
+                        @error('employeeRequest.role.healthcareServiceId')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{$message}}
@@ -70,19 +70,19 @@
                     @endif
                     <x-forms.form-group class="">
                         <x-slot name="label">
-                            <x-forms.label for="employee_type" class="default-label">
+                            <x-forms.label for="employeeType" class="default-label">
                                 {{__('forms.role')}}*
                             </x-forms.label>
                         </x-slot>
                         <x-slot name="input">
                             <x-forms.select
-                                class="default-input" wire:model="employee_request.role.employee_type" type="text"
-                                id="employee_type"
+                                class="default-input" wire:model="employeeRequest.role.employeeType" type="text"
+                                id="employeeType"
                             >
                                 <x-slot name="option">
                                     <option>{{__('forms.position')}}</option>
-                                    @foreach($this->dictionaries['EMPLOYEE_TYPE'] as $k=>$employee_type)
-                                        <option value="{{$k}}">{{$employee_type}}</option>
+                                    @foreach($this->dictionaries['EMPLOYEE_TYPE'] as $k=>$employeeType)
+                                        <option value="{{$k}}">{{$employeeType}}</option>
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>

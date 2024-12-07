@@ -33,7 +33,7 @@
          x-transition:leave-end="opacity-0">
     </div>
     <!-- Modal Content -->
-    <div x-show="show" class="bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-auto transform transition-all {{ $maxWidth }}"
+    <div x-show="show" class="w-full bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-auto transform transition-all {{ $maxWidth }}"
          x-trap.inert.noscroll="show"
          x-transition:enter="ease-out duration-300"
          x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"

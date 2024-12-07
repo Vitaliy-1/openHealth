@@ -43,7 +43,7 @@
                         <div class="flex items-center w-full sm:justify-end">
                             <div class="flex pl-2 space-x-1">
                                 <a href="#"
-                                    x-on:click="showFilter = !showFilter" 
+                                    x-on:click="showFilter = !showFilter"
                                     class="inline-flex justify-center p-1 text-gray-500 rounded cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                                 >
                                     <svg
@@ -117,7 +117,6 @@
                                         </td>
                                         <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400 ">
                                             <x-status-label :status="$declaration->status"></x-status-label>
-
                                         </td>
                                         <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400 ">
                                             <p class="text-black dark:text-white">

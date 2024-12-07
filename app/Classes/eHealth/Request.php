@@ -119,4 +119,7 @@ class Request
 //        // Виклик події браузера через Livewire
 //        \Livewire\Component::dispatch('flashMessage', ['message' => $message, 'type' => $type]);
 //    }
+
+
+
 }
