@@ -69,11 +69,12 @@ class ContractIndex extends Component
         ];
     }
 
-
-
     public function render()
     {
-        return view('livewire.contract.contract-index');
+        $perPage = config('pagination.per_page');
+        $contracts = $this->legalEntity->contract()->paginate($perPage);
+
+        return view('livewire.contract.contract-index', compact('contracts'));
     }
 
     public function createRequest()

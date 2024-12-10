@@ -1,5 +1,5 @@
+@props(['disabled' => false])
 
-
-<button {{ $attributes->merge(['type' => 'submit', 'class' => '']) }}>
+<button {{ $disabled ? 'disabled' : '' }} {{ $attributes->merge(['type' => 'submit', 'class' => '']) }}>
     {{ $slot }}
 </button>
