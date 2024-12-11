@@ -84,6 +84,11 @@ class EmployeeForm extends Component
 
     public ?object $file = null;
 
+    /**
+     * @var mixed|string
+     */
+    public mixed $singleProperty;
+
 
     public function boot(EmployeeRepository $employeeRepository): void
     {
@@ -144,6 +149,7 @@ class EmployeeForm extends Component
             }
         }
 
+
     }
 
     public function updatedFile(): void
@@ -168,14 +174,18 @@ class EmployeeForm extends Component
             ->get();
     }
 
-    public function openModalModel($model)
+    public function openModalModel($model, $singleProperty = '')
     {
         $this->showModal = $model;
+        $this->singleProperty = $singleProperty;
     }
 
-    public function create($model)
+    public function create($model, $singleProperty = '')
     {
         $this->mode = 'create';
+        if (!empty($singleProperty)) {
+            $this->singleProperty = $singleProperty;
+        }
         $this->employeeRequest->{$model} = [];
         $this->openModal($model);
         $this->getEmployee();
@@ -203,19 +213,23 @@ class EmployeeForm extends Component
     }
 
 
-    public function store($model) : void
+    public function store($model,$modelSingle = []) : void
     {
-        
-        $this->employeeRequest->rulesForModelValidate($model);
-
+        $rules = $model;
+        if (!empty($modelSingle)) {
+            $rules = $modelSingle;
+        }
+        $this->employeeRequest->rulesForModelValidate($rules);
         $this->resetErrorBag();
-
+        if (!empty($modelSingle)) {
+            $this->employeeRequest->{$model} = $this->employeeRequest->{$modelSingle};
+            unset($this->employeeRequest->{$modelSingle});
+        }
         if (isset($this->requestId)) {
             $this->storeCacheEmployee($model);
         }
         $this->closeModalModel();
         $this->dispatch('flashMessage', ['message' => __('Інформацію успішно оновлено'), 'type' => 'success']);
-
         $this->getEmployee();
     }
 
@@ -232,50 +246,41 @@ class EmployeeForm extends Component
 
 
 
-    public function edit($model, $keyProperty = '')
+    public function edit($model, $keyProperty = '', $singleProperty = '')
     {
 
         $this->keyProperty = $keyProperty;
         $this->mode = 'edit';
-        $this->openModal($model);
 
         if (isset($this->requestId)) {
-            $this->editCacheEmployee($model, $keyProperty);
+            $this->editCacheEmployee($model, $keyProperty,$singleProperty);
+
         }
+        $this->openModal($model);
 
     }
 
 
-    public function editCacheEmployee( string $model,  string $keyProperty = '')
+    public function editCacheEmployee( string $model,  string $keyProperty = '', $singleProperty = '')
     {
         $cacheData = $this->getCache($this->employeeCacheKey);
 
         if ($keyProperty !== '') {
-            $this->employeeRequest->{$model} = $cacheData[$this->requestId][$model][$keyProperty];
+            $this->employeeRequest->{$singleProperty ?: $model} = $cacheData[$this->requestId][$model][$keyProperty];
         } else {
             $this->employeeRequest->{$model} = $cacheData[$this->requestId][$model];
-
         }
     }
 
-    public function editEmployee($model, $keyProperty = '')
-    {
-        if ($model == 'documents') {
-            $this->employeeRequest->{$model} = $this->employee->party[$model][$keyProperty];
-        } elseif ($model == 'science_degree') {
-            $this->employeeRequest->{$model} = $this->employee->doctor[$model];
-        } else {
-            $this->employeeRequest->{$model} = $this->employee->doctor[$model][$keyProperty];
-        }
-    }
 
-    public function update($model, $keyProperty)
+    public function update($model, $keyProperty, $singleProperty = '')
     {
         $this->employeeRequest->rulesForModelValidate($model);
+
         $this->resetErrorBag();
 
         if (isset($this->requestId)) {
-            $this->updateCacheEmployee($model, $keyProperty);
+            $this->updateCacheEmployee($model, $keyProperty,$singleProperty);
         }
         if (isset($this->employeeId)) {
             $this->updateEmployee($model, $keyProperty);
@@ -283,11 +288,18 @@ class EmployeeForm extends Component
         $this->closeModalModel($model);
     }
 
-    public function updateCacheEmployee($model,$keyProperty)
+    public function updateCacheEmployee($model,$keyProperty, $singleProperty = '')
     {
+        if (!empty($modelSingle)) {
+            $this->employeeRequest->{$model} = $this->employeeRequest->{$modelSingle};
+            unset($this->employeeRequest->{$modelSingle});
+        }
+
         if ($this->hasCache($this->employeeCacheKey)) {
             $cacheData = $this->getCache($this->employeeCacheKey);
-            $cacheData[$this->requestId][$model][$keyProperty] = $this->employeeRequest->{$model};
+            if (isset($cacheData[$this->requestId][$model][$keyProperty])) {
+                $cacheData[$this->requestId][$model][$keyProperty] = $this->employeeRequest->{$singleProperty ?: $model};
+            }
             $this->putCache($this->employeeCacheKey, $cacheData);
         }
     }

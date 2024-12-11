@@ -7,7 +7,7 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.select
-                class="default-input" wire:model="employeeRequest.qualifications.type" type="text"
+                class="default-input" wire:model="employeeRequest.qualification.type" type="text"
                 id="type"
             >
                 <x-slot name="option">
@@ -19,7 +19,7 @@
             </x-forms.select>
 
         </x-slot>
-        @error('employeeRequest.qualifications.type')
+        @error('employeeRequest.qualification.type')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -35,10 +35,10 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.input class="default-input"
-                           wire:model="employeeRequest.qualifications.institutionName" type="text"
+                           wire:model="employeeRequest.qualification.institutionName" type="text"
                            id="institutionName"/>
         </x-slot>
-        @error('employeeRequest.qualifications.institutionName')
+        @error('employeeRequest.qualification.institutionName')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -55,11 +55,11 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="employeeRequest.qualifications.speciality"
+            <x-forms.input class="default-input" wire:model="employeeRequest.qualification.speciality"
                            type="text"
                            id="speciality"/>
         </x-slot>
-        @error('employeeRequest.qualifications.speciality')
+        @error('employeeRequest.qualification.speciality')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -74,11 +74,11 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input-date id="issuedDate" wire:model="employeeRequest.qualifications.issuedDate"
+            <x-forms.input-date id="issuedDate" wire:model="employeeRequest.qualification.issuedDate"
             />
 
         </x-slot>
-        @error('employeeRequest.qualifications.issuedDate')
+        @error('employeeRequest.qualification.issuedDate')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -96,10 +96,10 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.input class="default-input"
-                           wire:model="employeeRequest.qualifications.certificateNumber" type="text"
+                           wire:model="employeeRequest.qualification.certificateNumber" type="text"
                            id="certificateNumber"/>
         </x-slot>
-        @error('employeeRequest.qualifications.certificateNumber')
+        @error('employeeRequest.qualification.certificateNumber')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -114,9 +114,9 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input-date id="validTo" wire:model="employeeRequest.qualifications.validTo"/>
+            <x-forms.input-date id="validTo" wire:model="employeeRequest.qualification.validTo"/>
         </x-slot>
-        @error('employeeRequest.qualifications.validTo')
+        @error('employeeRequest.qualification.validTo')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -135,10 +135,10 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.textarea class="default-input"
-                              wire:model="employeeRequest.qualifications.additionalInfo" type="text"
+                              wire:model="employeeRequest.qualification.additionalInfo" type="text"
                               id="validTo"/>
         </x-slot>
-        @error('employeeRequest.qualifications.additionalInfo')
+        @error('employeeRequest.qualification.additionalInfo')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}

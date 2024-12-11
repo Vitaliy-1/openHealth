@@ -7,7 +7,7 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.select
-                class="default-input" wire:model="employeeRequest.educations.degree"
+                class="default-input" wire:model="employeeRequest.education.degree"
                 id="educationCountry"
             >
                 <x-slot name="option">
@@ -19,7 +19,7 @@
             </x-forms.select>
 
         </x-slot>
-        @error('employeeRequest.educations.degree')
+        @error('employeeRequest.education.degree')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -35,10 +35,10 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.input class="default-input"
-                           wire:model="employeeRequest.educations.institutionName" type="text"
+                           wire:model="employeeRequest.education.institutionName" type="text"
                            id="institutionName"/>
         </x-slot>
-        @error('employeeRequest.educations.institutionName')
+        @error('employeeRequest.education.institutionName')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -56,11 +56,11 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="employeeRequest.educations.speciality"
+            <x-forms.input class="default-input" wire:model="employeeRequest.education.speciality"
                            type="text"
                            id="speciality"/>
         </x-slot>
-        @error('employeeRequest.educations.speciality')
+        @error('employeeRequest.education.speciality')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -76,9 +76,9 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.dynamic-select :options="$dictionaries['COUNTRY']"
-                                    property="employeeRequest.educations.country"/>
+                                    property="employeeRequest.education.country"/>
         </x-slot>
-        @error('employeeRequest.educations.country')
+        @error('employeeRequest.education.country')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -96,11 +96,11 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="employeeRequest.educations.city"
+            <x-forms.input class="default-input" wire:model="employeeRequest.education.city"
                            type="text"
                            id="city"/>
         </x-slot>
-        @error('employeeRequest.educations.city')
+        @error('employeeRequest.education.city')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -115,11 +115,11 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="employeeRequest.educations.diplomaNumber"
+            <x-forms.input class="default-input" wire:model="employeeRequest.education.diplomaNumber"
                            type="text"
                            id="diplomaNumber"/>
         </x-slot>
-        @error('employeeRequest.educations.diplomaNumber')
+        @error('employeeRequest.education.diplomaNumber')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -137,10 +137,10 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input-date wire:model.defer="employeeRequest.educations.issuedDate"
+            <x-forms.input-date wire:model="employeeRequest.education.issuedDate"
                                 id="issuedDate"/>
         </x-slot>
-        @error('employeeRequest.educations.issuedDate')
+        @error('employeeRequest.education.issuedDate')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}

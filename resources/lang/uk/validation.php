@@ -259,6 +259,13 @@ return [
             'issuedAt' => 'Дата видачі документа',
             'expirationDate' => 'дійсний до',
         ],
+        'document' => [
+            'type' => 'Тип документа',
+            'number' => 'Серія/номер документа',
+            'issuedBy' => 'Орган яким виданий документ',
+            'issuedAt' => 'Дата видачі документа',
+            'expirationDate' => 'дійсний до',
+        ],
         'passportData' => [
             'firstName' => 'Ім’я',
             'lastName' => 'Прізвище',
@@ -320,6 +327,18 @@ return [
             'activeFromDate' => 'Дата початку дії ліцензії',
         ],
         'educations' => [
+            'degree' => 'Ступінь',
+            'speciality' => 'Спеціальність',
+            'institutionName' => 'Назва закладу',
+            'country' => 'Країна',
+            'city' => 'Місто',
+            'institutionType' => 'Тип закладу',
+            'specialityType' => 'Тип спеціальності',
+            'instituteType' => 'Тип закладу',
+            'specialityLevel' => 'Рівень спеціальності',
+            'diplomaNumber' => 'Номер диплому',
+        ],
+        'education' => [
             'degree' => 'Ступінь',
             'speciality' => 'Спеціальність',
             'institutionName' => 'Назва закладу',

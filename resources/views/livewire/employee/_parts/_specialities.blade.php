@@ -24,7 +24,7 @@
                             {{$speciality['certificateNumber'] ?? ''}}
                         </td>
                         <td class="border-b border-[#eee] px-4 py-5 dark:border-strokedark">
-                            <a  x-show="!employeeId" wire:click.prevent="edit('specialities',{{$k}})" href="">
+                            <a  x-show="!employeeId" wire:click.prevent="edit('specialities',{{$k}},'speciality')" href="">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                      stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -38,7 +38,7 @@
         </x-slot>
     </x-tables.table>
     <div class="mb-6 mt-6 flex flex-wrap gap-5 xl:gap-7.5">
-        <a  x-show="!employeeId" wire:click.prevent="create('specialities')"
+        <a  x-show="!employeeId" wire:click.prevent="create('specialities','speciality')"
            class="text-sm inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
            href="">{{__('forms.addEducation')}}</a>
     </div>

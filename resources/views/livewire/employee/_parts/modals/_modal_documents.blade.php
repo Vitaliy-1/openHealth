@@ -1,13 +1,13 @@
 <x-forms.form-row class="">
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
-            <x-forms.label for="documentsType" class="default-label">
+            <x-forms.label for="documentType" class="default-label">
                 {{__('forms.documentType')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.select id="documentsType"
-                            wire:model.defer="employeeRequest.documents.type"
+            <x-forms.select id="documentType"
+                            wire:model.defer="employeeRequest.document.type"
                             class="default-select">
                 <x-slot name="option">
                     <option>{{__('Обрати тип')}}</option>
@@ -17,7 +17,7 @@
                 </x-slot>
             </x-forms.select>
         </x-slot>
-        @error('employeeRequest.documents.type')
+        @error('employeeRequest.document.type')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -27,17 +27,17 @@
     </x-forms.form-group>
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
-            <x-forms.label for="documentsNumber" class="default-label">
+            <x-forms.label for="documentNumber" class="default-label">
                 {{__('forms.documentNumber')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
             <x-forms.input class="default-input"
-                           wire:model="employeeRequest.documents.number"
-                           type="text" id="documentsNumber"
+                           wire:model="employeeRequest.document.number"
+                           type="text" id="documentNumber"
             />
         </x-slot>
-        @error('employeeRequest.documents.number')
+        @error('employeeRequest.document.number')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -49,17 +49,17 @@
 <x-forms.form-row class="">
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
-            <x-forms.label for="documentsIssuedBy" class="default-label">
+            <x-forms.label for="documentIssuedBy" class="default-label">
                 {{__('forms.documentIssuedBy')}}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
             <x-forms.input class="default-input"
-                           wire:model="employeeRequest.documents.issuedBy"
-                           type="text" id="documentsIssuedBy"
-                           placeholder="{{__('Орган яким виданий документ')}}"/>
+                           wire:model="employeeRequest.document.issuedBy"
+                           type="text" id="documentIssuedBy"
+            />
         </x-slot>
-        @error('employeeRequest.documents.issuedBy')
+        @error('employeeRequest.document.issuedBy')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -69,15 +69,15 @@
     </x-forms.form-group>
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
-            <x-forms.label for="documentsIssuedAt" class="default-label">
+            <x-forms.label for="documentIssuedAt" class="default-label">
                 {{__('forms.documentIssuedAt')}}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input-date id="documentIssuedAt" wire:model="employeeRequest.documents.issuedAt"
+            <x-forms.input-date id="documentIssuedAt" wire:model="employeeRequest.document.issuedAt"
             />
         </x-slot>
-        @error('employeeRequest.documents.issuedAt')
+        @error('employeeRequest.document.issuedAt')
         <x-slot name="message">
             <x-forms.error>
                 {{$message}}

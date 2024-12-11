@@ -29,39 +29,40 @@ class EmployeeFormRequest extends Form
         'party.position'        => 'required|string',
         'party.startDate'       => 'date',
     ])]
-
     public ?array $party = [
         'position' => '',
     ];
 
     #[Validate([
-        'documents.type'   => 'required|string|min:3',
-        'documents.number' => 'required|string|min:3',
+        'document.type'   => 'required|string|min:3',
+        'document.number' => 'required|string|min:3',
     ])]
+    public ?array $document = [];
     public ?array $documents = [];
 
     #[Validate([
-        'educations.country'         => 'required|string',
-        'educations.city'            => 'required|string|min:3',
-        'educations.institutionName' => 'required|string|min:3',
-        'educations.diplomaNumber'   => 'required|string|min:3',
-        'educations.degree'          => 'required|string|min:3',
-        'educations.speciality'      => 'required|string|min:3',
+        'education.country'         => 'required|string',
+        'education.city'            => 'required|string|min:3',
+        'education.institutionName' => 'required|string|min:3',
+        'education.diplomaNumber'   => 'required|string|min:3',
+        'education.degree'          => 'required|string|min:3',
+        'education.speciality'      => 'required|string|min:3',
     ])]
-
-    public ?array $educations = [
-        'country'         => '',
+    public ?array $education = [
+        'country' => '',
     ];
+    public ?array $educations = [];
 
     #[Validate([
-        'specialities.speciality'        => 'required|string|min:3',
-        'specialities.level'             => 'required|string|min:3',
-        'specialities.qualificationType' => 'required|string|min:3',
-        'specialities.attestationName'   => 'required|string|min:3',
-        'specialities.attestationDate'   => 'required|date',
-        'specialities.certificateNumber' => 'required|string|min:3',
+        'speciality.speciality'        => 'required|string|min:3',
+        'speciality.level'             => 'required|string|min:3',
+        'speciality.qualificationType' => 'required|string|min:3',
+        'speciality.attestationName'   => 'required|string|min:3',
+        'speciality.attestationDate'   => 'required|date',
+        'speciality.certificateNumber' => 'required|string|min:3',
 
     ])]
+    public ?array $speciality = [];
     public ?array $specialities = [];
 
     #[Validate([
@@ -73,17 +74,15 @@ class EmployeeFormRequest extends Form
         'scienceDegree.speciality'      => 'required|string',
 
     ])]
-    public ?array $scienceDegree = [
-        'country' => '',
-    ];
-
+    public ?array $scienceDegree = [];
     #[Validate([
-        'qualifications.type'              => 'required|string',
-        'qualifications.institutionName'   => 'required|string',
-        'qualifications.speciality'        => 'required|string',
-        'qualifications.issuedDate'        => 'required|date',
-        'qualifications.certificateNumber' => 'required|string',
+        'qualification.type'              => 'required|string',
+        'qualification.institutionName'   => 'required|string',
+        'qualification.speciality'        => 'required|string',
+        'qualification.issuedDate'        => 'required|date',
+        'qualification.certificateNumber' => 'required|string',
     ])]
+    public ?array $qualification = [];
     public ?array $qualifications = [];
 
     /**
@@ -96,7 +95,7 @@ class EmployeeFormRequest extends Form
 
     public function validateBeforeSendApi(): array
     {
-        if (empty($this->party['documents'])) {
+        if (empty($this->documents)) {
             return [
                 'error'   => true,
                 'message' => __('validation.custom.documentsEmpty'),
@@ -110,17 +109,17 @@ class EmployeeFormRequest extends Form
             ];
         }
 
-        if (isset($this->employeeType) && $this->employeeType == 'DOCTOR' && empty($this->specialities)) {
+        if (isset($this->party['employeeType']) && $this->party['employeeType'] == 'DOCTOR' && empty($this->speciality)) {
             return [
                 'error'   => true,
-                'message' => __('validation.custom.specialitiesTable'),
+                'message' => __('validation.custom.specialityTable'),
             ];
         }
 
-        if (isset($this->employeeType) && $this->employeeType == 'DOCTOR' && empty($this->educations)) {
+        if (isset($this->party['employeeType']) && $this->party['employeeType'] == 'DOCTOR' && empty($this->education)) {
             return [
                 'error'   => true,
-                'message' => __('validation.custom.educationsTable'),
+                'message' => __('validation.custom.educationTable'),
             ];
         }
 

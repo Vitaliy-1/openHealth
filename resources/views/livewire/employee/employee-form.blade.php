@@ -25,12 +25,17 @@
             </div>
         </div>
     </div>
-    <x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model="showModal">
+    <x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:ignore wire:model="showModal">
         <x-slot name="title">
             {{__('forms.'.$showModal)}}
         </x-slot>
         <x-slot name="content">
-            <x-forms.forms-section-modal submit="{!! $mode === 'edit' ? 'update('.$showModal.',' . $keyProperty . ')' : 'store(\''.$showModal.'\')' !!}">
+            @php
+                $submitAction = $mode === 'edit'
+                    ? "update(''$showModal', '$keyProperty', '$singleProperty'')"
+                    : "store('$showModal', '$singleProperty')";
+            @endphp
+            <x-forms.forms-section-modal submit="{!! $submitAction !!}">
                 <x-slot name="form">
                     @if(view()->exists('livewire.employee._parts.modals._modal_'.$showModal))
                         @include('livewire.employee._parts.modals._modal_'.$showModal)
@@ -41,10 +46,6 @@
             </x-forms.forms-section-modal>
         </x-slot>
     </x-dialog-modal>
-
-
-
-
     <x-forms.loading/>
 
 </div>
