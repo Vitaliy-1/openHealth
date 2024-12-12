@@ -2,34 +2,34 @@
 
 namespace App\Livewire\Employee;
 
-use App\Classes\Cipher\Api\CipherApi;
+use App\Classes\eHealth\Api\EmployeeApi;
 use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
 use App\Livewire\Employee\Forms\EmployeeFormRequest;
 use App\Models\Division;
 use App\Models\Employee;
 use App\Models\LegalEntity;
-use App\Models\Person;
 use App\Models\User;
 use App\Classes\Cipher\Traits\Cipher;
+use App\Repositories\EmployeeRepository;
 use App\Traits\FormTrait;
 use App\Traits\InteractsWithCache;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
 class EmployeeForm extends Component
 {
-    use FormTrait,Cipher,WithFileUploads, InteractsWithCache;
+    use FormTrait;
+    use Cipher;
+    use WithFileUploads;
+    use InteractsWithCache;
 
     const CACHE_PREFIX = 'register_employee_form';
 
-    public EmployeeFormRequest $employee_request;
+    public EmployeeFormRequest $employeeRequest;
+
     protected string $employeeCacheKey;
 
     public Employee $employee;
@@ -42,12 +42,12 @@ class EmployeeForm extends Component
 
     public array $success = [
         'message' => '',
-        'status' => false,
+        'status'  => false,
     ];
 
     public ?array $error = [
         'message' => '',
-        'status' => false,
+        'status'  => false,
     ];
 
     public ?array $dictionaries_field = [
@@ -65,39 +65,46 @@ class EmployeeForm extends Component
         'EMPLOYEE_TYPE',
         'POSITION',
         'EDUCATION_DEGREE',
+        'EMPLOYEE_TYPE'
     ];
 
-    public \Illuminate\Database\Eloquent\Collection $divisions;
-    public \Illuminate\Database\Eloquent\Collection $healthcareServices;
+    public ?object $divisions;
+    public ?object $healthcareServices;
+
+    protected ?EmployeeRepository $employeeRepository;
 
     public array $tableHeaders;
     public string $requestId;
-    public string $employee_id;
+    public string $employeeId;
     /**
      * @var mixed|string
      */
-    public mixed $key_property;
+    public mixed $keyProperty;
 
 
-    public ?object  $file = null;
+    public ?object $file = null;
+
+    /**
+     * @var mixed|string
+     */
+    public mixed $singleProperty;
 
 
-    public function boot(): void
+    public function boot(EmployeeRepository $employeeRepository): void
     {
-        $this->employeeCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->legalEntity->uuid;
+        $this->employeeRepository = $employeeRepository;
+        $this->employeeCacheKey = self::CACHE_PREFIX.'-'.Auth::user()->legalEntity->uuid;
     }
 
     public function mount(Request $request, $id = '')
     {
-        $this->setTableHeaders();
         $this->getLegalEntity();
-        $this->getDivisions();
-        if ($request->has('store_id')) {
-            $this->requestId = $request->input('store_id');
+//        $this->getDivisions();
+        if ($request->has('storeId')) {
+            $this->requestId = $request->input('storeId');
         }
         if (!empty($id)) {
-
-            $this->employee_id = $id;
+            $this->employeeId = $id;
         }
         $this->setCertificateAuthority();
         $this->getEmployee();
@@ -122,7 +129,7 @@ class EmployeeForm extends Component
     {
         $dictionaries = $this->dictionaries;
         if (isset($this->employee['documents']) && !empty($this->employee['documents'])) {
-            foreach ($this->employee['documents'] as $k => $document) {
+            foreach ($this->employee['documents'] as $document) {
                 unset($dictionaries['DOCUMENT_TYPE'][$document['type']]);
             }
         }
@@ -131,79 +138,29 @@ class EmployeeForm extends Component
 
     public function getEmployee(): void
     {
-
-        if (isset($this->employee_id)) {
-             $employeeData = Employee::find($this->employee_id);
-            if (empty($employeeData)) {
-                abort(404);
-            }
-
-            $this->employee = $employeeData;
-            $this->employee->educations = $this->employee->doctor['educations'] ?? [];
-            $this->employee->specialities = $this->employee->doctor['specialities'] ?? [];
-            $this->employee->qualifications = $this->employee->doctor['qualifications'] ?? [];
-            $this->employee->science_degree = $this->employee->doctor['science_degree'] ?? [];
-
-            $this->employee->documents = $this->employee->party['documents'] ?? [];
-            if (!empty($this->employee)) {
-                $this->employee_request->fill(
-                    [
-                        'employee' => $this->employee->party,
-
-                    ],
-                );
-
-             $this->employee_request->employee['position'] = $this->employee->position;
-             $this->employee_request->employee['start_date'] = $this->employee->start_date;
-             $this->employee_request->employee['employee_type'] = $this->employee->employee_type;
-
-
-            }
+        if (isset($this->employeeId)) {
+            $employeeData = Employee::showEmployee($this->employeeId);
+            $this->employeeRequest->fill($employeeData);
         }
-
         if ($this->hasCache($this->employeeCacheKey) && isset($this->requestId)) {
             $employeeData = $this->getCache($this->employeeCacheKey);
-
             if (isset($employeeData[$this->requestId])) {
-                $this->employee = (new Employee())->forceFill($employeeData[$this->requestId]);
-
-                if (!empty($this->employee->employee)) {
-                    $this->employee_request->fill(
-                        [
-                            'employee' => $this->employee->employee,
-                            'documents' => $this->employee->documents?? [],
-                            'educations' => $this->employee->educations?? [],
-                            'specialities' => $this->employee->specialities?? [],
-                            'qualifications' => $this->employee->qualifications?? [],
-                            'science_degree' => $this->employee->science_degree?? [],
-                        ]
-                    );
-                }
+                $this->employeeRequest->fill($employeeData[$this->requestId]);
             }
         }
+
 
     }
 
-    public function updatedFile(): void{
+    public function updatedFile(): void
+    {
         $this->keyContainerUpload = $this->file;
     }
 
     /**
      * Set the table headers for the E-health table.
      */
-    public function setTableHeaders(): void
-    {
-        // Define the table headers
-        $this->tableHeaders = [
-            __('ID E-health'),
-            __('ПІБ'),
-            __('Телефон'),
-            __('Email'),
-            __('Посада'),
-            __('Статус'),
-            __('Дія'),
-        ];
-    }
+
 
     public function getLegalEntity()
     {
@@ -217,177 +174,146 @@ class EmployeeForm extends Component
             ->get();
     }
 
-    public function openModalModel($model)
+    public function openModalModel($model, $singleProperty = '')
     {
         $this->showModal = $model;
+        $this->singleProperty = $singleProperty;
     }
 
-    public function create($model)
+    public function create($model, $singleProperty = '')
     {
-
         $this->mode = 'create';
-        $this->employee_request->{$model} = [];
+        if (!empty($singleProperty)) {
+            $this->singleProperty = $singleProperty;
+        }
+        $this->employeeRequest->{$model} = [];
         $this->openModal($model);
         $this->getEmployee();
         $this->dictionaryUnset();
     }
 
 
-    public function signdeComplete($model){
+    public function signedComplete($model)
+    {
         $this->getEmployee();
-        $open = $this->employee_request->validateBeforeSendApi();
-        if ($open['error'] ) {
+        $open = $this->employeeRequest->validateBeforeSendApi();
+        if ($open['error']) {
             $this->dispatch('flashMessage', ['message' => $open['message'], 'type' => 'error']);
-        }
-        else{
+        } else {
             $this->openModal($model);
         }
     }
+
     public function updated($field)
     {
-        if ($field === 'keyContainerUpload'){
-          $this->getEmployee();
+
+        if ($field === 'keyContainerUpload') {
+            $this->getEmployee();
         }
     }
 
 
-    public function store($model)
+    public function store($model,$modelSingle = []) : void
     {
-
-        $this->employee_request->rulesForModelValidate($model);
-
+        $rules = $model;
+        if (!empty($modelSingle)) {
+            $rules = $modelSingle;
+        }
+        $this->employeeRequest->rulesForModelValidate($rules);
         $this->resetErrorBag();
-
+        if (!empty($modelSingle)) {
+            $this->employeeRequest->{$model} = $this->employeeRequest->{$modelSingle};
+            unset($this->employeeRequest->{$modelSingle});
+        }
         if (isset($this->requestId)) {
             $this->storeCacheEmployee($model);
         }
-        if (isset($this->employee_id)) {
-            $this->storeEmployee($model);
-        }
-
         $this->closeModalModel();
-
         $this->dispatch('flashMessage', ['message' => __('Інформацію успішно оновлено'), 'type' => 'success']);
-
         $this->getEmployee();
-
     }
 
     public function storeCacheEmployee(string $model): void
     {
-        $this->storeCacheData($this->employeeCacheKey, $model, 'employee_request', ['employee', 'science_degree', 'positions']);
-    }
-
-    public function storeEmployee($model)
-    {
-        if ($model == 'employee') {
-            $this->employee->position = $this->employee_request->employee['position'];
-            $this->employee->employee_type = $this->employee_request->employee['employee_type'];
-            $this->employee->start_date = $this->employee_request->employee['start_date'];
-            $this->employee->party = $this->employee_request->employee;
-
-        } elseif ($model == 'documents') {
-            $party = $this->employee->party;
-            $party['documents'][] = $this->employee_request->documents;
-            $this->employee->party = $party;
-        } elseif ($model == 'science_degree') {
-            $doctor = $this->employee->doctor;
-            $doctor['science_degree'] = $this->employee_request->science_degree;
-            $this->employee->doctor = $doctor;
-        }
-
-        else {
-            $doctor = $this->employee->doctor;
-            $doctor[$model][] = $this->employee_request->{$model};
-            $this->employee->doctor = $doctor;
-        }
-        unset($this->employee->educations,
-            $this->employee->specialities,
-            $this->employee->qualifications,
-            $this->employee->science_degree,
-            $this->employee->documents,
+        $this->storeCacheData(
+            $this->employeeCacheKey,
+            $model,
+            'employeeRequest',
+            ['party','scienceDegree']
         );
 
-        $this->employee->save();
-
     }
 
 
-    public function edit($model, $key_property = '')
+
+    public function edit($model, $keyProperty = '', $singleProperty = '')
     {
 
-        $this->key_property = $key_property;
+        $this->keyProperty = $keyProperty;
         $this->mode = 'edit';
-        $this->openModal($model);
+
         if (isset($this->requestId)) {
-            $this->editCacheEmployee($model, $key_property);
-        }
-        if (isset($this->employee_id)) {
+            $this->editCacheEmployee($model, $keyProperty,$singleProperty);
 
-            $this->editEmployee($model, $key_property);
         }
-
+        $this->openModal($model);
 
     }
 
-    public function editCacheEmployee($model, $key_property = '')
+
+    public function editCacheEmployee( string $model,  string $keyProperty = '', $singleProperty = '')
     {
         $cacheData = $this->getCache($this->employeeCacheKey);
 
-        if (empty($key_property) && $key_property !== 0) {
-            $this->employee_request->{$model} = $cacheData[$this->requestId][$model];
+        if ($keyProperty !== '') {
+            $this->employeeRequest->{$singleProperty ?: $model} = $cacheData[$this->requestId][$model][$keyProperty];
         } else {
-            $this->employee_request->{$model} = $cacheData[$this->requestId][$model][$key_property];
+            $this->employeeRequest->{$model} = $cacheData[$this->requestId][$model];
         }
     }
 
-    public function editEmployee($model, $key_property = '')
-    {
-        if ($model == 'documents') {
-            $this->employee_request->{$model} = $this->employee->party[$model][$key_property];
-        }
-        elseif ($model == 'science_degree') {
-            $this->employee_request->{$model} = $this->employee->doctor[$model];
-        }
-        else{
-            $this->employee_request->{$model} = $this->employee->doctor[$model][$key_property];
-        }
-    }
 
-    public function update($model, $key_property)
+    public function update($model, $keyProperty, $singleProperty = '')
     {
+        $this->employeeRequest->rulesForModelValidate($model);
 
-        $this->employee_request->rulesForModelValidate($model);
         $this->resetErrorBag();
+
         if (isset($this->requestId)) {
-            $this->updateCacheEmployee($model, $key_property);
+            $this->updateCacheEmployee($model, $keyProperty,$singleProperty);
         }
-        if (isset($this->employee_id)) {
-            $this->updateEmployee($model, $key_property);
+        if (isset($this->employeeId)) {
+            $this->updateEmployee($model, $keyProperty);
         }
         $this->closeModalModel($model);
     }
 
-    public function updateCacheEmployee($model, $key_property)
+    public function updateCacheEmployee($model,$keyProperty, $singleProperty = '')
     {
-        if ($this->hasCache($this->employeeCacheKey)) {
-            $cacheData = $this->getCache($this->employeeCacheKey);
-            $cacheData[$this->requestId][$model][$key_property] = $this->employee_request->{$model};
-            $this->putCache($this->employeeCacheKey, $cacheData);
+        if (!empty($modelSingle)) {
+            $this->employeeRequest->{$model} = $this->employeeRequest->{$modelSingle};
+            unset($this->employeeRequest->{$modelSingle});
         }
 
+        if ($this->hasCache($this->employeeCacheKey)) {
+            $cacheData = $this->getCache($this->employeeCacheKey);
+            if (isset($cacheData[$this->requestId][$model][$keyProperty])) {
+                $cacheData[$this->requestId][$model][$keyProperty] = $this->employeeRequest->{$singleProperty ?: $model};
+            }
+            $this->putCache($this->employeeCacheKey, $cacheData);
+        }
     }
 
-    public function updateEmployee($model, $key_property)
+
+    public function updateEmployee($model, $keyProperty)
     {
         if ($model === 'documents') {
             $party = $this->employee->party;
-            $party[$model][$key_property] = $this->employee_request->{$model};
+            $party[$model][$keyProperty] = $this->employeeRequest->{$model};
             $this->employee->party = $party;
-        }
-        else {
+        } else {
             $doctor = $this->employee->doctor;
-            $doctor[$model][$key_property] = $this->employee_request->{$model};
+            $doctor[$model][$keyProperty] = $this->employeeRequest->{$model};
             $this->employee->doctor = $doctor;
         }
         $this->employee->save();
@@ -396,7 +322,7 @@ class EmployeeForm extends Component
     public function closeModalModel($model = null): void
     {
         if (!empty($model)) {
-            $this->employee_request->{$model} = [];
+            $this->employeeRequest->{$model} = [];
         }
 
         $this->closeModal();
@@ -406,60 +332,38 @@ class EmployeeForm extends Component
 
     public function sendApiRequest()
     {
-        $cacheData = $this->getCache($this->employeeCacheKey);
+        $preRequest = $this->employeeRequest->toArray();
+        $preRequest['doctor'] = [
+            'specialities'   => $preRequest['specialities'],
+            'qualifications' => $preRequest['qualifications'],
+            'educations'     => $preRequest['educations'],
+            'scienceDegree'  => $preRequest['scienceDegree']
+        ];
+        $employeeRequest = schemaService()->requestSchemaNormalize(
+            ['employee_request' => $preRequest],
+            app(EmployeeApi::class),
+        );
 
-        if (isset($this->requestId) && isset($cacheData[$this->requestId])) {
-            $this->employee_request->fill($cacheData[$this->requestId]);
+        dd($employeeRequest);
+        $base64Data = $this->sendEncryptedData($employeeRequest);
+        if (isset($base64Data['errors'])) {
+            $this->dispatch('flashMessage', [
+                'message' => $base64Data['errors'],
+                'type'    => 'error'
+            ]);
+            return;
         }
+        $data = [
+            'signed_content'          => $base64Data,
+            'signed_content_encoding' => 'base64',
+        ];
 
-        if (isset($this->employee_id)) {
-            $this->employee_request->fill($this->employee->toArray());
-            $this->employee_request->documents = $this->employee->party['documents'];
-            $this->employee_request->science_degree = $this->employee->doctor['science_degree'] ?? [];
-            $this->employee_request->specialities = $this->employee->doctor['specialities'] ?? [];
-            $this->employee_request->educations = $this->employee->doctor['educations'] ?? [];
-            $this->employee_request->qualifications = $this->employee->doctor['qualifications'] ?? [];
-
+        $employeeRequest = EmployeeRequestApi::createEmployeeRequest($data);
+        $this->employeeRepository->saveEmployeeData($employeeRequest, $this->legalEntity);
+        if (isset($this->requestId)) {
+            $this->forgetCacheIndex();
         }
-
-        $error = $this->employee_request->validateBeforeSendApi();
-
-        if (!$error['error']) {
-            // TODO: need more testing for correctness receiving 'tax_id' value from the form
-            $taxId =$this->employee_request->employee['tax_id'] ?? '';
-
-            $base64Data =  $this->sendEncryptedData($this->buildEmployeeRequest(), $taxId);
-
-             if (isset($base64Data['errors'])) {
-                 $this->dispatch('flashMessage', [
-                     'message' => $base64Data['errors'],
-                     'type'    => 'error'
-                 ]);
-                 return;
-             }
-
-            $data = [
-                'signed_content' =>    $base64Data,
-                'signed_content_encoding' => 'base64',
-            ];
-            $employeeRequest = EmployeeRequestApi::createEmployeeRequest($data);
-
-            if (isset($this->requestId)) {
-                $this->saveUser($employeeRequest);
-                $this->saveEmployee($employeeRequest);
-                $this->forgetCacheIndex();
-            }
-            unset($employeeRequest['id']);
-            unset($employeeRequest['legal_entity_id']);
-            unset($employeeRequest['division_id']);
-            $this->employee->update($employeeRequest);
-            return redirect(route('employee.index'));
-
-        } else {
-            $this->error['status'] = $error['status'];
-            $this->error['message'] = $error['message'];
-        }
-        $this->getEmployee();
+        return redirect(route('employee.index'));
     }
 
 
@@ -473,21 +377,16 @@ class EmployeeForm extends Component
     }
 
 
-    public function savePerson($data)
-    {
-        return Person::create($data['party']);
-    }
-
     /**
      * Save a new user with the provided data.
      *
-     * @param array $data The data to create the user with.
+     * @param  array  $data  The data to create the user with.
      */
 
     public function saveUser(array $data)
     {
-        $user =  User::create([
-            'email' =>  $data['party']['email'],
+        $user = User::create([
+            'email'    => $data['party']['email'],
             'password' => Hash::make(\Illuminate\Support\Str::random(8)),
         ]);
         $user->assignRole($data['employee_type']);
@@ -495,67 +394,15 @@ class EmployeeForm extends Component
         $user->save();
     }
 
-    /**
-     * Save an employee record based on the provided data.
-     *
-     * @param array $data The data to fill the employee record with.
-     * @return Employee The saved employee record.
-     */
-    public function saveEmployee(array $data)
-    {
-        $employee = new Employee();
-        $employee->fill($data);
-        $employee->uuid = $data['id'];
-        $employee->division_uuid = $data['division_id'] ?? null;
-        $employee->legal_entity_uuid = $data['legal_entity_id'] ?? null;
-        $employee->legal_entity_id = $this->legalEntity->getId();
-        return $employee;
-    }
-
-    public function buildEmployeeRequest(): array
-    {
-        $employee_request = $this->employee_request->toArray();
-
-        $data['employee_request'] = [
-            'employee_type' => $employee_request['employee']['employee_type'] ?? '',
-            'employee_id' => $this->employee->uuid ?? '',
-            'legal_entity_id' => $this->legalEntity->uuid ?? '',
-            'position' => $employee_request['employee']['position'] ?? '',
-            'status' => 'NEW',
-            'start_date' => isset($employee_request['employee']['start_date']) ? Carbon::parse( $employee_request['employee']['start_date'])->format('Y-m-d') : '',
-            'party' => [
-                'email' => $employee_request['employee']['email'] ?? '',
-                'first_name' => $employee_request['employee']['first_name'] ?? '',
-                'last_name' => $employee_request['employee']['last_name'] ?? '',
-                'phones' => $employee_request['employee']['phones'] ?? '',
-                'tax_id' => $employee_request['employee']['tax_id'] ?? '',
-                'no_tax_id' => $employee_request['employee']['no_tax_id'] ?? false,
-                'gender' => $employee_request['employee']['gender'] ?? '',
-                'documents' => $employee_request['documents'] ?? '',
-                'birth_date' => isset($employee_request['employee']['birth_date']) ? Carbon::parse( $employee_request['employee']['birth_date'])->format('Y-m-d') : '',
-                'working_experience' => (int)$employee_request['employee']['working_experience'] ?? '',
-                'about_myself' => $employee_request['employee']['about_myself'] ?? '',
-            ],
-            'doctor' => [
-                'educations' => $employee_request['educations'] ?? [],
-                'specialities' => $employee_request['specialities'] ?? [],
-                'qualifications' => $employee_request['qualifications'] ?? [],
-                'science_degree' => $employee_request['science_degree'] ?? [],
-            ],
-        ];
-
-        return removeEmptyKeys($data);
-    }
-
-
     /*
      * Include functions after  getDictionary
      * @return array
      */
-    public function getEmployeeDictionaryRole(): array {
+    public function getEmployeeDictionaryRole(): array
+    {
         $validRoles = ['OWNER', 'ADMIN', 'DOCTOR', 'HR'];
 
-        $filteredRoles = array_filter($this->dictionaries['EMPLOYEE_TYPE'], function($key) use ($validRoles) {
+        $filteredRoles = array_filter($this->dictionaries['EMPLOYEE_TYPE'], function ($key) use ($validRoles) {
             return in_array($key, $validRoles);
         }, ARRAY_FILTER_USE_KEY);
 
@@ -563,18 +410,38 @@ class EmployeeForm extends Component
     }
 
 
-    public function getEmployeeDictionaryPosition(): array {
+    public function getEmployeeDictionaryPosition(): array
+    {
+        $validPositions = [
+            "P3", "P274", "P93", "P202", "P215", "P159", "P118", "P46", "P54", "P99", "P109", "P96", "P245", "P279",
+            "P63", "P123", "P17", "P62", "P45", "P10", "P74", "P37", "P114", "P127", "P214", "P179", "P156", "P145",
+            "P103", "P115", "P126", "P120", "P268", "P110", "P43", "P130", "P203", "P81", "P273", "P95", "P191", "P42",
+            "P38", "P105", "P23", "P197", "P154", "P65", "P58", "P175", "P61", "P98", "P13", "P177", "P173", "P72",
+            "P256", "P178", "P153", "P212", "P53", "P48", "P7", "P106", "P122", "P52", "P158", "P15", "P22", "P39",
+            "P92", "P112", "P71", "P164", "P170", "P266", "P224", "P270", "P78", "P242", "P160", "P2", "P213", "P152",
+            "P26", "P247", "P192", "P36", "P67", "P181", "P124", "P73", "P228", "P55", "P117", "P249", "P91", "P70",
+            "P231", "P229", "P97", "P167", "P169", "P238", "P149", "P150", "P128", "P64", "P51", "P83", "P44", "P241",
+            "P4", "P50", "P250", "P116", "P185", "P276", "P76", "P40", "P69", "P84", "P82", "P176", "P174", "P278",
+            "P155", "P9", "P257", "P29", "P252", "P243", "P24", "P180", "P166", "P201", "P16", "P200", "P210", "P34",
+            "P272", "P168", "P275", "P194", "P165", "P146", "P151", "P111", "P85", "P265", "P87", "P246", "P6", "P77",
+            "P41", "P204", "P94", "P240", "P79", "P14", "P216", "P32", "P59", "P230", "P1", "P88", "P248", "P172",
+            "P75", "P113", "P196", "P28", "P129", "P206", "P57", "P162", "P35", "P107", "P184", "P68", "P131", "P189",
+            "P211", "P60", "P25", "P56", "P161", "P5", "P89", "P188", "P183", "P100", "P47", "P269", "P66", "P8",
+            "P207", "P255", "P119", "P90", "P86", "P27", "P199", "P108", "P163", "P157", "P277", "P11"
+        ];
 
-        $validPositions = ["P3", "P274", "P93", "P202", "P215", "P159", "P118", "P46", "P54", "P99", "P109", "P96", "P245", "P279", "P63", "P123", "P17", "P62", "P45", "P10", "P74", "P37", "P114", "P127", "P214", "P179", "P156", "P145", "P103", "P115", "P126", "P120", "P268", "P110", "P43", "P130", "P203", "P81", "P273", "P95", "P191", "P42", "P38", "P105", "P23", "P197", "P154", "P65", "P58", "P175", "P61", "P98", "P13", "P177", "P173", "P72", "P256", "P178", "P153", "P212", "P53", "P48", "P7", "P106", "P122", "P52", "P158", "P15", "P22", "P39", "P92", "P112", "P71", "P164", "P170", "P266", "P224", "P270", "P78", "P242", "P160", "P2", "P213", "P152", "P26", "P247", "P192", "P36", "P67", "P181", "P124", "P73", "P228", "P55", "P117", "P249", "P91", "P70", "P231", "P229", "P97", "P167", "P169", "P238", "P149", "P150", "P128", "P64", "P51", "P83", "P44", "P241", "P4", "P50", "P250", "P116", "P185", "P276", "P76", "P40", "P69", "P84", "P82", "P176", "P174", "P278", "P155", "P9", "P257", "P29", "P252", "P243", "P24", "P180", "P166", "P201", "P16", "P200", "P210", "P34", "P272", "P168", "P275", "P194", "P165", "P146", "P151", "P111", "P85", "P265", "P87", "P246", "P6", "P77", "P41", "P204", "P94", "P240", "P79", "P14", "P216", "P32", "P59", "P230", "P1", "P88", "P248", "P172", "P75", "P113", "P196", "P28", "P129", "P206", "P57", "P162", "P35", "P107", "P184", "P68", "P131", "P189", "P211", "P60", "P25", "P56", "P161", "P5", "P89", "P188", "P183", "P100", "P47", "P269", "P66", "P8", "P207", "P255", "P119", "P90", "P86", "P27", "P199", "P108", "P163", "P157", "P277", "P11"];
-        $filterPosition = array_filter($this->dictionaries['POSITION'], function($key) use ($validPositions) {
+
+        $filterPosition = array_filter($this->dictionaries['POSITION'], function ($key) use ($validPositions) {
             return in_array($key, $validPositions);
         }, ARRAY_FILTER_USE_KEY);
-        return $this->dictionaries['POSITION'] = $filterPosition;
 
+        return $this->dictionaries['POSITION'] = $filterPosition;
     }
 
     public function render()
     {
+         $this->getDictionary();
+
         return view('livewire.employee.employee-form');
     }
 

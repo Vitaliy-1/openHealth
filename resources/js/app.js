@@ -29,8 +29,8 @@ const initializeDatepickers = () => {
             const datepicker = new Datepicker(element, {
                 format: 'yyyy-mm-dd',
                 language: 'uk',
-                minDate: minDate,  // Мінімальна дата
-                maxDate: maxDate,  // Максимальна дата
+                minDate: minDate,
+                maxDate: maxDate,
             });
 
             element.classList.add('datepicker-initialized');

@@ -1,6 +1,6 @@
 @props(['title', 'description'])
 
-<div class="mb-4 p-4">
+<div class="mb-4">
     <nav class="flex mb-5" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
             <li class="inline-flex items-center">

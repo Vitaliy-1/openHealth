@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Classes\eHealth\Services\SchemaService;
+use App\Repositories\EmployeeRepository;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 
