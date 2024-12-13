@@ -17,8 +17,8 @@
                                     wire:model="knedp"
                                     id="knedp">
                         <x-slot name="option">
-                            @foreach($getCertificateAuthority as $certificate_type)
-                                <option value="{{ $certificate_type['id'] }}">{{ $certificate_type['name'] }}</option>
+                            @foreach($getCertificateAuthority as $certificateType)
+                                <option value="{{ $certificateType['id'] }}">{{ $certificateType['name'] }}</option>
                             @endforeach
                         </x-slot>
                     </x-forms.select>

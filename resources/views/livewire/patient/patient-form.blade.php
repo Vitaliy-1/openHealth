@@ -37,19 +37,11 @@
                                         id="is_incapable"
                             />
                         </x-slot>
-
-                        @error('is_incapable')
-                        <x-slot name="error">
-                            <x-forms.error>
-                                {{ $message }}
-                            </x-forms.error>
-                        </x-slot>
-                        @enderror
                     </x-forms.form-group>
                 </x-forms.form-row>
 
                 @if($isIncapable)
-                    {{-- TODO: додати поле пошуку person_id --}}
+                    <livewire:patient.patients-filter/>
                     @include('livewire.patient._parts._confidant_person_documents_relationship')
                 @endif
             </div>
@@ -74,7 +66,9 @@
                 </div>
 
                 <div class="xl:w-1/4 text-right">
-                    <button wire:click="createPerson" type="button" class="btn-primary">
+                    <button wire:click="createPerson" type="button"
+                            class="btn-primary {{ $isPatientStored ? '' : 'cursor-not-allowed' }}"
+                        {{ $isPatientStored ? '' : 'disabled' }}>
                         {{ __('Відправити на затвердження') }}
                     </button>
                 </div>
@@ -87,7 +81,7 @@
 
     @if($showModal === 'documents')
         @include('livewire.patient._parts.modals._modal_documents')
-    @elseif($showModal === 'documents_relationship')
+    @elseif($showModal === 'documentsRelationship')
         @include('livewire.patient._parts.modals._modal_confidant_person_documents_relationship')
     @endif
 </div>

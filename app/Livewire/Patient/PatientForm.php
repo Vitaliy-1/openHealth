@@ -10,9 +10,11 @@ use App\Livewire\Patient\Forms\PatientFormRequest;
 use App\Models\Person;
 use App\Traits\FormTrait;
 use App\Traits\InteractsWithCache;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -25,12 +27,22 @@ class PatientForm extends Component
     public string $mode = 'create';
     public PatientFormRequest $patientRequest;
     public Person $patient;
+    public array $documents = [];
+    public array $documentsRelationship = [];
+    public array $uploadedDocuments = [];
     public string $requestId;
     public string $patientId;
     protected string $patientCacheKey;
     public int $keyProperty;
 
     public string $viewState = 'default';
+
+    /**
+     * Check is store patient was successful
+     * @var bool
+     */
+    public bool $isPatientStored = false;
+
     /**
      * Mark 'information from the leaflet was communicated to the patient'
      * @var bool
@@ -50,7 +62,7 @@ class PatientForm extends Component
     public bool $noTaxId = false;
 
     /**
-     * Is patient incapable
+     * Is patient incapable or child less than 14 y.o
      * @var bool
      */
     public bool $isIncapable = false;
@@ -67,6 +79,12 @@ class PatientForm extends Component
      */
     public ?object $file = null;
 
+    /**
+     * Time to resend SMS
+     * @var int
+     */
+    public int $resendCooldown = 60;
+
     protected $listeners = ['addressDataFetched'];
     public array $dictionaries_field = [
         'DOCUMENT_TYPE',
@@ -79,9 +97,12 @@ class PatientForm extends Component
 
     public function boot(): void
     {
-        $this->patientCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->id . '-' . Auth::user()->legalEntity->uuid;
+        $this->patientCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->legalEntity->uuid;
     }
 
+    /**
+     * @throws \App\Classes\Cipher\Exceptions\ApiException
+     */
     public function mount(Request $request, string $id = ''): void
     {
         if ($request->has('store_id')) {
@@ -97,16 +118,23 @@ class PatientForm extends Component
         $this->getDictionary();
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.patient.patient-form');
     }
 
-    public function hydrate(): void
+    #[On('confidant-person-selected')]
+    public function confidantPersonSelected(string $id): void
     {
-        if ($this->mode !== 'edit' && ($this->patientRequest->documents || $this->patientRequest->documents_relationship)) {
-            $this->getPatient();
-        }
+        $cacheData = $this->getCache($this->patientCacheKey) ?? [];
+
+        $cacheData[$this->requestId]['documentsRelationship']['confidantPersonId'] = $id;
+        $cacheData[$this->requestId]['patient']['authenticationMethods']['value'] = $id;
+
+        $this->patientRequest->documentsRelationship['confidantPersonId'] = $id;
+        $this->patientRequest->patient['authenticationMethods']['value'] = $id;
+
+        $this->putCache($this->patientCacheKey, $cacheData);
     }
 
     /**
@@ -132,21 +160,38 @@ class PatientForm extends Component
      */
     public function store(string $model): void
     {
-        $this->patientRequest->rulesForModelValidate($model);
-        $this->fetchDataFromAddressesComponent();
-        $this->resetErrorBag();
+        try {
+            $this->patientRequest->rulesForModelValidate($model);
+            $this->fetchDataFromAddressesComponent();
+            $this->resetErrorBag();
 
-        if (isset($this->requestId)) {
-            $this->storeCachePatient($model);
+            if (isset($this->requestId)) {
+                $this->storeCachePatient($model);
+            }
+
+            $this->closeModalModel();
+            $this->dispatch('flashMessage', [
+                'message' => __('Інформацію успішно оновлено'),
+                'type' => 'success'
+            ]);
+
+            $this->getPatient();
+            // allow to create person
+            if ($model === 'patient') {
+                $this->isPatientStored = true;
+            }
+        } catch (ValidationException $e) {
+            $this->dispatch('flashMessage', [
+                'message' => __('Помилка валідації'),
+                'type' => 'error'
+            ]);
+
+            if (isset($this->requestId) && $model === 'patient') {
+                $this->storeCachePatient($model);
+            }
+
+            throw $e;
         }
-
-        $this->closeModalModel();
-        $this->dispatch('flashMessage', [
-            'message' => __('Інформацію успішно оновлено'),
-            'type' => 'success'
-        ]);
-
-        $this->getPatient();
     }
 
     /**
@@ -161,21 +206,86 @@ class PatientForm extends Component
     }
 
     /**
+     * Send API request 'Create Person v2' and show the next page if data is validated.
+     *
+     * @return void
+     * @throws ApiException
+     */
+    public function createPerson(): void
+    {
+        $open = $this->patientRequest->validateBeforeSendApi();
+
+        if ($open['error']) {
+            $this->dispatch('flashMessage', [
+                'message' => $open['messages'][0],
+                'type' => 'error'
+            ]);
+
+            return;
+        }
+
+        $response = $this->sendPersonRequest($this->patientRequest->toArray());
+        if ($response['meta']['code'] === 201) {
+            // Show next view page and save patient ID and documents that need to be uploaded
+            $cacheData = $this->getCache($this->patientCacheKey);
+            $cacheData[$this->requestId]['uploadedDocuments'] = $response['urgent']['documents'];
+            $cacheData[$this->requestId]['patient']['id'] = $response['data']['id'];
+            $this->putCache($this->patientCacheKey, $cacheData);
+
+            $this->id = $response['data']['id'];
+            $this->viewState = 'new';
+        }
+    }
+
+    /**
+     * Upload patient files to the appropriate URL.
+     *
+     * @param  string  $model
+     * @param  string  $documentType
+     * @return void
+     * @throws ApiException|ValidationException
+     */
+    public function uploadFile(string $model, string $documentType): void
+    {
+        $this->patientRequest->rulesForModelValidate($model);
+
+        $document = collect($this->patientRequest->uploadedDocuments)
+            ->firstWhere('type', $documentType);
+
+        if ($document) {
+            $requestData = PatientRequestApi::buildUploadFileRequest($document['documentsRelationship']);
+            $uploadResponse = PersonApi::uploadFileRequest($document['url'], $requestData);
+
+            if (isset($uploadResponse['status']) && $uploadResponse['status'] === 200) {
+                $this->dispatch('flashMessage', [
+                    'message' => 'Фото успішно завантажено',
+                    'type' => 'success',
+                ]);
+            } else {
+                $errorMessage = $uploadResponse['Message'] ?? 'Сталася помилка під час завантаження файлу';
+                $this->dispatch('flashMessage', [
+                    'message' => "Помилка: $errorMessage",
+                    'type' => 'error',
+                ]);
+            }
+        }
+    }
+
+    /**
      * Build and send API request 'Approve Person v2' and show the next page if data is validated.
      *
      * @param  string  $model
      * @return void
-     * @throws ApiException
-     * @throws ValidationException
+     * @throws ValidationException|ApiException
      */
     public function approvePerson(string $model): void
     {
         $this->patientRequest->rulesForModelValidate($model);
 
-        $confirmationCode = $this->patientRequest->confirmation_code;
+        $confirmationCode = $this->patientRequest->confirmationCode;
 
         $requestData = PatientRequestApi::buildApprovePersonRequest($confirmationCode);
-        $response = PersonApi::approvePersonRequest($this->id, $requestData);
+        $response = PersonApi::approvePersonRequest($this->id ?? $this->patientRequest->patient['id'], $requestData);
 
         if ($response['status'] === 'APPROVED') {
             $this->isApproved = true;
@@ -190,17 +300,18 @@ class PatientForm extends Component
      */
     public function signPerson(): void
     {
-        $getPatientById = PersonApi::getCreatedPersonById($this->id);
+        $getPatientById = PersonApi::getCreatedPersonById($this->id ?? $this->patientRequest->patient['id']);
         unset($getPatientById['meta'], $getPatientById['urgent']);
 
         $encryptedRequestData = PatientRequestApi::buildEncryptedSignPersonRequest($getPatientById);
-        $base64EncryptedData = $this->sendEncryptedData($encryptedRequestData, $this->patientRequest->patient['taxId']);
+        $base64EncryptedData = $this->sendEncryptedData($encryptedRequestData, Auth::user()->tax_id);
 
         $signRequestData = PatientRequestApi::buildSignPersonRequest($base64EncryptedData);
-        $signResponse = PersonApi::singPersonRequest($this->id, $signRequestData, Auth::user()->tax_id);
+        $signResponse = PersonApi::singPersonRequest($this->id ?? $this->patientRequest->patient['id'],
+            $signRequestData, Auth::user()->tax_id);
 
         if ($signResponse['status'] === 'SIGNED') {
-            to_route('patient.form');
+            to_route('patient.index');
         }
     }
 
@@ -231,25 +342,26 @@ class PatientForm extends Component
     }
 
     /**
-     * Send API request 'Create Person v2' and show the next page if data is validated.
+     * Resend SMS with confirmation code.
      *
      * @return void
      * @throws ApiException
      */
-    public function createPerson(): void
+    public function resendSms(): void
     {
-        $open = $this->patientRequest->validateBeforeSendApi();
-
-        if ($open['error']) {
-            $this->dispatch('flashMessage', ['message' => $open['message'], 'type' => 'error']);
+        if ($this->resendCooldown > 0) {
+            return;
         }
 
-        $response = $this->sendPersonRequest($this->patientRequest->toArray());
+        $response = PersonApi::resendAuthorizationSms($this->id ?? $this->patientRequest->patient['id']);
 
-        if ($response['meta']['code'] === 201) {
-            // Show next view page
-            $this->id = $response['data']['id'];
-            $this->viewState = 'new';
+        if ($response['status'] === 'new') {
+            $this->dispatch('flashMessage', [
+                'message' => __('SMS успішно надіслано!'),
+                'type' => 'success'
+            ]);
+
+            $this->resendCooldown = 60;
         }
     }
 
@@ -279,6 +391,9 @@ class PatientForm extends Component
 
             if (isset($patientData[$this->requestId])) {
                 $this->patient = (new Person())->forceFill($patientData[$this->requestId]);
+                $this->documents = $patientData[$this->requestId]['documents'] ?? [];
+                $this->documentsRelationship = $patientData[$this->requestId]['documentsRelationship'] ?? [];
+                $this->uploadedDocuments = $patientData[$this->requestId]['uploadedDocuments'] ?? [];
 
                 if (!empty($this->patient->patient)) {
                     $this->patientRequest->fill(
@@ -286,7 +401,8 @@ class PatientForm extends Component
                             'patient' => $this->patient->patient,
                             'documents' => $this->patient->documents ?? [],
                             'addresses' => $this->patient->addresses ?? [],
-                            'documents_relationship' => $this->patient->documents_relationship ?? [],
+                            'documentsRelationship' => $this->patient->documentsRelationship ?? [],
+                            'uploadedDocuments' => $this->patient->uploadedDocuments ?? [],
                         ]
                     );
                 }
@@ -298,7 +414,7 @@ class PatientForm extends Component
      * Initialize the edit mode for a specific model.
      *
      * @param  string  $model  The model type to initialize for editing.
-     * @param  int  $keyProperty  The key property used to identify the specific item to edit (optional).
+     * @param  int  $keyProperty  The key property used to identify the specific item to edit.
      * @return void
      */
     public function edit(string $model, int $keyProperty): void
@@ -385,6 +501,7 @@ class PatientForm extends Component
         }
 
         $this->closeModalModel($model);
+        $this->getPatient();
     }
 
     /**
@@ -417,6 +534,5 @@ class PatientForm extends Component
         }
 
         $this->closeModal();
-        $this->getPatient();
     }
 }
