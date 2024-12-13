@@ -58,6 +58,41 @@
             </x-forms.form-group>
         </x-forms.form-row>
 
+        @if(!empty($uploadedDocuments))
+            @foreach($uploadedDocuments as $key => $document)
+                <div class="pb-4 flex items-center">
+                    <div class="flex-grow">
+                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">
+                            {{ $document['type'] }} *
+                        </label>
+                        <div class="flex items-center gap-4">
+                            <input
+                                class="xl:w-1/2 block text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                                id="file_input" type="file"
+                                wire:model.live="patientRequest.uploadedDocuments.{{ $key }}.documentsRelationship">
+                            <a type="button" href="#" class="text-green-700 hover:text-white border border-green-700
+                                    hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300
+                                    font-medium rounded-lg text-sm px-5 py-2.5 text-center
+                                    dark:border-green-500 dark:text-green-500 dark:hover:text-white
+                                    dark:hover:bg-green-600 dark:focus:ring-green-800"
+                               wire:click.prevent="uploadFile('uploadedDocuments', '{{ $document['type'] }}')"
+                               wire:loading.attr="disabled"
+                               wire:loading.class="opacity-50 cursor-not-allowed">
+                                {{ __('Відправити') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                @error('patientRequest.uploadedDocuments.documentsRelationship')
+                <div class="text-red-500 text-sm mb-2">
+                    {{ $message }}
+                </div>
+                @enderror
+
+            @endforeach
+        @endif
+
         <x-forms.form-row>
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
@@ -71,7 +106,7 @@
                         <span class="text-green-500">Підтверджено</span>
                     @else
                         <x-forms.input class="default-input"
-                                       wire:model="patientRequest.confirmation_code"
+                                       wire:model="patientRequest.confirmationCode"
                                        type="text"
                                        id="confirmation_code"
                                        maxlength="4"
@@ -79,7 +114,7 @@
                     @endif
                 </x-slot>
 
-                @error('patientRequest.confirmation_code')
+                @error('patientRequest.confirmationCode')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
@@ -88,15 +123,58 @@
                 @enderror
             </x-forms.form-group>
 
+            <!-- Resend SMS button -->
+            <div class="xl:w-1/4 flex items-end">
+                <button
+                    type="button"
+                    wire:click="resendSms"
+                    x-data="{
+                    cooldown: @entangle('resendCooldown'),
+                    startCooldown() {
+                        if (this.cooldown > 0) {
+                            const interval = setInterval(() => {
+                                if (this.cooldown > 0) {
+                                    this.cooldown--;
+                                } else {
+                                    clearInterval(interval);
+                                }
+                            }, 1000);
+                        }
+                    },
+                }"
+                    x-init="startCooldown()"
+                    x-effect="startCooldown()"
+                    x-bind:disabled="cooldown > 0"
+                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
+                >
+                    <svg
+                        x-show="cooldown > 0"
+                        x-cloak
+                        aria-hidden="true"
+                        class="w-4 h-4 mr-2 text-gray-200 animate-spin"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C3.582 0 0 3.582 0 8h4zm2 5.291V20c2.485 0 4.68-1.122 6-2.905l-1.609-.692A7.992 7.992 0 016 17.291z"></path>
+                    </svg>
+                    <span
+                        x-text="cooldown > 0 ? `Повторна відправка коду через ${cooldown} сек.` : 'Відправити ще раз'"></span>
+                </button>
+            </div>
+
             <div class="xl:w-1/4 flex">
-                <button wire:click="approvePerson('confirmation_code')" type="button"
+                <button wire:click="approvePerson('confirmationCode')" type="button"
                         class="btn-primary" {{ $isInformed ? '' : 'disabled' }}>
                     {{ __('Відправити на затвердження') }}
                 </button>
             </div>
         </x-forms.form-row>
 
-        @if ($isApproved)
+        @if($isApproved)
             <div class="xl:w-1/4">
                 <button wire:click="create('signed_content')" type="button" class="default-button">
                     {{__('Підписати КЕПом')}}

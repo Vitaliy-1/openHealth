@@ -15,13 +15,13 @@
 
                 <x-slot name="input">
                     <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.emergency_contact.firstName"
+                                   wire:model="patientRequest.patient.emergencyContact.firstName"
                                    type="text"
                                    id="emergency_contact_first_name"
                     />
                 </x-slot>
 
-                @error('patientRequest.patient.emergency_contact.firstName')
+                @error('patientRequest.patient.emergencyContact.firstName')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
@@ -39,13 +39,13 @@
 
                 <x-slot name="input">
                     <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.emergency_contact.lastName"
+                                   wire:model="patientRequest.patient.emergencyContact.lastName"
                                    type="text"
                                    id="emergency_contact_last_name"
                     />
                 </x-slot>
 
-                @error('patientRequest.patient.emergency_contact.lastName')
+                @error('patientRequest.patient.emergencyContact.lastName')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
@@ -63,13 +63,13 @@
 
                 <x-slot name="input">
                     <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.emergency_contact.secondName"
+                                   wire:model="patientRequest.patient.emergencyContact.secondName"
                                    type="text"
                                    id="emergency_contact_second_name"
                     />
                 </x-slot>
 
-                @error('patientRequest.patient.emergency_contact.secondName')
+                @error('patientRequest.patient.emergencyContact.secondName')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
@@ -81,14 +81,14 @@
 
         <x-forms.form-row cols="flex-col" gap="gap-0">
             <x-forms.label name="label" class="default-label">
-                {{ __('forms.phones') }}
+                {{ __('forms.phones') }} *
             </x-forms.label>
 
             <x-forms.form-group class="mb-2">
                 <x-slot name="label">
                     <div class="flex-row flex gap-6 items-center">
                         <div class="w-1/4">
-                            <x-forms.select wire:model.defer="patientRequest.patient.emergency_contact.phones.type"
+                            <x-forms.select wire:model="patientRequest.patient.emergencyContact.phones.type"
                                             class="default-select">
                                 <x-slot name="option">
                                     <option>{{ __('forms.phone_type') }}</option>
@@ -98,7 +98,7 @@
                                 </x-slot>
                             </x-forms.select>
 
-                            @error("patientRequest.patient.emergency_contact.phones.type")
+                            @error("patientRequest.patient.emergencyContact.phones.type")
                             <x-forms.error>
                                 {{ $message }}
                             </x-forms.error>
@@ -107,12 +107,12 @@
                         <div class="w-1/4">
                             <x-forms.input class="default-input"
                                            x-mask="+380999999999"
-                                           wire:model="patientRequest.patient.emergency_contact.phones.number"
+                                           wire:model="patientRequest.patient.emergencyContact.phones.number"
                                            type="text"
                                            placeholder="{{ __('+ 3(80)00 000 00 00 ') }}"
                             />
 
-                            @error("patientRequest.patient.emergency_contact.phones.number")
+                            @error("patientRequest.patient.emergencyContact.phones.number")
                             <x-forms.error>
                                 {{ $message }}
                             </x-forms.error>

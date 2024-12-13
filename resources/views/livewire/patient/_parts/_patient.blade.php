@@ -88,8 +88,7 @@
                 </x-slot>
 
                 <x-slot name="input">
-                    <x-forms.input-date :maxDate="now()->subYears(18)->format('Y-m-d')"
-                                        wire:model="patientRequest.patient.birthDate"
+                    <x-forms.input-date wire:model="patientRequest.patient.birthDate"
                                         id="birth_date"
                     />
                 </x-slot>

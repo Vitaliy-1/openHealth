@@ -3,6 +3,8 @@
 namespace App\Livewire\Patient\Forms\Api;
 
 use App\Classes\eHealth\Api\PersonApi;
+use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class PatientRequestApi extends PersonApi
 {
@@ -17,12 +19,12 @@ class PatientRequestApi extends PersonApi
     public static function buildCreatePersonRequest(array $cacheData, bool $noTaxId, bool $isIncapable): array
     {
         $patient = $cacheData['patient'];
-        $documents = $cacheData['documents'][0];
+        $documents = $cacheData['documents'];
         $addresses = $cacheData['addresses'];
-        $phones = $patient['phones'];
-        $authentication_methods = $patient['authentication_methods'];
-        $emergency_contact = $patient['emergency_contact'];
-        $documents_relationship = $cacheData['documents_relationship'][0] ?? null;
+        $phones = $patient['phones'] ?? null;
+        $authenticationMethods = $patient['authenticationMethods'];
+        $emergencyContact = $patient['emergencyContact'];
+        $documentsRelationship = $cacheData['documentsRelationship'] ?? null;
 
         $patientData = [
             'first_name' => $patient['firstName'],
@@ -35,16 +37,6 @@ class PatientRequestApi extends PersonApi
             'email' => $patient['email'] ?? '',
             'no_tax_id' => $noTaxId,
             'secret' => $patient['secret'],
-
-            'documents' => [
-                [
-                    'type' => $documents['type'],
-                    'number' => $documents['number'],
-                    'issued_by' => $documents['issuedBy'],
-                    'issued_at' => $documents['issuedAt'],
-                    'expiration_date' => $documents['expirationDate'] ?? '',
-                ]
-            ],
 
             'addresses' => [
                 [
@@ -59,26 +51,19 @@ class PatientRequestApi extends PersonApi
                     'street' => $addresses['street'] ?? '',
                     'building' => $addresses['building'] ?? '',
                     'apartment' => $addresses['apartment'] ?? '',
-                    'zip' => $addresses['zip'] ?? '',
-                ]
-            ],
-
-            'phones' => [
-                [
-                    'type' => $phones['type'],
-                    'number' => $phones['number'],
+                    'zip' => $addresses['zip'] ?? ''
                 ]
             ],
 
             'authentication_methods' => [
                 [
-                    'type' => $authentication_methods['type'],
+                    'type' => $authenticationMethods['type'],
                     // required for type = OTP
-                    'phone_number' => $authentication_methods['phoneNumber'] ?? '',
+                    'phone_number' => $authenticationMethods['phoneNumber'] ?? '',
                     // required for type = THIRD_PERSON
-                    'value' => $authentication_methods['value'] ?? '',
+                    'value' => $documentsRelationship['confidantPersonId'] ?? '',
                     // required it type = THIRD_PERSON, and optional for type = OTP or OFFLINE
-                    'alias' => $authentication_methods['alias'] ?? '',
+                    'alias' => $authenticationMethods['alias'] ?? ''
                 ]
             ],
 
@@ -86,18 +71,37 @@ class PatientRequestApi extends PersonApi
 
             'emergency_contact' => (object)
             [
-                'first_name' => $emergency_contact['firstName'],
-                'last_name' => $emergency_contact['lastName'],
-                'second_name' => $emergency_contact['secondName'] ?? '',
+                'first_name' => $emergencyContact['firstName'],
+                'last_name' => $emergencyContact['lastName'],
+                'second_name' => $emergencyContact['secondName'] ?? '',
 
                 'phones' => [
                     [
-                        'type' => $emergency_contact['phones']['type'],
-                        'number' => $emergency_contact['phones']['number'],
+                        'type' => $emergencyContact['phones']['type'],
+                        'number' => $emergencyContact['phones']['number']
                     ]
-                ],
-            ],
+                ]
+            ]
         ];
+
+        foreach ($documents as $document) {
+            $patientData['documents'][] = [
+                'type' => $document['type'],
+                'number' => $document['number'],
+                'issued_by' => $document['issuedBy'],
+                'issued_at' => $document['issuedAt'],
+                'expiration_date' => $document['expirationDate'] ?? ''
+            ];
+        }
+
+        if (isset($phones)) {
+            $patientData['phones'] = [
+                [
+                    'type' => $phones['type'] ?? '',
+                    'number' => $phones['number'] ?? ''
+                ]
+            ];
+        }
 
         if (!$noTaxId) {
             $patientData['tax_id'] = $patient['taxId'];
@@ -106,19 +110,23 @@ class PatientRequestApi extends PersonApi
         if ($isIncapable) {
             $patientData['confidant_person'] = (object)
             [
-                'person_id' => '',
-
-                'documents_relationship' => [
-                    [
-                        'type' => $documents_relationship['type'],
-                        'number' => $documents_relationship['number'],
-                        'issued_by' => $documents_relationship['issued_by'] ?? '',
-                        'issued_at' => $documents_relationship['issued_at'] ?? '',
-                        // ?? schema does not allow additional properties, але в general MIS API є....
-//                        'active_to' => $documents_relationship['expiration_date'] ?? '',
-                    ]
-                ],
+                'person_id' => $documentsRelationship['confidantPersonId'],
+                'documents_relationship' => []
             ];
+
+            foreach ($documentsRelationship as $key => $documentRelationship) {
+                if ($key === 'confidantPersonId') {
+                    continue;
+                }
+
+                $patientData['confidant_person']->documents_relationship[] = [
+                    'type' => $documentRelationship['type'],
+                    'number' => $documentRelationship['number'],
+                    'issued_by' => $documentRelationship['issuedBy'],
+                    'issued_at' => $documentRelationship['issuedAt'],
+                    'active_to' => $documentRelationship['activeTo'] ?? ''
+                ];
+            }
         }
 
         self::removeEmptyKeys($patientData);
@@ -126,7 +134,26 @@ class PatientRequestApi extends PersonApi
         return [
             'person' => (object) $patientData,
             'patient_signed' => false,
-            'process_disclosure_data_consent' => true,
+            'process_disclosure_data_consent' => true
+        ];
+    }
+
+    /**
+     * Build an array of parameters for uploading files to storage.
+     *
+     * @param  TemporaryUploadedFile  $uploadedFile
+     * @return array[]
+     */
+    public static function buildUploadFileRequest(TemporaryUploadedFile $uploadedFile): array
+    {
+        return [
+            'multipart' => [
+                [
+                    'name' => 'file',
+                    'contents' => fopen($uploadedFile->getRealPath(), 'rb'),
+                    'filename' => $uploadedFile->getClientOriginalName()
+                ],
+            ],
         ];
     }
 
@@ -144,30 +171,30 @@ class PatientRequestApi extends PersonApi
     /**
      * Build an array of parameters for signing a patient request.
      *
-     * @param $cacheData
+     * @param $encryptedData
      * @return array
      */
-    public static function buildSignPersonRequest($cacheData): array
+    public static function buildSignPersonRequest($encryptedData): array
     {
-        return ['signed_content' => $cacheData];
+        return ['signed_content' => $encryptedData];
     }
 
     /**
      * Build an array of parameters for encrypting a patient request.
      *
-     * @param  array  $cacheData
+     * @param  array  $patientData
      * @return array
      */
-    public static function buildEncryptedSignPersonRequest(array $cacheData): array
+    public static function buildEncryptedSignPersonRequest(array $patientData): array
     {
         return [
-            'status' => $cacheData['data']['status'],
-            'id' => $cacheData['data']['id'],
-            'person' => (object) $cacheData['data']['person'],
+            'status' => $patientData['data']['status'],
+            'id' => $patientData['data']['id'],
+            'person' => (object) $patientData['data']['person'],
             'patient_signed' => true,
-            'process_disclosure_data_consent' => $cacheData['data']['process_disclosure_data_consent'],
-            'content' => $cacheData['data']['content'],
-            'channel' => $cacheData['data']['channel'],
+            'process_disclosure_data_consent' => $patientData['data']['process_disclosure_data_consent'],
+            'content' => $patientData['data']['content'],
+            'channel' => $patientData['data']['channel']
         ];
     }
 
@@ -184,8 +211,25 @@ class PatientRequestApi extends PersonApi
         return [
             'status' => $status,
             'page' => $page,
-            'page_size' => $pageSize,
+            'page_size' => $pageSize
         ];
+    }
+
+    /**
+     * Build an array of parameters for a patient request list.
+     *
+     * @param  array  $filters
+     * @return array
+     */
+    public static function buildSearchForPerson(array $filters): array
+    {
+        foreach ($filters as $key => $filter) {
+            $result[Str::snake($key)] = $filter;
+        }
+
+        self::removeEmptyKeys($result);
+
+        return $result;
     }
 
     /**

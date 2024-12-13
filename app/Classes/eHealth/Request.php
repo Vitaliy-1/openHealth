@@ -28,8 +28,17 @@ class Request
         $this->mspDrfo = $mspDrfo ?? '';
     }
 
+    /**
+     * If the URL is already absolute, return it unchanged, otherwise, add a basic domain
+     *
+     * @return string
+     */
     protected function makeApiUrl(): string
     {
+        if (filter_var($this->url, FILTER_VALIDATE_URL)) {
+            return $this->url;
+        }
+
         return config('ehealth.api.domain') . $this->url;
     }
 
@@ -38,11 +47,25 @@ class Request
      */
     public function sendRequest()
     {
+        // If the URL is full, and you need to send a file via form-data
+        if (filter_var($this->url, FILTER_VALIDATE_URL)) {
+            $file = $this->params['multipart'][0] ?? null;
+            $fileContent = stream_get_contents($file['contents']);
+
+            $response = Http::attach('file', $fileContent, $file['filename'])->withHeaders(['Content-Type' => 'multipart/form-data'])
+                ->put($this->url);
+
+            return [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ];
+        }
+
         //TODO DELETE AFTER TESTING
         if (config('ehealth.api.key') == null && empty(config('ehealth.api.key'))) {
             $data = [
                 'method' => $this->method,
-                'url' => self::makeApiUrl(),
+                'url' => $this->makeApiUrl(),
                 'params' => $this->params,
                 'token' => $this->oAuthEhealth->getToken(),
                 'isToken' => $this->isToken
@@ -52,7 +75,7 @@ class Request
         } else {
             $response = Http::acceptJson()
                 ->withHeaders($this->getHeaders())
-                ->{$this->method}(self::makeApiUrl(), $this->params);
+                ->{$this->method}($this->makeApiUrl(), $this->params);
         }
 
         if ($response->successful()) {

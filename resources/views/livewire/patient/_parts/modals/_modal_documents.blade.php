@@ -17,12 +17,13 @@
 
                         <x-slot name="input">
                             <x-forms.select class="default-select"
-                                            wire:model.defer="patientRequest.documents.type"
+                                            wire:model="patientRequest.documents.type"
                                             id="documents_type"
                             >
                                 <x-slot name="option">
                                     <option>{{ __('forms.select') }} {{ __('forms.type') }}</option>
                                     @foreach($this->dictionaries['DOCUMENT_TYPE'] as $key => $document)
+                                        @continue($key === 'COMPLEMENTARY_PROTECTION_CERTIFICATE')
                                         <option value="{{ $key }}">{{ $document }}</option>
                                     @endforeach
                                 </x-slot>
@@ -117,15 +118,13 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="expiration_date" class="default-label">
-                                {{ in_array($patientRequest->documents['type'] ?? '', ['NATIONAL_ID', 'COMPLEMENTARY_PROTECTION_CERTIFICATE', 'PERMANENT_RESIDENCE_PERMIT', 'REFUGEE_CERTIFICATE', 'TEMPORARY_CERTIFICATE', 'TEMPORARY_PASSPORT'])
-                                    ? __('forms.expiration_date_required')
-                                    : __('forms.expiration_date') }}
+                                {{ __('forms.expiration_date') }}
                             </x-forms.label>
                         </x-slot>
 
                         <x-slot name="input">
                             <x-forms.input-date :minDate="now()->format('Y-m-d')"
-                                                wire:model.blur="patientRequest.documents.expirationDate"
+                                                wire:model="patientRequest.documents.expirationDate"
                                                 id="expiration_date"
                             />
                         </x-slot>

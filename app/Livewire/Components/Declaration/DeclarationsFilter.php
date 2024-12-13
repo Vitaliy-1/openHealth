@@ -2,12 +2,12 @@
 
 namespace App\Livewire\Components\Declaration;
 
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 class DeclarationsFilter extends Component
 {
-
-    public $declarations_filter = [
+    public array $declarations_filter = [
         'first_name' => '',
         'last_name' => '',
         'second_name' => '',
@@ -16,13 +16,12 @@ class DeclarationsFilter extends Component
         'birth_date' => '',
     ];
 
-    public function updated($field)
+    public function updated(): void
     {
         $this->dispatch('searchUpdated', $this->declarations_filter);
     }
 
-
-    public function render()
+    public function render(): View
     {
         return view('livewire.components.declaration.declarations-filter');
     }

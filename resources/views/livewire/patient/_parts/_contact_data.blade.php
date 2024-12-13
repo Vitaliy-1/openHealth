@@ -13,20 +13,22 @@
                 <x-slot name="label">
                     <div class="flex-row flex gap-6 items-center">
                         <div class="w-1/4">
-                            <x-forms.select wire:model.defer="patientRequest.patient.phones.type"
+                            <x-forms.select wire:model="patientRequest.patient.phones.type"
                                             class="default-select">
                                 <x-slot name="option">
                                     <option>{{ __('forms.phone_type') }}</option>
-                                    @foreach($this->dictionaries['PHONE_TYPE'] as $key => $phone_type)
-                                        <option value="{{ $key }}">{{ $phone_type }}</option>
+                                    @foreach($this->dictionaries['PHONE_TYPE'] as $key => $phoneType)
+                                        <option value="{{ $key }}">{{ $phoneType }}</option>
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>
 
                             @error("patientRequest.patient.phones.type")
-                            <x-forms.error>
-                                {{ $message }}
-                            </x-forms.error>
+                            <x-slot name="error">
+                                <x-forms.error>
+                                    {{ $message }}
+                                </x-forms.error>
+                            </x-slot>
                             @enderror
                         </div>
                         <div class="w-1/4">
@@ -38,9 +40,11 @@
                             />
 
                             @error("patientRequest.patient.phones.number")
-                            <x-forms.error>
-                                {{ $message }}
-                            </x-forms.error>
+                            <x-slot name="error">
+                                <x-forms.error>
+                                    {{ $message }}
+                                </x-forms.error>
+                            </x-slot>
                             @enderror
                         </div>
                     </div>
@@ -89,8 +93,8 @@
                     >
                         <x-slot name="option">
                             <option> {{ __('forms.select') }} {{ __('forms.preferred_way_communication') }}</option>
-                            @foreach($this->dictionaries['PREFERRED_WAY_COMMUNICATION'] as $key => $preferred_way_communication)
-                                <option value="{{ $key }}">{{ $preferred_way_communication }}</option>
+                            @foreach($this->dictionaries['PREFERRED_WAY_COMMUNICATION'] as $key => $preferredWayCommunication)
+                                <option value="{{ $key }}">{{ $preferredWayCommunication }}</option>
                             @endforeach
                         </x-slot>
                     </x-forms.select>
