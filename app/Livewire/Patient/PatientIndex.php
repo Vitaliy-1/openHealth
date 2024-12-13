@@ -4,6 +4,7 @@ namespace App\Livewire\Patient;
 
 use App\Models\LegalEntity;
 use App\Traits\InteractsWithCache;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -39,12 +40,11 @@ class PatientIndex extends Component
      */
     public function search(): void
     {
-
     }
 
     public function boot(): void
     {
-        $this->patientCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->id . '-' . Auth::user()->legalEntity->uuid;
+        $this->patientCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->legalEntity->uuid;
 
         $this->legalEntity = Auth::user()->legalEntity;
     }
@@ -66,7 +66,7 @@ class PatientIndex extends Component
         $this->storeId = array_key_last($cacheData) + 1;
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.patient.index');
     }

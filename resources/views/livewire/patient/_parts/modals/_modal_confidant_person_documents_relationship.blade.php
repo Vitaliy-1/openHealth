@@ -5,7 +5,7 @@
 
     <x-slot name="content">
         <x-forms.forms-section-modal
-            submit="{!! $mode === 'edit' ? 'update(\'documents_relationship\', ' . $keyProperty . ')' : 'store(\'documents_relationship\')' !!}">
+            submit="{!! $mode === 'edit' ? 'update(\'documentsRelationship\', ' . $keyProperty . ')' : 'store(\'documentsRelationship\')' !!}">
             <x-slot name="form">
                 <x-forms.form-row class="flex-col">
                     <x-forms.form-group class="xl:w-1/2">
@@ -17,7 +17,7 @@
 
                         <x-slot name="input">
                             <x-forms.select class="default-select"
-                                            wire:model.defer="patientRequest.documents_relationship.type"
+                                            wire:model="patientRequest.documentsRelationship.type"
                                             id="documents_type"
                             >
                                 <x-slot name="option">
@@ -29,7 +29,7 @@
                             </x-forms.select>
                         </x-slot>
 
-                        @error('patientRequest.documents_relationship.type')
+                        @error('patientRequest.documentsRelationship.type')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
@@ -47,13 +47,13 @@
 
                         <x-slot name="input">
                             <x-forms.input class="default-input"
-                                           wire:model="patientRequest.documents_relationship.number"
+                                           wire:model="patientRequest.documentsRelationship.number"
                                            type="text"
                                            id="documents_number"
                             />
                         </x-slot>
 
-                        @error('patientRequest.documents_relationship.number')
+                        @error('patientRequest.documentsRelationship.number')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
@@ -73,14 +73,14 @@
 
                         <x-slot name="input">
                             <x-forms.input class="default-input"
-                                           wire:model="patientRequest.documents_relationship.issued_by"
+                                           wire:model="patientRequest.documentsRelationship.issuedBy"
                                            type="text"
                                            id="documents_issued_by"
                                            placeholder="{{ __('forms.document_issued_by') }}"
                             />
                         </x-slot>
 
-                        @error('patientRequest.documents_relationship.issued_by')
+                        @error('patientRequest.documentsRelationship.issuedBy')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
@@ -91,21 +91,45 @@
 
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
-                            <x-forms.label for="documents_issued_at" class="default-label">
+                            <x-forms.label for="confidant_person_documents_issued_at" class="default-label">
                                 {{ __('forms.document_issued_at') }} *
                             </x-forms.label>
                         </x-slot>
 
                         <x-slot name="input">
-                            <x-forms.input class="default-input"
-                                           wire:model="patientRequest.documents_relationship.issued_at"
-                                           type="date"
-                                           id="documents_issued_at"
+                            <x-forms.input-date :maxDate="now()->format('Y-m-d')"
+                                                wire:model="patientRequest.documentsRelationship.issuedAt"
+                                                id="confidant_person_documents_issued_at"
                             />
                         </x-slot>
 
-                        @error('patientRequest.documents_relationship.issued_at')
-                        <x-slot name="message">
+                        @error('patientRequest.documentsRelationship.issuedAt')
+                        <x-slot name="error">
+                            <x-forms.error>
+                                {{ $message }}
+                            </x-forms.error>
+                        </x-slot>
+                        @enderror
+                    </x-forms.form-group>
+                </x-forms.form-row>
+
+                <x-forms.form-row class="flex-col">
+                    <x-forms.form-group class="xl:w-1/2">
+                        <x-slot name="label">
+                            <x-forms.label for="active_to" class="default-label">
+                                {{ __('forms.active_to') }}
+                            </x-forms.label>
+                        </x-slot>
+
+                        <x-slot name="input">
+                            <x-forms.input-date :minDate="now()->format('Y-m-d')"
+                                                wire:model="patientRequest.documentsRelationship.activeTo"
+                                                id="active_to"
+                            />
+                        </x-slot>
+
+                        @error('patientRequest.documentsRelationship.activeTo')
+                        <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
                             </x-forms.error>
