@@ -69,6 +69,8 @@ return [
     'updateInfo'                           => 'Оновити інформацію',
     'UNZR'                                 => 'УНЗР',
     //Form fields
+    'alias'                                => 'аліас',
+    'active_to'                            => 'Активний до',
     'edrpou'                               => 'ЄДРПОУ',
     'firstName'                            => 'Ім’я',
     'lastName'                             => 'Прізвище',
