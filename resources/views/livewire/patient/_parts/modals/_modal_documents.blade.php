@@ -5,7 +5,7 @@
 
     <x-slot name="content">
         <x-forms.forms-section-modal
-            submit="{!! $mode === 'edit' ? 'update(\'documents\',' . $keyProperty . ')' : 'store(\'documents\')' !!}">
+            submit="{!! $mode === 'edit' ? 'update(\'documents\', ' . $keyProperty . ')' : 'store(\'documents\')' !!}">
             <x-slot name="form">
                 <x-forms.form-row class="flex-col">
                     <x-forms.form-group class="xl:w-1/2">
@@ -17,12 +17,13 @@
 
                         <x-slot name="input">
                             <x-forms.select class="default-select"
-                                            wire:model.defer="patientRequest.documents.type"
+                                            wire:model="patientRequest.documents.type"
                                             id="documents_type"
                             >
                                 <x-slot name="option">
                                     <option>{{ __('forms.select') }} {{ __('forms.type') }}</option>
                                     @foreach($this->dictionaries['DOCUMENT_TYPE'] as $key => $document)
+                                        @continue($key === 'COMPLEMENTARY_PROTECTION_CERTIFICATE')
                                         <option value="{{ $key }}">{{ $document }}</option>
                                     @endforeach
                                 </x-slot>
@@ -73,14 +74,14 @@
 
                         <x-slot name="input">
                             <x-forms.input class="default-input"
-                                           wire:model="patientRequest.documents.issued_by"
+                                           wire:model="patientRequest.documents.issuedBy"
                                            type="text"
                                            id="documents_issued_by"
                                            placeholder="{{ __('forms.document_issued_by') }}"
                             />
                         </x-slot>
 
-                        @error('patientRequest.documents.issued_by')
+                        @error('patientRequest.documents.issuedBy')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
@@ -97,13 +98,14 @@
                         </x-slot>
 
                         <x-slot name="input">
-                            <x-forms.input-date wire:model="patientRequest.documents.issued_at"
-                                                id="document_issued_at"
+                            <x-forms.input-date :maxDate="now()->format('Y-m-d')"
+                                                wire:model="patientRequest.documents.issuedAt"
+                                                id="documents_issued_at"
                             />
                         </x-slot>
 
-                        @error('patientRequest.documents.issued_at')
-                        <x-slot name="message">
+                        @error('patientRequest.documents.issuedAt')
+                        <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}
                             </x-forms.error>
@@ -121,37 +123,13 @@
                         </x-slot>
 
                         <x-slot name="input">
-                            <x-forms.input-date wire:model="patientRequest.documents.expiration_date"
+                            <x-forms.input-date :minDate="now()->format('Y-m-d')"
+                                                wire:model="patientRequest.documents.expirationDate"
                                                 id="expiration_date"
                             />
                         </x-slot>
 
-                        @error('patientRequest.documents.expiration_date')
-                        <x-slot name="message">
-                            <x-forms.error>
-                                {{ $message }}
-                            </x-forms.error>
-                        </x-slot>
-                        @enderror
-                    </x-forms.form-group>
-
-                    <x-forms.form-group class="xl:w-1/2">
-                        <x-slot name="label">
-                            <x-forms.label for="unzr" class="default-label">
-                                {{ __('forms.UNZR') }}
-                            </x-forms.label>
-                        </x-slot>
-
-                        <x-slot name="input">
-                            <x-forms.input class="default-input"
-                                           maxlength="14"
-                                           wire:model="patientRequest.documents.unzr"
-                                           type="text"
-                                           id="unzr"
-                            />
-                        </x-slot>
-
-                        @error('patientRequest.documents.unzr')
+                        @error('patientRequest.documents.expirationDate')
                         <x-slot name="error">
                             <x-forms.error>
                                 {{ $message }}

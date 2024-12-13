@@ -5,6 +5,7 @@ namespace App\Livewire\Components;
 use App\Classes\eHealth\Api\AdressesApi;
 use App\Helpers\JsonHelper;
 use App\Rules\Zip;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Illuminate\Validation\Rule;
 
@@ -49,7 +50,7 @@ class AddressesSearch extends Component
         ];
     }
 
-    public function mount($addresses, $class)
+    public function mount($addresses, $class): void
     {
         if (!empty($addresses)) {
             $this->updatedFields($addresses);
@@ -64,7 +65,7 @@ class AddressesSearch extends Component
         ]);
     }
 
-    public function updatedFields($addresses)
+    public function updatedFields($addresses): void
     {
         foreach ($addresses as $key => $address) {
             if (!empty($address)) {
@@ -73,7 +74,7 @@ class AddressesSearch extends Component
         }
     }
 
-    public function updatedArea($value)
+    public function updatedArea($value): void
     {
         if ($value === 'М.КИЇВ') {
             $this->region = '';
@@ -83,12 +84,12 @@ class AddressesSearch extends Component
         }
     }
 
-    public function setAddressesFields($addresses)
+    public function setAddressesFields($addresses): void
     {
         $this->updatedFields($addresses);
     }
 
-    public function updated($field)
+    public function updated($field): void
     {
         $fieldsToReset = [];
 
@@ -115,7 +116,7 @@ class AddressesSearch extends Component
         }
     }
 
-    public function provideAddressData()
+    public function provideAddressData(): void
     {
         $this->validate();
 
@@ -172,7 +173,7 @@ class AddressesSearch extends Component
         );
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.components.addresses-search');
     }
