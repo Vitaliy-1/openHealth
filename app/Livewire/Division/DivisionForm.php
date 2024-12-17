@@ -5,6 +5,7 @@ namespace App\Livewire\Division;
 use App\Classes\eHealth\Api\DivisionApi;
 use App\Helpers\JsonHelper;
 use App\Livewire\Division\Api\DivisionRequestApi;
+use App\Livewire\Division\Forms\DivisionFormRequest;
 use App\Models\Division;
 use App\Models\LegalEntity;
 use Livewire\Attributes\Validate;
@@ -12,23 +13,26 @@ use Livewire\Component;
 
 class DivisionForm extends Component
 {
-    #[Validate([
-        'division.name' => 'required|min:6|max:255',
-        'division.type' => 'required',
-        'division.email' => 'required',
-        'division.phones.number' => 'required|string',
-        'division.phones.type' => 'required',
-        'division.addresses' => 'required',
-    ])]
+    // #[Validate([
+    //     'division.name' => 'required|min:6|max:255',
+    //     'division.type' => 'required',
+    //     'division.email' => 'required',
+    //     'division.phones.number' => 'required|string',
+    //     'division.phones.type' => 'required',
+    //     'division.addresses' => 'required',
+    // ])]
 
-    public ?array $division = [];
+    // public ?array $division = [];
+
+    public DivisionFormRequest $formService;
 
 
     public ?object $legalEntity;
 
-     public string $mode = 'create';
+    public string $mode = 'create';
 
     public ?array $dictionaries;
+
     public ?array $working_hours = [
         'mon' => 'Понеділок',
         'tue' => 'Вівторок',
@@ -39,7 +43,6 @@ class DivisionForm extends Component
         'sun' => 'Неділя',
     ];
 
-
     protected $listeners = ['addressDataFetched'];
 
     public function mount($id = '')
@@ -47,13 +50,29 @@ class DivisionForm extends Component
         if ( !empty($id)) {
             $this->getDivision($id);
             $this->mode = 'edit';
+        } else {
+            $this->initWorkingHours();
         }
+
         $this->getLegalEntity();
-        $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', [
-            'PHONE_TYPE',
-            'SETTLEMENT_TYPE',
-            'DIVISION_TYPE',
-        ]);
+
+        $this->dictionaries = [
+            'PHONE_TYPE' => dictionary()->getDictionary('PHONE_TYPE', true)['values'],
+            'SETTLEMENT_TYPE' => dictionary()->getDictionary('SETTLEMENT_TYPE', true)['values'],
+            'DIVISION_TYPE' => dictionary()->getDictionary('DIVISION_TYPE', true)['values']
+        ];
+    }
+
+
+    protected function initWorkingHours()
+    {
+        $arr = [];
+
+        foreach ($this->working_hours as $day => $name) {
+            $arr[$day] = [];
+        }
+
+        $this->formService->setDivisionParam('working_hours', $arr);
     }
 
     public function getLegalEntity()
@@ -63,9 +82,14 @@ class DivisionForm extends Component
 
     public function getDivision($id)
     {
-        $this->division = Division::find($id)->toArray();
-        $this->division['phones'] = $this->division['phones'][0];
-        $this->division['addresses'] = $this->division['addresses'][0];
+        $this->formService->setDivision(Division::find($id)->toArray());
+        $this->formService->setDivisionParam('phones', $this->formService->getDivisionParam('phones')[0]);
+        $this->formService->setDivisionParam('addresses', $this->formService->getDivisionParam('addresses')[0]);
+
+        if ($this->formService->isDivisionParamExistAndNull('working_hours')) {
+            // $this->formService->unsetDivisionParam('working_hours');
+            $this->initWorkingHours();
+        }
     }
 
     public function fetchDataFromAddressesComponent():void
@@ -73,19 +97,27 @@ class DivisionForm extends Component
         $this->dispatch('fetchAddressData');
     }
 
-
-
     public function addressDataFetched($addressData): void
     {
-        $this->division['addresses'] = $addressData;
-
+        // dd('in addressDataFetched');
+        $this->formService->setDivisionParam('addresses', $addressData);
     }
 
-    public function validateDivision(): void
+    public function validateDivision(): bool
     {
-        $this->resetErrorBag();
-        $this->validate();
+        // $this->resetErrorBag();
 
+        // $this->validate();
+        // dd($this->formService->getDivision());
+        $error = $this->formService->doValidation($this->mode);
+
+        if ($error) {
+            $this->dispatch('flashMessage', ['message' => $error, 'type' => 'error']);
+
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public function create()
@@ -97,39 +129,55 @@ class DivisionForm extends Component
     {
         $this->fetchDataFromAddressesComponent();
         $this->dispatch('address-data-fetched');
-        $this->validateDivision();
-        $this->updateOrCreate(new Division());
-        $this->resetErrorBag();
+
+        if ($this->validateDivision()) {
+            $this->updateOrCreate(new Division());
+        }
+
+        // $this->resetErrorBag();
     }
 
     public function edit(Division $division)
     {
-        $this->mode = 'edit';
-        $this->division = $division->toArray();
+        dd('edit');
 
-        $this->setAddressesFields();
+        $this->mode = 'edit';
+        $this->formService->setDivision($division->toArray());
+
+        // $this->setAddressesFields();
     }
 
-    public function setAddressesFields():void
+    // public function setAddressesFields():void
+    // {
+    //     $this->dispatch('setAddressesFields',$this->formService->getDivisionParam('addresses') ?? []);
+    // }
+
+    /**
+     * Checks if the residence address in the legal entity form is an array and not empty.
+     * If it is, increment the current step and put the legal entity in the cache.
+     */
+    public function checkAndProceedToNextStep(): void
     {
-        $this->dispatch('setAddressesFields',$this->division['addresses'] ?? []);
+        dd('IN DIVISION checkAndProceedToNextStep');
     }
 
     public function update():void
     {
-
+        $breakpoint = true;
         $this->fetchDataFromAddressesComponent();
-        $this->dispatch('address-data-fetched');
-        $this->validateDivision();
-        $division = Division::find($this->division['id']);
 
-        $this->updateOrCreate($division);
+        // $this->dispatch('address-data-fetched');
 
+        if ($this->validateDivision()) {
+            $division = Division::find($this->formService->getDivisionParam('id'));
 
+            $this->updateOrCreate($division);
+        }
     }
 
     public function updateOrCreate(Division $division)
     {
+        // dd($this->formService->division);
         $response = $this->mode === 'edit'
             ? $this->updateDivision()
             : $this->createDivision();
@@ -145,41 +193,61 @@ class DivisionForm extends Component
 
     private function updateDivision(): array
     {
-        return DivisionRequestApi::updateDivisionRequest($this->division['uuid'],removeEmptyKeys($this->division));
+        // dd($this->formService->getDivision());
+        return DivisionRequestApi::updateDivisionRequest(
+            $this->formService->getDivisionParam('uuid'),
+            removeEmptyKeys($this->formService->getDivision())
+        );
     }
 
     private function createDivision(): array
     {
-        $division = removeEmptyKeys($this->division);
+        // dd($this->formService->getDivision());
+        $division = removeEmptyKeys($this->formService->getDivision());
+
         return DivisionRequestApi::createDivisionRequest($division);
     }
 
-
-
     private function saveDivision(Division $division, array $response): void
     {
-
         $division->fill($response);
+        $division->setAttribute('legal_entity_id', $this->legalEntity->id); // TODO: Delete after testing
         $division->setAttribute('uuid', $response['id']);
         $division->setAttribute('legal_entity_uuid', $response['legal_entity_id']);
         $division->setAttribute('external_id', $response['external_id']);
         $division->setAttribute('status', $response['status']);
+        // dd($division);
         $this->legalEntity->division()->save($division);
     }
 
-    public function notWorking($day)
+    public function notWorking($day, $showWork)
     {
-        $this->division['working_hours'][$day][] = [];
+        // dd($day, $showWork);
+        if ($showWork) {
+            $working_hours = $this->formService->getDivisionParam('working_hours');
+
+            if (isset($working_hours[$day])) {
+                unset($working_hours[$day]);
+            }
+
+            $this->formService->setDivisionParam('working_hours', $working_hours);
+        }
     }
-
-
-
 
     public function render()
     {
+        $currentDivision = [];
+        $_division = $this->formService->getDivision();
 
-    return view('livewire.division.division-form-create');
+        if (!empty($_division)) {
+            $currentDivision['name'] = !empty($_division['name'])
+                ? $_division['name']
+                : '';
+            $currentDivision['type'] = !empty($_division['type'])
+                ? dictionary()->getDictionary('DIVISION_TYPE', true)['values'][$_division['type']]
+                : '';
+        }
 
+        return view('livewire.division.division-form-create', compact('currentDivision'));
     }
-
 }

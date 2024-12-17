@@ -4,7 +4,7 @@
         <div
             class="alert-message flex fixed  top-[1.5rem] w-auto z-[100000]  right-2 "
             x-init="setTimeout(() => document.querySelector('.alert-message').remove(), 3000)"
-
+        >
             @if(!$errors)
                 @if($type == 'error')
                     <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">

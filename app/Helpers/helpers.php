@@ -42,6 +42,20 @@ if (!function_exists("get_day_value")) {
     }
 }
 
+if (!function_exists("get_day_name"))
+{
+    function get_day_name($k)
+    {
+        foreach(all_day() as $day) {
+            if ($k === $day['key']) {
+                return $day['value'];
+            }
+        }
+
+        return "";
+    }
+}
+
 if (!function_exists("removeEmptyKeys")) {
     function removeEmptyKeys(array $array): array
     {
@@ -71,12 +85,12 @@ if (!function_exists("available_time")) {
                     $value["days_of_week"]
                 ),
                 "all_day"              => $value["all_day"],
-                "available_start_time" => addSecondsToTime(
-                    $value["available_start_time"]
-                ),
-                "available_end_time"   => addSecondsToTime(
-                    $value["available_end_time"]
-                ),
+                "available_start_time" => empty($value["all_day"])
+                    ? addSecondsToTime($value["available_start_time"])
+                    : '',
+                "available_end_time"   => empty($value["all_day"])
+                    ? addSecondsToTime($value["available_end_time"])
+                    : '',
             ];
         }
 

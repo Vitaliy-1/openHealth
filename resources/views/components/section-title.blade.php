@@ -40,4 +40,8 @@
         </ol>
     </nav>
     <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">{{ $title }}</h1>
+
+    <p class="pt-2 text-xs italic font-bold text-left font-normal text-gray-500 whitespace-nowrap dark:text-gray-700">
+        <span> {{ $description }}</span>
+    </p>
 </div>
