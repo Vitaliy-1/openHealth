@@ -3,19 +3,19 @@
 namespace App\Livewire\Employee;
 
 use App\Classes\eHealth\Api\EmployeeApi;
+use App\Classes\eHealth\Services\SchemaService;
+use App\Jobs\SendApiRequestJob;
 use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
 use App\Livewire\Employee\Forms\EmployeeFormRequest;
 use App\Models\Division;
 use App\Models\Employee;
 use App\Models\LegalEntity;
-use App\Models\User;
 use App\Classes\Cipher\Traits\Cipher;
 use App\Repositories\EmployeeRepository;
 use App\Traits\FormTrait;
 use App\Traits\InteractsWithCache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -70,17 +70,17 @@ class EmployeeForm extends Component
 
     public ?object $divisions;
     public ?object $healthcareServices;
-
     protected ?EmployeeRepository $employeeRepository;
 
     public array $tableHeaders;
     public string $requestId;
+
     public string $employeeId;
+
     /**
      * @var mixed|string
      */
     public mixed $keyProperty;
-
 
     public ?object $file = null;
 
@@ -99,7 +99,6 @@ class EmployeeForm extends Component
     public function mount(Request $request, $id = '')
     {
         $this->getLegalEntity();
-//        $this->getDivisions();
         if ($request->has('storeId')) {
             $this->requestId = $request->input('storeId');
         }
@@ -108,9 +107,7 @@ class EmployeeForm extends Component
         }
         $this->setCertificateAuthority();
         $this->getEmployee();
-        $this->getDictionary();
-        $this->getEmployeeDictionaryRole();
-        $this->getEmployeeDictionaryPosition();
+        $this->getDictionaries();
     }
 
     public function getHealthcareServices($id)
@@ -120,20 +117,26 @@ class EmployeeForm extends Component
             ->get();
     }
 
+    public function getDictionaries(): void
+    {
+        $this->getDictionary();
+        $this->getEmployeeDictionaryRole();
+        $this->getEmployeeDictionaryPosition();
+//        $this->dictionaryUnset();
+    }
+
     public function setCertificateAuthority(): array|null
     {
         return $this->getCertificateAuthority = $this->getCertificateAuthority();
     }
 
-    public function dictionaryUnset(): array
+    public function dictionaryUnset(): void
     {
-        $dictionaries = $this->dictionaries;
-        if (isset($this->employee['documents']) && !empty($this->employee['documents'])) {
-            foreach ($this->employee['documents'] as $document) {
-                unset($dictionaries['DOCUMENT_TYPE'][$document['type']]);
+        if (isset($this->employeeRequest->documents) && !empty($this->employeeRequest->documents)) {
+            foreach ($this->employeeRequest->documents as $document) {
+                unset($this->dictionaries['DOCUMENT_TYPE'][$document['type']]);
             }
         }
-        return $this->dictionaries = $dictionaries;
     }
 
     public function getEmployee(): void
@@ -148,18 +151,12 @@ class EmployeeForm extends Component
                 $this->employeeRequest->fill($employeeData[$this->requestId]);
             }
         }
-
-
     }
 
     public function updatedFile(): void
     {
         $this->keyContainerUpload = $this->file;
     }
-
-    /**
-     * Set the table headers for the E-health table.
-     */
 
 
     public function getLegalEntity()
@@ -192,7 +189,6 @@ class EmployeeForm extends Component
         $this->dictionaryUnset();
     }
 
-
     public function signedComplete($model)
     {
         $this->getEmployee();
@@ -206,14 +202,12 @@ class EmployeeForm extends Component
 
     public function updated($field)
     {
-
         if ($field === 'keyContainerUpload') {
             $this->getEmployee();
         }
     }
 
-
-    public function store($model,$modelSingle = []) : void
+    public function store($model, $modelSingle = []): void
     {
         $rules = $model;
         if (!empty($modelSingle)) {
@@ -239,32 +233,24 @@ class EmployeeForm extends Component
             $this->employeeCacheKey,
             $model,
             'employeeRequest',
-            ['party','scienceDegree']
+            ['party', 'scienceDegree']
         );
-
     }
 
-
-
-    public function edit($model, $keyProperty = '', $singleProperty = '')
+    public function edit($model, $keyProperty = '', $singleProperty = ''): void
     {
-
         $this->keyProperty = $keyProperty;
         $this->mode = 'edit';
-
+        $this->singleProperty = $singleProperty;
         if (isset($this->requestId)) {
-            $this->editCacheEmployee($model, $keyProperty,$singleProperty);
-
+            $this->editCacheEmployee($model, $keyProperty, $singleProperty);
         }
         $this->openModal($model);
-
     }
 
-
-    public function editCacheEmployee( string $model,  string $keyProperty = '', $singleProperty = '')
+    public function editCacheEmployee(string $model, string $keyProperty = '', $singleProperty = '')
     {
         $cacheData = $this->getCache($this->employeeCacheKey);
-
         if ($keyProperty !== '') {
             $this->employeeRequest->{$singleProperty ?: $model} = $cacheData[$this->requestId][$model][$keyProperty];
         } else {
@@ -272,23 +258,23 @@ class EmployeeForm extends Component
         }
     }
 
-
-    public function update($model, $keyProperty, $singleProperty = '')
+    public function update($model, $keyProperty, $modelSingle = '')
     {
-        $this->employeeRequest->rulesForModelValidate($model);
+        $rules = $model;
+        if (!empty($modelSingle)) {
+            $rules = $modelSingle;
+        }
 
+        $this->employeeRequest->rulesForModelValidate($rules);
         $this->resetErrorBag();
-
         if (isset($this->requestId)) {
-            $this->updateCacheEmployee($model, $keyProperty,$singleProperty);
+            $this->updateCacheEmployee($model, $keyProperty, $modelSingle);
         }
-        if (isset($this->employeeId)) {
-            $this->updateEmployee($model, $keyProperty);
-        }
+        unset($this->employeeRequest->{$modelSingle});
         $this->closeModalModel($model);
     }
 
-    public function updateCacheEmployee($model,$keyProperty, $singleProperty = '')
+    public function updateCacheEmployee($model, $keyProperty, $singleProperty = '')
     {
         if (!empty($modelSingle)) {
             $this->employeeRequest->{$model} = $this->employeeRequest->{$modelSingle};
@@ -304,19 +290,14 @@ class EmployeeForm extends Component
         }
     }
 
-
-    public function updateEmployee($model, $keyProperty)
+    public function remove($model, $keyProperty = ''): void
     {
-        if ($model === 'documents') {
-            $party = $this->employee->party;
-            $party[$model][$keyProperty] = $this->employeeRequest->{$model};
-            $this->employee->party = $party;
-        } else {
-            $doctor = $this->employee->doctor;
-            $doctor[$model][$keyProperty] = $this->employeeRequest->{$model};
-            $this->employee->doctor = $doctor;
+        $cacheData = $this->getCache($this->employeeCacheKey);
+        if (isset($cacheData[$this->requestId][$model][$keyProperty])) {
+            unset($cacheData[$this->requestId][$model][$keyProperty]);
         }
-        $this->employee->save();
+        $this->putCache($this->employeeCacheKey, $cacheData);
+        $this->getEmployee();
     }
 
     public function closeModalModel($model = null): void
@@ -324,48 +305,67 @@ class EmployeeForm extends Component
         if (!empty($model)) {
             $this->employeeRequest->{$model} = [];
         }
-
         $this->closeModal();
         $this->getEmployee();
     }
 
+    public function preRequestData(): array
+    {
+        $preRequest = $this->employeeRequest->toArray();
+
+        $fieldMappings = [
+            'doctor' => ['specialities', 'qualifications', 'educations', 'scienceDegree'],
+            'party'  => ['documents'],
+        ];
+
+        foreach ($fieldMappings as $group => $fields) {
+            foreach ($fields as $field) {
+                $preRequest[$group][$field] = $preRequest[$field] ?? null;
+            }
+        }
+        foreach (['position', 'employeeType', 'startDate'] as $field) {
+            $preRequest[$field] = $preRequest['party'][$field] ?? null;
+        }
+
+        return schemaService()->setDataSchema(['employee_request' => $preRequest],app(EmployeeApi::class))
+            ->requestSchemaNormalize()
+            ->removeItemsKey()
+            ->filterNormalizedData()
+            ->getNormalizedData();
+    }
 
     public function sendApiRequest()
     {
-        $preRequest = $this->employeeRequest->toArray();
-        $preRequest['doctor'] = [
-            'specialities'   => $preRequest['specialities'],
-            'qualifications' => $preRequest['qualifications'],
-            'educations'     => $preRequest['educations'],
-            'scienceDegree'  => $preRequest['scienceDegree']
-        ];
-        $employeeRequest = schemaService()->requestSchemaNormalize(
-            ['employee_request' => $preRequest],
-            app(EmployeeApi::class),
+        $base64Data = $this->sendEncryptedData(
+            removeEmptyKeys($this->preRequestData()),
+            \auth()->user()->tax_id
         );
-
-        dd($employeeRequest);
-        $base64Data = $this->sendEncryptedData($employeeRequest);
         if (isset($base64Data['errors'])) {
-            $this->dispatch('flashMessage', [
-                'message' => $base64Data['errors'],
-                'type'    => 'error'
-            ]);
+            $this->dispatchErrorMessage($base64Data['errors']);
             return;
         }
-        $data = [
-            'signed_content'          => $base64Data,
-            'signed_content_encoding' => 'base64',
-        ];
 
-        $employeeRequest = EmployeeRequestApi::createEmployeeRequest($data);
-        $this->employeeRepository->saveEmployeeData($employeeRequest, $this->legalEntity);
-        if (isset($this->requestId)) {
-            $this->forgetCacheIndex();
-        }
-        return redirect(route('employee.index'));
+        SendApiRequestJob::dispatch($base64Data)->delay(26);
+
+        $this->dispatch('flashMessage', [
+            'message' => __('api.api_request_sent'),
+            'type'    => 'success',
+        ]);
+
+        return redirect()->route('employee.index');
+
+        //TODO: add flash message
     }
 
+
+    private function dispatchErrorMessage(string $message, array $errors = []): void
+    {
+        $this->dispatch('flashMessage', [
+            'message' => $message,
+            'type'    => 'error',
+            'errors'  => $errors
+        ]);
+    }
 
     private function forgetCacheIndex()
     {
@@ -376,74 +376,108 @@ class EmployeeForm extends Component
         }
     }
 
-
-    /**
-     * Save a new user with the provided data.
-     *
-     * @param  array  $data  The data to create the user with.
-     */
-
-    public function saveUser(array $data)
+    public function getEmployeeDictionaryRole(): void
     {
-        $user = User::create([
-            'email'    => $data['party']['email'],
-            'password' => Hash::make(\Illuminate\Support\Str::random(8)),
-        ]);
-        $user->assignRole($data['employee_type']);
-        $user->legalEntity()->associate($this->legalEntity);
-        $user->save();
+        $this->getDictionariesFields(config('ehealth.legal_entity_type.primary_care.roles'), 'EMPLOYEE_TYPE');
     }
 
-    /*
-     * Include functions after  getDictionary
-     * @return array
-     */
-    public function getEmployeeDictionaryRole(): array
+    public function getEmployeeDictionaryPosition(): void
     {
-        $validRoles = ['OWNER', 'ADMIN', 'DOCTOR', 'HR'];
-
-        $filteredRoles = array_filter($this->dictionaries['EMPLOYEE_TYPE'], function ($key) use ($validRoles) {
-            return in_array($key, $validRoles);
-        }, ARRAY_FILTER_USE_KEY);
-
-        return $this->dictionaries['EMPLOYEE_TYPE'] = $filteredRoles;
-    }
-
-
-    public function getEmployeeDictionaryPosition(): array
-    {
-        $validPositions = [
-            "P3", "P274", "P93", "P202", "P215", "P159", "P118", "P46", "P54", "P99", "P109", "P96", "P245", "P279",
-            "P63", "P123", "P17", "P62", "P45", "P10", "P74", "P37", "P114", "P127", "P214", "P179", "P156", "P145",
-            "P103", "P115", "P126", "P120", "P268", "P110", "P43", "P130", "P203", "P81", "P273", "P95", "P191", "P42",
-            "P38", "P105", "P23", "P197", "P154", "P65", "P58", "P175", "P61", "P98", "P13", "P177", "P173", "P72",
-            "P256", "P178", "P153", "P212", "P53", "P48", "P7", "P106", "P122", "P52", "P158", "P15", "P22", "P39",
-            "P92", "P112", "P71", "P164", "P170", "P266", "P224", "P270", "P78", "P242", "P160", "P2", "P213", "P152",
-            "P26", "P247", "P192", "P36", "P67", "P181", "P124", "P73", "P228", "P55", "P117", "P249", "P91", "P70",
-            "P231", "P229", "P97", "P167", "P169", "P238", "P149", "P150", "P128", "P64", "P51", "P83", "P44", "P241",
-            "P4", "P50", "P250", "P116", "P185", "P276", "P76", "P40", "P69", "P84", "P82", "P176", "P174", "P278",
-            "P155", "P9", "P257", "P29", "P252", "P243", "P24", "P180", "P166", "P201", "P16", "P200", "P210", "P34",
-            "P272", "P168", "P275", "P194", "P165", "P146", "P151", "P111", "P85", "P265", "P87", "P246", "P6", "P77",
-            "P41", "P204", "P94", "P240", "P79", "P14", "P216", "P32", "P59", "P230", "P1", "P88", "P248", "P172",
-            "P75", "P113", "P196", "P28", "P129", "P206", "P57", "P162", "P35", "P107", "P184", "P68", "P131", "P189",
-            "P211", "P60", "P25", "P56", "P161", "P5", "P89", "P188", "P183", "P100", "P47", "P269", "P66", "P8",
-            "P207", "P255", "P119", "P90", "P86", "P27", "P199", "P108", "P163", "P157", "P277", "P11"
-        ];
-
-
-        $filterPosition = array_filter($this->dictionaries['POSITION'], function ($key) use ($validPositions) {
-            return in_array($key, $validPositions);
-        }, ARRAY_FILTER_USE_KEY);
-
-        return $this->dictionaries['POSITION'] = $filterPosition;
+        $this->getDictionariesFields(config('ehealth.legal_entity_type.primary_care.positions'), 'POSITION');
     }
 
     public function render()
     {
-         $this->getDictionary();
-
         return view('livewire.employee.employee-form');
     }
+
+
+//    public function testEmployee(){
+//        return array(
+//            "division_id" => "b075f148-7f93-4fc2-b2ec-2d81b19a9b7b",
+//            "legal_entity_id" => "d290f1ee-6c54-4b01-90e6-d701748f0851",
+//            "position" => "P8",
+//            "start_date" => "2017-03-02T10:45:16.000Z",
+//            "end_date" => "2018-03-02T10:45:16.000Z",
+//            "status" => "NEW",
+//            "employee_type" => "DOCTOR",
+//            "party" => array(
+//                "id" => "b075f148-7f93-4fc2-b2ec-2d81b19a9b7b",
+//                "first_name" => "Петро",
+//                "last_name" => "Іванов",
+//                "second_name" => "Миколайович",
+//                "birth_date" => "1991-08-19T00:00:00.000Z",
+//                "gender" => "MALE",
+//                "no_tax_id" => false,
+//                "tax_id: 3126509816 (string, required) - if no_tax_id=true then passport number, otherwise tax_id" => "",
+//                "email" => "email@example.com",
+//                "documents" => array(
+//                    array(
+//                        "type" => "PASSPORT",
+//                        "number" => "АА120518",
+//                        "issued_by" => "Рокитнянським РВ ГУ МВС Київської області",
+//                        "issued_at" => "2017-02-28"
+//                    )
+//                ),
+//                "phones" => array(
+//                    array(
+//                        "type" => "MOBILE",
+//                        "number" => "+380503410870"
+//                    )
+//                ),
+//                "working_experience" => 10,
+//                "about_myself" => "Закінчив всі можливі курси"
+//            ),
+//            "doctor" => array(
+//                "educations" => array(
+//                    array(
+//                        "country" => "UA",
+//                        "city" => "Київ",
+//                        "institution_name" => "Академія Богомольця",
+//                        "issued_date" => "2017-02-28",
+//                        "diploma_number" => "DD123543",
+//                        "degree" => "MASTER",
+//                        "speciality" => "Педіатр"
+//                    )
+//                ),
+//                "qualifications" => array(
+//                    array(
+//                        "type" => "SPECIALIZATION",
+//                        "institution_name" => "Академія Богомольця",
+//                        "speciality" => "Педіатр",
+//                        "issued_date" => "2017-02-28",
+//                        "certificate_number" => "2017-02-28",
+//                        "valid_to" => "2017-02-28",
+//                        "additional_info" => "додаткова інофрмація"
+//                    )
+//                ),
+//                "specialities" => array(
+//                    array(
+//                        "speciality" => "THERAPIST",
+//                        "speciality_officio" => true,
+//                        "level" => "FIRST",
+//                        "qualification_type" => "AWARDING",
+//                        "attestation_name" => "Академія Богомольця",
+//                        "attestation_date" => "2017-02-28",
+//                        "valid_to_date" => "2020-02-28",
+//                        "certificate_number" => "AB/21331"
+//                    )
+//                ),
+//                "science_degree" => array(
+//                    "country" => "UA",
+//                    "city" => "Київ",
+//                    "degree" => "",
+//                    "institution_name" => "Академія Богомольця",
+//                    "diploma_number" => "DD123543",
+//                    "speciality" => "Педіатр",
+//                    "issued_date" => "2017-02-28"
+//                )
+//            ),
+//            "id" => "b075f148-7f93-4fc2-b2ec-2d81b19a9b7b",
+//            "inserted_at" => "2017-05-05T14:09:59.232112",
+//            "updated_at" => "2017-05-05T14:09:59.232112"
+//        );
+//    }
 
 
 }

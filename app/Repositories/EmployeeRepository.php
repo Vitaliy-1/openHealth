@@ -3,9 +3,10 @@
 namespace App\Repositories;
 
 use App\Models\Employee;
+use App\Models\Employee\BaseEmployee;
+use App\Models\Employee\EmployeeRequest;
 use App\Models\LegalEntity;
 use Exception;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
 
 class EmployeeRepository
@@ -61,21 +62,23 @@ class EmployeeRepository
      * @param $data
      * @return Employee
      */
-    public function createOrUpdate($data): Employee
+    public function createOrUpdate($data, string $typeRequest): BaseEmployee
     {
-        return Employee::updateOrCreate(
+
+        $typeRequest = $typeRequest === 'employee' ? new Employee() : new EmployeeRequest();
+        return $typeRequest::updateOrCreate(
             [
-                'uuid' => $data['id']
+                'uuid' => $data['uuid'] ?? '',
             ],
             $data
         );
     }
 
-    public function saveEmployeeData($request, LegalEntity $legalEntity): ?Employee //TODO: Global LegalEntity model
+    public function saveEmployeeData($request, LegalEntity $legalEntity , string $typeRequest = 'employee'): ?Employee //TODO: Global LegalEntity model
     {
-        DB::beginTransaction();
+//        DB::beginTransaction();
 
-        try {
+//        try {
             // Create or update User
             if (isset($request['party']['email'])) {
                 $user = $this->userRepository->createIfNotExist($request['party']['email'], $request['employee_type']);
@@ -84,7 +87,8 @@ class EmployeeRepository
             }
 
             // Create or update Employee
-            $employee = $this->createOrUpdate($request);
+            $employee = $this->createOrUpdate($request,$typeRequest);
+
             $employee->legalEntity()->associate($legalEntity);
 
             // Create or update Party
@@ -112,15 +116,15 @@ class EmployeeRepository
             $party->employees()->save($employee);
 
             // Commit the transaction
-            DB::commit();
+//            DB::commit();
 
             return $employee;
-        } catch (Exception $e) {
-            // Rollback the transaction on error
-            DB::rollBack();
-
-            return null;
-        }
+//        } catch (Exception $e) {
+//            // Rollback the transaction on error
+//            DB::rollBack();
+//
+//            return null;
+//        }
     }
 
 }
