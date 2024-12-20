@@ -64,7 +64,6 @@ class EmployeeRepository
      */
     public function createOrUpdate($data, string $typeRequest): BaseEmployee
     {
-
         $typeRequest = $typeRequest === 'employee' ? new Employee() : new EmployeeRequest();
         return $typeRequest::updateOrCreate(
             [
@@ -74,21 +73,16 @@ class EmployeeRepository
         );
     }
 
-    public function saveEmployeeData($request, LegalEntity $legalEntity , string $typeRequest = 'employee'): ?Employee //TODO: Global LegalEntity model
+    public function saveEmployeeData($request, LegalEntity $legalEntity , string $typeRequest = 'employee'): Employee|EmployeeRequest //TODO: Global LegalEntity model
     {
 //        DB::beginTransaction();
 
 //        try {
             // Create or update User
-            if (isset($request['party']['email'])) {
-                $user = $this->userRepository->createIfNotExist($request['party']['email'], $request['employee_type']);
-                $user->legalEntity()->associate($legalEntity);
-                $user->save();
-            }
+            $this->userRepository->createIfNotExist($request['party'], $request['employee_type'], $legalEntity);
 
             // Create or update Employee
-            $employee = $this->createOrUpdate($request,$typeRequest);
-
+            $employee = $this->createOrUpdate($request,$typeRequest,$legalEntity);
             $employee->legalEntity()->associate($legalEntity);
 
             // Create or update Party

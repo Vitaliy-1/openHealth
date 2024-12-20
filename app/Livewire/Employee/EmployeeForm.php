@@ -311,23 +311,13 @@ class EmployeeForm extends Component
 
     public function preRequestData(): array
     {
-        $preRequest = $this->employeeRequest->toArray();
-
-        $fieldMappings = [
-            'doctor' => ['specialities', 'qualifications', 'educations', 'scienceDegree'],
-            'party'  => ['documents'],
-        ];
-
-        foreach ($fieldMappings as $group => $fields) {
-            foreach ($fields as $field) {
-                $preRequest[$group][$field] = $preRequest[$field] ?? null;
-            }
-        }
-        foreach (['position', 'employeeType', 'startDate'] as $field) {
-            $preRequest[$field] = $preRequest['party'][$field] ?? null;
-        }
-
-        return schemaService()->setDataSchema(['employee_request' => $preRequest],app(EmployeeApi::class))
+        return schemaService()
+            ->setDataSchema(['employee_request' => $this->employeeRequest->toArray()],app(EmployeeApi::class))
+            ->mapFields(['position', 'employeeType', 'startDate'], 'party', 'employee_request')
+            ->mapFields([
+                'doctor' => ['specialities', 'qualifications', 'educations', 'scienceDegree'],
+                'party'  => ['documents'],
+            ],'','employee_request')
             ->requestSchemaNormalize()
             ->removeItemsKey()
             ->filterNormalizedData()
@@ -345,7 +335,13 @@ class EmployeeForm extends Component
             return;
         }
 
-        SendApiRequestJob::dispatch($base64Data)->delay(26);
+        $employeeRequest = EmployeeRequestApi::createEmployeeRequest([
+            'signed_content'          => $base64Data,
+            'signed_content_encoding' => 'base64',
+        ]);
+        $this->apiResponse($employeeRequest);
+
+        //TODO: add flash message
 
         $this->dispatch('flashMessage', [
             'message' => __('api.api_request_sent'),
@@ -354,9 +350,18 @@ class EmployeeForm extends Component
 
         return redirect()->route('employee.index');
 
-        //TODO: add flash message
     }
 
+    public function apiResponse($response)
+    {
+        $employeeResponse = schemaService()->setDataSchema($response, app(EmployeeApi::class))
+            ->responseSchemaNormalize()
+            ->replaceIdsKeysToUuid(['id', 'legal_entity_id', 'division_id', 'party_id'])
+            ->filterNormalizedData()
+            ->getNormalizedData();
+        app(EmployeeRepository::class)->saveEmployeeData($employeeResponse, auth()->user()->legalEntity,
+            'employeeRequest');
+    }
 
     private function dispatchErrorMessage(string $message, array $errors = []): void
     {
@@ -365,15 +370,6 @@ class EmployeeForm extends Component
             'type'    => 'error',
             'errors'  => $errors
         ]);
-    }
-
-    private function forgetCacheIndex()
-    {
-        $cacheData = $this->getCache($this->employeeCacheKey);
-        if (isset($cacheData[$this->requestId])) {
-            unset($cacheData[$this->requestId]);
-            $this->putCache($this->employeeCacheKey, $cacheData);
-        }
     }
 
     public function getEmployeeDictionaryRole(): void
@@ -392,92 +388,92 @@ class EmployeeForm extends Component
     }
 
 
-//    public function testEmployee(){
-//        return array(
-//            "division_id" => "b075f148-7f93-4fc2-b2ec-2d81b19a9b7b",
-//            "legal_entity_id" => "d290f1ee-6c54-4b01-90e6-d701748f0851",
-//            "position" => "P8",
-//            "start_date" => "2017-03-02T10:45:16.000Z",
-//            "end_date" => "2018-03-02T10:45:16.000Z",
-//            "status" => "NEW",
-//            "employee_type" => "DOCTOR",
-//            "party" => array(
-//                "id" => "b075f148-7f93-4fc2-b2ec-2d81b19a9b7b",
-//                "first_name" => "Петро",
-//                "last_name" => "Іванов",
-//                "second_name" => "Миколайович",
-//                "birth_date" => "1991-08-19T00:00:00.000Z",
-//                "gender" => "MALE",
-//                "no_tax_id" => false,
-//                "tax_id: 3126509816 (string, required) - if no_tax_id=true then passport number, otherwise tax_id" => "",
-//                "email" => "email@example.com",
-//                "documents" => array(
-//                    array(
-//                        "type" => "PASSPORT",
-//                        "number" => "АА120518",
-//                        "issued_by" => "Рокитнянським РВ ГУ МВС Київської області",
-//                        "issued_at" => "2017-02-28"
-//                    )
-//                ),
-//                "phones" => array(
-//                    array(
-//                        "type" => "MOBILE",
-//                        "number" => "+380503410870"
-//                    )
-//                ),
-//                "working_experience" => 10,
-//                "about_myself" => "Закінчив всі можливі курси"
-//            ),
-//            "doctor" => array(
-//                "educations" => array(
-//                    array(
-//                        "country" => "UA",
-//                        "city" => "Київ",
-//                        "institution_name" => "Академія Богомольця",
-//                        "issued_date" => "2017-02-28",
-//                        "diploma_number" => "DD123543",
-//                        "degree" => "MASTER",
-//                        "speciality" => "Педіатр"
-//                    )
-//                ),
-//                "qualifications" => array(
-//                    array(
-//                        "type" => "SPECIALIZATION",
-//                        "institution_name" => "Академія Богомольця",
-//                        "speciality" => "Педіатр",
-//                        "issued_date" => "2017-02-28",
-//                        "certificate_number" => "2017-02-28",
-//                        "valid_to" => "2017-02-28",
-//                        "additional_info" => "додаткова інофрмація"
-//                    )
-//                ),
-//                "specialities" => array(
-//                    array(
-//                        "speciality" => "THERAPIST",
-//                        "speciality_officio" => true,
-//                        "level" => "FIRST",
-//                        "qualification_type" => "AWARDING",
-//                        "attestation_name" => "Академія Богомольця",
-//                        "attestation_date" => "2017-02-28",
-//                        "valid_to_date" => "2020-02-28",
-//                        "certificate_number" => "AB/21331"
-//                    )
-//                ),
-//                "science_degree" => array(
-//                    "country" => "UA",
-//                    "city" => "Київ",
-//                    "degree" => "",
-//                    "institution_name" => "Академія Богомольця",
-//                    "diploma_number" => "DD123543",
-//                    "speciality" => "Педіатр",
-//                    "issued_date" => "2017-02-28"
-//                )
-//            ),
-//            "id" => "b075f148-7f93-4fc2-b2ec-2d81b19a9b7b",
-//            "inserted_at" => "2017-05-05T14:09:59.232112",
-//            "updated_at" => "2017-05-05T14:09:59.232112"
-//        );
-//    }
+    public function testEmployee(){
+        return array(
+            "division_id" => "b075f148-7f93-4fc2-b2ec-2d81b19a9b7b",
+            "legal_entity_id" => "d290f1ee-6c54-4b01-90e6-d701748f0851",
+            "position" => "P8",
+            "start_date" => "2017-03-02T10:45:16.000Z",
+            "end_date" => "2018-03-02T10:45:16.000Z",
+            "status" => "NEW",
+            "employee_type" => "DOCTOR",
+            "party" => array(
+                "id" => "b075f148-7f93-4fc2-b2ec-2d81b19a9b7b",
+                "first_name" => "Петро",
+                "last_name" => "Іванов",
+                "second_name" => "Миколайович",
+                "birth_date" => "1991-08-19T00:00:00.000Z",
+                "gender" => "MALE",
+                "no_tax_id" => false,
+                "tax_id" => "3213213213",
+                "email" => "emai133l@example.com",
+                "documents" => array(
+                    array(
+                        "type" => "PASSPORT",
+                        "number" => "АА120518",
+                        "issued_by" => "Рокитнянським РВ ГУ МВС Київської області",
+                        "issued_at" => "2017-02-28"
+                    )
+                ),
+                "phones" => array(
+                    array(
+                        "type" => "MOBILE",
+                        "number" => "+380503410870"
+                    )
+                ),
+                "working_experience" => 10,
+                "about_myself" => "Закінчив всі можливі курси"
+            ),
+            "doctor" => array(
+                "educations" => array(
+                    array(
+                        "country" => "UA",
+                        "city" => "Київ",
+                        "institution_name" => "Академія Богомольця",
+                        "issued_date" => "2017-02-28",
+                        "diploma_number" => "DD123543",
+                        "degree" => "MASTER",
+                        "speciality" => "Педіатр"
+                    )
+                ),
+                "qualifications" => array(
+                    array(
+                        "type" => "SPECIALIZATION",
+                        "institution_name" => "Академія Богомольця",
+                        "speciality" => "Педіатр",
+                        "issued_date" => "2017-02-28",
+                        "certificate_number" => "2017-02-28",
+                        "valid_to" => "2017-02-28",
+                        "additional_info" => "додаткова інофрмація"
+                    )
+                ),
+                "specialities" => array(
+                    array(
+                        "speciality" => "THERAPIST",
+                        "speciality_officio" => true,
+                        "level" => "FIRST",
+                        "qualification_type" => "AWARDING",
+                        "attestation_name" => "Академія Богомольця",
+                        "attestation_date" => "2017-02-28",
+                        "valid_to_date" => "2020-02-28",
+                        "certificate_number" => "AB/21331"
+                    )
+                ),
+                "science_degree" => array(
+                    "country" => "UA",
+                    "city" => "Київ",
+                    "degree" => "",
+                    "institution_name" => "Академія Богомольця",
+                    "diploma_number" => "DD123543",
+                    "speciality" => "Педіатр",
+                    "issued_date" => "2017-02-28"
+                )
+            ),
+            "id" => "b075f148-7f93-4fc2-b2ec-2d81b19a9b7b",
+            "inserted_at" => "2017-05-05T14:09:59.232112",
+            "updated_at" => "2017-05-05T14:09:59.232112"
+        );
+    }
 
 
 }
