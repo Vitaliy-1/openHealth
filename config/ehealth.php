@@ -43,5 +43,7 @@ return [
             ],
         ],
     ],
-
+    'rate_limit' =>[
+        'employee_request' => 20
+    ]
 ];

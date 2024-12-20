@@ -109,14 +109,14 @@ class EmployeeFormRequest extends Form
             ];
         }
 
-        if (isset($this->party['employeeType']) && $this->party['employeeType'] == 'DOCTOR' && empty($this->speciality)) {
+        if (isset($this->party['employeeType']) && $this->party['employeeType'] == 'DOCTOR' && empty($this->specialities)) {
             return [
                 'error'   => true,
                 'message' => __('validation.custom.specialityTable'),
             ];
         }
 
-        if (isset($this->party['employeeType']) && $this->party['employeeType'] == 'DOCTOR' && empty($this->education)) {
+        if (isset($this->party['employeeType']) && $this->party['employeeType'] == 'DOCTOR' && empty($this->educations)) {
             return [
                 'error'   => true,
                 'message' => __('validation.custom.educationTable'),
