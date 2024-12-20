@@ -14,30 +14,37 @@ class DivisionRequestApi extends DivisionApi
         return self::_get($params);
     }
 
-    public static function createDivisionRequest($data):array
+    public static function createDivisionRequest($data): array
     {
+        // dd('request', $data);
         $params = [
             'name' => $data['name'],
             'type' =>$data['type'],
             'email' => $data['email'],
             'phones' => [$data['phones']],
+            'external_id' => $data['external_id'] ?? null,
             'addresses' => [$data['addresses']],
-//            'locations' => (object)$data['location'],
-            ];
+            'working_hours' => isset($data['working_hours']) ? $data['working_hours'] : null,
+            'location' => isset($data['location']) ? json_encode($data['location']) : [],
+        ];
 
         return self::_create($params);
     }
 
-    public static function updateDivisionRequest($id, $data):array
+    public static function updateDivisionRequest($id, $data): array
     {
+        // dd('request', $data);
         $params = [
             'name' => $data['name'],
             'type' =>$data['type'],
             'email' => $data['email'],
             'phones' => [$data['phones']],
+            'external_id' => $data['external_id'] ?? null,
             'addresses' => [$data['addresses']],
-            //            'locations' => (object)$data['location'],
+            'working_hours' => isset($data['working_hours']) ? $data['working_hours'] : null,
+            'location' => isset($data['location']) ? json_encode($data['location']) : [],
         ];
+
         return self::_update($id, $params);
     }
 

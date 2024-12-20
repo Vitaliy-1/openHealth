@@ -167,7 +167,7 @@ class CipherApi
         // If KEP key is not valid (ex. very old one)
         if (!$cipherResponse['canBeUsed']) {
             ErrorHandler::throwError([
-                'message' => __('validation.custom.cipher.kep_not_valid'),
+                'message' => __('validation.custom.cipher.kepNotValid'),
                 'failureCause' => ''
             ]);
         }
@@ -189,7 +189,7 @@ class CipherApi
 
         if ($expirationDate <= Carbon::now()) {
             ErrorHandler::throwError([
-                'message' => __('validation.custom.cipher.kep_time_expired'),
+                'message' => __('validation.custom.cipher.kepTimeExpired'),
                 'failureCause' => ''
             ]);
         }
@@ -198,7 +198,7 @@ class CipherApi
             // Check if key is not a personal key
             if (!$isBusinessKey) {
                 ErrorHandler::throwError([
-                    'message' => __('validation.custom.cipher.initiator_differ_business'),
+                    'message' => __('validation.custom.cipher.initiatorDifferBusiness'),
                     'failureCause' => ''
                 ]);
             }
@@ -206,7 +206,7 @@ class CipherApi
             // Check for EDRPOU value match between key and form ones
             if ($inKeyEdrpou !== $taxId) {
                 ErrorHandler::throwError([
-                    'message' => __('validation.custom.cipher.edrpou_differ'),
+                    'message' => __('validation.custom.cipher.edrpouDiffer'),
                     'failureCause' => ''
                 ]);
             }
@@ -214,7 +214,7 @@ class CipherApi
             // Check if key is a personal key
             if ($isBusinessKey) {
                 ErrorHandler::throwError([
-                    'message' => __('validation.custom.cipher.initiator_differ_person'),
+                    'message' => __('validation.custom.cipher.initiatorDifferPerson'),
                     'failureCause' => ''
                 ]);
             }
@@ -222,7 +222,7 @@ class CipherApi
             // Check for DRFOU value match between key and form ones
             if ($inKeyDrfou !== $taxId) {
                 ErrorHandler::throwError([
-                    'message' => __('validation.custom.cipher.drfou_differ'),
+                    'message' => __('validation.custom.cipher.drfouDiffer'),
                     'failureCause' => ''
                 ]);
             }

@@ -54,7 +54,6 @@ class Request
      */
     public function sendRequest()
     {
-
         //TODO DELETE AFTER TESTING
         if (config('ehealth.api.key') == null && empty(config('ehealth.api.key'))) {
             $data = [

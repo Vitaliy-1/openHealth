@@ -2,7 +2,7 @@
     <x-section-navigation x-data="{ showFilter: false }" class="">
         <x-slot name='title'>{{ __('forms.contract') }}</x-slot>
 
-        <x-slot name='description'>{{ __('forms.contract') }}</x-slot>
+        {{-- <x-slot name='description'>{{ __('forms.contract') }}</x-slot> --}}
 
         <x-slot name='navigation'>
             <div class='rounded-sm border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark'>
@@ -13,23 +13,23 @@
                         class='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'
                         wire:click.prevent="openModal('intialization_contract')"
                     >
-                        {{ __('forms.add_contract') }}
+                        {{ __('forms.addContract') }}
                     </a>
                 </div>
             </div>
         </x-slot>
     </x-section-navigation>
 
-    <div class='flex flex-col h-screen -mt-4 border-t'>
+    {{-- <div class='flex flex-col h-screen -mt-4 border-t'> --}}
         <div class='overflow-x-auto'>
             <div class='inline-block min-w-full align-middle'>
-                <div class='overflow-hidden shadow'>
-                    <x-tables.table>
+                <div class='shadow'>
+                    <x-tables.table class="mb-20">
                         <x-slot name='headers' :list="$tableHeaders"></x-slot>
 
                         <x-slot name='tbody'>
-                            @if ($legalEntity->contract)
-                                @foreach ($legalEntity->contract as $contract)
+                            @nonempty($contracts->items())
+                                @foreach ($contracts as $contract)
                                     <tr>
                                         <td class='border-b border-[#eee] py-5 px-4'>
                                             <p class='text-black dark:text-white'>
@@ -140,13 +140,22 @@
                                         </td>
                                     </tr>
                                 @endforeach
-                            @endif
+                            @elsenonempty
+                            <tr>
+                                <td class="text-black w-full p-4 border-gray-200 text-center dark:bg-gray-800 dark:border-gray-700 dark:text-white" colspan="6">
+                                    <p >
+                                        {{ __('Нічого не знайдено') }}
+                                    </p>
+                                </td>
+                            </tr>
+                            @endnonempty
                         </x-slot>
                     </x-tables.table>
+                    <x-pagination :pagination="$contracts" class="pagination" style="margin-block-start: -80px;"/>
                 </div>
             </div>
         </div>
-    </div>
+    {{-- </div> --}}
 
     @if ($showModal == 'intialization_contract')
         <x-alert-modal
@@ -157,14 +166,14 @@
             class='w-2 h-full'
         >
             <x-slot name='title'>
-                {{ __('forms.initialization_contract') }}
+                {{ __('forms.initializationContract') }}
             </x-slot>
 
             <x-slot name='text'>
                 @if ($hasInitContract)
                     <x-forms.select wire:model='contract_type' class='default-select'>
                         <x-slot name='option'>
-                            <option value=''>{{ __('forms.contract_type') }}</option>
+                            <option value=''>{{ __('forms.contractType') }}</option>
                             <option value='capitation'>CAPITATION</option>
 
                             {{--                                @foreach ($this->dictionaries['CONTRACT_TYPE'] as $k => $contract_type) --}}
@@ -178,7 +187,7 @@
                         </x-forms.error>
                     @enderror
                 @else
-                    <p> {{ __('forms.alert_initialization_contract') }} </p>
+                    <p> {{ __('forms.alertInitializationContract') }} </p>
                 @endif
             </x-slot>
 
@@ -208,7 +217,7 @@
                 <x-forms.form-group class='mb-4'>
                     <x-slot name='label'>
                         <x-forms.label for='inserted_at' class='default-label'>
-                            {{ __('forms.inserted_at_contract') }} *
+                            {{ __('forms.insertedAtContract') }} *
                         </x-forms.label>
                     </x-slot>
                     <x-slot name='input'>
@@ -225,7 +234,7 @@
                 <x-forms.form-group class='mb-4'>
                     <x-slot name='label'>
                         <x-forms.label for='contractor_base' class='default-label'>
-                            {{ __('forms.status_reason') }} *
+                            {{ __('forms.statusReason') }} *
                         </x-forms.label>
                     </x-slot>
                     <x-slot name='input'>
