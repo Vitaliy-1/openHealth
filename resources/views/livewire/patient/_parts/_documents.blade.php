@@ -5,7 +5,7 @@
 
     <x-tables.table>
         <x-slot name="headers"
-                :list="[__('forms.document_type'), __('forms.number'), __('forms.issued_by'), __('forms.issued_at'), __('forms.expiration_date'), __('forms.actions')]">
+                :list="[__('forms.documentType'), __('forms.number'), __('forms.issuedBy'), __('forms.issuedAt'), __('forms.expirationDate'), __('forms.actions')]">
         </x-slot>
 
         <x-slot name="tbody">
@@ -57,7 +57,7 @@
         <a wire:click.prevent="create('documents')"
            class="text-sm inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
            href="#">
-            {{ __('forms.add_document') }}
+            {{ __('forms.addDocument') }}
         </a>
     </div>
 </div>

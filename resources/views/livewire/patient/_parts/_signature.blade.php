@@ -96,7 +96,7 @@
         <x-forms.form-row>
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
-                    <x-forms.label for="confirmation_code" class="default-label">
+                    <x-forms.label for="verification_code" class="default-label">
                         {{ __('Код підтвердження') }} *
                     </x-forms.label>
                 </x-slot>
@@ -106,15 +106,15 @@
                         <span class="text-green-500">Підтверджено</span>
                     @else
                         <x-forms.input class="default-input"
-                                       wire:model="patientRequest.confirmationCode"
+                                       wire:model="patientRequest.verificationCode"
                                        type="text"
-                                       id="confirmation_code"
+                                       id="verification_code"
                                        maxlength="4"
                         />
                     @endif
                 </x-slot>
 
-                @error('patientRequest.confirmationCode')
+                @error('patientRequest.verificationCode')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
@@ -129,19 +129,25 @@
                     type="button"
                     wire:click="resendSms"
                     x-data="{
-                    cooldown: @entangle('resendCooldown'),
-                    startCooldown() {
-                        if (this.cooldown > 0) {
-                            const interval = setInterval(() => {
-                                if (this.cooldown > 0) {
-                                    this.cooldown--;
-                                } else {
-                                    clearInterval(interval);
-                                }
-                            }, 1000);
-                        }
-                    },
-                }"
+                        cooldown: @entangle('resendCooldown'),
+                        interval: null,
+                        startCooldown() {
+                            if (this.interval) {
+                                clearInterval(this.interval);
+                                this.interval = null;
+                            }
+                            if (this.cooldown > 0) {
+                                this.interval = setInterval(() => {
+                                    if (this.cooldown > 0) {
+                                        this.cooldown--;
+                                    } else {
+                                        clearInterval(this.interval);
+                                        this.interval = null;
+                                    }
+                                }, 1000);
+                            }
+                        },
+                    }"
                     x-init="startCooldown()"
                     x-effect="startCooldown()"
                     x-bind:disabled="cooldown > 0"
@@ -167,14 +173,14 @@
             </div>
 
             <div class="xl:w-1/4 flex">
-                <button wire:click="approvePerson('confirmationCode')" type="button"
+                <button wire:click="approvePerson('verificationCode')" type="button"
                         class="btn-primary" {{ $isInformed ? '' : 'disabled' }}>
                     {{ __('Відправити на затвердження') }}
                 </button>
             </div>
         </x-forms.form-row>
 
-        @if($isApproved)
+        @if(!$isApproved)
             <div class="xl:w-1/4">
                 <button wire:click="create('signed_content')" type="button" class="default-button">
                     {{__('Підписати КЕПом')}}
