@@ -16,7 +16,7 @@
 
                 <x-slot name="input">
                     <x-forms.select class="default-input"
-                                    wire:model.live="patientRequest.patient.authenticationMethods.type"
+                                    wire:model.live="patientRequest.patient.authenticationMethods.0.type"
                                     type="text"
                                     id="relation_type"
                     >
@@ -50,15 +50,15 @@
             </x-forms.form-group>
         </x-forms.form-row>
 
-        @isset($patientRequest->patient['authenticationMethods']['type'])
-            @if($patientRequest->patient['authenticationMethods']['type'] === AuthenticationMethod::OTP->value)
+        @isset($patientRequest->patient['authenticationMethods'][0]['type'])
+            @if($patientRequest->patient['authenticationMethods'][0]['type'] === AuthenticationMethod::OTP->value)
                 <x-forms.form-group class="mb-2">
                     <x-slot name="label">
                         <x-forms.form-row class="items-center">
                             <div class="w-1/3">
                                 <x-forms.input class="default-input"
                                                x-mask="+380999999999"
-                                               wire:model="patientRequest.patient.authenticationMethods.phoneNumber"
+                                               wire:model="patientRequest.patient.authenticationMethods.0.phoneNumber"
                                                type="text"
                                                id="phone_number"
                                                placeholder="{{ __('+ 3(80)00 000 00 00 ') }}"
@@ -74,7 +74,7 @@
                     </x-slot>
                 </x-forms.form-group>
 
-            @elseif($patientRequest->patient['authenticationMethods']['type'] === AuthenticationMethod::THIRD_PERSON->value)
+            @elseif($patientRequest->patient['authenticationMethods'][0]['type'] === AuthenticationMethod::THIRD_PERSON->value)
                 <x-forms.form-group class="xl:w-1/3">
                     <x-slot name="label">
                         <x-forms.label for="alias" class="default-label">
@@ -84,7 +84,7 @@
 
                     <x-slot name="input">
                         <x-forms.input class="default-input"
-                                       wire:model="patientRequest.patient.authenticationMethods.alias"
+                                       wire:model="patientRequest.patient.authenticationMethods.0.alias"
                                        type="text"
                                        id="alias"
                         />

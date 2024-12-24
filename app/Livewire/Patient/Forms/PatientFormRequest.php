@@ -30,21 +30,20 @@ class PatientFormRequest extends Form
         'patient.taxId' => ['nullable', 'numeric', 'digits:10'],
         'patient.secret' => ['required', 'string', 'min:6'],
         'patient.email' => ['nullable', 'email', 'string'],
-        'patient.preferredWayCommunication' => ['nullable', 'string'],
 
-        'patient.phones.type' => ['nullable', 'string'],
-        'patient.phones.number' => ['nullable', 'string', 'min:13', 'max:13'],
+        'patient.phones.*.type' => ['nullable', 'string'],
+        'patient.phones.*.number' => ['nullable', 'string', 'min:13', 'max:13'],
 
         'patient.emergencyContact.firstName' => ['required', 'min:3', new Cyrillic()],
         'patient.emergencyContact.lastName' => ['required', 'min:3', new Cyrillic()],
         'patient.emergencyContact.secondName' => ['nullable', 'min:3', new Cyrillic()],
-        'patient.emergencyContact.phones.type' => ['required', 'string'],
-        'patient.emergencyContact.phones.number' => ['required', 'string', 'min:13', 'max:13'],
+        'patient.emergencyContact.phones.*.type' => ['required', 'string'],
+        'patient.emergencyContact.phones.*.number' => ['required', 'string', 'min:13', 'max:13'],
 
-        'patient.authenticationMethods.type' => ['required', 'string'],
-        'patient.authenticationMethods.phoneNumber' => ['nullable', 'string', 'min:13', 'max:13'],
-        'patient.authenticationMethods.value' => ['nullable', 'string'],
-        'patient.authenticationMethods.alias' => ['nullable', 'string']
+        'patient.authenticationMethods.*.type' => ['required', 'string'],
+        'patient.authenticationMethods.*.phoneNumber' => ['nullable', 'string', 'min:13', 'max:13'],
+        'patient.authenticationMethods.*.value' => ['nullable', 'string'],
+        'patient.authenticationMethods.*.alias' => ['nullable', 'string']
     ])]
     public array $patient = [];
 
@@ -64,14 +63,14 @@ class PatientFormRequest extends Form
         'documentsRelationship.number' => ['required', 'string', 'max:255'],
         'documentsRelationship.issuedBy' => ['required', 'string'],
         'documentsRelationship.issuedAt' => ['required', 'date', 'before:today', 'after:patient.birthDate'],
-        'documentsRelationship.activeTo' => ['nullable', 'date', 'after:today']
+        'documentsRelationship.activeTo' => ['nullable', 'date', 'after:tomorrow']
     ])]
     public array $documentsRelationship = [];
 
     #[Validate([
-        'confirmationCode' => ['required', 'numeric', 'digits:4']
+        'verificationCode' => ['required', 'numeric', 'digits:4']
     ])]
-    public string $confirmationCode;
+    public string $verificationCode;
 
     #[Validate([
         'uploadedDocuments.unzr' => ['nullable', 'file', 'mimes:jpeg', 'max:10000'],

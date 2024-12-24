@@ -18,24 +18,12 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('second_name')->nullable();
             $table->date('birth_date');
-            $table->string('birth_country');
-            $table->string('birth_settlement');
-            $table->enum('gender', ['male', 'female']);
-            $table->string('email')->unique();
+            $table->enum('gender', ['MALE', 'FEMALE']);
             $table->string('tax_id')->nullable();
-            $table->string('secret');
-            $table->json('documents');
-            $table->json('addresses');
-            $table->json('phones')->nullable();
-            $table->json('authentication_methods');
-            $table->enum('preferred_way_communication', ['email', 'phone', 'sms']);
-            $table->json('emergency_contact');
-            $table->json('confidant_persons');
-            $table->boolean('is_active')->default(true);
-            $table->json('merged_ids')->nullable();
+            $table->string('birth_settlement')->nullable();
+            $table->string('birth_country')->nullable();
             $table->timestamps();
         });
-
     }
 
     /**
@@ -43,8 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-
         Schema::dropIfExists('persons');
-
     }
 };

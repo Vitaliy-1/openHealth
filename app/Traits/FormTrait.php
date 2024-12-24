@@ -2,17 +2,8 @@
 
 namespace App\Traits;
 
-use App\Helpers\JsonHelper;
-use App\Models\Employee;
-use Illuminate\Support\Arr;
-
-
-/**
- *
- */
 trait FormTrait
 {
-
     /**
      * @var bool|string
      */
@@ -59,7 +50,7 @@ trait FormTrait
     public function addRowPhone($property = '', $value = 'phones'): array|null
     {
         if (!empty($property)) {
-            return $this->handleDynamicProperty($property)[$value][] = ['type' => '', 'number' => ''];;
+            return $this->handleDynamicProperty($property)[$value][] = ['type' => '', 'number' => ''];
         }
 
         return null;
@@ -77,7 +68,7 @@ trait FormTrait
     {
         if (!empty($property)) {
             // Remove the phone number from the property
-           $this->handleDynamicProperty($property);
+            $this->handleDynamicProperty($property);
             // Remove the phone number from the property
             if (isset($this->handleDynamicProperty($property)[$value][$key])) {
                 unset($this->handleDynamicProperty($property)[$value][$key]);
@@ -85,25 +76,30 @@ trait FormTrait
         }
     }
 
-    public function &handleDynamicProperty(string $property)
+    public function &handleDynamicProperty(string $property): mixed
     {
         $propertyParts = explode('.', $property);
         $currentProperty = &$this;
+
         foreach ($propertyParts as $part) {
-            if (property_exists($currentProperty, $part)) {
-                $currentProperty = &$currentProperty->{$part};
-            } else {
-                if (is_object($currentProperty)) {
-                    $currentProperty->{$part} = [];
-                } else {
-                    $currentProperty[$part] = [];
+            if (is_object($currentProperty)) {
+                if (!property_exists($currentProperty, $part)) {
+                    $currentProperty->{$part} = []; // Create a new property as an array
                 }
+
                 $currentProperty = &$currentProperty->{$part};
+            } // If $currentProperty is an array
+            elseif (is_array($currentProperty)) {
+                if (!array_key_exists($part, $currentProperty)) {
+                    $currentProperty[$part] = []; // Add a new key
+                }
+
+                $currentProperty = &$currentProperty[$part];
             }
         }
+
         return $currentProperty;
     }
-
 
     /**
      * Retrieves and sets the dictionaries by searching for the value of 'DICTIONARIES_PATH' in the dictionaries field.
@@ -115,9 +111,9 @@ trait FormTrait
 //        $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', $this->dictionaries_field ?? []);
 //    }
 
-    public function getDictionary() {
-
-        $this->dictionaries = dictionary()->getDictionaries( $this->dictionaries_field ?? [], true);
+    public function getDictionary(): void
+    {
+        $this->dictionaries = dictionary()->getDictionaries($this->dictionaries_field ?? [], true);
     }
 
     /**
@@ -146,4 +142,3 @@ trait FormTrait
         $this->showModal = false;
     }
 }
-

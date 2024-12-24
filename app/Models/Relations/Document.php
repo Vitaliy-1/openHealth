@@ -2,16 +2,13 @@
 
 namespace App\Models\Relations;
 
-use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Document extends Model
 {
     use HasFactory;
-
-    use HasCamelCasing;
-
 
     protected $fillable = [
         'type',
@@ -20,7 +17,8 @@ class Document extends Model
         'issuedAt',
     ];
 
-    public function documentable(){
+    public function documentable(): MorphTo
+    {
         return $this->morphTo();
     }
 }
