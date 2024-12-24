@@ -1,17 +1,17 @@
 <div class="w-full mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <h5 class="mb-5 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-        {{ __('forms.confidant_person_documents_relationship') }}
+        {{ __('forms.confidantPersonDocumentsRelationship') }}
     </h5>
 
     <x-tables.table>
         <x-slot name="headers"
-                :list="[__('forms.document_type'), __('forms.number'), __('forms.issued_by'), __('forms.issued_at'), __('forms.active_to'), __('forms.actions')]">
+                :list="[__('forms.documentType'), __('forms.number'), __('forms.issuedBy'), __('forms.issuedAt'), __('forms.activeTo'), __('forms.actions')]">
         </x-slot>
 
         <x-slot name="tbody">
             @isset($documentsRelationship)
                 @foreach($documentsRelationship as $key => $documentRelationship)
-                    @continue($key === 'confidantPersonId')
+                    @continue($key === 'personId')
                     <tr>
                         <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
                             {{ $documentRelationship['type'] ?? '' }}
@@ -58,7 +58,7 @@
         <a wire:click.prevent="create('documentsRelationship')"
            class="text-sm inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
            href="#">
-            {{ __('forms.add_document') }}
+            {{ __('forms.addDocument') }}
         </a>
     </div>
 </div>

@@ -4,6 +4,7 @@ namespace App\Models\Relations;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Phone extends Model
 {
@@ -11,10 +12,10 @@ class Phone extends Model
 
     protected $fillable = [
         'type',
-        'number',
+        'number'
     ];
 
-    public function phoneable()
+    public function phoneable(): MorphTo
     {
         return $this->morphTo();
     }

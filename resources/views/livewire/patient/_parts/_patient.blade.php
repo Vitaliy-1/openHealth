@@ -2,14 +2,14 @@
     <div
         class="w-full mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {{ __('forms.patient_information') }}
+            {{ __('forms.patientInformation') }}
         </h5>
 
         <x-forms.form-row>
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="patient_first_name" class="default-label">
-                        {{ __('forms.first_name') }} *
+                        {{ __('forms.firstName') }} *
                     </x-forms.label>
                 </x-slot>
 
@@ -33,7 +33,7 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="patient_last_name" class="default-label">
-                        {{ __('forms.last_name') }} *
+                        {{ __('forms.lastName') }} *
                     </x-forms.label>
                 </x-slot>
 
@@ -57,7 +57,7 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="patient_second_name" class="default-label">
-                        {{ __('forms.second_name') }}
+                        {{ __('forms.secondName') }}
                     </x-forms.label>
                 </x-slot>
 
@@ -83,7 +83,7 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="birth_date" class="default-label">
-                        {{ __('forms.birth_date') }} *
+                        {{ __('forms.birthDate') }} *
                     </x-forms.label>
                 </x-slot>
 
@@ -129,7 +129,7 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="birth_settlement" class="default-label">
-                        {{ __('forms.birth_settlement') }} *
+                        {{ __('forms.birthSettlement') }} *
                     </x-forms.label>
                 </x-slot>
 

@@ -52,8 +52,17 @@ class Request
             $file = $this->params['multipart'][0] ?? null;
             $fileContent = stream_get_contents($file['contents']);
 
-            $response = Http::attach('file', $fileContent, $file['filename'])->withHeaders(['Content-Type' => 'multipart/form-data'])
+            $response = Http::attach('file', $fileContent, $file['filename'])
+                ->withHeaders(['Content-Type' => 'multipart/form-data'])
                 ->put($this->url);
+
+            if ($response->status() !== 200) {
+                Log::channel('api_errors')->error('API request failed', [
+                    'url' => $this->makeApiUrl(),
+                    'status' => $response->status(),
+                    'errors' => $response->body()
+                ]);
+            }
 
             return [
                 'status' => $response->status(),
@@ -97,7 +106,7 @@ class Request
             dd($errors);
 
             Log::channel('api_errors')->error('API request failed', [
-                'url' => self::makeApiUrl(),
+                'url' => $this->makeApiUrl(),
                 'status' => $response->status(),
                 'errors' => $errors
             ]);
@@ -131,7 +140,4 @@ class Request
 //        // Виклик події браузера через Livewire
 //        \Livewire\Component::dispatch('flashMessage', ['message' => $message, 'type' => $type]);
 //    }
-
-
-
 }

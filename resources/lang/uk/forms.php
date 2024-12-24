@@ -70,7 +70,7 @@ return [
     'UNZR'                                 => 'УНЗР',
     //Form fields
     'alias'                                => 'аліас',
-    'active_to'                            => 'Активний до',
+    'activeTo'                            => 'Активний до',
     'edrpou'                               => 'ЄДРПОУ',
     'firstName'                            => 'Ім’я',
     'lastName'                             => 'Прізвище',

@@ -11,7 +11,7 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="documents_type" class="default-label">
-                                {{ __('forms.document_type') }} *
+                                {{ __('forms.documentType') }} *
                             </x-forms.label>
                         </x-slot>
 
@@ -42,7 +42,7 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="documents_number" class="default-label">
-                                {{ __('forms.document_number') }} *
+                                {{ __('forms.documentNumber') }} *
                             </x-forms.label>
                         </x-slot>
 
@@ -68,7 +68,7 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="documents_issued_by" class="default-label">
-                                {{ __('forms.document_issued_by') }} *
+                                {{ __('forms.documentIssuedBy') }} *
                             </x-forms.label>
                         </x-slot>
 
@@ -77,7 +77,7 @@
                                            wire:model="patientRequest.documents.issuedBy"
                                            type="text"
                                            id="documents_issued_by"
-                                           placeholder="{{ __('forms.document_issued_by') }}"
+                                           placeholder="{{ __('forms.documentIssuedBy') }}"
                             />
                         </x-slot>
 
@@ -93,7 +93,7 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="documents_issued_at" class="default-label">
-                                {{ __('forms.document_issued_at') }} *
+                                {{ __('forms.documentIssuedAt') }} *
                             </x-forms.label>
                         </x-slot>
 
@@ -118,7 +118,7 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="expiration_date" class="default-label">
-                                {{ __('forms.expiration_date') }}
+                                {{ __('forms.expirationDate') }}
                             </x-forms.label>
                         </x-slot>
 

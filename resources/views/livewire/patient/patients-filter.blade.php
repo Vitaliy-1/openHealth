@@ -7,7 +7,7 @@
                 <x-forms.form-group>
                     <x-slot name="label">
                         <x-forms.label for="filter_first_name">
-                            {{ __('forms.first_name') }} *
+                            {{ __('forms.firstName') }} *
                         </x-forms.label>
                     </x-slot>
 
@@ -30,7 +30,7 @@
                 <x-forms.form-group>
                     <x-slot name="label">
                         <x-forms.label for="filter_last_name">
-                            {{ __('forms.last_name') }} *
+                            {{ __('forms.lastName') }} *
                         </x-forms.label>
                     </x-slot>
 
@@ -53,7 +53,7 @@
                 <x-forms.form-group>
                     <x-slot name="label">
                         <x-forms.label for="filter_birth_date">
-                            {{ __('forms.birth_date') }} *
+                            {{ __('forms.birthDate') }} *
                         </x-forms.label>
                     </x-slot>
 
@@ -85,7 +85,7 @@
                 <x-forms.form-group>
                     <x-slot name="label">
                         <x-forms.label for="filter_second_name">
-                            {{ __('forms.second_name') }}
+                            {{ __('forms.secondName') }}
                         </x-forms.label>
                     </x-slot>
 
@@ -100,7 +100,7 @@
                 <x-forms.form-group>
                     <x-slot name="label">
                         <x-forms.label for="filter_tax_id">
-                            {{ __('forms.tax_id') }}
+                            {{ __('forms.taxId') }}
                         </x-forms.label>
                     </x-slot>
 
