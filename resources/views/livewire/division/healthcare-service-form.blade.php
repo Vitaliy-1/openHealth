@@ -1,12 +1,16 @@
 <div>
     <x-section-navigation x-data="{ showFilter: false }" class="">
         <x-slot name="title">{{ __('Послуги') }}</x-slot>
-        <x-slot name="description">{{ __('Послуги') }}</x-slot>
-
+        <x-slot name="description">{{ $currentDivision['type'] }} '{{ $currentDivision['name'] }}'</x-slot>
         <x-slot name="navigation">
             <div class="rounded-sm border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                <div class="flex justify-end border-stroke px-7 py-4 dark:border-strokedark">
+                <div
+                    x-data="{ isDivisionActive: @js($divisionStatus) }"
+                    class="flex justify-end border-stroke px-7 py-4 dark:border-strokedark"
+                    x-cloak
+                >
                     <button
+                        x-show="isDivisionActive"
                         type="button"
                         wire:click="create"
                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
@@ -26,51 +30,50 @@
         </x-slot>
     </x-section-navigation>
 
-    <div class="flex flex-col h-screen -mt-4 border-t">
+    {{-- <div class="flex flex-col h-screen -mt-4 border-t"> --}}
         <div class="overflow-x-auto">
             <div class="inline-block min-w-full align-middle">
-                <div class="overflow-hidden shadow">
-                    <x-tables.table>
+                <div class="shadow">
+                    <x-tables.table class="mb-20">
                         <x-slot name="headers" :list="$tableHeaders"></x-slot>
-
                         <x-slot name="tbody">
-                            @if ($healthcare_services)
-                                @foreach ($healthcare_services as $k => $item)
+                            @nonempty($healthcareServices->items())
+                                @foreach ($healthcareServices as $k => $service)
                                     <tr>
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            <p class="text-black dark:text-white">
-                                                {{ $item->uuid ?? '' }}
+                                        <td class="p-4 text-sm text-center font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                            <p class="font-semibold text-gray-900 dark:text-white">
+                                                {{ $service->uuid ?? '' }}
                                             </p>
                                         </td>
 
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            <p class="text-black dark:text-white">
-                                                {{ $item->healthcare_category ?? '' }}
+                                        <td class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                            <p class="inline-flex items-center font-medium text-gray-600 dark:text-gray-500">
+                                                {{ $dictionaries['show']['HEALTHCARE_SERVICE_CATEGORIES'][$service->healthcare_category] ?? '' }}
                                             </p>
                                         </td>
 
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            <p class="text-black dark:text-white">
-                                                {{ $item->providing_condition ?? '' }}
+                                        <td class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                            <p class="inline-flex items-center font-medium text-gray-600 dark:text-gray-500">
+                                                {{ $dictionaries['show']['PROVIDING_CONDITION'][$service->providing_condition] ?? '' }}
                                             </p>
                                         </td>
 
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            <p class="text-black dark:text-white">
-                                                {{ $dictionaries['SPECIALITY_TYPE'][$item->speciality_type] ?? '' }}
+                                        <td class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400 ">
+                                            <p class="text-gray-900 dark:text-white">
+                                                {{ $dictionaries['show']['SPECIALITY_TYPE'][$service->speciality_type] ?? '' }}
                                             </p>
                                         </td>
 
-                                        <td class="border-b border-[#eee] py-5 px-4 ">
-                                            @if ($item->status == 'INACTIVE')
-                                                <span class="text-meta-1">{{ __('Не активний') }}</span>
+                                        <td class="p-4 text-sm font-normal text-center text-gray-500 whitespace-nowrap dark:text-gray-400">
+                                            @if ($service->status == 'DEACTIVATED')
+                                                <span class="rejected text-meta-1">{{ __('Не активний') }}</span>
                                             @else
-                                                <span class="text-meta-3">{{ __('Активний') }}</span>
+                                                <span class="approved text-meta-3">{{ __('Активний') }}</span>
                                             @endif
                                         </td>
 
                                         <td class="border-b border-[#eee] py-5 px-4 ">
-                                            @if ($item->status == 'ACTIVE')
+                                            @if ($divisionStatus)
                                                 <div class="flex justify-center">
                                                     <div x-data="{
                                                             open: false,
@@ -130,17 +133,17 @@
                                                             style="display: none;"
                                                             class="absolute right-0 mt-2 w-40 rounded-md bg-white shadow-md z-50"
                                                         >
-                                                            <a
-                                                                wire:click="edit({{ $item }})"
-                                                                href="#"
-                                                                class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
-                                                            >
-                                                                {{ __('forms.edit') }}
-                                                            </a>
-                                                            @if ($item->status == 'ACTIVE')
+                                                            @if ($service->status == 'ACTIVE')
+                                                                <a
+                                                                    wire:click="edit({{ $service }}); toggle()"
+                                                                    href="#"
+                                                                    class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
+                                                                >
+                                                                    {{ __('forms.edit') }}
+                                                                </a>
                                                                 <a
                                                                     href="#"
-                                                                    wire:click="deactivate({{ $item }})"
+                                                                    wire:click="deactivate({{ $service }}); toggle()"
                                                                     class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
                                                                 >
                                                                     {{ __('forms.deactivate') }}
@@ -148,7 +151,7 @@
                                                             @else
                                                                 <a
                                                                     href="#"
-                                                                    wire:click="activate({{ $item }})"
+                                                                    wire:click="activate({{ $service }}); toggle()"
                                                                     class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500"
                                                                 >
                                                                     {{ __('forms.activate') }}
@@ -161,23 +164,30 @@
                                         </td>
                                     </tr>
                                 @endforeach
-                            @endif
+                            @elsenonempty
+                            <tr>
+                                <td class="text-black w-full p-4 border-gray-200 text-center dark:bg-gray-800 dark:border-gray-700 dark:text-white" colspan="7">
+                                    <p >
+                                        {{ __('Нічого не знайдено') }}
+                                    </p>
+                                </td>
+                            </tr>
+                            @endnonempty
                         </x-slot>
                     </x-tables.table>
-
-                    <div class="footer flex flex-start border-stroke px-7 py-2 mt-4">
-                        <x-secondary-button>
-                            <a href="{{ route('division.index') }}">
-                                {{ __('Назад') }}
-                            </a>
-                        </x-secondary-button>
-                    </div>
-
+                    <x-pagination :pagination="$healthcareServices" class="pagination" style="margin-block-start: -80px;"/>
                 </div>
             </div>
         </div>
-    </div>
+    {{-- </div> --}}
 
+    <div class="footer flex flex-start border-stroke px-7 py-2 my-4">
+        <x-secondary-button>
+            <a href="{{ route('division.index') }}">
+                {{ __('Назад') }}
+            </a>
+        </x-secondary-button>
+    </div>
     @include('livewire.division._parts._healthcare_service_form')
 
 </div>

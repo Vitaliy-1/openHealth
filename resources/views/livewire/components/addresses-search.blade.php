@@ -52,7 +52,7 @@
                     x-bind:disabled="{{ empty($area) || $area === 'М.КИЇВ' ? 'true' : 'false' }}"
                     x-on:keyup.debounce.500ms="
                         if ($event.target.value.length >= 3) {
-                            $wire.call('getDisstricts');
+                            $wire.call('getDistricts');
                             open = true;
                         }
                     "
@@ -108,7 +108,7 @@
                 for="type"
                 name="label"
             >
-                {{ __('forms.settlement_type') }} *
+                {{ __('forms.settlementType') }} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -209,7 +209,7 @@
         <x-slot name="label">
             <x-forms.label class="default-label" for="area"
                            name="label">
-                {{__('forms.street_type')}} *
+                {{__('forms.streetType')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -305,7 +305,7 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.input class="default-input"
-                           wire:model.live="building"
+                           wire:model="building"
                            x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
                            type="text" id="building"
             />
@@ -330,7 +330,7 @@
         <x-slot name="input">
             <x-forms.input
                 class="default-input"
-                wire:model.live="apartment"
+                wire:model="apartment"
                 x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
                 type="text" id="apartment"/>
         </x-slot>
@@ -348,13 +348,13 @@
         <x-slot name="label">
             <x-forms.label class="default-label" for="zip"
                            name="label">
-                {{__('forms.zip_code')}}
+                {{__('forms.zipCode')}}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
             <x-forms.input x-mask="99999"
                            class="default-input"
-                           wire:model.live="zip"
+                           wire:model="zip"
                            x-bind:disabled="{{ empty($settlement) ? 'true' : 'false' }}"
                            type="text" id="zip"
             />

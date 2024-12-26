@@ -4,7 +4,7 @@
    <div class="w-full mb-1">
         <x-section-title>
             <x-slot name="title"> {{ $title }}</x-slot>
-            <x-slot name="description">{{ $description ?? $title }}</x-slot>
+            <x-slot name="description">{{ $description ?? '' }}</x-slot>
         </x-section-title>
         {{ $navigation ?? '' }}
    </div>
