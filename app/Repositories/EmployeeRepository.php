@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use App\Models\Employee;
 use App\Models\Employee\BaseEmployee;
+use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeRequest;
 use App\Models\LegalEntity;
 use Exception;
@@ -62,28 +62,31 @@ class EmployeeRepository
      * @param $data
      * @return Employee
      */
-    public function createOrUpdate($data, string $typeRequest): BaseEmployee
+    public function createOrUpdate($data, Employee|EmployeeRequest $employeeModel, LegalEntity $legalEntity): BaseEmployee
     {
-        $typeRequest = $typeRequest === 'employee' ? new Employee() : new EmployeeRequest();
-        return $typeRequest::updateOrCreate(
+        $employee =  $employeeModel::updateOrCreate(
             [
                 'uuid' => $data['uuid'] ?? '',
             ],
             $data
         );
+
+        $employee->legalEntity()->associate($legalEntity);
+
+        return  $employee;
+
     }
 
-    public function saveEmployeeData($request, LegalEntity $legalEntity , string $typeRequest = 'employee'): Employee|EmployeeRequest //TODO: Global LegalEntity model
+    public function saveEmployeeData($request, LegalEntity $legalEntity ,  Employee|EmployeeRequest $employeeModel): Employee|EmployeeRequest //TODO: Global LegalEntity model
     {
 //        DB::beginTransaction();
-
 //        try {
             // Create or update User
-            $this->userRepository->createIfNotExist($request['party'], $request['employee_type'], $legalEntity);
-
+            if (isset($request['party']['email']) && !empty($request['party']['email'])) {
+                $this->userRepository->createIfNotExist($request['party'], $request['employeeType'], $legalEntity);
+            }
             // Create or update Employee
-            $employee = $this->createOrUpdate($request,$typeRequest,$legalEntity);
-            $employee->legalEntity()->associate($legalEntity);
+            $employee = $this->createOrUpdate($request,$employeeModel,$legalEntity);
 
             // Create or update Party
             $party = $this->partyRepository->createOrUpdate($request['party']);
@@ -98,7 +101,7 @@ class EmployeeRepository
             $this->educationRepository->addEducations($employee, $request['doctor']['educations'] ?? []);
 
             // Add science degrees
-            $this->scienceDegreeRepository->addScienceDegrees($employee, $request['doctor']['science_degrees'] ?? []);
+            $this->scienceDegreeRepository->addScienceDegrees($employee, $request['doctor']['scienceDegree'] ?? []);
 
             // Add qualifications
             $this->qualificationRepository->addQualifications($employee, $request['doctor']['qualifications'] ?? []);

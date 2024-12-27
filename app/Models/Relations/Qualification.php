@@ -13,12 +13,12 @@ class Qualification extends Model
 
     protected $fillable = [
         'type',
-        'institution_name',
+        'institutionName',
         'speciality',
-        'issued_date',
-        'certificate_number',
-        'valid_to',
-        'additional_info',
+        'issuedDate',
+        'certificateNumber',
+        'validTo',
+        'additionalInfo',
     ];
 
     public function qualificationable()

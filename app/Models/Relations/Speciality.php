@@ -14,12 +14,12 @@ class Speciality extends Model
 
     protected $fillable = [
         'speciality',
-        'speciality_officio',
+        'specialityOfficio',
         'level',
-        'qualification_type',
-        'attestation_name',
-        'attestation_date',
-        'valid_to_date',
-        'certificate_number'
+        'qualificationType',
+        'attestationName',
+        'attestationDate',
+        'validToDate',
+        'certificateNumber'
     ];
 }

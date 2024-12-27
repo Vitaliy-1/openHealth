@@ -3,12 +3,11 @@
 namespace App\Livewire\Employee;
 
 use App\Classes\eHealth\Api\EmployeeApi;
-use App\Classes\eHealth\Services\SchemaService;
-use App\Jobs\SendApiRequestJob;
 use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
 use App\Livewire\Employee\Forms\EmployeeFormRequest;
 use App\Models\Division;
-use App\Models\Employee;
+use App\Models\Employee\Employee;
+use App\Models\Employee\EmployeeRequest;
 use App\Models\LegalEntity;
 use App\Classes\Cipher\Traits\Cipher;
 use App\Repositories\EmployeeRepository;
@@ -65,7 +64,7 @@ class EmployeeForm extends Component
         'EMPLOYEE_TYPE',
         'POSITION',
         'EDUCATION_DEGREE',
-        'EMPLOYEE_TYPE'
+        'EMPLOYEE_TYPE',
     ];
 
     public ?object $divisions;
@@ -122,7 +121,6 @@ class EmployeeForm extends Component
         $this->getDictionary();
         $this->getEmployeeDictionaryRole();
         $this->getEmployeeDictionaryPosition();
-//        $this->dictionaryUnset();
     }
 
     public function setCertificateAuthority(): array|null
@@ -191,6 +189,7 @@ class EmployeeForm extends Component
 
     public function signedComplete($model)
     {
+
         $this->getEmployee();
         $open = $this->employeeRequest->validateBeforeSendApi();
         if ($open['error']) {
@@ -296,6 +295,7 @@ class EmployeeForm extends Component
         if (isset($cacheData[$this->requestId][$model][$keyProperty])) {
             unset($cacheData[$this->requestId][$model][$keyProperty]);
         }
+
         $this->putCache($this->employeeCacheKey, $cacheData);
         $this->getEmployee();
     }
@@ -311,21 +311,26 @@ class EmployeeForm extends Component
 
     public function preRequestData(): array
     {
+        if (!in_array($this->employeeRequest->party['employeeType'],config('ehealth.doctors_type',[]))) {
+            unset($this->employeeRequest->specialities);
+            unset($this->employeeRequest->qualifications);
+            unset($this->employeeRequest->educations);
+            unset($this->employeeRequest->scienceDegree);
+        }
         return schemaService()
             ->setDataSchema(['employee_request' => $this->employeeRequest->toArray()],app(EmployeeApi::class))
             ->mapFields(['position', 'employeeType', 'startDate'], 'party', 'employee_request')
             ->mapFields([
                 'doctor' => ['specialities', 'qualifications', 'educations', 'scienceDegree'],
-                'party'  => ['documents'],
+                'party'  => ['documents']
             ],'','employee_request')
             ->requestSchemaNormalize()
-            ->removeItemsKey()
-            ->filterNormalizedData()
             ->getNormalizedData();
     }
 
     public function sendApiRequest()
     {
+
         $base64Data = $this->sendEncryptedData(
             removeEmptyKeys($this->preRequestData()),
             \auth()->user()->tax_id
@@ -339,6 +344,7 @@ class EmployeeForm extends Component
             'signed_content'          => $base64Data,
             'signed_content_encoding' => 'base64',
         ]);
+
         $this->apiResponse($employeeRequest);
 
         //TODO: add flash message
@@ -352,15 +358,16 @@ class EmployeeForm extends Component
 
     }
 
-    public function apiResponse($response)
+
+    //Response from api
+    public function apiResponse($response):void
     {
         $employeeResponse = schemaService()->setDataSchema($response, app(EmployeeApi::class))
             ->responseSchemaNormalize()
-            ->replaceIdsKeysToUuid(['id', 'legal_entity_id', 'division_id', 'party_id'])
-            ->filterNormalizedData()
+            ->replaceIdsKeysToUuid(['id', 'legalEntityId', 'divisionId', 'partyId'])
             ->getNormalizedData();
         app(EmployeeRepository::class)->saveEmployeeData($employeeResponse, auth()->user()->legalEntity,
-            'employeeRequest');
+            EmployeeRequest::class);
     }
 
     private function dispatchErrorMessage(string $message, array $errors = []): void
@@ -374,12 +381,35 @@ class EmployeeForm extends Component
 
     public function getEmployeeDictionaryRole(): void
     {
-        $this->getDictionariesFields(config('ehealth.legal_entity_type.primary_care.roles'), 'EMPLOYEE_TYPE');
+       $this->dictionaries['EMPLOYEE_TYPE'] = $this->getDictionariesFields(config('ehealth.legal_entity_type.' . auth()->user()->legalEntity->type.'.roles'), 'EMPLOYEE_TYPE');
+    }
+
+    public function updatedEmployeeRequestPartyEmployeeType(): void{
+        $this->getEmployeeDictionaryPosition();
+        if (!in_array( $this->employeeRequest->party['employeeType'],config('ehealth.doctors_type',[]))) {
+
+            $this->employeeRequest->educations = [];
+            $this->employeeRequest->qualifications = [];
+            $this->employeeRequest->scienceDegree = [];
+            $this->employeeRequest->specialities = [];
+        }
+
+        $this->employeeRequest->party['position'] = '';
     }
 
     public function getEmployeeDictionaryPosition(): void
     {
-        $this->getDictionariesFields(config('ehealth.legal_entity_type.primary_care.positions'), 'POSITION');
+        $employeeType = $this->employeeRequest->party['employeeType'] ?? null;
+
+        if (!empty($employeeType)) {
+            $keys = config("ehealth.employee_type.{$employeeType}.position", []);
+            if (!empty($keys)) {
+              $this->dictionaries['POSITION_EMPLOYEE_TYPE'] =  $this->getDictionariesFields($keys, 'POSITION');
+            }
+        }
+        else{
+            $this->dictionaries['POSITION_EMPLOYEE_TYPE'] = [];
+        }
     }
 
     public function render()
@@ -462,7 +492,7 @@ class EmployeeForm extends Component
                 "science_degree" => array(
                     "country" => "UA",
                     "city" => "Київ",
-                    "degree" => "",
+                    "degree" => "SCIENCE_DEGREE",
                     "institution_name" => "Академія Богомольця",
                     "diploma_number" => "DD123543",
                     "speciality" => "Педіатр",
