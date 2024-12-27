@@ -2,23 +2,19 @@
 
 namespace App\Livewire\Employee;
 
-use App\Classes\eHealth\Api\PersonApi;
+use App\Classes\eHealth\Api\EmployeeApi;
 use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
-use App\Models\Employee;
+use App\Models\Employee\BaseEmployee;
+use App\Models\Employee\Employee;
 use App\Models\LegalEntity;
-use App\Models\Relations\Document;
+
 use App\Models\Relations\Party;
 use App\Models\Relations\Phone;
-use App\Models\User;
 use App\Repositories\EmployeeRepository;
-use App\Services\EmployeeService;
 use App\Traits\FormTrait;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 
 class EmployeeIndex extends Component
@@ -76,7 +72,10 @@ class EmployeeIndex extends Component
     {
         if (Cache::has($this->employeeCacheKey)) {
             return collect(Cache::get($this->employeeCacheKey))->map(function ($data) {
-                return (new Employee())->forceFill($data);
+                $employee = (new BaseEmployee())->forceFill($data['party']);
+                $employee->party = (new Party())->forceFill($data['party'] ?? []);
+                $employee->party->phones = (new Phone())->forceFill($data['party']['phones'] ?? []);
+                return $employee;
             });
         }
         return collect();
@@ -84,9 +83,14 @@ class EmployeeIndex extends Component
 
     public function getEmployees(): void
     {
-      $this->employees = $this->status === 'APPROVED' && 'NEW' ?
-          $this->legalEntity->employees()->with('party')->where('status', $this->status)->get()
-      : $this->getEmployeesCache();
+        if ($this->status === 'APPROVED') {
+            $this->employees = $this->legalEntity->employees()->get();
+        } elseif ($this->status === 'NEW') {
+            $this->employees = $this->legalEntity->employeesRequest()->get();
+        } else {
+            $this->employees = $this->getEmployeesCache();
+
+        }
 
     }
 
@@ -105,8 +109,8 @@ class EmployeeIndex extends Component
 
     public function sortEmployees($status): void
     {
-        dd($status);
         $this->status = $status;
+        $this->getEmployees();
     }
 
     public function dismissed(Employee $employee)
@@ -152,10 +156,15 @@ class EmployeeIndex extends Component
         $requests = EmployeeRequestApi::getEmployees($this->legalEntity->uuid);
 
         foreach ($requests as $request) {
-            $request = EmployeeRequestApi::getEmployeeById($request['id']);
-            $request['uuid'] = $request['id'];
-            $request['legal_entity_uuid'] = $request['legal_entity']['id'];
-            $this->employeeRepository->saveEmployeeData($request, $this->legalEntity);
+            $response = EmployeeRequestApi::getEmployeeById($request['id']);
+            $employeeResponse = schemaService()->setDataSchema($response, app(EmployeeApi::class))
+                ->responseSchemaNormalize()
+                ->replaceIdsKeysToUuid(['id', 'legalEntityId', 'divisionId', 'partyId'])
+                ->getNormalizedData();
+            app(EmployeeRepository::class)
+                ->saveEmployeeData($employeeResponse,
+                auth()->user()->legalEntity,
+                new Employee());
         }
 
         $this->dispatchErrorMessage(__('Співробітники успішно синхронізовано'));

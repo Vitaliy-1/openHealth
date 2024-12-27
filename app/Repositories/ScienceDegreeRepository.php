@@ -13,10 +13,10 @@ class ScienceDegreeRepository
      * @param array $scienceDegrees
      * @return void
      */
-    public function addScienceDegrees(object $model, array $scienceDegrees): void
+    public function addScienceDegrees(object $model, array $scienceDegreeData): void
     {
-        if (!empty($scienceDegrees)) {
-            foreach ($scienceDegrees as $scienceDegreeData) {
+        if (!empty($scienceDegreeData)) {
+//            foreach ($scienceDegrees as $scienceDegreeData) {
                 $scienceDegree = ScienceDegree::firstOrNew(
                     [
                         'science_degreeable_type' => get_class($model),
@@ -26,7 +26,7 @@ class ScienceDegreeRepository
                 );
                 $model->scienceDegrees()->save($scienceDegree);
             }
-        }
+//        }
 
     }
 

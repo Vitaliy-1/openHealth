@@ -127,21 +127,17 @@ trait FormTrait
      * @param  string  $dictionaries  The name of the dictionaries array to filter
      * @return void
      */
-    public function getDictionariesFields(array $keys, string $dictionaries): void
+    public function getDictionariesFields(array $keys, string $dictionaries): array
     {
-        // Check if the dictionaries array exists and is an array
-        if (is_array($this->dictionaries[$dictionaries])) {
-            // Filter the dictionaries array to keep only the specified keys
-            $this->dictionaries[$dictionaries] = array_filter(
-                $this->dictionaries[$dictionaries],
-                function ($key) use ($keys) {
-                    return in_array($key, $keys);
-                },
-                ARRAY_FILTER_USE_KEY
-            );
+        // If the dictionaries array exists and is an array, filter and keep only the specified keys
+        if (isset($this->dictionaries[$dictionaries]) && is_array($this->dictionaries[$dictionaries])) {
+            // Filter and keep only the specified keys in the dictionaries array
+            return array_intersect_key($this->dictionaries[$dictionaries], array_flip($keys));
         }
-    }
 
+        // return an empty array if the dictionaries array does not exist or is not an array
+        return [];
+    }
     /**
      * Closes the modal by setting the showModal property to false.
      */

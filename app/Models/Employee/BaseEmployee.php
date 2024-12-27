@@ -39,19 +39,17 @@ class BaseEmployee extends Model
     use HasCamelCasing;
 
 
-    protected $hidden = ['id'];
-
     protected $fillable = [
         'uuid',
-        'legal_entity_uuid',
-        'division_uuid',
-        'legal_entity_id',
+        'legalEntityUuid',
+        'divisionUuid',
+        'legalEntityId',
         'status',
         'position',
-        'start_date',
-        'end_date',
-        'party_id',
-        'employee_type',
+        'startDate',
+        'endDate',
+        'partyId',
+        'employeeType',
     ];
 
     protected $casts = [

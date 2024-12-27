@@ -36,7 +36,8 @@ class SchemaService
         return $this->setSchema($this->class->schemaRequest())
             ->arrayToCollection()
             ->snakeCaseKeys()
-            ->mappingSchemaNormalize();
+            ->mappingSchemaNormalize()
+            ->removeItemsKey();
     }
 
     /**
@@ -47,7 +48,8 @@ class SchemaService
     public function schemaNormalize(): self{
         return $this->arrayToCollection()
             ->snakeCaseKeys()
-            ->mappingSchemaNormalize();
+            ->mappingSchemaNormalize()
+            ->removeItemsKey();
     }
 
 
@@ -61,8 +63,8 @@ class SchemaService
         }
         return $this->setSchema($this->class->schemaResponse())
             ->arrayToCollection()
-            ->snakeCaseKeys()
-            ->mappingSchemaNormalize();
+            ->mappingSchemaNormalize()
+            ->camelCaseKeys();
     }
 
 
@@ -85,6 +87,7 @@ class SchemaService
         $this->normalizedData = $this->mapDataBySchema(
             collect($this->data),
             $this->schema);
+
         return $this;
     }
 
@@ -131,20 +134,27 @@ class SchemaService
             $definitions,
             $schema
         ) {
+            // Check if the property is a reference
             if (isset($property['$ref'])) {
+                // Check if the reference is in the definitions
                 $this->handleRefProperty($data, $property, $definitions, $key);
+
+           // Check if the property is an array
             } elseif (isset($property['items'])) {
+                // Check if the property is an array of references
                 $this->handleItemsProperty($data, $property, $definitions, $key);
             } elseif (isset($property['properties'])) {
                 $this->handleProperty($data, $property, $definitions, $key);
             } else {
                 $this->handleDataKey($data, $key);
             }
+            // Return the updated data
             return $data->get($key);
+        })->filter(function ($value) {
+            // Filter out empty values
+            return $this->isNotEmpty($value);
         });
     }
-
-
 
     /**
      * Handle the provided key in the data collection.
@@ -205,7 +215,6 @@ class SchemaService
 
         // Retrieve the definition from the definitions if it exists
         $definition = $definitions?->get($definitionKey);
-
         // Process the data based on the schema definition if the definition is found
         if ($definition) {
             $data->put($key, $this->mapDataBySchema(collect($data), collect($definition), $definitions));
@@ -226,62 +235,45 @@ class SchemaService
         mixed $definitions,
         string $key
     ): void {
-        // Check if the key exists in the data
-        $refPath = $property['items']['$ref'];
+        // Check if the 'items' key exists in the property
+        if (!isset($property['items']['$ref'])) {
+            return;
+        }
 
+        // Extract the $ref path from the property array
+        $refPath = $property['items']['$ref'];
         // Extract the definition key from the $ref path
         $definitionKey = $this->extractDefinitionKey($refPath);
-
-        // Get the definition
+        // get the definition from the definitions if it exists
         $definition = $definitions?->get($definitionKey);
 
-        if ($data->has($key)) {
-            // Map data based on the schema definition
-            $data->put($key, collect($data->get($key))->map(function ($item) use ($definition, $definitions) {
+        // Process the data based on the schema definition if the definition is found
+        $data->put($key, collect($data->get($key))->map(function ($item) use ($definition, $definitions) {
+            // Process the data based on the schema definition
+            if (is_iterable($item)) {
                 return $this->mapDataBySchema(collect($item), collect($definition), $definitions);
-            }));
-        }
-    }
-
-    /**
-     * Filter out empty values from the normalized data.
-     *
-     * @return self
-     */
-    public function filterNormalizedData(): self
-    {
-        $this->normalizedData = $this->removeEmptyCollectionsFromCollection($this->normalizedData);
-        return $this;
-    }
-
-    /**
-     * Removes empty collections and empty values from the given collection recursively.
-     *
-     * @param Collection $collection
-     * @return Collection
-     */
-    public function removeEmptyCollectionsFromCollection( Collection $collection):Collection
-    {
-        $collection->each(function ($value, $key) use ($collection) {
-            // Check if the value is an instance of the Collection class
-            if ($value instanceof Collection) {
-                // Recursive call to remove empty collections within collections
-                $this->removeEmptyCollectionsFromCollection($value);
-
-                // Remove the collection if it is empty
-                if ($value->isEmpty()) {
-                    $collection->forget($key);
-                }
-            } else {
-                // Remove the value if it is empty and not false
-                if (empty($value) && $value !== false) {
-                    $collection->forget($key);
-                }
             }
-        });
-
-        return $collection;
+            // Return the original item if it is not an array
+            return $item;
+        }));
     }
+
+
+
+    // Remove empty values from the normalized data.
+    protected function isNotEmpty($value): bool
+    {
+        if (is_array($value)) {
+            return !empty(array_filter($value, fn($item) => $this->isNotEmpty($item)));
+        }
+
+        if ($value instanceof Collection) {
+            return $value->filter(fn($item) => $this->isNotEmpty($item))->isNotEmpty();
+        }
+
+        return !is_null($value) && $value !== '' && $value !== [];
+    }
+
 
     /**
      * Removes the specified key from the data and flattens the nested structure.
@@ -310,7 +302,6 @@ class SchemaService
             if (is_array($value)) {
                 $value = collect($value);
             }
-
             // Check if the value is a Collection
             if ($value instanceof Collection) {
                 // Check if the Collection has the specified key
@@ -352,6 +343,8 @@ class SchemaService
         return $this;
     }
 
+
+
     /**
      * Convert keys from camelCase to snake_case.
      */
@@ -364,6 +357,33 @@ class SchemaService
     }
 
 
+
+    /**
+     * camelCaseKeys function converts keys of data to camel case.
+     *
+     * @return self
+     */
+    public function camelCaseKeys(): self
+    {
+        $this->normalizedData = $this->convertKeysToCamelCase($this->normalizedData);
+        return $this;
+    }
+
+    /**
+     * Convert keys from camelCase to snake_case.
+     */
+    protected function convertKeysToCamelCase(Collection $data): Collection
+    {
+        return $data->mapWithKeys(function ($value, $key) {
+            $camelKey = Str::camel($key);
+            if (is_array($value)) {
+                $value = $this->convertKeysToCamelCase(collect($value));
+            } elseif ($value instanceof Collection) {
+                $value = $this->convertKeysToCamelCase($value);
+            }
+            return [$camelKey => $value];
+        });
+    }
     /**
      * Convert the schema to collection.
      *
@@ -404,7 +424,6 @@ class SchemaService
         if (empty($replace) || empty($data)) {
             return $data;
         }
-
         // Replace the keys
         return $data->mapWithKeys(function ($value, $key) use ($replace) {
             $newKey = $key;
@@ -415,7 +434,7 @@ class SchemaService
                 if ($key == 'id') {
                     $newKey = 'uuid';
                 } else {
-                    $newKey = Str::replace('_id', '_uuid', $key);
+                    $newKey = Str::replace('Id', 'Uuid', $key);
                 }
             }
             // If the value is an array or collection, process it recursively

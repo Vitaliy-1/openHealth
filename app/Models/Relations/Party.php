@@ -2,15 +2,12 @@
 
 namespace App\Models\Relations;
 
-use App\Models\Employee;
+use App\Models\Employee\BaseEmployee;
 use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Support\Str;
 
 class Party extends Model
 {
@@ -20,23 +17,23 @@ class Party extends Model
 
     protected $fillable = [
         'uuid',
-        'last_name',
-        'first_name',
-        'second_name',
+        'lastName',
+        'firstName',
+        'secondName',
         'email',
-        'birth_date',
+        'birthDate',
         'gender',
-        'tax_id',
-        'no_tax_id',
-        'about_myself',
-        'working_experience',
+        'taxId',
+        'noTaxId',
+        'aboutMyself',
+        'workingExperience',
     ];
 
     public $timestamps = false;
 
     public function employees(): HasMany
     {
-        return $this->hasMany(Employee::class);
+        return $this->hasMany(BaseEmployee::class);
     }
 
     public function documents(): MorphMany
