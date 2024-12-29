@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Employee\Employee;
+use App\Models\Employee\EmployeeRequest;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
-use Ramsey\Uuid\Uuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -64,7 +64,12 @@ class LegalEntity extends Model
 
     public function employees(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Employee::class,'legal_entity_id','id');
+        return $this->hasMany(Employee::class);
+    }
+
+    public function employeesRequest(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(EmployeeRequest::class);
     }
 
     public function setAddressesAttribute($value)

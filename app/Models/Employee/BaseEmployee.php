@@ -1,8 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Employee;
 
 use App\Enums\Status;
+use App\Models\Declaration;
+use App\Models\Division;
+use App\Models\Employee;
+use App\Models\LegalEntity;
 use App\Models\Relations\Education;
 use App\Models\Relations\Party;
 use App\Models\Relations\Qualification;
@@ -28,7 +32,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property Carbon $end_date
  * @property string $employee_type
  */
-class Employee extends Model
+class BaseEmployee extends Model
 {
     use HasFactory;
     use HasPersonalAttributes;
@@ -127,5 +131,7 @@ class Employee extends Model
         $employeeData->documents = $employeeData->party->documents()->get()->toArray() ?? [];
         return $employeeData->toArray();
     }
+
+
 
 }

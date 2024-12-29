@@ -4,6 +4,7 @@ namespace App\Livewire\Employee\Forms;
 
 use App\Rules\AgeCheck;
 use App\Rules\Cyrillic;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -95,6 +96,10 @@ class EmployeeFormRequest extends Form
 
     public function validateBeforeSendApi(): array
     {
+
+        $doctorTypes = config('ehealth.doctors_type'); // Get doctor types from config
+
+        // Check if documents is empty
         if (empty($this->documents)) {
             return [
                 'error'   => true,
@@ -102,21 +107,22 @@ class EmployeeFormRequest extends Form
             ];
         }
 
+        // Check if taxId is empty
         if (isset($this->party['taxId']) && empty($this->party['taxId'])) {
             return [
                 'error'   => true,
                 'message' => __('validation.custom.documentsEmpty'),
             ];
         }
-
-        if (isset($this->party['employeeType']) && $this->party['employeeType'] == 'DOCTOR' && empty($this->speciality)) {
+        // Check if doctor type is empty
+        if ( in_array($this->party['employeeType'],$doctorTypes) && empty($this->specialities)) {
             return [
                 'error'   => true,
                 'message' => __('validation.custom.specialityTable'),
             ];
         }
-
-        if (isset($this->party['employeeType']) && $this->party['employeeType'] == 'DOCTOR' && empty($this->education)) {
+        // Check if doctor type is empty
+        if ( in_array($this->party['employeeType'],$doctorTypes) && empty($this->educations)) {
             return [
                 'error'   => true,
                 'message' => __('validation.custom.educationTable'),
