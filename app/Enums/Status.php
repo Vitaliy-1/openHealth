@@ -6,7 +6,7 @@ enum Status: string
 {
 
 
-    case ACTIVE = 'NEW';
+    case NEW = 'NEW';
     case APPROVED = 'APPROVED';
     case REJECTED = 'REJECTED';
     case SIGNED = 'SIGNED';
@@ -14,7 +14,7 @@ enum Status: string
     public function label(): string
     {
         return match ($this) {
-            self::ACTIVE => 'Новий',
+            self::NEW => 'Новий',
             self::APPROVED => 'Підтверджено',
             self::REJECTED => 'Відхилено',
             self::SIGNED => 'Підписано',

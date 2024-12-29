@@ -38,8 +38,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'legal_entity_id',
-        'client_id',
         'secret_key',
+        'tax_id',
     ];
 
     /**

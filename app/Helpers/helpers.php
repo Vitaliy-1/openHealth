@@ -156,7 +156,7 @@ if (!function_exists('replacePhone')) {
     function removeSpacePhones($phones): array
     {
         return collect($phones)->map(function ($phone) {
-            $phone['number'] = '+' . str_replace(' ', '', $phone['number']);
+            $phone['number'] = '+'.str_replace(' ', '', $phone['number']);
             return $phone;
         })->toArray();
     }
@@ -175,14 +175,11 @@ if (!function_exists('hisBirthDate')) {
         // Return an empty string if the birth_date is missing or invalid
         return '';
     }
-
-
-
-    if (!function_exists('schemaService')){
-        function schemaService(): SchemaService
-        {
-           return  app(SchemaService::class);
-        }
+}
+if (!function_exists('schemaService')) {
+    function schemaService(): SchemaService
+    {
+        return app(SchemaService::class);
     }
 }
 

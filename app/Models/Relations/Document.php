@@ -16,8 +16,8 @@ class Document extends Model
     protected $fillable = [
         'type',
         'number',
-        'issued_by',
-        'issued_at',
+        'issuedBy',
+        'issuedAt',
     ];
 
     public function documentable(){

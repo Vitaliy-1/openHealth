@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Relations\Party;
+use Illuminate\Support\Str;
 
 class PartyRepository
 {
@@ -13,9 +14,10 @@ class PartyRepository
      */
     public function createOrUpdate($data): Party
     {
+        $uuid = $data['uuid'] ?? Str::uuid();
         return Party::updateOrCreate(
             [
-                'uuid' => $data['id']
+                'uuid' => $uuid,
             ],
             $data
         );

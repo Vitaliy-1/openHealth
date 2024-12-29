@@ -2,10 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Models\Employee;
+use App\Models\Employee\BaseEmployee;
+use App\Models\Employee\Employee;
+use App\Models\Employee\EmployeeRequest;
 use App\Models\LegalEntity;
 use Exception;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
 
 class EmployeeRepository
@@ -61,31 +62,31 @@ class EmployeeRepository
      * @param $data
      * @return Employee
      */
-    public function createOrUpdate($data): Employee
+    public function createOrUpdate($data, Employee|EmployeeRequest $employeeModel, LegalEntity $legalEntity): BaseEmployee
     {
-        return Employee::updateOrCreate(
+        $employee =  $employeeModel::updateOrCreate(
             [
-                'uuid' => $data['id']
+                'uuid' => $data['uuid'] ?? '',
             ],
             $data
         );
+
+        $employee->legalEntity()->associate($legalEntity);
+
+        return  $employee;
+
     }
 
-    public function saveEmployeeData($request, LegalEntity $legalEntity): ?Employee //TODO: Global LegalEntity model
+    public function saveEmployeeData($request, LegalEntity $legalEntity ,  Employee|EmployeeRequest $employeeModel): Employee|EmployeeRequest //TODO: Global LegalEntity model
     {
-        DB::beginTransaction();
-
-        try {
+//        DB::beginTransaction();
+//        try {
             // Create or update User
-            if (isset($request['party']['email'])) {
-                $user = $this->userRepository->createIfNotExist($request['party']['email'], $request['employee_type']);
-                $user->legalEntity()->associate($legalEntity);
-                $user->save();
+            if (isset($request['party']['email']) && !empty($request['party']['email'])) {
+                $this->userRepository->createIfNotExist($request['party'], $request['employeeType'], $legalEntity);
             }
-
             // Create or update Employee
-            $employee = $this->createOrUpdate($request);
-            $employee->legalEntity()->associate($legalEntity);
+            $employee = $this->createOrUpdate($request,$employeeModel,$legalEntity);
 
             // Create or update Party
             $party = $this->partyRepository->createOrUpdate($request['party']);
@@ -100,7 +101,7 @@ class EmployeeRepository
             $this->educationRepository->addEducations($employee, $request['doctor']['educations'] ?? []);
 
             // Add science degrees
-            $this->scienceDegreeRepository->addScienceDegrees($employee, $request['doctor']['science_degrees'] ?? []);
+            $this->scienceDegreeRepository->addScienceDegrees($employee, $request['doctor']['scienceDegree'] ?? []);
 
             // Add qualifications
             $this->qualificationRepository->addQualifications($employee, $request['doctor']['qualifications'] ?? []);
@@ -112,15 +113,15 @@ class EmployeeRepository
             $party->employees()->save($employee);
 
             // Commit the transaction
-            DB::commit();
+//            DB::commit();
 
             return $employee;
-        } catch (Exception $e) {
-            // Rollback the transaction on error
-            DB::rollBack();
-
-            return null;
-        }
+//        } catch (Exception $e) {
+//            // Rollback the transaction on error
+//            DB::rollBack();
+//
+//            return null;
+//        }
     }
 
 }

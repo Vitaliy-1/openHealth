@@ -14,11 +14,12 @@ class ScienceDegree extends Model
     protected $fillable = [
         'country',
         'city',
-        'institution_name',
-        'issued_date',
-        'diploma_number',
+        'institutionName',
+        'issuedDate',
+        'degree',
+        'diplomaNumber',
         'speciality',
-        'issued_date'
+        'issuedDate'
     ];
 
     public function science_degreeable()
