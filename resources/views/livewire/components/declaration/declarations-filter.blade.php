@@ -8,7 +8,7 @@
                 <x-forms.form-group>
                     <x-slot name="label">
                         <x-forms.label for="declarations_filter_first_name">
-                            {{__('forms.first_name')}}
+                            {{__('forms.firstName')}}
                         </x-forms.label>
                     </x-slot>
                     <x-slot name="input">
@@ -20,7 +20,7 @@
                 <x-forms.form-group>
                     <x-slot name="label">
                         <x-forms.label for="declarations_filter_last_name">
-                            {{__('forms.last_name')}}
+                            {{__('forms.lastName')}}
                         </x-forms.label>
                     </x-slot>
                     <x-slot name="input">
