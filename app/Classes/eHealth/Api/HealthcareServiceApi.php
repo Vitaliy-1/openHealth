@@ -6,8 +6,7 @@ use App\Classes\eHealth\Request;
 
 class HealthcareServiceApi extends Request
 {
-     public const URL = '/api/healthcare_services';
-
+    public const URL = '/api/healthcare_services';
 
     public static function  _get($params = []): array
     {
@@ -33,7 +32,7 @@ class HealthcareServiceApi extends Request
 
     public static  function _activate($id): array
     {
-        return (new Request('patch', self::URL. '/' . $id, []))->sendRequest();
+        return (new Request('patch', self::URL. '/' . $id . '/actions/activate', []))->sendRequest();
 
     }
 
@@ -42,6 +41,4 @@ class HealthcareServiceApi extends Request
         return (new Request('patch', self::URL  . '/' .  $id . '/actions/deactivate', []))->sendRequest();
 
     }
-
-
 }
