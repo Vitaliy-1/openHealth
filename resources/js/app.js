@@ -37,11 +37,8 @@ const initializeDatepickers = () => {
 
             element.addEventListener('changeDate', function(event) {
                 const selectedDate = event.target.value;
-
                 const wireModel = element.getAttribute('wire:model');
-
                 const componentId = element.closest('[wire\\:id]').getAttribute('wire:id');
-
                 if (Livewire.find(componentId)) {
                     Livewire.find(componentId).set(wireModel, selectedDate);
                 }

@@ -13,14 +13,16 @@
                         </x-slot>
                         <x-slot name="input" class="max-w-2xs">
                             <x-forms.select
-                                class="default-input" wire:model.live="status" wire:change="sortEmployees()"
+                                class="default-input"
+                                wire:model.live="status"
+                                wire:change="sortEmployees($event.target.value)"
                                 type="text"
                                 id="ownerPosition"
                             >
                                 <x-slot name="option">
                                     <option selected value="APPROVED" class="text-body">Активні</option>
                                     <option value="NEW" class="text-body">Нові</option>
-                                    <option value="CACHE" class="text-body">Не завешені</option>
+                                    <option value="CACHE" class="text-body">Не завершені</option>
                                 </x-slot>
                             </x-forms.select>
                         </x-slot>
@@ -79,6 +81,7 @@
                                     @endif
                                 </td>
                                 <td class="border-b border-[#eee] py-5 px-4 ">
+                                    @if( $employee->status !== \App\Enums\Status::NEW )
                                     <div class="flex justify-center">
                                         <div
                                             x-data="{
@@ -127,17 +130,27 @@
                                                 :id="$id('dropdown-button')"
                                                 style="display: none;"
                                                 class="absolute right-0 mt-2 w-40 rounded-md bg-white shadow-md z-50">
-                                                <a href="{{route('employee.form', $employee->id)}}"
+                                                @if(!isset($employee->id) && empty($employee->id))
+                                                <a href="{{route('employee.form', ['storeId' => $k])}}"
                                                    class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">
                                                     {{__('forms.edit')}}
                                                 </a>
+                                                @else
+                                                    <a href="{{route('employee.form', $employee->id)}}"
+                                                       class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">
+                                                        {{__('forms.edit')}}
+                                                    </a>
+                                                @endif
+                                                @if($employee->status === \App\Enums\Status::APPROVED)
                                                 <a wire:click="showModalDismissed({{$employee->id}})"
                                                    class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">
                                                     {{__('forms.dismissed')}}
                                                 </a>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
+                                    @endif
                                 </td>
 
                             </tr>

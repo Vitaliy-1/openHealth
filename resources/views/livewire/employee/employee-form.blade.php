@@ -6,7 +6,7 @@
     <div class="flex bg-white  p-6 flex-col ">
         @include('livewire.employee._parts._employee')
         @include('livewire.employee._parts._documents')
-        @if(isset($employeeRequest->party['employeeType']) && $employeeRequest->party['employeeType'] === 'DOCTOR')
+        @if(isset($employeeRequest->party['employeeType']) && in_array($employeeRequest->party['employeeType'],config('ehealth.doctors_type')))
             @include('livewire.employee._parts._education')
             @include('livewire.employee._parts._specialities')
             @include('livewire.employee._parts._science_degree')

@@ -367,7 +367,7 @@ class EmployeeForm extends Component
             ->replaceIdsKeysToUuid(['id', 'legalEntityId', 'divisionId', 'partyId'])
             ->getNormalizedData();
         app(EmployeeRepository::class)->saveEmployeeData($employeeResponse, auth()->user()->legalEntity,
-            EmployeeRequest::class);
+            new EmployeeRequest());
     }
 
     private function dispatchErrorMessage(string $message, array $errors = []): void
@@ -381,19 +381,18 @@ class EmployeeForm extends Component
 
     public function getEmployeeDictionaryRole(): void
     {
-       $this->dictionaries['EMPLOYEE_TYPE'] = $this->getDictionariesFields(config('ehealth.legal_entity_type.' . auth()->user()->legalEntity->type.'.roles'), 'EMPLOYEE_TYPE');
+        $this->dictionaries['EMPLOYEE_TYPE'] = $this->getDictionariesFields(config('ehealth.legal_entity_type.'.auth()->user()->legalEntity->type.'.roles'),
+            'EMPLOYEE_TYPE');
     }
 
     public function updatedEmployeeRequestPartyEmployeeType(): void{
         $this->getEmployeeDictionaryPosition();
         if (!in_array( $this->employeeRequest->party['employeeType'],config('ehealth.doctors_type',[]))) {
-
             $this->employeeRequest->educations = [];
             $this->employeeRequest->qualifications = [];
             $this->employeeRequest->scienceDegree = [];
             $this->employeeRequest->specialities = [];
         }
-
         $this->employeeRequest->party['position'] = '';
     }
 
