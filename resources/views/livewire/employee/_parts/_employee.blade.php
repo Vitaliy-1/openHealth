@@ -1,5 +1,6 @@
 <div>
-    <div class="w-full mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div
+        class="w-full mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
             {{__('forms.personalData')}}
         </h5>
@@ -70,7 +71,7 @@
 
                 <x-slot name="input">
                     <x-forms.input-date :maxDate="now()->subYears(18)->format('Y-m-d')" id="birthDate"
-                                   wire:model="employeeRequest.party.birthDate"/>
+                                        wire:model="employeeRequest.party.birthDate"/>
                 </x-slot>
                 @error('employeeRequest.party.birthDate')
                 <x-slot name="error">
@@ -121,30 +122,13 @@
         <x-forms.form-row class="">
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
-                    <x-forms.label for="position" class="default-label">
-                        {{__('forms.position')}} *
-                    </x-forms.label>
-                </x-slot>
-                <x-slot name="input">
-                    <x-forms.dynamic-select :options="$dictionaries['POSITION']" property="employeeRequest.party.position" />
-                </x-slot>
-                @error('employeeRequest.party.position')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
                     <x-forms.label for="employeeType" class="default-label">
                         {{__('forms.role')}}*
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">
                     <x-forms.select
-                        class="default-input" wire:model="employeeRequest.party.employeeType" type="text"
+                        class="default-input" wire:update="getEmployeeDictionaryPosition()" wire:model.live="employeeRequest.party.employeeType"
                         id="employeeType"
                     >
                         <x-slot name="option">
@@ -166,14 +150,46 @@
             </x-forms.form-group>
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
+                    <x-forms.label for="position" class="default-label">
+                        {{__('forms.position')}} *
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+                    <x-forms.select
+                        class="default-input" wire:model="employeeRequest.party.position"
+                        id="position"
+                    >
+                        <x-slot name="option">
+                            <option> {{__('forms.select')}} {{__('forms.position')}}</option>
+                            @if( isset($this->dictionaries['POSITION_EMPLOYEE_TYPE']) )
+                                @foreach($this->dictionaries['POSITION_EMPLOYEE_TYPE'] as $k=>$position)
+                                    <option value="{{$k}}">{{$position}}</option>
+                        @endforeach
+                        </x-slot>
+                        @endif
+                    </x-forms.select>
+{{--                    <x-forms.dynamic-select :options="$dictionaries['POSITION_EMPLOYEE_TYPE'] ?? []"--}}
+{{--                                            property="employeeRequest.party.position"/>--}}
+                </x-slot>
+                @error('employeeRequest.party.position')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
                     <x-forms.label for="startDate" class="default-label">
                         {{__('forms.startDateWork')}}
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">
 
-                    <x-forms.input-date   id="startDate"
-                                   wire:model="employeeRequest.party.startDate"
+                    <x-forms.input-date id="startDate"
+                                        wire:model="employeeRequest.party.startDate"
                     />
                 </x-slot>
                 @error('employeeRequest.party.startDate')
@@ -262,7 +278,8 @@
         </x-forms.form-row>
         <x-forms.form-row class="justify-end">
             <div class="xl:w-1/4 text-right">
-                <x-button  x-show="!employeeId" wire:click="store('party')" type="submit" class="default-button max-w-[150px]">
+                <x-button x-show="!employeeId" wire:click="store('party')" type="submit"
+                          class="default-button max-w-[150px]">
                     {{__('forms.save')}}
                 </x-button>
             </div>
