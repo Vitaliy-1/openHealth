@@ -12,71 +12,114 @@
             <x-slot name='form'>
                 <div>
                     <div class='grid grid-cols-2 gap-4'>
-                        <x-forms.form-group class=''>
+                        {{-- CATEGORY --}}
+                        {{-- <x-forms.form-group class=''>
                             <x-slot name='label'>
-                                <x-forms.label for="name" class="default-label">
+                                <x-forms.label for="category" class="default-label">
                                     {{ __('forms.category') }} *
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name='input'>
                                 <x-forms.select
                                     wire:change='changeCategory'
-                                    wire:model.defer='healthcare_service.category'
+                                    wire:model.defer='formService.healthcare_service.category'
                                     class='default-select'
+                                    id='category'
                                 >
                                     <x-slot name='option'>
                                         <option value=''>
                                             {{ __('forms.select') }} {{ __('forms.category') }}
-                                        </option>
-                                        @foreach ($this->dictionaries['HEALTHCARE_SERVICE_CATEGORIES'] as $k => $s_cat)
+                                        </option> --}}
+                                        {{-- <option value='MSP'>{{ $this->dictionaries['HEALTHCARE_SERVICE_CATEGORIES']['MSP'] }}</option> --}}
+                                       {{-- @foreach ($dictionaries['modal']['HEALTHCARE_SERVICE_CATEGORIES'] as $k => $s_cat)
                                             <option value="{{ $k }}">{{ $s_cat }}</option>
                                         @endforeach
                                     </x-slot>
                                 </x-forms.select>
-                                @error('healthcare_service.category')
+                                @error('formService.healthcare_service.category')
                                     <x-forms.error>
                                         {{ $message }}
                                     </x-forms.error>
                                 @enderror
                             </x-slot>
+                        </x-forms.form-group> --}}
 
+                        {{-- PROVIDING CONDITION --}}
+                        <x-forms.form-group class=''>
+
+                            <x-slot name='label'>
+                                <x-forms.label for='providing_condition' class='default-label'>
+                                    {{ __('forms.providingConditions') }} *
+                                </x-forms.label>
+                            </x-slot>
+
+                            <x-slot name='input' >
+                                <x-forms.select
+                                    x-bind:disabled="{{ $category === 'MSP' }}"
+                                    id='providing_condition'
+                                    wire:change="changeProvidingCondition($event.target.value)"
+                                    wire:model.defer='formService.healthcare_service.providing_condition'
+                                    class='default-select'
+                                >
+                                    <x-slot name='option'>
+                                        <option
+                                            value=''
+                                            disabled
+                                        >
+                                            {{ __('forms.select') }} {{ __('forms.providingConditions') }}
+                                        </option>
+                                        @foreach ($dictionaries['modal']['PROVIDING_CONDITION'] as $k_p_con => $p_con)
+                                            <option
+                                                wire:key="{{ $k_p_con }}"
+                                                value="{{ $k_p_con }}"
+                                                @if($category == 'MSP' && $k_p_con == 'OUTPATIENT') selected @endif
+                                            >
+                                                {{ $p_con }}
+                                            </option>
+                                        @endforeach
+                                    </x-slot>
+                                </x-forms.select>
+                                @error('formService.healthcare_service.providing_condition')
+                                <x-forms.error>
+                                    {{ $message }}
+                                </x-forms.error>
+                                @enderror
+                            </x-slot>
                         </x-forms.form-group>
-
+                        {{-- SPECIALITY --}}
                         <x-forms.form-group class=''>
                             <x-slot name='label'>
-                                <x-forms.label for='speciality' class='default-label'>
-                                    {{ __('forms.speciality') }}
+                                <x-forms.label for='speciality_type' class='default-label'>
+                                    {{ __('forms.specialityType') }} *
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name='input'>
                                 <x-forms.select
-                                    x-bind:disabled="{{ empty($healthcare_service['category']) }}"
-                                    wire:model.defer='healthcare_service.speciality_type'
+                                    x-bind:disabled="{{ $mode === 'update' ? 'true' : 'false' }}"
+                                    wire:model.defer='formService.healthcare_service.speciality_type'
                                     class='default-select'
-                                    id='speciality'
+                                    id='speciality_type'
                                 >
                                     <x-slot name='option'>
                                         <option value=''>
-                                            {{ __('forms.select') }} {{ __('forms.speciality') }}
+                                            {{ __('forms.select') }} {{ __('forms.specialityType') }}
                                         </option>
-                                        @foreach ($this->dictionaries['SPECIALITY_TYPE'] as $k_type => $s_type)
-                                            <option value="{{ $k_type }}">{{ $s_type }}</option>
+                                        @foreach ($dictionaries['modal']['SPECIALITY_TYPE'] as $k_type => $s_type)
+                                            <option
+                                                wire:key="{{ $k_p_con }}"
+                                                value="{{ $k_type }}"
+                                            >
+                                                {{ $s_type }}
+                                            </option>
                                         @endforeach
                                     </x-slot>
                                 </x-forms.select>
-                                @error('healthcare_service.category')
+                                @error('formService.healthcare_service.speciality_type')
                                     <x-forms.error>
                                         {{ $message }}
                                     </x-forms.error>
                                 @enderror
                             </x-slot>
-                            @error('healthcare_service.speciality_type')
-                                <x-slot name='error'>
-                                    <x-forms.error>
-                                        {{ $message }}
-                                    </x-forms.error>
-                                </x-slot>
-                            @enderror
                         </x-forms.form-group>
                         {{--                        <x-forms.form-group class=""> --}}
                         {{--                            <x-slot name="label"> --}}
@@ -115,30 +158,8 @@
                         {{--                                {{__('forms.providing_conditions')}} * --}}
                         {{--                            </x-forms.label> --}}
                         {{--                        </x-slot> --}}
-                        <x-forms.form-group class=''>
-                            <x-slot name='label'>
-                                <x-forms.label for='providing_condition' class='default-label'>
-                                    {{ __('forms.providing_conditions') }} *
-                                </x-forms.label>
-                            </x-slot>
-                            <x-slot name='input'>
-                                <x-forms.select
-                                    id='providing_condition'
-                                    wire:model.defer='healthcare_service.providing_condition'
-                                    class='default-select'
-                                >
-                                    <x-slot name='option'>
-                                        <option value=''>
-                                            {{ __('forms.select') }} {{ __('forms.providing_conditions') }}
-                                        </option>
-                                        @foreach ($this->dictionaries['PROVIDING_CONDITION'] as $k_p_con => $p_con)
-                                            <option value="{{ $k_p_con }}">{{ $p_con }}</option>
-                                        @endforeach
-                                    </x-slot>
-                                </x-forms.select>
-                            </x-slot>
-                        </x-forms.form-group>
 
+                        {{-- COMMENT --}}
                         <x-forms.form-group class='col-span-2'>
                             <x-slot name='label'>
                                 <x-forms.label for='comment' class='default-label'>
@@ -150,40 +171,43 @@
                                     row='15'
                                     id='comment'
                                     class='default-input'
-                                    wire:model='healthcare_service.comment'
+                                    wire:model='formService.healthcare_service.comment'
                                     type='text'
                                 >
                                 </x-forms.textarea>
-                                @error('healthcare_service.license_id')
+                                @error('formService.healthcare_service.comment')
                                     <x-forms.error>
                                         {{ $message }}
                                     </x-forms.error>
                                 @enderror
                             </x-slot>
                         </x-forms.form-group>
-                    </div>
+                    </>
                 </div>
-
+                {{-- TIME PART --}}
                 <div class='mb-4 mt-4'>
                     <h3 class='text-sm font-bold dark:text-white mb-5'>{{ __('Час Доступності') }}</h3>
 
-                    @if (isset($healthcare_service['available_time']) && !empty($healthcare_service['available_time']))
-                        @foreach ($healthcare_service['available_time'] as $k => $a_time)
-                            <input type='hidden' wire:model="healthcare_service.available_time.{{ $k }}.days_of_week">
+                    @nonempty($this->availableTime)
+                        @foreach ($this->availableTime as $k => $a_time)
+                            <input type='hidden' wire:model="formService.healthcare_service.available_time.{{ $k }}.days_of_week">
 
                             <h3 class='text-[16px] font-semibold mt-4 mb-4'>{{ get_day_value($k) }}</h3>
 
-                            <div class='grid grid-cols-4 gap-4 mb-5'>
+                            <div class='grid grid-cols-4 gap-4 mb-5' x-data='{ disabled : @js($a_time['all_day']) }'>
                                 <x-forms.form-group class='col-span-1'>
                                     <x-slot name='input'>
                                         <div class='flex items-center mb-4'>
                                             <x-forms.checkbox
-                                                wire:model="healthcare_service.available_time.{{ $k }}.all_day"
+                                                wire:model="formService.healthcare_service.available_time.{{ $k }}.all_day"
                                                 id="all_day_{{ $k }}"
-                                                class='default-ce' type='checkbox'
+                                                class='default-ce'
+                                                type='checkbox'
+                                                x-bind:checked="disabled"
+                                                x-on:click="disabled = !disabled"
                                             />
                                             <label for="all_day_{{ $k }}" class='ms-2 text-sm font-medium text-gray-900 dark:text-gray-300'>
-                                                   {{ __('forms.all_day') }}
+                                                   {{ __('forms.allDay') }}
                                             </label>
                                         </div>
                                     </x-slot>
@@ -191,17 +215,19 @@
 
                                 <x-forms.form-group>
                                     <x-slot name='label'>
-                                        <x-forms.label for="start_time-{{ $k }}" class='default-label'>
-                                            {{ __('forms.available_start_time') }}
+                                        <x-forms.label for="start_time-{{ $k }}" class="default-label" x-bind:disabled="disabled">
+                                                {{ __('forms.availableStartTime') }} <span x-show="!disabled">*</span>
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name='input'>
                                         <x-forms.input-time
                                             id="start_time-{{ $k }}"
-                                            wire:model="healthcare_service.available_time.{{ $k }}.available_start_time"
+                                            wire:model="formService.healthcare_service.available_time.{{ $k }}.available_start_time"
+                                            x-bind:disabled="disabled"
+                                            required
                                         />
                                     </x-slot>
-                                    @error('healthcare_service.start_time-{{ $k }}')
+                                    @error("formService.healthcare_service.available_time.{{ $k }}.available_start_time")
                                             <x-forms.error>
                                                 {{ $message }}
                                             </x-forms.error>
@@ -210,17 +236,19 @@
 
                                 <x-forms.form-group>
                                     <x-slot name='label'>
-                                        <x-forms.label for="end_time-{{ $k }}" class='default-label'>
-                                            {{ __('forms.available_end_time') }}
+                                        <x-forms.label for="end_time-{{ $k }}" class='default-label' x-bind:disabled="disabled">
+                                            {{ __('forms.availableEndTime') }} <span x-show="!disabled">*</span>
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name='input'>
                                         <x-forms.input-time
                                             id="end_time-{{ $k }}"
-                                            wire:model="healthcare_service.available_time.{{ $k }}.available_end_time"
+                                            wire:model="formService.healthcare_service.available_time.{{ $k }}.available_end_time"
+                                            x-bind:disabled="disabled"
+                                            required
                                         />
                                     </x-slot>
-                                    @error('healthcare_service.end_time-{{ $k }}')
+                                    @error('formService.healthcare_service.available_time.{{ $k }}.available_end_time')
                                         <x-forms.error>
                                             {{ $message }}
                                         </x-forms.error>
@@ -237,13 +265,13 @@
                                 </div>
                             </div>
                         @endforeach
-                    @endif
+                    @endnonempty
 
-                    @if (count($available_time) < 7)
+                    @if (count($this->availableTime) < 7)
                         <button
                             class='flex text-sm text-primary hover:text-black'
                             type='button'
-                            wire:click="addAvailableTime({{ max(0, count($available_time) - 1) }})"
+                            wire:click="addAvailableTime({{ max(0, count($this->availableTime)) }})"
                         >
                             {{ __('Додати Час') }}
                         </button>
@@ -253,24 +281,25 @@
                 <div class='mb-4 mt-4'>
                     <h3 class='text-sm font-bold dark:text-white mb-5'>{{ __('Час Не Доступності') }}</h3>
 
-                    @if (isset($healthcare_service['not_available']) && !empty($healthcare_service['not_available']))
-                        @foreach ($healthcare_service['not_available'] as $k => $not_time)
+                    @nonempty($this->notAvailable)
+                        @foreach ($this->notAvailable as $k => $not_time)
                             <div class='grid grid-cols-2 gap-6 mb-5'>
 
                                 <x-forms.form-group>
                                     <x-slot name='label'>
                                         <x-forms.label for="during_start-{{ $k }}" class='default-label'>
-                                            {{ __('forms.not_available_start') }}
+                                            {{ __('forms.notAvailableStart') }} *
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name='input'>
                                         <x-forms.input-date
                                             id="during_start-{{ $k }}"
-                                            wire:model="healthcare_service.not_available.{{ $k }}.during.start"
+                                            wire:model="formService.healthcare_service.not_available.{{ $k }}.during.start"
                                             type='date'
+                                            required
                                         />
                                     </x-slot>
-                                    @error("legal_entity_form.during_start-{{ $k }}")
+                                    @error("formService.healthcare_service.not_available.{{ $k }}.during.start")
                                     <x-slot name='error'>
                                         <x-forms.error>
                                             {{ $message }}
@@ -282,17 +311,18 @@
                                 <x-forms.form-group>
                                     <x-slot name='label'>
                                         <x-forms.label for="during_end-{{ $k }}" class='default-label'>
-                                            {{ __('forms.not_available_end') }}
+                                            {{ __('forms.notAvailableEnd') }} *
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name='input'>
                                         <x-forms.input-date
                                             id="during_end-{{ $k }}"
-                                            wire:model="healthcare_service.not_available.{{ $k }}.during.end"
+                                            wire:model="formService.healthcare_service.not_available.{{ $k }}.during.end"
                                             type='date'
+                                            required
                                         />
                                     </x-slot>
-                                    @error("legal_entity_form.during_end-{{ $k }}")
+                                    @error("formService.healthcare_service.not_available.{{ $k }}.during.end")
                                     <x-slot name='error'>
                                         <x-forms.error>
                                             {{ $message }}
@@ -322,18 +352,26 @@
                                     </x-slot>
                                     <x-slot name='input'>
                                         <x-forms.textarea
-                                            wire:model="healthcare_service.not_available.{{ $k }}.description"
+                                            wire:model="formService.healthcare_service.not_available.{{ $k }}.description"
                                             id="description_{{ $k }}"
                                             class='default-input'
                                             type='text'
+                                            required
                                         >
                                         </x-forms.textarea>
                                     </x-slot>
+                                    @error("formService.healthcare_service.not_available.{{ $k }}.description")
+                                    <x-slot name='error'>
+                                        <x-forms.error>
+                                            {{ $message }}
+                                        </x-forms.error>
+                                    </x-slot>
+                                    @enderror
                                 </x-forms.form-group>
 
                             </div>
                         @endforeach
-                    @endif
+                    @endnonempty
                     <button
                         class='flex text-sm text-primary hover:text-black'
                         type='button'
@@ -349,13 +387,18 @@
                             {{ __('Закрити') }}
                         </x-secondary-button>
                     </div>
-
                     <div class='xl:w-1/4 text-right'>
                         <x-button
+                            x-bind:disabled="{{ (!empty($formService->healthcare_service['status']) && $formService->healthcare_service['status'] !== 'ACTIVE') ? 'true' : 'false' }}"
                             type='submit'
-                            class='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'
+                            class='text-white focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'
+                            x-bind:class="'{{ (!empty($formService->healthcare_service['status']) && $formService->healthcare_service['status'] !== 'ACTIVE') ? '' : 'bg-blue-700 hover:bg-blue-800' }}'"
                         >
+                        @if($mode === 'store')
                             {{ __('Створити') }}
+                        @else
+                            {{ __('Оновити') }}
+                        @endif
                         </x-button>
                     </div>
                 </div>

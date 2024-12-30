@@ -3,9 +3,9 @@
         <x-slot name='title'>
             {{ $mode === 'edit' ? __('Редагувати ліцензію') : __('Додати ліцензію') }}
         </x-slot>
-        <x-slot name='description'>
+        {{-- <x-slot name='description'>
             {{ $mode === 'edit' ? __('Редагувати ліцензію') : __('Додати ліцензію') }}
-        </x-slot>
+        </x-slot> --}}
     </x-section-navigation>
 
 
