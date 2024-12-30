@@ -1,6 +1,6 @@
 <x-dialog-modal maxWidth='3xl' class='w-1 h-full' wire:model.live='showModal'>
     <x-slot name='title'>
-        {{ __('forms.external_contractors') }}
+        {{ __('forms.externalContractors') }}
     </x-slot>
 
     <x-slot name='content'>
@@ -67,7 +67,7 @@
                         <x-forms.form-group>
                             <x-slot name='label'>
                                 <x-forms.label for='contract_number' class='default-label'>
-                                    {{ __('forms.external_contractors_number') }} *
+                                    {{ __('forms.externalContractorsNumber') }} *
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name='input'>
@@ -92,7 +92,7 @@
                         <x-forms.form-group>
                             <x-slot name='label'>
                                 <x-forms.label for='contract_issued_at' class='default-label'>
-                                    {{ __('forms.external_contractors_issued_at') }} *
+                                    {{ __('forms.externalContractorsIssuedAt') }} *
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name='input'>
@@ -114,7 +114,7 @@
                         <x-forms.form-group>
                             <x-slot name='label'>
                                 <x-forms.label for='contract_expires_at' class='default-label'>
-                                    {{ __('forms.external_contractors_expires_at') }} *
+                                    {{ __('forms.externalContractorsExpiresAt') }} *
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name='input'>
@@ -171,7 +171,7 @@
                         <x-forms.form-group class=''>
                             <x-slot name='label'>
                                 <x-forms.label for='division_external_contractors_medical_service" class="default-label'>
-                                    {{ __('forms.medical_service') }} *
+                                    {{ __('forms.medicalService') }} *
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name='input'>

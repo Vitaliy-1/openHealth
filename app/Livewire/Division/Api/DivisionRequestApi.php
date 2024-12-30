@@ -3,47 +3,51 @@
 namespace App\Livewire\Division\Api;
 
 use App\Classes\eHealth\Api\DivisionApi;
+use App\Services\DivisionApiService;
 
 class DivisionRequestApi extends DivisionApi
 {
+    public static ?DivisionApiService $apiService = null;
 
+    public static function getApiService(): DivisionApiService
+    {
+        if (self::$apiService === null) {
+            self::$apiService = new DivisionApiService();
+        }
 
+        return self::$apiService;
+    }
 
-    public static  function getDivisionRequest($params = []):array
+    public static function getDivisionRequest($params = []):array
     {
         return self::_get($params);
     }
 
-    public static function createDivisionRequest($data):array
+    public static function createDivisionRequest($data): array
     {
-        $params = [
-            'name' => $data['name'],
-            'type' =>$data['type'],
-            'email' => $data['email'],
-            'phones' => [$data['phones']],
-            'addresses' => [$data['addresses']],
-//            'locations' => (object)$data['location'],
-            ];
+        $service = self::getApiService();
 
-        return self::_create($params);
+        $params = self::$apiService->prepareRequest($data);
+
+        $response = self::_create($params);
+
+        return $service->prepareResponse($response);
     }
 
-    public static function updateDivisionRequest($id, $data):array
+    public static function updateDivisionRequest($id, $data): array
     {
-        $params = [
-            'name' => $data['name'],
-            'type' =>$data['type'],
-            'email' => $data['email'],
-            'phones' => [$data['phones']],
-            'addresses' => [$data['addresses']],
-            //            'locations' => (object)$data['location'],
-        ];
-        return self::_update($id, $params);
+        $service = self::getApiService();
+
+        $params = $service->prepareRequest($data);
+
+        $response = self::_update($id, $params);
+
+        return $service->prepareResponse($response);
     }
 
     public static function deactivateDivisionRequest($id):array
     {
-        dd(self::_deactivate($id));
+        // dd(self::_deactivate($id));
         return self::_deactivate($id);
     }
 

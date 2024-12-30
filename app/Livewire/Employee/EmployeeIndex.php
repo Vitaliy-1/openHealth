@@ -16,11 +16,13 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class EmployeeIndex extends Component
 {
 
-    use FormTrait;
+    use FormTrait,
+        WithPagination;
 
     const CACHE_PREFIX = 'register_employee_form';
 
@@ -58,6 +60,13 @@ class EmployeeIndex extends Component
         $this->getLastStoreId();
         $this->getEmployees();
         $this->getDictionary();
+    }
+
+
+    #[On('refreshPage')]
+    public function refreshPage()
+    {
+        $this->dispatch('$refresh');
     }
 
     public function getLastStoreId()
@@ -125,6 +134,7 @@ class EmployeeIndex extends Component
         }
         $this->closeModal();
         $this->getEmployees();
+        // $this->dispatch('refreshPage');
     }
 
     public function showModalDismissed($id)
@@ -170,8 +180,8 @@ class EmployeeIndex extends Component
         $this->dispatchErrorMessage(__('Співробітники успішно синхронізовано'));
 
         $this->getEmployees();
+        // $this->dispatch('refreshPage');
     }
-
 
     private function dispatchErrorMessage(string $message, string $type = 'success', array $errors = []): void
     {
@@ -182,11 +192,12 @@ class EmployeeIndex extends Component
         ]);
     }
 
-
     public function render()
     {
+        // $perPage = config('pagination.per_page');
+        // $employees = Auth::user()->legalEntity->employees()->paginate($perPage);
+
+        // return view('livewire.employee.employee-index', compact('employees'));
         return view('livewire.employee.employee-index');
     }
-
-
 }

@@ -1,11 +1,11 @@
 <div>
     <x-section-navigation x-data="{ showFilter: false }" class=''>
         <x-slot name='title'>
-            {{ $contract_request->previous_request_id === '' ? __('forms.add_contract') :  __('forms.edit_contract', ['contract' => $contract_request->previous_request_id]) }}
+            {{ $contract_request->previous_request_id === '' ? __('forms.addContract') :  __('forms.editContract', ['contract' => $contract_request->previous_request_id]) }}
         </x-slot>
-        <x-slot name='description'>
-            {{ $contract_request->previous_request_id === '' ? __('forms.add_contract') :  __('forms.edit_contract', ['contract' => $contract_request->previous_request_id]) }}
-        </x-slot>
+        {{-- <x-slot name='description'>
+            {{ $contract_request->previous_request_id === '' ? __('forms.addContract') :  __('forms.editContract', ['contract' => $contract_request->previous_request_id]) }}
+        </x-slot> --}}
     </x-section-navigation>
 
     <div class='flex bg-white pb-10 p-6 flex-col'>
@@ -16,14 +16,14 @@
                     <div class='dark:bg-boxdark'>
                         <div class='border-stroke px-6.5 py-4 dark:border-strokedark'>
                             <h3 class='font-medium text-2xl text-black dark:text-white'>
-                                {{ __('forms.legal_entity_info') }}
+                                {{ __('forms.legalEntityInfo') }}
                             </h3>
                         </div>
                         <div class='flex flex-col gap-5.5 p-6.5'>
                             <x-forms.form-group class='mb-4'>
                                 <x-slot name='label'>
                                     <x-forms.label for='legal_entity_name' class='default-label'>
-                                        {{ __('forms.legal_entity_name') }} *
+                                        {{ __('forms.legalEntityName') }} *
                                     </x-forms.label>
                                 </x-slot>
                                 <x-slot name='input'>
@@ -40,7 +40,7 @@
                             <x-forms.form-group>
                                 <x-slot name='label'>
                                     <x-forms.label for='legal_entity_owner' class='default-label'>
-                                        {{ __('forms.legal_entity_owner')}} *
+                                        {{ __('forms.legalEntityOwner')}} *
                                     </x-forms.label>
                                 </x-slot>
                                 <x-slot name='input'>
@@ -69,7 +69,7 @@
                             <x-forms.form-group>
                                 <x-slot name='label'>
                                     <x-forms.label for='contractor_base' class='default-label'>
-                                        {{ __('forms.contractor_base') }} *
+                                        {{ __('forms.contractorBase') }} *
                                     </x-forms.label>
                                 </x-slot>
                                 <x-slot name='input'>
@@ -102,7 +102,7 @@
                     <div class='dark:bg-boxdark'>
                         <div class='border-stroke px-6.5 py-4 dark:border-strokedark'>
                             <h3 class='font-medium text-2xl text-black dark:text-white'>
-                                {{ __('forms.documents_medical_organization') }}
+                                {{ __('forms.documentsMedicalOrganization') }}
                             </h3>
                         </div>
 
@@ -110,7 +110,7 @@
                             <x-forms.form-group>
                                 <x-slot name='label'>
                                     <x-forms.label for='contractor_base' class='default-label'>
-                                        {{ __('forms.statute_md5') }} *
+                                        {{ __('forms.statuteMd5') }} *
                                     </x-forms.label>
                                 </x-slot>
                                 <x-slot name='input'>
@@ -132,7 +132,7 @@
                             <x-forms.form-group class='mt-4'>
                                 <x-slot name='label'>
                                     <x-forms.label for='additional_document_md5' class='default-label'>
-                                        {{ __('forms.additional_document_md5') }} *
+                                        {{ __('forms.additionalDocumentMd5') }} *
                                     </x-forms.label>
                                 </x-slot>
                                 <x-slot name='input'>
@@ -162,7 +162,7 @@
                 <div class='dark:bg-boxdark'>
                     <div class='border-stroke px-6.5 py-4 dark:border-strokedark'>
                         <h3 class='font-medium text-2xl text-black dark:text-white'>
-                            {{ __('forms.сontract_term') }}
+                            {{ __('forms.сontractTerm') }}
                         </h3>
                     </div>
 
@@ -170,7 +170,7 @@
                         <x-forms.form-group>
                             <x-slot name='label'>
                                 <x-forms.label for='id_form' class='default-label'>
-                                    {{ __('forms.contract_type') }} *
+                                    {{ __('forms.contractType') }} *
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name='input'>
@@ -195,7 +195,7 @@
                         <x-forms.form-group class='max-w-[190px]'>
                             <x-slot name='label'>
                                 <x-forms.label for='start_date' class='default-label'>
-                                    {{ __('forms.start_date_contract') }} *
+                                    {{ __('forms.startDateContract') }} *
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name='input'>
@@ -217,7 +217,7 @@
                         <x-forms.form-group class='max-w-[210px]'>
                             <x-slot name='label'>
                                 <x-forms.label for='end_date' class='default-label'>
-                                    {{ __('forms.end_date_contract') }} *
+                                    {{ __('forms.endDateContract') }} *
                                 </x-forms.label>
                             </x-slot>
                             <x-slot name='input'>
@@ -247,7 +247,7 @@
                     <div class='dark:bg-boxdark'>
                         <div class='border-stroke px-6.5 py-4 dark:border-strokedark'>
                             <h3 class='font-medium text-2xl text-black dark:text-white'>
-                                {{ __('forms.payment_details') }}
+                                {{ __('forms.paymentDetails') }}
                             </h3>
                         </div>
 
@@ -255,7 +255,7 @@
                             <x-forms.form-group>
                                 <x-slot name='label'>
                                     <x-forms.label for='bank_name' class='default-label'>
-                                        {{ __('forms.bank_name') }} *
+                                        {{ __('forms.bankName') }} *
                                     </x-forms.label>
                                 </x-slot>
                                 <x-slot name='input'>
@@ -300,7 +300,7 @@
                             <x-forms.form-group class='mt-4'>
                                 <x-slot name='label'>
                                     <x-forms.label for='payer_account' class='default-label'>
-                                        {{ __('forms.payer_account') }} *
+                                        {{ __('forms.payerAccount') }} *
                                     </x-forms.label>
                                 </x-slot>
                                 <x-slot name='input'>
@@ -334,7 +334,7 @@
                     <div class='dark:bg-boxdark'>
                         <div class='border-stroke px-6.5 py-4 dark:border-strokedark'>
                             <h3 class='font-medium text-2xl text-black dark:text-white'>
-                                {{ __('forms.places_of_service') }}
+                                {{ __('forms.placesOfService') }}
                             </h3>
                         </div>
 
@@ -347,7 +347,8 @@
                                     </x-forms.label>
                                 </x-slot>
                                 <x-slot name='input'>
-                                    <x-forms.multi-select
+                                    <x-forms.select
+                                        multiple
                                         size='5'
                                         id='contractor_divisions'
                                         class='default-input'
@@ -358,7 +359,7 @@
                                                 <option value="{{$division->uuid}}">{{$division->name}}</option>
                                             @endforeach
                                         </x-slot>
-                                    </x-forms.multi-select>
+                                    </x-forms.select>
                                 </x-slot>
                                 @error('contract_request.contractor_divisions')
                                 <x-slot name='error'>
@@ -381,7 +382,7 @@
                 <div class='dark:bg-boxdark'>
                     <div class='border-stroke px-6.5 py-4 dark:border-strokedark'>
                         <h3 class='font-medium text-2xl text-black dark:text-white'>
-                            {{ __('forms.involved_persons') }}
+                            {{ __('forms.involvedPersons') }}
                         </h3>
                     </div>
                     <div class='flex flex-col gap-5.5 p-6.5'>
@@ -391,19 +392,19 @@
                                 <thead>
                                     <tr class='bg-gray-2 text-left dark:bg-meta-4'>
                                         <th class='px-4 py-4 font-medium text-black dark:text-white'>
-                                            {{ __('forms.legal_entity') }}
+                                            {{ __('forms.legalEntity') }}
                                         </th>
 
                                         <th class='min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11'>
-                                            {{ __('forms.external_contractor_number') }}
+                                            {{ __('forms.externalContractorNumber') }}
                                         </th>
 
                                         <th class='min-w-[150px] px-4 py-4 font-medium text-black dark:text-white'>
-                                            {{ __('forms.external_contractor_issued_at') }}
+                                            {{ __('forms.externalContractorIssuedAt') }}
                                         </th>
 
                                         <th class="px-4 py-4 font-medium text-black dark:text-white">
-                                            {{ __('forms.external_contractor_expires_at') }}
+                                            {{ __('forms.externalContractorExpiresAt') }}
                                         </th>
 
                                         <th class='px-4 py-4 font-medium text-black dark:text-white'>
@@ -473,7 +474,7 @@
                             wire:click.prevent="openModal('addExternalContractors')"
                             href=''
                         >
-                            + {{ __('forms.add_involved_person') }}
+                            + {{ __('forms.addInvolvedPerson') }}
                         </a>
                     </div>
 
@@ -534,7 +535,7 @@
                     wire:click='openModalSigned()'
                     class='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'
                 >
-                    {{ __('forms.send_for_approval') }}
+                    {{ __('forms.sendForApproval') }}
                 </x-button>
             </div>
         </div>
