@@ -1,12 +1,15 @@
+@php
+    $svgSprite = file_get_contents(resource_path('images/sprite.svg'));
+@endphp
+
 <div>
-    <x-section-title>
-        <x-slot name="title">
-            {{ __('patients.add_patient') }}
-        </x-slot>
-        <x-slot name="description">
-            {{ __('patients.add_patient') }}
-        </x-slot>
-    </x-section-title>
+    <div style="display: none">
+        {!! $svgSprite !!}
+    </div>
+
+    <x-section-navigation>
+        <x-slot name="title">{{ __('patients.add_patient') }}</x-slot>
+    </x-section-navigation>
 
     <div class="flex bg-white p-6 flex-col">
         @if($viewState === 'default')
@@ -19,26 +22,15 @@
 
             <div
                 class="w-full mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                    {{ __('forms.patientLegalRepresentative') }}
-                </h5>
-
-                <x-forms.form-row class="flex-col">
-                    <x-forms.form-group class="xl:w-1/2 flex items-center gap-3">
-                        <x-slot name="label">
-                            <x-forms.label class="default-label" for="is_incapable">
-                                {{ __('forms.incapable') }}
-                            </x-forms.label>
-                        </x-slot>
-
-                        <x-slot name="input">
-                            <x-checkbox class="default-checkbox mb-2"
-                                        wire:model.live="isIncapable"
-                                        id="is_incapable"
-                            />
-                        </x-slot>
-                    </x-forms.form-group>
-                </x-forms.form-row>
+                <div class="flex items-baseline gap-2">
+                    <x-checkbox class="default-checkbox mb-2"
+                                wire:model.live="isIncapable"
+                                id="is_incapable"
+                    />
+                    <h5 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                        {{ __('forms.incapable') }}
+                    </h5>
+                </div>
 
                 @if($isIncapable)
                     <livewire:patient.patients-filter/>

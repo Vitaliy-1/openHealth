@@ -6,7 +6,7 @@
         </h5>
 
         <x-forms.form-row>
-            <x-forms.form-group class="xl:w-1/2 flex items-center gap-3">
+            <x-forms.form-group class="flex items-center gap-3">
                 <x-slot name="label">
                     <x-forms.label for="no_tax_id" class="default-label">
                         {{ __('forms.rnokppNotFound') }}

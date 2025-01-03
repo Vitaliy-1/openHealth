@@ -73,8 +73,7 @@ class PatientFormRequest extends Form
     public string $verificationCode;
 
     #[Validate([
-        'uploadedDocuments.unzr' => ['nullable', 'file', 'mimes:jpeg', 'max:10000'],
-        'uploadedDocuments.documentsRelationship' => ['nullable', 'file', 'mimes:jpeg', 'max:10000']
+        'uploadedDocuments.*.documentsRelationship' => ['nullable', 'file', 'mimes:jpeg,jpg', 'max:10000']
     ])]
     public array $uploadedDocuments;
 
@@ -101,10 +100,6 @@ class PatientFormRequest extends Form
         if ($model === 'patient') {
             $this->addNoTaxIdValidation($rules);
             $this->addUnzrRuleIfRequired($rules);
-        }
-
-        if ($model === 'uploadedDocuments') {
-            $this->addMimeTypeValidation();
         }
 
         return $this->validate($rules);
@@ -239,7 +234,7 @@ class PatientFormRequest extends Form
         $personAge = Carbon::parse($this->patient['birthDate'])->age;
 
         // If age less than 18 then check that confidant_person is submitted
-        if ($personAge < self::NO_SELF_REGISTRATION_AGE && empty($this->documentsRelationship['confidantPersonId'])) {
+        if ($personAge < self::NO_SELF_REGISTRATION_AGE && empty($this->documentsRelationship['personId'])) {
             return [
                 'error' => true,
                 'message' => __('Confidant person is mandatory for children.')
@@ -263,7 +258,7 @@ class PatientFormRequest extends Form
             }
 
             // if none of persons documents has type from PERSON_LEGAL_CAPACITY_DOCUMENT_TYPES config parameter - check that confidant_person is submitted
-            if (!$hasLegalCapacityDocument && empty($this->documentsRelationship['confidantPersonId'])) {
+            if (!$hasLegalCapacityDocument && empty($this->documentsRelationship['personId'])) {
                 return [
                     'error' => true,
                     'message' => __('Confidant person is mandatory for minor patients.')
@@ -271,7 +266,7 @@ class PatientFormRequest extends Form
             }
 
             // Else if at least one of submitted person document types exist in PERSON_LEGAL_CAPACITY_DOCUMENT_TYPES config parameter - check that confidant_person is not submitted
-            if ($hasLegalCapacityDocument && !empty($this->documentsRelationship['confidantPersonId'])) {
+            if ($hasLegalCapacityDocument && !empty($this->documentsRelationship['personId'])) {
                 return [
                     'error' => true,
                     'message' => __('Confidant can not be submitted for person who has document that proves legal capacity.')
@@ -380,25 +375,5 @@ class PatientFormRequest extends Form
             'error' => false,
             'message' => ''
         ];
-    }
-
-    /**
-     * Check if the mime type for uploaded files is only JPG.
-     *
-     * @throws ValidationException
-     */
-    private function addMimeTypeValidation(): void
-    {
-        if (isset($this->uploadedDocuments['unzr']) && $this->uploadedDocuments['unzr']->getMimeType() !== 'image/jpeg') {
-            throw ValidationException::withMessages([
-                'patientRequest.uploadedDocuments.unzr' => 'The file must be a JPG image.',
-            ]);
-        }
-
-        if (isset($this->uploadedDocuments['documentsRelationship']) && $this->uploadedDocuments['documentsRelationship']->getMimeType() !== 'image/jpeg') {
-            throw ValidationException::withMessages([
-                'patientRequest.uploadedDocuments.documentsRelationship' => 'The file must be a JPG image.'
-            ]);
-        }
     }
 }
