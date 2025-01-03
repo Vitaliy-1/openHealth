@@ -1,9 +1,10 @@
 <div {!! $attributes->merge(['class' => '']) !!}>
-    {{$label ?? ''}}
+    {{ $label ?? '' }}
     @isset($input)
-    {{$input}}
+        {{ $input }}
     @endisset
+
     @isset($error)
-    {{$error}}
+        {{ $error }}
     @endisset
 </div>

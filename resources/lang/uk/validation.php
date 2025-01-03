@@ -442,7 +442,9 @@ return [
         'orderNo' => 'номер наказу',
         'expiryDate' => 'дата завершення дії ліцензії',
         'whatLicensed' => 'напрям діяльності, що ліцензовано',
+
+        'uploadedDocuments.*.documentsRelationship' => 'для завантаження файлів',
+        'verificationCode' => 'код підтвердження з СМС'
     ],
-    'consentText' => 'Я погоджуюсь з умовами'
-    //
+    'consentText' => 'Я погоджуюсь з умовами',
 ];

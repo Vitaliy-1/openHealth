@@ -14,8 +14,7 @@ class PatientsFilter extends Component
     #[Validate([
         'patientsFilter.firstName' => 'required',
         'patientsFilter.lastName' => 'required',
-        'patientsFilter.birthDate' => 'required',
-
+        'patientsFilter.birthDate' => 'required'
     ])]
     public array $patientsFilter = [
         'firstName' => '',
@@ -27,9 +26,35 @@ class PatientsFilter extends Component
         'birthCertificate' => ''
     ];
 
+    public bool $showAdditionalParams = false;
+
+    /**
+     * Check if the search person's request found someone.
+     *
+     * @var bool
+     */
+    public bool $searchPerformed = false;
+
     public array $tableHeaders = [];
 
-    public array $patients = [];
+    public array $patients = [
+//        0 => [
+//            "birth_country" => "Україна",
+//            "birth_date" => "2005-07-02",
+//            "birth_settlement" => "Київ",
+//            "first_name" => "Михайло",
+//            "gender" => "MALE",
+//            "id" => "f3c55699-fc11-4934-a54b-03c100785807",
+//            "last_name" => "Михавко",
+//            "second_name" => "Михайлович",
+//            'phones' => [
+//                0 => [
+//                    'type' => 'MOBILE',
+//                    'number' => '+380503410870'
+//                ]
+//            ]
+//        ]
+    ];
 
     public ?string $selectedPatientId = null;
 
@@ -41,26 +66,28 @@ class PatientsFilter extends Component
     public function mount(): void
     {
         $this->tableHeaders = [
-            __("Ім'я"),
-            __('Прізвище'),
-            __('По батькові'),
-            __('Дата народження'),
-            __('Місце народження'),
+            __('ПІБ'),
+            __('forms.phones'),
+            __('Д.Н.'),
+            __('forms.RNOCPP') . '(' . __('forms.ipn') . ')',
+            __('forms.action')
         ];
     }
 
     /**
-     * Do search for person in DB with provided filters.
+     * Search for person with provided filters.
      *
      * @return void
      * @throws ApiException
      */
-    public function searchPerson(): void
+    public function searchForPerson(): void
     {
         $this->validate();
 
-        $buildSingleSearch = PatientRequestApi::buildSearchForPerson($this->patientsFilter);
-        $this->patients = PersonApi::searchForPersonByParams($buildSingleSearch);
+        $buildSearchRequest = PatientRequestApi::buildSearchForPerson($this->patientsFilter);
+
+        $this->patients = PersonApi::searchForPersonByParams($buildSearchRequest);
+        $this->searchPerformed = true;
     }
 
     /**
@@ -72,7 +99,21 @@ class PatientsFilter extends Component
     public function chooseConfidantPerson(string $id): void
     {
         $this->selectedPatientId = $id;
+
         $this->dispatch('confidant-person-selected', $id);
-        $this->dispatch('close-search-form');
+        $this->dispatch('patient-selected');
+    }
+
+    /**
+     * Remove selected confidant person.
+     *
+     * @return void
+     */
+    public function removeConfidantPerson(): void
+    {
+        $this->patients = [];
+        $this->selectedPatientId = null;
+
+        $this->dispatch('confidant-person-removed');
     }
 }
