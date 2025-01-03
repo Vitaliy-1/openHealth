@@ -39,15 +39,13 @@ class PersonRequestRepository
 
             $this->documentRepository->addDocuments($personRequest, $response['person']['documents']);
             $this->addressRepository->addAddresses($personRequest, $response['person']['addresses']);
-            $this->phoneRepository->addPhones($personRequest, $response['person']['phones']);
+            $this->phoneRepository->addPhones($personRequest, $response['person']['phones'] ?? []);
             $this->authenticationMethodRepository->addAuthenticationMethod(
                 $personRequest,
                 $response['person']['authentication_methods']
             );
-            $this->confidantPersonRepository->addConfidantPerson(
-                $personRequest,
-                $response['person']['confidant_person']
-            );
+            $this->confidantPersonRepository->addConfidantPerson($personRequest,
+                $response['person']['confidant_person'] ?? []);
 
             DB::commit();
 

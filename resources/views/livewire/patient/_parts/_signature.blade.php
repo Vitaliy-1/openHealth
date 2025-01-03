@@ -1,134 +1,114 @@
-<div
-    class="w-full mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-        {{ __('forms.signature') }}
-    </h5>
-
+<div class="w-full mb-8 p-10 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <div class="max-w-3xl">
-        <div id="printable-content">
-            <div class="mb-3">
-                <div>Ви, як медичний працівник закладу охорони здоров’я:</div>
-                <ul style="list-style-type: none">
-                    <li>
-                        - підтверджуєте, що пацієнта як особу ідентифіковано;
-                    </li>
-                    <li>
-                        - підтверджуєте, що повідомили пацієнту або його представнику мету та підстави обробки його
-                        персональних даних.
-                    </li>
-                </ul>
-            </div>
-
-            <div id="reminder-section" class="mb-3">
-                <h5>ПАМ’ЯТКА ПАЦІЄНТУ</h5>
-                <div>
-                    Надаючи код або документи особа чи її представник:
-                </div>
-                <ul style="list-style-type: none">
-                    <li>
-                        - надає згоду медичному працівнику закладу охорони здоров’я на обробку персональних даних
-                        пацієнта, для якого створюється запис в реєстрі пацієнтів Електронної системи охорони здоров’я;
-                    </li>
-                    <li>
-                        - надає згоду медичному працівнику закладу охорони здоров’я створити та при необхідності оновити
-                        запис про пацієнта у електронній системі охорони здоров’я від імені особи або її представника.
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <button onclick="printContent('printable-content')" class="mb-3 underline">
-            Роздрукувати пам'ятку для ознайомлення пацієнтом
-        </button>
-
-        <x-forms.form-row class="flex-col">
-            <x-forms.form-group class="xl:w-1/2 flex items-center gap-3">
-                <x-slot name="label">
-                    <x-forms.label class="default-label" for="isInformed">
-                        {{ __("Інформація з пам'ятки повідомлена пацієнту") }}
-                    </x-forms.label>
-                </x-slot>
-
-                <x-slot name="input">
-                    <x-checkbox class="default-checkbox mb-2"
-                                wire:model.live="isInformed"
-                                id="isInformed"
-                    />
-                </x-slot>
-            </x-forms.form-group>
-        </x-forms.form-row>
-
         @if(!empty($uploadedDocuments))
+            <h5 class="mb-8 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {{ __('Завантаження документів') }}
+            </h5>
+
             @foreach($uploadedDocuments as $key => $document)
-                <div class="pb-4 flex items-center">
+                <div class="pb-4 flex">
                     <div class="flex-grow">
-                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">
-                            {{ $document['type'] }} *
+                        <label class="block mb-3 text-sm font-medium text-gray-900 dark:text-white"
+                               for="file_input_{{ $key }}">
+                            {{ __('patients.documents.' . Str::lower(Str::afterLast($document['type'], '.'))) }}
                         </label>
                         <div class="flex items-center gap-4">
                             <input
                                 class="xl:w-1/2 block text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                                id="file_input" type="file"
-                                wire:model.live="patientRequest.uploadedDocuments.{{ $key }}.documentsRelationship">
-                            <a type="button" href="#" class="text-green-700 hover:text-white border border-green-700
-                                    hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300
-                                    font-medium rounded-lg text-sm px-5 py-2.5 text-center
-                                    dark:border-green-500 dark:text-green-500 dark:hover:text-white
-                                    dark:hover:bg-green-600 dark:focus:ring-green-800"
-                               wire:click.prevent="uploadFile('uploadedDocuments', '{{ $document['type'] }}')"
-                               wire:loading.attr="disabled"
-                               wire:loading.class="opacity-50 cursor-not-allowed">
-                                {{ __('Відправити') }}
-                            </a>
+                                id="file_input_{{ $key }}"
+                                type="file"
+                                wire:model.live="patientRequest.uploadedDocuments.{{ $key }}.documentsRelationship"
+                            >
+
+                            @if(isset($document['documentsRelationship']) && !$errors->has("patientRequest.uploadedDocuments.$key.documentsRelationship"))
+                                @if(!isset($uploadedFiles[$key]) || $uploadedFiles[$key] === false)
+                                    <button class="flex items-center gap-1"
+                                            wire:click.prevent="deleteDocument({{ $key }})">
+                                        <svg width="14" height="14">
+                                            <use xlink:href="#svg-trash"></use>
+                                        </svg>
+                                        <span class="font-medium text-red-600 text-sm">{{ __('forms.delete') }}</span>
+                                    </button>
+                                @else
+                                    <button class="flex items-center gap-1">
+                                        <svg width="14" height="14">
+                                            <use xlink:href="#svg-check-circle"></use>
+                                        </svg>
+                                        <span class="font-medium text-green-400 text-sm">{{ __('Відправлено') }}</span>
+                                    </button>
+                                @endif
+                            @endif
                         </div>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">
+                            {{ __('Розмір завантажуваного файлу не більше 10МБ у форматі jpeg') }}
+                        </p>
+
+                        @error("patientRequest.uploadedDocuments.$key.documentsRelationship")
+                        <div class="mt-1">
+                            <x-forms.error>
+                                {{ $message }}
+                            </x-forms.error>
+                        </div>
+                        @enderror
                     </div>
                 </div>
-
-                @error('patientRequest.uploadedDocuments.documentsRelationship')
-                <div class="text-red-500 text-sm mb-2">
-                    {{ $message }}
-                </div>
-                @enderror
-
             @endforeach
+
+            @if(!$isUploaded)
+                <x-forms.form-group>
+                    <x-slot name="label">
+                        <x-forms.button-with-icon wire:click.prevent="sendFiles('uploadedDocuments')"
+                                                  class="default-button flex-row-reverse mt-8"
+                                                  label="{{ __('Відправити файли') }}"
+                                                  svgId="svg-arrow-right"
+                        />
+                    </x-slot>
+                </x-forms.form-group>
+            @endif
         @endif
 
-        <x-forms.form-row>
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
-                    <x-forms.label for="verification_code" class="default-label">
-                        {{ __('Код підтвердження') }} *
-                    </x-forms.label>
-                </x-slot>
+        @if($isUploaded)
+            <h5 class="lg:mt-16 text-2xl font-semibold text-gray-900 dark:text-white">
+                {{ __('Код з СМС') }}
+            </h5>
+            <x-forms.form-row gap="gap-3" class="{{ empty($uploadedDocuments) ? 'mt-0' : 'mt-8' }} mb-14">
 
-                <x-slot name="input">
-                    @if($isApproved)
-                        <span class="text-green-500">Підтверджено</span>
-                    @else
+                <x-forms.form-group class="xl:w-1/3">
+                    <x-slot name="input">
                         <x-forms.input class="default-input"
                                        wire:model="patientRequest.verificationCode"
                                        type="text"
                                        id="verification_code"
                                        maxlength="4"
+                                       placeholder="{{ __('Код підтвердження з СМС') }}"
                         />
-                    @endif
-                </x-slot>
+                    </x-slot>
 
-                @error('patientRequest.verificationCode')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{ $message }}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
+                    @error('patientRequest.verificationCode')
+                    <x-slot name="error">
+                        <x-forms.error>
+                            {{ $message }}
+                        </x-forms.error>
+                    </x-slot>
+                    @enderror
+                </x-forms.form-group>
 
-            <!-- Resend SMS button -->
-            <div class="xl:w-1/4 flex items-end">
-                <button
-                    type="button"
-                    wire:click="resendSms"
-                    x-data="{
+                @if(!$isApproved)
+                    <div>
+                        <button wire:click="approvePerson('verificationCode')"
+                                type="button"
+                                class="default-button"
+                        >
+                            {{ __('forms.confirm') }}
+                        </button>
+                    </div>
+
+                    <!-- Resend SMS button -->
+                    <div>
+                        <button
+                            type="button"
+                            wire:click="resendSms"
+                            x-data="{
                         cooldown: @entangle('resendCooldown'),
                         interval: null,
                         startCooldown() {
@@ -148,48 +128,49 @@
                             }
                         },
                     }"
-                    x-init="startCooldown()"
-                    x-effect="startCooldown()"
-                    x-bind:disabled="cooldown > 0"
-                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
-                >
-                    <svg
-                        x-show="cooldown > 0"
-                        x-cloak
-                        aria-hidden="true"
-                        class="w-4 h-4 mr-2 text-gray-200 animate-spin"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                    >
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C3.582 0 0 3.582 0 8h4zm2 5.291V20c2.485 0 4.68-1.122 6-2.905l-1.609-.692A7.992 7.992 0 016 17.291z"></path>
+                            x-init="startCooldown()"
+                            x-effect="startCooldown()"
+                            x-bind:disabled="cooldown > 0"
+                            x-bind:class="{ 'cursor-not-allowed': cooldown > 0 }"
+                            class="light-button px-3 flex items-center gap-2"
+                        >
+                            <svg width="16" height="17">
+                                <use xlink:href="#svg-mail"></use>
+                            </svg>
+                            <span
+                                x-text="cooldown > 0 ? `Відправити ще раз (через ${cooldown} с)` : 'Відправити ще раз'">
+                            </span>
+                        </button>
+                    </div>
+                @else
+                    <svg width="46" height="46">
+                        <use xlink:href="#svg-badge-check"></use>
                     </svg>
-                    <span
-                        x-text="cooldown > 0 ? `Повторна відправка коду через ${cooldown} сек.` : 'Відправити ще раз'"></span>
-                </button>
-            </div>
+                @endif
+            </x-forms.form-row>
+        @endif
 
-            <div class="xl:w-1/4 flex">
-                <button wire:click="approvePerson('verificationCode')" type="button"
-                        class="btn-primary" {{ $isInformed ? '' : 'disabled' }}>
-                    {{ __('Відправити на затвердження') }}
-                </button>
-            </div>
-        </x-forms.form-row>
-
-        @if(!$isApproved)
-            <div class="xl:w-1/4">
-                <button wire:click="create('signed_content')" type="button" class="default-button">
-                    {{__('Підписати КЕПом')}}
+        @if($isApproved)
+            <div class="mt-16">
+                <button wire:click="create('signedContent')"
+                        type="button"
+                        class="default-button flex items-center gap-2"
+                >
+                    <svg width="16" height="17">
+                        <use xlink:href="#svg-key"></use>
+                    </svg>
+                    {{ __('Підписати КЕПом') }}
+                    <svg width="16" height="17">
+                        <use xlink:href="#svg-arrow-right"></use>
+                    </svg>
                 </button>
             </div>
         @endif
 
-        @if($showModal === 'signed_content')
+        @if($showModal === 'signedContent')
             @include('livewire.patient._parts.modals._modal_signed_content')
+        @elseif($showModal === 'patientLeaflet')
+            @include('livewire.patient._parts.modals._modal_leaflet')
         @endif
     </div>
 </div>

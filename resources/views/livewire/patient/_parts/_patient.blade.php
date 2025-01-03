@@ -105,7 +105,7 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="birth_country" class="default-label">
-                        {{ __('forms.birth_country') }} *
+                        {{ __('forms.birthCountry') }} *
                     </x-forms.label>
                 </x-slot>
 

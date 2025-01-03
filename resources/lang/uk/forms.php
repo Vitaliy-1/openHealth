@@ -70,19 +70,19 @@ return [
     'UNZR'                                 => 'УНЗР',
     //Form fields
     'alias'                                => 'аліас',
-    'activeTo'                            => 'Активний до',
+    'activeTo'                             => 'Активний до',
     'edrpou'                               => 'ЄДРПОУ',
     'firstName'                            => 'Ім’я',
     'lastName'                             => 'Прізвище',
     'secondName'                           => 'По батькові',
     'birthDate'                            => 'Дата народження',
     'birthCountry'                         => 'Країна народження',
+    'birthCertificate'                     => 'Свідоцтво про народження',
     'email'                                => 'E-mail',
     'expirationDate'                       => 'Дійсний до',
     'gender'                               => 'Стать',
     'ownerPosition'                        => 'Посада керівника НМП',
     'phonesOwner'                          => 'Контактні телефони керівника НМП',
-    'preferredWayCommunication'            => 'Бажаний спосіб зв’язку',
     'taxId'                                => 'Номер РНОКПП',
     'documentType'                         => 'Тип документа',
     'documentNumber'                       => 'Cерія/номер документа',
@@ -239,4 +239,5 @@ return [
     'specialityAttestationName'            => 'Назва навчальної діяльності',
     'specialityAttestationDate'            => 'Дата навчальної діяльності',
     'actions'                              => 'Діі',
+    'delete'                               => 'Видалити'
 ];

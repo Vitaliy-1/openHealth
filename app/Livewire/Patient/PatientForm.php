@@ -27,76 +27,87 @@ class PatientForm extends Component
 
     private const string CACHE_PREFIX = 'register_patient_form';
 
+    protected PersonRequestRepository $personRequestRepository;
+    protected PersonRepository $personRepository;
+    protected string $patientCacheKey;
+
+    public array $documents = [];
+    public array $documentsRelationship = [];
     public string $mode = 'create';
     public PatientFormRequest $patientRequest;
     public Person $patient;
-    protected PersonRequestRepository $personRequestRepository;
-    protected PersonRepository $personRepository;
-    public array $documents = [];
-    public array $documentsRelationship = [];
     public array $uploadedDocuments = [];
-    public string $requestId;
-    public string $patientId;
-    protected string $patientCacheKey;
-    public int $keyProperty;
 
+    /**
+     * Content that shows to the patient when signing the leaflet.
+     * @var string
+     */
+    public string $leafletContent;
+    public string $requestId;
+    public int $keyProperty;
     public string $viewState = 'default';
 
     /**
-     * Check is store patient was successful
+     * Track uploaded files.
+     * @var array
+     */
+    public array $uploadedFiles = [];
+
+    /**
+     * Check is files was successfully uploaded.
+     * @var bool
+     */
+    public bool $isUploaded = false;
+
+    /**
+     * Check is store patient was successful.
      * @var bool
      */
     public bool $isPatientStored = false;
 
     /**
-     * Mark 'information from the leaflet was communicated to the patient'
+     * Mark 'information from the leaflet was communicated to the patient'.
      * @var bool
      */
     public bool $isInformed = false;
 
     /**
-     * MPI id of the person
-     * @var string|null
-     */
-    public ?string $id = null;
-
-    /**
-     * Check is patient refused to provide РНОКПП/ІПН
+     * Check is patient refused to provide РНОКПП/ІПН.
      * @var bool
      */
     public bool $noTaxId = false;
 
     /**
-     * Is patient incapable or child less than 14 y.o
+     * Is patient incapable or child less than 14 y.o.
      * @var bool
      */
     public bool $isIncapable = false;
 
     /**
-     * Check is person approved
+     * Check is person approved.
      * @var bool
      */
     public bool $isApproved = false;
 
     /**
-     * KEP key
+     * KEP key.
      * @var object|null
      */
     public ?object $file = null;
 
     /**
-     * Time to resend SMS
+     * Time to resend SMS in seconds.
      * @var int
      */
     public int $resendCooldown = 60;
 
     protected $listeners = ['addressDataFetched'];
+
     public array $dictionaries_field = [
         'DOCUMENT_TYPE',
         'DOCUMENT_RELATIONSHIP_TYPE',
         'GENDER',
-        'PHONE_TYPE',
-        'STREET_TYPE'
+        'PHONE_TYPE'
     ];
 
     public function boot(PersonRequestRepository $personRequestRepository, PersonRepository $personRepository): void
@@ -109,14 +120,10 @@ class PatientForm extends Component
     /**
      * @throws \App\Classes\Cipher\Exceptions\ApiException
      */
-    public function mount(Request $request, string $id = ''): void
+    public function mount(Request $request): void
     {
-        if ($request->has('store_id')) {
-            $this->requestId = $request->input('store_id');
-        }
-
-        if (!empty($id)) {
-            $this->patientId = $id;
+        if ($request->has('storeId')) {
+            $this->requestId = $request->input('storeId');
         }
 
         $this->getPatient();
@@ -143,6 +150,19 @@ class PatientForm extends Component
         $this->putCache($this->patientCacheKey, $cacheData);
     }
 
+    #[On('confidant-person-removed')]
+    public function confidantPersonRemoved(): void
+    {
+        $cacheData = $this->getCache($this->patientCacheKey) ?? [];
+
+        unset($cacheData[$this->requestId]['documentsRelationship']['personId'], $cacheData[$this->requestId]['patient']['authenticationMethods'][0]['value']);
+
+        $this->patientRequest->documentsRelationship['personId'] = null;
+        $this->patientRequest->patient['authenticationMethods'][0]['value'] = null;
+
+        $this->putCache($this->patientCacheKey, $cacheData);
+    }
+
     /**
      * Initialize the creation mode for a specific model.
      *
@@ -154,7 +174,6 @@ class PatientForm extends Component
         $this->mode = 'create';
         $this->patientRequest->{$model} = [];
         $this->openModal($model);
-        $this->getPatient();
     }
 
     /**
@@ -175,6 +194,7 @@ class PatientForm extends Component
                 if (isset($this->patientRequest->documentsRelationship['personId'])) {
                     unset($this->patientRequest->documentsRelationship['personId']);
                 }
+
                 $this->storeCachePatient($model);
             }
 
@@ -218,7 +238,7 @@ class PatientForm extends Component
      * Send API request 'Create Person v2' and show the next page if data is validated.
      *
      * @return void
-     * @throws ApiException|Throwable
+     * @throws Throwable
      */
     public function createPerson(): void
     {
@@ -233,7 +253,7 @@ class PatientForm extends Component
             return;
         }
 
-        $response = $this->sendPersonRequest($this->patientRequest->toArray());
+        $response = $this->sendPersonRequest(removeEmptyKeys($this->patientRequest->toArray()));
 
         if ($response['meta']['code'] !== 201) {
             $this->dispatch('flashMessage', [
@@ -255,14 +275,29 @@ class PatientForm extends Component
                 return;
             }
 
-            // Save URLs for uploading in cache
+            // Save ID and URLs for uploading in cache
             $cacheData = $this->getCache($this->patientCacheKey);
             $cacheData[$this->requestId]['uploadedDocuments'] = $response['urgent']['documents'];
             $cacheData[$this->requestId]['patient']['id'] = $response['data']['id'];
             $this->putCache($this->patientCacheKey, $cacheData);
 
-            $this->id = $response['data']['id'];
+            $this->uploadedDocuments = $response['urgent']['documents'];
             $this->viewState = 'new';
+        }
+    }
+
+    /**
+     * Validate uploaded files and save.
+     *
+     * @param  string  $propertyName
+     * @return void
+     * @throws ValidationException
+     */
+    public function updated(string $propertyName): void
+    {
+        if (str_starts_with($propertyName, 'patientRequest.uploadedDocuments')) {
+            $this->patientRequest->rulesForModelValidate('uploadedDocuments');
+            $this->uploadedDocuments = $this->patientRequest->uploadedDocuments;
         }
     }
 
@@ -270,33 +305,81 @@ class PatientForm extends Component
      * Upload patient files to the appropriate URL.
      *
      * @param  string  $model
-     * @param  string  $documentType
      * @return void
-     * @throws ApiException|ValidationException
+     * @throws ValidationException
      */
-    public function uploadFile(string $model, string $documentType): void
+    public function sendFiles(string $model): void
     {
         $this->patientRequest->rulesForModelValidate($model);
 
-        $document = collect($this->patientRequest->uploadedDocuments)
-            ->firstWhere('type', $documentType);
+        // Check that all files were uploaded
+        $allDocumentsUploaded = collect($this->patientRequest->uploadedDocuments)
+            ->every(fn($document) => isset($document['documentsRelationship']));
 
-        if ($document) {
-            $requestData = PatientRequestApi::buildUploadFileRequest($document['documentsRelationship']);
-            $uploadResponse = PersonApi::uploadFileRequest($document['url'], $requestData);
+        if (!$allDocumentsUploaded) {
+            $this->dispatch('flashMessage', [
+                'message' => 'Будь ласка завантажте всі файли!',
+                'type' => 'error',
+            ]);
 
-            if (isset($uploadResponse['status']) && $uploadResponse['status'] === 200) {
+            return;
+        }
+
+        $successCount = 0;
+        $totalFiles = count($this->patientRequest->uploadedDocuments);
+
+        foreach ($this->patientRequest->uploadedDocuments as $key => $document) {
+            if (!isset($document['documentsRelationship'])) {
+                continue;
+            }
+
+            try {
+                $requestData = PatientRequestApi::buildUploadFileRequest($document['documentsRelationship']);
+                $uploadResponse = PersonApi::uploadFileRequest($document['url'], $requestData);
+
+                if (isset($uploadResponse['status']) && $uploadResponse['status'] === 200) {
+                    $successCount++;
+
+                    $this->uploadedFiles[$key] = true;
+                } else {
+                    $this->dispatch('flashMessage', [
+                        'message' => 'Виникла помилка, зверніться до адміністратора',
+                        'type' => 'error',
+                    ]);
+
+                    $this->uploadedFiles[$key] = false;
+                }
+            } catch (\Exception $e) {
                 $this->dispatch('flashMessage', [
-                    'message' => 'Фото успішно завантажено',
-                    'type' => 'success',
-                ]);
-            } else {
-                $this->dispatch('flashMessage', [
-                    'message' => 'Сталася помилка під час завантаження файлу',
+                    'message' => 'Виникла помилка, зверніться до адміністратора',
                     'type' => 'error',
                 ]);
+
+                $this->uploadedFiles[$key] = false;
             }
         }
+
+        // Show final status message
+        if ($successCount === $totalFiles) {
+            $this->isUploaded = true;
+
+            $this->dispatch('flashMessage', [
+                'message' => 'Всі файли успішно завантажено',
+                'type' => 'success',
+            ]);
+        }
+    }
+
+    /**
+     * Delete uploaded file.
+     *
+     * @param  int  $key
+     * @return void
+     */
+    public function deleteDocument(int $key): void
+    {
+        unset($this->patientRequest->uploadedDocuments[$key]['documentsRelationship']);
+        $this->uploadedDocuments = $this->patientRequest->uploadedDocuments;
     }
 
     /**
@@ -313,10 +396,12 @@ class PatientForm extends Component
         $preRequest = [
             'verification_code' => (int) $this->patientRequest->verificationCode
         ];
-        $requestData = schemaService()->requestSchemaNormalize($preRequest, app(PersonApi::class),
-            'approveSchemaRequest');
+        $requestData = schemaService()
+            ->setDataSchema($preRequest, app(PersonApi::class))
+            ->requestSchemaNormalize('approveSchemaRequest')
+            ->getNormalizedData();
 
-        $response = PersonApi::approvePersonRequest($this->id ?? $this->patientRequest->patient['id'], $requestData);
+        $response = PersonApi::approvePersonRequest($this->patientRequest->patient['id'], $requestData);
 
         if ($response['status'] !== 'APPROVED') {
             $this->dispatch('flashMessage', [
@@ -328,7 +413,26 @@ class PatientForm extends Component
         if ($response['status'] === 'APPROVED') {
             $this->personRequestRepository->updatePersonRequestStatusByUuid($response);
             $this->isApproved = true;
+
+            // save a leaflet and open the modal
+            $cacheData = $this->getCache($this->patientCacheKey);
+            $this->leafletContent = $response['data']['content'];
+            $cacheData[$this->requestId]['content'] = $response['data']['content'];
+            $this->putCache($this->patientCacheKey, $cacheData);
+
+            $this->openModal('patientLeaflet');
         }
+    }
+
+    /**
+     * Inform the patient about processing his data and close the modal.
+     *
+     * @return void
+     */
+    public function informAndCloseModal(): void
+    {
+        $this->isInformed = true;
+        $this->closeModal();
     }
 
     /**
@@ -339,25 +443,29 @@ class PatientForm extends Component
      */
     public function signPerson(): void
     {
-        $patientId = $this->id ?? $this->patientRequest->patient['id'];
+        $patientId = $this->patientRequest->patient['id'];
 
         $getPatientById = PersonApi::getCreatedPersonById($patientId);
         unset($getPatientById['meta'], $getPatientById['urgent']);
         $getPatientById['data']['patient_signed'] = $this->isInformed;
 
         // encrypt data
-        $encryptedRequestData = schemaService()->requestSchemaNormalize($getPatientById['data'], app(PersonApi::class),
-            'encryptSignSchemaRequest');
-        // TODO: після мержа затестити чи пропадають ключі в яких значення false
-        $encryptedRequestData['person']['no_tax_id'] = $this->noTaxId;
+        $encryptedRequestData = schemaService()
+            ->setDataSchema($getPatientById['data'], app(PersonApi::class))
+            ->requestSchemaNormalize('encryptSignSchemaRequest')
+            ->getNormalizedData();
+
         $base64EncryptedData = $this->sendEncryptedData($encryptedRequestData, Auth::user()->tax_id);
 
         // sign person request
         $preRequest = [
             'signed_content' => $base64EncryptedData
         ];
-        $signRequestData = schemaService()->requestSchemaNormalize($preRequest, app(PersonApi::class),
-            'signSchemaRequest');
+        $signRequestData = schemaService()
+            ->setDataSchema($preRequest, app(PersonApi::class))
+            ->requestSchemaNormalize('signSchemaRequest')
+            ->getNormalizedData();
+
         $signResponse = PersonApi::singPersonRequest($patientId, $signRequestData, Auth::user()->tax_id);
 
         if ($signResponse['status'] !== 'SIGNED') {
@@ -427,7 +535,7 @@ class PatientForm extends Component
             return;
         }
 
-        $response = PersonApi::resendAuthorizationSms($this->id ?? $this->patientRequest->patient['id']);
+        $response = PersonApi::resendAuthorizationSms($this->patientRequest->patient['id']);
 
         if ($response['status'] === 'new') {
             $this->dispatch('flashMessage', [
@@ -440,7 +548,7 @@ class PatientForm extends Component
     }
 
     /**
-     * Build and send API request for create person
+     * Build and send API request for create person.
      *
      * @param  array  $patientData
      * @return array
@@ -448,24 +556,25 @@ class PatientForm extends Component
      */
     protected function sendPersonRequest(array $patientData): array
     {
+        $patientData['patient']['noTaxId'] = $this->noTaxId;
         $patientData['patient']['documents'] = $patientData['documents'];
         $patientData['patient']['addresses'][] = $patientData['addresses'];
-        $patientData['patient']['confidantPerson']['personId'] = $patientData['documentsRelationship']['personId'];
-        unset($patientData['documentsRelationship']['personId']);
-        $patientData['patient']['confidantPerson']['documentsRelationship'] = $patientData['documentsRelationship'];
 
-        $preRequest = [
-            'person' => $patientData['patient']
-        ];
-        $filtered = removeEmptyKeys($preRequest);
+        if (!empty($patientData['documentsRelationship'])) {
+            $patientData['patient']['confidantPerson']['personId'] = $patientData['documentsRelationship']['personId'];
+            unset($patientData['documentsRelationship']['personId']);
+            $patientData['patient']['confidantPerson']['documentsRelationship'] = $patientData['documentsRelationship'];
+        }
 
-        $patientRequest = schemaService()->requestSchemaNormalize($filtered, app(PersonApi::class));
-        $patientRequest['person']['no_tax_id'] = $this->noTaxId;
-        $patientRequest['patient_signed'] = false;
-        $patientRequest['process_disclosure_data_consent'] = true;
-        unset($patientRequest['person']['id']);
+        $preRequest = schemaService()
+            ->setDataSchema(['person' => $patientData['patient']], app(PersonApi::class))
+            ->requestSchemaNormalize()
+            ->getNormalizedData();
 
-        return PersonApi::createPersonRequest($patientRequest);
+        $preRequest['patient_signed'] = $this->isInformed;
+        $preRequest['process_disclosure_data_consent'] = true;
+
+        return PersonApi::createPersonRequest($preRequest);
     }
 
     /**
@@ -560,7 +669,7 @@ class PatientForm extends Component
     /**
      * Updates the cache with the provided data under a specific key for the current request ID.
      *
-     * @param  string  $key  The key under which the data should be stored in the cache (e.g., 'addresses').
+     * @param  string  $key  The key under which the data should be stored in the cache
      * @param  array  $data  The data to be stored in the cache.
      * @return void
      */
