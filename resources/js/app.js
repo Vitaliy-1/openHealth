@@ -1,6 +1,8 @@
+import 'flowbite';
 import './bootstrap';
 import './common';
 import './index';
+
 // import { initFlowbite } from 'flowbite';
 
 import Datepicker from 'flowbite-datepicker/Datepicker';
