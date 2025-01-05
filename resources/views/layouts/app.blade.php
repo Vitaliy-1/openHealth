@@ -7,36 +7,26 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet"/>
-
     @livewireStyles
-    @livewireScripts
-    <!-- Scripts -->
-    @vite([ 'resources/js/index.js','resources/css/app.css', 'resources/js/app.js'])
-{{--            @vite([ 'resources/css/style.css'])--}}
+    @vite(['resources/css/app.css'])
 </head>
 
-
-<body class="bg-gray-50 dark:bg-gray-800">
-@livewire('components.header')
-<div class="flex pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
-    <!-- ===== Sidebar Start ===== -->
-    @livewire('components.sidebar')
-    <div id="main-content" class="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 dark:bg-gray-900">
-        <main>
+<body>
+    <div class="antialiased bg-gray-50 dark:bg-gray-900">
+        @livewire('components.header')
+        <!-- ===== Sidebar Start ===== -->
+        @livewire('components.sidebar')
+        <main id="main-content" class="p-4 md:ml-64 h-auto pt-20">
            {{ $slot}}
         </main>
+
+        @livewireScripts
+        @stack('modals')
+        @stack('scripts')
+        @livewire('components.flash-message')
+        @vite(['resources/js/index.js', 'resources/js/app.js'])
+        @yield('scripts')
     </div>
-</div>
-
-@stack('modals')
-
-@stack('scripts')
-@livewire('components.flash-message')
-@yield('scripts')
 </body>
-
 
 </html>
