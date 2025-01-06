@@ -33,5 +33,6 @@ return [
         'confidant_certificate' => 'Посвідчення опікуна',
         'court_decision' => 'Рішення суду',
         'document' => 'Документ'
-    ]
+    ],
+    'encounter_create' => 'Створення медичного запису'
 ];
