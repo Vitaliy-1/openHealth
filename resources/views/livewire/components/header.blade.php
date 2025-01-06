@@ -1,55 +1,149 @@
-{{--<header class="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">--}}
-{{--    <div class="flex flex-grow items-center justify-end py-4 px-4 shadow-2 md:px-6 2xl:px-11">--}}
+<nav
+    class="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50">
+    <div class="flex flex-wrap justify-between items-center">
+        <div class="flex justify-start items-center">
 
-{{--        <div class="flex items-center gap-3 2xsm:gap-7">--}}
+            <button
+                data-drawer-target="drawer-navigation"
+                data-drawer-toggle="drawer-navigation"
+                aria-controls="drawer-navigation"
+                class="p-2 mr-2 text-gray-600 rounded-lg cursor-pointer md:hidden hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            >
+                <svg
+                    aria-hidden="true"
+                    class="w-6 h-6"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                        clip-rule="evenodd"
+                    ></path>
+                </svg>
+                <svg
+                    aria-hidden="true"
+                    class="hidden w-6 h-6"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                    ></path>
+                </svg>
+                <span class="sr-only">Toggle sidebar</span>
+            </button>
 
-{{--            <!-- User Area -->--}}
-{{--            <div class="relative" x-data="{ dropdownOpen: false }" @click.outside="dropdownOpen = false">--}}
-{{--                <form method="POST" action="{{route('logout')}}">--}}
-{{--                    @csrf--}}
-{{--                    <button--}}
-{{--                        type="submit"--}}
-{{--                        class="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">--}}
-{{--                        <svg class="fill-current" width="22" height="22" viewBox="0 0 22 22" fill="none"--}}
-{{--                             xmlns="http://www.w3.org/2000/svg">--}}
-{{--                            <path--}}
-{{--                                d="M15.5375 0.618744H11.6531C10.7594 0.618744 10.0031 1.37499 10.0031 2.26874V4.64062C10.0031 5.05312 10.3469 5.39687 10.7594 5.39687C11.1719 5.39687 11.55 5.05312 11.55 4.64062V2.23437C11.55 2.16562 11.5844 2.13124 11.6531 2.13124H15.5375C16.3625 2.13124 17.0156 2.78437 17.0156 3.60937V18.3562C17.0156 19.1812 16.3625 19.8344 15.5375 19.8344H11.6531C11.5844 19.8344 11.55 19.8 11.55 19.7312V17.3594C11.55 16.9469 11.2062 16.6031 10.7594 16.6031C10.3125 16.6031 10.0031 16.9469 10.0031 17.3594V19.7312C10.0031 20.625 10.7594 21.3812 11.6531 21.3812H15.5375C17.2219 21.3812 18.5625 20.0062 18.5625 18.3562V3.64374C18.5625 1.95937 17.1875 0.618744 15.5375 0.618744Z"--}}
-{{--                                fill="" />--}}
-{{--                            <path--}}
-{{--                                d="M6.05001 11.7563H12.2031C12.6156 11.7563 12.9594 11.4125 12.9594 11C12.9594 10.5875 12.6156 10.2438 12.2031 10.2438H6.08439L8.21564 8.07813C8.52501 7.76875 8.52501 7.2875 8.21564 6.97812C7.90626 6.66875 7.42501 6.66875 7.11564 6.97812L3.67814 10.4844C3.36876 10.7938 3.36876 11.275 3.67814 11.5844L7.11564 15.0906C7.25314 15.2281 7.45939 15.3312 7.66564 15.3312C7.87189 15.3312 8.04376 15.2625 8.21564 15.125C8.52501 14.8156 8.52501 14.3344 8.21564 14.025L6.05001 11.7563Z"--}}
-{{--                                fill="" />--}}
-{{--                        </svg>--}}
-{{--                        Вийти--}}
-{{--                    </button>--}}
-{{--                </form>--}}
-{{--            </div>--}}
-{{--            <!-- User Area -->--}}
-{{--        </div>--}}
-{{--    </div>--}}
-{{--</header>--}}
+            {{-- Logo --}}
+            <a href="{{ url('/dashboard') }}" class="flex items-center justify-between mr-4">
+                <img
+                    src="{{ Vite::asset('resources/images/logo-180x180.png') }}"
+                    class="mr-3 h-8"
+                    alt="Open Health logo"
+                >
+                <span class="self-center text-l font-bold whitespace-nowrap dark:text-white text-teal uppercase">
+                    Open Health
+                </span>
+            </a>
+        </div>
 
+        <div class="flex items-center lg:order-2">
 
-<nav class="fixed z-30 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-    <div class="px-3 py-3 lg:px-5 lg:pl-3">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center flex-start">
-                <button id="toggleSidebarMobile" aria-expanded="true" aria-controls="sidebar" class="p-2 text-gray-600 rounded cursor-pointer lg:hidden hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                    <svg id="toggleSidebarMobileHamburger" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-                    <svg id="toggleSidebarMobileClose" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                </button>
-                <a href="https://flowbite-admin-dashboard.vercel.app/" class="flex ml-2 md:mr-24">
-                    <x-application-logo />
-                </a>
+            {{-- Notifications --}}
+            <button
+                type="button"
+                data-dropdown-toggle="notification-dropdown"
+                class="p-2 mr-1 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+            >
+                <span class="sr-only">View notifications</span>
+                {{-- Bell icon --}}
+                <svg
+                    aria-hidden="true"
+                    class="w-6 h-6"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"
+                    ></path>
+                </svg>
+            </button>
+
+            {{-- Notifications dropdown --}}
+            <div
+                class="hidden overflow-hidden z-50 my-4 max-w-sm text-base list-none bg-white rounded divide-y divide-gray-100 shadow-lg dark:divide-gray-600 dark:bg-gray-700 rounded-xl"
+                id="notification-dropdown"
+            >
+                <div
+                    class="block py-2 px-4 text-base font-medium text-center text-gray-700 bg-gray-50 dark:bg-gray-600 dark:text-gray-300">
+                    Notifications
+                </div>
+
+                {{-- When implemented, notificaitons should go here --}}
             </div>
-            <div class="flex items-center">
-                <form action="{{route('logout')}}" method="POST" class=" lg:block lg:pl-3.5">
-                    @csrf
-                    <button id="toggleSidebarMobile" onclick="" aria-expanded="true" aria-controls="sidebar" class="p-2 text-gray-600 rounded cursor-pointer  hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                        Вийти
-                    </button>
-                </form>
+
+            {{-- Profile dropdown menu --}}
+            <button
+                type="button"
+                class="flex mx-3 text-sm text-gray-500 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                id="user-menu-button"
+                aria-expanded="false"
+                data-dropdown-toggle="dropdown"
+            >
+                <span class="sr-only">Open user menu</span>
+
+                {{-- TODO if user has a profile picture add it here --}}
+                <svg class="w-8 h-8"
+                     aria-hidden="true"
+                     xmlns="http://www.w3.org/2000/svg"
+                     width="24" height="24"
+                     fill="currentColor"
+                     viewBox="0 0 24 24"
+                >
+                    <path fill-rule="evenodd"
+                          d="M12 20a7.966 7.966 0 0 1-5.002-1.756l.002.001v-.683c0-1.794 1.492-3.25 3.333-3.25h3.334c1.84 0 3.333 1.456 3.333 3.25v.683A7.966 7.966 0 0 1 12 20ZM2 12C2 6.477 6.477 2 12 2s10 4.477 10 10c0 5.5-4.44 9.963-9.932 10h-.138C6.438 21.962 2 17.5 2 12Zm10-5c-1.84 0-3.333 1.455-3.333 3.25S10.159 13.5 12 13.5c1.84 0 3.333-1.455 3.333-3.25S13.841 7 12 7Z"
+                          clip-rule="evenodd"
+                    />
+                </svg>
+
+            </button>
+
+            <div
+                class="hidden z-50 my-4 w-56 text-base list-none bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 rounded-xl"
+                id="dropdown"
+            >
+                <div class="py-3 px-4">
+                    <span class="block text-sm font-semibold text-gray-900 dark:text-white">
+                        {{-- TODO Get the name of the current user --}}
+                        {{ auth()->user()->name}}
+                    </span>
+                    <span class="block text-sm text-gray-900 truncate dark:text-white">
+                        {{auth()->user()->email}}
+                    </span>
+                </div>
+
+                <ul class="py-1 text-gray-700 dark:text-gray-300"
+                    aria-labelledby="dropdown"
+                >
+                    <li>
+                        <a href="{{route('profile.show')}}"
+                           class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white"
+                        >
+                            {{__('general.profile')}}
+                        </a>
+                    </li>
+
+                </ul>
+
             </div>
         </div>
+
+
     </div>
 </nav>
 
