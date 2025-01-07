@@ -4,17 +4,16 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDeclarationsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-
         Schema::create('declarations', function (Blueprint $table) {
             $table->id();
-            $table->uuid('uuid');
+            $table->uuid();
             $table->string('declaration_number')->unique();
             $table->date('start_date');
             $table->date('end_date');
@@ -30,14 +29,12 @@ class CreateDeclarationsTable extends Migration
             $table->dateTime('updated_at')->nullable();
             $table->string('reason')->nullable();
             $table->string('reason_description')->nullable();
-            $table->foreignId('person_id')->nullable();
             $table->foreignId('employee_id');
             $table->foreignId('division_id')->nullable();
-            $table->foreign('person_id')->references('id')->on('persons');
+            $table->foreignId('person_id')->nullable()->constrained('persons')->onDelete('set null');
             $table->foreign('employee_id')->references('id')->on('employees');
             $table->foreign('division_id')->references('id')->on('divisions');
         });
-
     }
 
     /**

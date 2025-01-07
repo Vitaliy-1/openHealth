@@ -25,15 +25,22 @@ class SchemaService
         return $this;
     }
 
-    //Return schema from class
-    public function requestSchemaNormalize(): self
+    /**
+     * Return schema from class.
+     *
+     * @param  string $method The method name to call on the class instance
+     * @return self
+     * @throws \InvalidArgumentException When the specified method doesn't exist
+     */
+    public function requestSchemaNormalize(string $method = 'schemaRequest'): self
     {
         if ($this->class) {
-            if (!method_exists($this->class, 'schemaRequest')) {
+            if (!method_exists($this->class, $method)) {
                 throw new \InvalidArgumentException('Переданий об\'єкт повинен мати метод schemaRequest');
             }
         }
-        return $this->setSchema($this->class->schemaRequest())
+
+        return $this->setSchema($this->class->$method())
             ->arrayToCollection()
             ->snakeCaseKeys()
             ->mappingSchemaNormalize()
@@ -69,7 +76,7 @@ class SchemaService
 
 
     //Set schema and convert data to collection
-    public function setSchema($schema): self
+    private function setSchema($schema): self
     {
         $this->schema = collect($schema);
         return $this;

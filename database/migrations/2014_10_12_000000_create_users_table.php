@@ -23,8 +23,7 @@ return new class extends Migration
             $table->jsonb('priv_settings')->nullable();
             $table->boolean('is_blocked')->nullable();
             $table->string('block_reason')->nullable();
-            $table->foreignId('person_id')->nullable();
-            $table->foreign('person_id')->references('id')->on('persons')->onDelete('set null');
+            $table->foreignId('person_id')->nullable()->constrained('persons')->onDelete('set null');
             $table->rememberToken();
             $table->timestamps();
         });

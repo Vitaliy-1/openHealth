@@ -1,7 +1,6 @@
 <?php
 
 use App\Classes\eHealth\Services\SchemaService;
-use App\Helpers\JsonHelper;
 use App\Services\DictionaryService;
 use Carbon\Carbon;
 
@@ -65,12 +64,11 @@ if (!function_exists("removeEmptyKeys")) {
                 if (empty($array[$key])) {
                     unset($array[$key]);
                 }
-            } else {
-                if (empty($value) && $value !== false) {
-                    unset($array[$key]);
-                }
+            } elseif ((empty($value) && $value !== false) || $value === '') {
+                unset($array[$key]);
             }
         }
+
         return $array;
     }
 }
@@ -81,7 +79,7 @@ if (!function_exists("available_time")) {
         $available_time = [];
         foreach ($available_times as $key => $value) {
             $available_time[] = [
-                "days_of_week"         => checkAndConvertArrayToString(
+                "days_of_week" => checkAndConvertArrayToString(
                     $value["days_of_week"]
                 ),
                 "all_day"              => $value["all_day"],
@@ -131,9 +129,9 @@ if (!function_exists("not_available")) {
 
         foreach ($not_availables as $key => $value) {
             $not_available[] = [
-                "during"      => [
+                "during" => [
                     "start" => convertToISO8601($value["during"]["start"]),
-                    "end"   => convertToISO8601($value["during"]["end"]),
+                    "end" => convertToISO8601($value["during"]["end"]),
                 ],
                 "description" => $value["description"],
             ];
@@ -176,6 +174,7 @@ if (!function_exists('hisBirthDate')) {
         return '';
     }
 }
+
 if (!function_exists('schemaService')) {
     function schemaService(): SchemaService
     {

@@ -17,16 +17,22 @@ return [
     'firstName' => 'Ім’я',
     'lastName' => 'Прізвище',
     'secondName' => 'По батькові',
-    'patient_pib' => 'ПІБ пацієнта',
-    'phone_number' => 'Номер телефону',
     'relation_type' => [
         'primary' => 'Основний',
-        'secondary' => 'Не основний',
+        'secondary' => 'Не основний'
     ],
     'authentication_method' => [
         'otp' => 'через СМС',
         'offline' => 'через документи',
-        'third_person' => 'через законного представника',
+        'third_person' => 'через законного представника'
+    ],
+    'documents' => [
+        'unzr' => 'УНЗР',
+        'birth_certificate' => 'Свідоцтво про народження',
+        'birth_certificate_foreign' => 'Свідоцтво про народження іноземного зразку',
+        'confidant_certificate' => 'Посвідчення опікуна',
+        'court_decision' => 'Рішення суду',
+        'document' => 'Документ'
     ],
     'encounter_create' => 'Створення медичного запису'
 ];

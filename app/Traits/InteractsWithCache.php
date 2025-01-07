@@ -3,7 +3,6 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Gate;
 
 trait InteractsWithCache
 {
@@ -40,7 +39,7 @@ trait InteractsWithCache
                 $cacheData[$this->requestId][$model] = [];
             }
             // Append to the array if model allows multiple entries
-            $cacheData[$this->requestId][$model][] = $this->{$requestProperty}->{$model};
+            $cacheData[$this->requestId][$model][] = array_filter($this->{$requestProperty}->{$model}, fn($key) => !is_numeric($key), ARRAY_FILTER_USE_KEY);
         }
 
         $this->putCache($cacheKey, $cacheData);
