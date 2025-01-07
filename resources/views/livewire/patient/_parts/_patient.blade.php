@@ -2,26 +2,26 @@
     <div
         class="w-full mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {{ __('forms.patient_information') }}
+            {{ __('forms.patientInformation') }}
         </h5>
 
         <x-forms.form-row>
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="patient_first_name" class="default-label">
-                        {{ __('forms.first_name') }} *
+                        {{ __('forms.firstName') }} *
                     </x-forms.label>
                 </x-slot>
 
                 <x-slot name="input">
                     <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.first_name"
+                                   wire:model="patientRequest.patient.firstName"
                                    type="text"
                                    id="patient_first_name"
                     />
                 </x-slot>
 
-                @error('patientRequest.patient.first_name')
+                @error('patientRequest.patient.firstName')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
@@ -33,19 +33,19 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="patient_last_name" class="default-label">
-                        {{ __('forms.last_name') }} *
+                        {{ __('forms.lastName') }} *
                     </x-forms.label>
                 </x-slot>
 
                 <x-slot name="input">
                     <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.last_name"
+                                   wire:model="patientRequest.patient.lastName"
                                    type="text"
                                    id="patient_last_name"
                     />
                 </x-slot>
 
-                @error('patientRequest.patient.last_name')
+                @error('patientRequest.patient.lastName')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
@@ -57,19 +57,19 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="patient_second_name" class="default-label">
-                        {{ __('forms.second_name') }}
+                        {{ __('forms.secondName') }}
                     </x-forms.label>
                 </x-slot>
 
                 <x-slot name="input">
                     <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.second_name"
+                                   wire:model="patientRequest.patient.secondName"
                                    type="text"
                                    id="patient_second_name"
                     />
                 </x-slot>
 
-                @error('patientRequest.patient.second_name')
+                @error('patientRequest.patient.secondName')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
@@ -83,18 +83,17 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="birth_date" class="default-label">
-                        {{ __('forms.birth_date') }} *
+                        {{ __('forms.birthDate') }} *
                     </x-forms.label>
                 </x-slot>
 
                 <x-slot name="input">
-                    <x-forms.input-date :maxDate="now()->subYears(18)->format('Y-m-d')"
-                                        wire:model="patientRequest.patient.birth_date"
+                    <x-forms.input-date wire:model="patientRequest.patient.birthDate"
                                         id="birth_date"
                     />
                 </x-slot>
 
-                @error('patientRequest.patient.birth_date')
+                @error('patientRequest.patient.birthDate')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
@@ -106,19 +105,19 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="birth_country" class="default-label">
-                        {{ __('forms.birth_country') }} *
+                        {{ __('forms.birthCountry') }} *
                     </x-forms.label>
                 </x-slot>
 
                 <x-slot name="input">
                     <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.birth_country"
+                                   wire:model="patientRequest.patient.birthCountry"
                                    type="text"
                                    id="birth_country"
                     />
                 </x-slot>
 
-                @error('patientRequest.patient.birth_country')
+                @error('patientRequest.patient.birthCountry')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
@@ -130,19 +129,19 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="birth_settlement" class="default-label">
-                        {{ __('forms.birth_settlement') }} *
+                        {{ __('forms.birthSettlement') }} *
                     </x-forms.label>
                 </x-slot>
 
                 <x-slot name="input">
                     <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.birth_settlement"
+                                   wire:model="patientRequest.patient.birthSettlement"
                                    type="text"
                                    id="birth_settlement"
                     />
                 </x-slot>
 
-                @error('patientRequest.patient.birth_settlement')
+                @error('patientRequest.patient.birthSettlement')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}
@@ -152,7 +151,7 @@
             </x-forms.form-group>
         </x-forms.form-row>
 
-        <x-forms.form-row class="flex-col" gap="gap-1">
+        <x-forms.form-row>
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="gender" class="default-label">
@@ -179,6 +178,31 @@
                 </x-slot>
 
                 @error('patientRequest.patient.gender')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{ $message }}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label for="unzr" class="default-label">
+                        {{ __('forms.UNZR') }}
+                    </x-forms.label>
+                </x-slot>
+
+                <x-slot name="input">
+                    <x-forms.input class="default-input"
+                                   maxlength="14"
+                                   wire:model="patientRequest.patient.unzr"
+                                   type="text"
+                                   id="unzr"
+                    />
+                </x-slot>
+
+                @error('patientRequest.patient.unzr')
                 <x-slot name="error">
                     <x-forms.error>
                         {{ $message }}

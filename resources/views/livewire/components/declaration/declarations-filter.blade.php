@@ -3,7 +3,7 @@
          x-transition
          class="mt-6">
         <div class="w-[60%]">
-            <h2 class="text-[20px] mb-[10px] font-bold dark:text-white">{{__('Паціент')}}</h2>
+            <h2 class="text-[20px] mb-[10px] font-bold dark:text-white">{{ __('Пацієнт') }}</h2>
             <div class="grid gap-6 mb-6 md:grid-cols-4">
                 <x-forms.form-group>
                     <x-slot name="label">
@@ -78,7 +78,6 @@
                                             autocomplete="off"/>
                     </x-slot>
                 </x-forms.form-group>
-
             </div>
         </div>
     </div>

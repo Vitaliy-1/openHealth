@@ -2,14 +2,14 @@
     <div
         class="w-full mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {{ __('forms.patient_identity_documents') }}
+            {{ __('forms.patientIdentityDocuments') }}
         </h5>
 
         <x-forms.form-row>
-            <x-forms.form-group class="xl:w-1/2 flex items-center gap-3">
+            <x-forms.form-group class="flex items-center gap-3">
                 <x-slot name="label">
                     <x-forms.label for="no_tax_id" class="default-label">
-                        {{ __('forms.rnokpp_not_found') }}
+                        {{ __('forms.rnokppNotFound') }}
                     </x-forms.label>
                 </x-slot>
 
@@ -35,13 +35,13 @@
                         <x-forms.input class="default-input"
                                        checked
                                        maxlength="10"
-                                       wire:model="patientRequest.patient.tax_id"
+                                       wire:model="patientRequest.patient.taxId"
                                        type="text"
                                        id="tax_id"
                         />
                     </x-slot>
 
-                    @error('patientRequest.patient.tax_id')
+                    @error('patientRequest.patient.taxId')
                     <x-slot name="error">
                         <x-forms.error>
                             {{ $message }}

@@ -214,12 +214,13 @@ return [
             'birthSettlement' => 'місто народження',
             'gender' => 'стать',
             'email' => 'E-mail',
+            'unzr' => 'УНЗР',
             'taxId' => 'номер РНОКПП',
             'secret' => 'кодове слово',
 
             'phones' => [
                 'type' => 'тип телефону',
-                'number' => 'номер телефону',
+                'number' => 'номер телефону'
             ],
 
             'emergencyContact' => [
@@ -228,13 +229,13 @@ return [
                 'secondName' => 'по батькові',
                 'phones' => [
                     'type' => 'тип телефону',
-                    'number' => 'номер телефону',
-                ],
+                    'number' => 'номер телефону'
+                ]
             ],
 
             'authenticationMethods' => [
                 'type' => 'метод автентифікації',
-                'phoneNumber' => 'номер телефону',
+                'phoneNumber' => 'номер телефону'
             ],
         ],
         'addresses' => [
@@ -244,20 +245,26 @@ return [
             'street' => 'назва вулиці',
             'building' => 'будинок',
             'apartment' => 'квартира',
-            'zip' => 'поштовий індекс',
+            'zip' => 'поштовий індекс'
         ],
         'documentsRelationship' => [
             'type' => 'тип документа',
             'number' => 'серія/номер документа',
             'issuedBy' => 'орган яким виданий документ',
             'issuedAt' => 'дата видачі документа',
+            'activeTo' => 'дійсний до'
         ],
         'documents' => [
             'type' => 'Тип документа',
             'number' => 'Серія/номер документа',
             'issuedBy' => 'Орган яким виданий документ',
             'issuedAt' => 'Дата видачі документа',
-            'expirationDate' => 'дійсний до',
+            'expirationDate' => 'дійсний до'
+        ],
+        'patientsFilter' => [
+            'firstName' => 'ім’я',
+            'lastName' => 'прізвище',
+            'birthDate' => 'дата народження'
         ],
         'document' => [
             'type' => 'Тип документа',
@@ -435,7 +442,9 @@ return [
         'orderNo' => 'номер наказу',
         'expiryDate' => 'дата завершення дії ліцензії',
         'whatLicensed' => 'напрям діяльності, що ліцензовано',
+
+        'uploadedDocuments.*.documentsRelationship' => 'для завантаження файлів',
+        'verificationCode' => 'код підтвердження з СМС'
     ],
-    'consentText' => 'Я погоджуюсь з умовами'
-    //
+    'consentText' => 'Я погоджуюсь з умовами',
 ];
