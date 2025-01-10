@@ -18,10 +18,18 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('second_name')->nullable();
             $table->date('birth_date');
-            $table->enum('gender', ['MALE', 'FEMALE']);
-            $table->string('tax_id')->nullable();
-            $table->string('birth_settlement')->nullable();
             $table->string('birth_country')->nullable();
+            $table->string('birth_settlement')->nullable();
+            $table->enum('gender', ['MALE', 'FEMALE']);
+            $table->string('email')->unique()->nullable();
+            $table->boolean('no_tax_id');
+            $table->string('tax_id')->unique()->nullable();
+            $table->string('secret');
+            $table->string('unzr')->unique()->nullable();
+            $table->jsonb('emergency_contact');
+            $table->boolean('patient_signed')->default(false)->comment("Person's evidence of sign the person request");
+            $table->boolean('process_disclosure_data_consent')->default(true)->comment("Person's evidence of information about consent to data disclosure");
+            $table->date('death_date')->nullable();
             $table->timestamps();
         });
     }

@@ -26,6 +26,10 @@ class PatientsFilter extends Component
         'birthCertificate' => ''
     ];
 
+    /**
+     * Toggle displaying additional parameters.
+     * @var bool
+     */
     public bool $showAdditionalParams = false;
 
     /**
@@ -35,27 +39,17 @@ class PatientsFilter extends Component
      */
     public bool $searchPerformed = false;
 
+    /**
+     * List of table headers.
+     * @var array
+     */
     public array $tableHeaders = [];
 
-    public array $patients = [
-//        0 => [
-//            "birth_country" => "Україна",
-//            "birth_date" => "2005-07-02",
-//            "birth_settlement" => "Київ",
-//            "first_name" => "Михайло",
-//            "gender" => "MALE",
-//            "id" => "f3c55699-fc11-4934-a54b-03c100785807",
-//            "last_name" => "Михавко",
-//            "second_name" => "Михайлович",
-//            'phones' => [
-//                0 => [
-//                    'type' => 'MOBILE',
-//                    'number' => '+380503410870'
-//                ]
-//            ]
-//        ]
-    ];
-
+    /**
+     * List of patients found.
+     * @var array
+     */
+    public array $patients = [];
     public ?string $selectedPatientId = null;
 
     public function render(): View
@@ -91,17 +85,21 @@ class PatientsFilter extends Component
     }
 
     /**
-     * Choose confidant from provided list.
+     * Choose a confidant person from the provided list.
      *
      * @param  string  $id
      * @return void
      */
     public function chooseConfidantPerson(string $id): void
     {
-        $this->selectedPatientId = $id;
+        $patientData = collect($this->patients)->firstWhere('id', $id);
 
-        $this->dispatch('confidant-person-selected', $id);
-        $this->dispatch('patient-selected');
+        if ($patientData) {
+            $this->selectedPatientId = $id;
+
+            $this->dispatch('confidant-person-selected', $patientData);
+            $this->dispatch('patient-selected');
+        }
     }
 
     /**
@@ -113,6 +111,7 @@ class PatientsFilter extends Component
     {
         $this->patients = [];
         $this->selectedPatientId = null;
+        $this->searchPerformed = false;
 
         $this->dispatch('confidant-person-removed');
     }
