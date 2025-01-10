@@ -33,8 +33,8 @@
                 </div>
 
                 @if($isIncapable)
-                    <livewire:patient.patients-filter/>
-                    @include('livewire.patient._parts._confidant_person_documents_relationship')
+                    <livewire:patient.patients-filter />
+                    @include('livewire.patient._parts._confidant_person')
                 @endif
             </div>
 
@@ -74,6 +74,6 @@
     @if($showModal === 'documents')
         @include('livewire.patient._parts.modals._modal_documents')
     @elseif($showModal === 'documentsRelationship')
-        @include('livewire.patient._parts.modals._modal_confidant_person_documents_relationship')
+        @include('livewire.patient._parts.modals._modal_documents_relationship')
     @endif
 </div>

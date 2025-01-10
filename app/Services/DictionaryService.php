@@ -10,7 +10,7 @@ class DictionaryService
 {
     protected string $dictionariesUrl;
 
-    /*
+    /**
     * Local storage for all founded Dictionaries into incoming array.
     * As 'Dictionary' here should be interpreted as object created from the associative array.
     * Also must be present the key that pointed to.
@@ -28,7 +28,7 @@ class DictionaryService
         $this->update();
     }
 
-    /*
+    /**
     * Update the data received from aHealth API.
     * This method filled the $rootDictionary with all founded data.
     *
@@ -54,9 +54,7 @@ class DictionaryService
      * Get all dictionaries data from external resource via API and put it into the Cache
      *
      * @param mixed $dictionariesUrl API URL to the resource
-     *
      * @return array
-     *
      * @throws RuntimeException
      */
     public static function getSourceDictionaries($dictionariesUrl): array
@@ -83,11 +81,11 @@ class DictionaryService
     }
 
 
-    /*
+    /**
     * Get all founded Dictionaries and return it as associative array.
     * The key pointed to the dictionary is it's name.
     *
-    * @ return array
+    * @return array
     */
     public function getAll(): array
     {
@@ -104,7 +102,7 @@ class DictionaryService
         return $dictionaries;
     }
 
-    /*
+    /**
     * Found and return (if successfully) the Dictionary object.
     * If $isArray is set to TRUE then method return an array instead of the object.
     *
@@ -120,14 +118,13 @@ class DictionaryService
             : $this->rootDictionary->getValue($key);
     }
 
-    /*
+    /**
     * Find and return (if successfully) array of the Dictionaries.
     * If $isArray is set to TRUE then method return an array instead of the object.
     *
     * @param array $searchArray Name of Dictionary
     * @param bool $isArray Flag indicates to return Dictionary as Array
-    *
-    * @param @array
+    * @return array
     */
     public function getDictionaries(array $searchArray, bool $isArray = false): array
     {
@@ -149,11 +146,12 @@ class DictionaryService
         return $dictionaries;
     }
 
-    /*
+    /**
     * Get the associative array with key as name of Dictionary pointed to array with specified keys and its data.
     *
     * @param array $filterKeys Keys to store in array with its values
-    * @param trying $searchDict Dictionary where the
+    * @param string $searchDict Dictionary where the
+     * @return array
     */
     public function getDictionariesFields(array $filterKeys, string $searchDict): array
     {
@@ -164,7 +162,6 @@ class DictionaryService
 
             $filteredDictionaries[$dictionary->getName()][$key] = $dictionary?->getValueThrough($key) ?? '';
         }
-
 
         return $filteredDictionaries;
     }

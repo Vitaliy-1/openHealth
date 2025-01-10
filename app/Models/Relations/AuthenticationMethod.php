@@ -2,9 +2,8 @@
 
 namespace App\Models\Relations;
 
-use App\Models\PersonRequest;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class AuthenticationMethod extends Model
 {
@@ -15,8 +14,8 @@ class AuthenticationMethod extends Model
         'alias'
     ];
 
-    public function personRequest(): BelongsTo
+    public function authenticatable(): MorphTo
     {
-        return $this->belongsTo(PersonRequest::class);
+        return $this->morphTo();
     }
 }

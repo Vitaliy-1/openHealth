@@ -431,7 +431,7 @@ class PersonApi
     public function signSchemaRequest(): array
     {
         return [
-            '$schema' => "http://json-schema.org/draft-07/schema#",
+            '$schema' => 'http://json-schema.org/draft-07/schema#',
             'type' => 'object',
             'properties' => [
                 'signed_content' => [

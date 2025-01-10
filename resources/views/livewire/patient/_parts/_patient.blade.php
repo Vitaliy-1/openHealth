@@ -89,6 +89,7 @@
 
                 <x-slot name="input">
                     <x-forms.input-date wire:model="patientRequest.patient.birthDate"
+                                        :maxDate="now()->format('Y-m-d')"
                                         id="birth_date"
                     />
                 </x-slot>
@@ -171,7 +172,7 @@
                             </option>
 
                             @foreach($this->dictionaries['GENDER'] as $key => $gender)
-                                <option value="{{ $key }}">{{ $gender }}</option>
+                                <option value="{{ $key }}" wire:key="{{ $key }}">{{ $gender }}</option>
                             @endforeach
                         </x-slot>
                     </x-forms.select>

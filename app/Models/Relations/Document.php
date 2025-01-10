@@ -2,19 +2,17 @@
 
 namespace App\Models\Relations;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Document extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'type',
         'number',
-        'issuedBy',
-        'issuedAt',
+        'issued_by',
+        'issued_at',
+        'expiration_date'
     ];
 
     public function documentable(): MorphTo

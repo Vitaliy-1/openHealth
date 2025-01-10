@@ -14,8 +14,18 @@ return new class extends Migration
         Schema::create('confidant_persons', function (Blueprint $table) {
             $table->id();
             $table->foreignId('person_id')->nullable()->constrained('persons');
-            $table->foreignId('person_request_id')->nullable()->constrained();
+            $table->foreignId('person_request_id')->constrained();
             $table->jsonb('documents_relationship');
+            $table->string('person_uuid');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('second_name')->nullable();
+            $table->enum('gender', ['MALE', 'FEMALE']);
+            $table->date('birth_date');
+            $table->string('birth_country');
+            $table->string('birth_settlement');
+            $table->string('tax_id')->nullable();
+            $table->string('birth_certificate')->nullable();
             $table->timestamps();
         });
     }
