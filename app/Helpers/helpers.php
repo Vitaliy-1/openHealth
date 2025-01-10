@@ -3,6 +3,7 @@
 use App\Classes\eHealth\Services\SchemaService;
 use App\Services\DictionaryService;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 if (!function_exists("all_day")) {
     function all_day(): array
@@ -186,5 +187,23 @@ if (!function_exists('dictionary')) {
     function dictionary()
     {
         return app(DictionaryService::class);
+    }
+}
+
+if (!function_exists('arrayKeysToCamel')) {
+    function arrayKeysToCamel(array $array): array
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            $camelKey = Str::camel($key);
+
+            // If value is an array, recursively convert its keys
+            $result[$camelKey] = is_array($value)
+                ? arrayKeysToCamel($value)
+                : $value;
+        }
+
+        return $result;
     }
 }

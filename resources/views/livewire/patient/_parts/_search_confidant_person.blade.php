@@ -17,10 +17,10 @@
                         <x-slot name="headers" :list="$tableHeaders"></x-slot>
                         <x-slot name="tbody">
                             @foreach($patients as $patient)
-                                <tr>
+                                <tr wire:key="{{ $patient['id'] }}">
                                     <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
                                         <p class="text-base text-gray-900 dark:text-white">
-                                            {{ $patient['first_name'] }} {{ $patient['last_name'] }} {{ $patient['second_name'] }}
+                                            {{ $patient['last_name'] }} {{ $patient['first_name'] }} {{ $patient['second_name'] }}
                                         </p>
                                     </td>
                                     <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
@@ -49,14 +49,14 @@
                                                 </svg>
                                                 <span class="text-sm font-medium text-red-600"
                                                       wire:click.prevent="removeConfidantPerson"
-                                                      x-on:click="showFilter = true">
+                                                      @click="showFilter = true">
                                                     {{ __('Видалити') }}
                                                 </span>
                                             @else
                                                 <svg width="40" height="41" viewBox="0 0 40 41" fill="none"
                                                      xmlns="http://www.w3.org/2000/svg"
                                                      wire:click.prevent="chooseConfidantPerson('{{ $patient['id'] }}')"
-                                                     x-on:click="showFilter = false"
+                                                     @click="showFilter = false"
                                                 >
                                                     <path
                                                         d="M0 20.5C0 9.45431 8.95431 0.5 20 0.5C31.0457 0.5 40 9.45431 40 20.5C40 31.5457 31.0457 40.5 20 40.5C8.95431 40.5 0 31.5457 0 20.5Z"
