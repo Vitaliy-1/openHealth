@@ -1,4 +1,4 @@
-<x-dialog-modal maxWidth="3xl" class="w-3 h-full z-999999" wire:model.live="showModal">
+<x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model="showModal">
     <x-slot name="title">
         {{ __('forms.documents') }}
     </x-slot>
@@ -23,7 +23,7 @@
                                 <x-slot name="option">
                                     <option>{{ __('forms.select') }} {{ __('forms.type') }}</option>
                                     @foreach($this->dictionaries['DOCUMENT_RELATIONSHIP_TYPE'] as $key => $document)
-                                        <option value="{{ $key }}">{{ $document }}</option>
+                                        <option value="{{ $key }}" wire:key="{{ $key }}">{{ $document }}</option>
                                     @endforeach
                                 </x-slot>
                             </x-forms.select>

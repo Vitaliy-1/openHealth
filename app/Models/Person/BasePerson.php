@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Person;
 
 use App\Models\Relations\Address;
 use App\Models\Relations\AuthenticationMethod;
@@ -8,16 +8,14 @@ use App\Models\Relations\ConfidantPerson;
 use App\Models\Relations\Document;
 use App\Models\Relations\Phone;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
-class PersonRequest extends Model
+class BasePerson extends Model
 {
     protected $fillable = [
         'uuid',
-        'status',
         'first_name',
         'last_name',
         'second_name',
@@ -32,17 +30,16 @@ class PersonRequest extends Model
         'unzr',
         'emergency_contact',
         'patient_signed',
-        'process_disclosure_data_consent',
-        'authorize_with'
+        'process_disclosure_data_consent'
     ];
 
     protected $casts = [
         'emergency_contact' => 'array'
     ];
 
-    public function person(): BelongsTo
+    public function address(): MorphOne
     {
-        return $this->belongsTo(Person::class);
+        return $this->morphOne(Address::class, 'addressable');
     }
 
     public function documents(): MorphMany
@@ -50,19 +47,14 @@ class PersonRequest extends Model
         return $this->morphMany(Document::class, 'documentable');
     }
 
-    public function address(): MorphOne
-    {
-        return $this->morphOne(Address::class, 'addressable');
-    }
-
     public function phones(): MorphMany
     {
         return $this->morphMany(Phone::class, 'phoneable');
     }
 
-    public function authenticationMethod(): HasOne
+    public function authenticationMethod(): MorphMany
     {
-        return $this->hasOne(AuthenticationMethod::class);
+        return $this->morphMany(AuthenticationMethod::class, 'authenticatable');
     }
 
     public function confidantPerson(): HasOne

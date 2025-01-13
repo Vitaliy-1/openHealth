@@ -1,12 +1,12 @@
 <div class="w-full mb-8 p-10 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
     <div class="max-w-3xl">
-        @if(!empty($uploadedDocuments))
+        @if(!empty($patientRequest->uploadedDocuments))
             <h5 class="mb-8 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                 {{ __('Завантаження документів') }}
             </h5>
 
-            @foreach($uploadedDocuments as $key => $document)
-                <div class="pb-4 flex">
+            @foreach($patientRequest->uploadedDocuments as $key => $document)
+                <div class="pb-4 flex" wire:key="{{ $key }}">
                     <div class="flex-grow">
                         <label class="block mb-3 text-sm font-medium text-gray-900 dark:text-white"
                                for="file_input_{{ $key }}">
@@ -67,11 +67,11 @@
             @endif
         @endif
 
-        @if($isUploaded)
-            <h5 class="lg:mt-16 text-2xl font-semibold text-gray-900 dark:text-white">
+        @if($isUploaded || empty($patientRequest->uploadedDocuments))
+            <h5 class="mb-8 text-2xl font-semibold text-gray-900 dark:text-white">
                 {{ __('Код з СМС') }}
             </h5>
-            <x-forms.form-row gap="gap-3" class="{{ empty($uploadedDocuments) ? 'mt-0' : 'mt-8' }} mb-14">
+            <x-forms.form-row gap="gap-3" class="{{ empty($patientRequest->uploadedDocuments) ? 'mt-0' : 'mt-8' }} mb-14">
 
                 <x-forms.form-group class="xl:w-1/3">
                     <x-slot name="input">
@@ -150,7 +150,7 @@
             </x-forms.form-row>
         @endif
 
-        @if($isApproved)
+        @if($isInformed)
             <div class="mt-16">
                 <button wire:click="create('signedContent')"
                         type="button"
@@ -174,29 +174,3 @@
         @endif
     </div>
 </div>
-
-<script>
-    function printContent(elementId) {
-        const content = document.getElementById(elementId).innerHTML;
-        const printWindow = window.open('', '_blank');
-        printWindow.document.open();
-        printWindow.document.write(`
-        <html lang="uk">
-        <head>
-            <title>Друк пам'ятки</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    line-height: 1.5;
-                    margin: 20px;
-                }
-            </style>
-        </head>
-        <body onload="window.print(); window.close();">
-            ${content}
-        </body>
-        </html>
-    `);
-        printWindow.document.close();
-    }
-</script>

@@ -7,7 +7,7 @@
 
         <x-forms.form-row cols="flex-col" gap="gap-0">
             <x-forms.label name="label" class="default-label">
-                {{ __('forms.phones') }} *
+                {{ __('forms.phones') }}
             </x-forms.label>
 
             <x-forms.form-phone :phones="$patientRequest->patient['phones'] ?? []"
