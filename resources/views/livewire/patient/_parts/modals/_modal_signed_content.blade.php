@@ -18,7 +18,9 @@
                                     id="knedp">
                         <x-slot name="option">
                             @foreach($getCertificateAuthority as $certificateType)
-                                <option value="{{ $certificateType['id'] }}">{{ $certificateType['name'] }}</option>
+                                <option value="{{ $certificateType['id'] }}" wire:key="{{ $certificateType['id'] }}">
+                                    {{ $certificateType['name'] }}
+                                </option>
                             @endforeach
                         </x-slot>
                     </x-forms.select>

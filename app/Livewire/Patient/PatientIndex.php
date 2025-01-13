@@ -45,7 +45,6 @@ class PatientIndex extends Component
     public function boot(): void
     {
         $this->patientCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->legalEntity->uuid;
-
         $this->legalEntity = Auth::user()->legalEntity;
     }
 

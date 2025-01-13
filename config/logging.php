@@ -129,8 +129,14 @@ return [
 
         'api_errors' => [
             'driver' => 'single',
-            'path' => storage_path('logs/api_errors.log'), // путь к вашему файлу логов
-            'level' => 'error',
+            'path' => storage_path('logs/api_errors.log'),
+            'level' => 'error'
+        ],
+
+        'db_errors' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/db_errors.log'),
+            'level' => 'error'
         ],
 
     ],

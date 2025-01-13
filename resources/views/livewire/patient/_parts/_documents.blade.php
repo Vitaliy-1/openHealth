@@ -3,7 +3,7 @@
         {{ __('forms.documents') }}
     </h5>
 
-    <x-tables.table>
+    <x-tables.table align="left">
         <x-slot name="headers"
                 :list="[__('forms.documentType'), __('forms.number'), __('forms.issuedBy'), __('forms.issuedAt'), __('forms.expirationDate'), __('forms.action')]">
         </x-slot>
@@ -11,7 +11,7 @@
         <x-slot name="tbody">
             @isset($documents)
                 @foreach($documents as $key => $document)
-                    <tr>
+                    <tr wire:key="{{ $key }}">
                         <td class="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11">
                             {{ $document['type'] ?? '' }}
                         </td>

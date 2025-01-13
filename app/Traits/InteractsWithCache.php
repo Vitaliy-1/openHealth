@@ -78,4 +78,15 @@ trait InteractsWithCache
     {
         Cache::put($cacheKey, $cacheData, now()->days(90));
     }
+
+    /**
+     * Remove all data from cache by key.
+     *
+     * @param  string  $cacheKey
+     * @return void
+     */
+    public function forgetCache(string $cacheKey): void
+    {
+        Cache::forget($cacheKey);
+    }
 }
