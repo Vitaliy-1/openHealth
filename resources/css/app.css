@@ -6,6 +6,54 @@
 
 /* Ваши стили должны быть написаны после загрузки компонентов Tailwind */
 @layer components {
+
+    /* Forms */
+    .section-form {
+        @apply bg-white dark:bg-gray-800
+    }
+
+    .form-primary {
+        @apply py-8 px-4 mx-auto md:max-w-6xl lg:py-16
+    }
+
+    .fieldset {
+        @apply p-4 sm:p-8 border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700
+    }
+
+    .legend {
+        @apply mb-4 text-xl font-bold text-gray-900 dark:text-white
+    }
+
+    .form-row-4 {
+        @apply grid gap-4 md:gap-6 lg:grid-cols-4 md:grid-cols-2
+    }
+
+    .form-group {
+        @apply relative z-0 w-full mb-5 mt-5
+    }
+
+    .input {
+        @apply block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600
+    }
+
+    .label {
+        @apply peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6
+    }
+
+    .table-row {
+
+    }
+
+    .table-row-secondary {
+
+    }
+
+    .table-cell {
+
+    }
+
+    /* General */
+
     .default-label {
         @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white;
     }

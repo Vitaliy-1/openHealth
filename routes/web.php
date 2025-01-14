@@ -10,7 +10,7 @@ use App\Livewire\Division\DivisionIndex;
 use App\Livewire\Division\HealthcareServiceForm;
 use App\Livewire\Employee\EmployeeForm;
 use App\Livewire\Employee\EmployeeIndex;
-use App\Livewire\Encounter\Encounter;
+use App\Livewire\Encounter\EncounterCreate;
 use App\Livewire\LegalEntity\LegalEntities;
 use App\Livewire\License\LicenseIndex;
 use App\Livewire\License\LicenseShow;
@@ -93,7 +93,7 @@ Route::middleware([
             Route::get('/create/{id?}', PatientForm::class)->name('patient.form');
 
             Route::prefix('encounter')->group(function () {
-                Route::get('/create', Encounter::class)->name('encounter.form');
+                Route::get('/create', EncounterCreate::class)->name('encounter.form');
             });
         });
     });
