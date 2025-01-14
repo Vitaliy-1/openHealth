@@ -9,10 +9,19 @@
 
     @livewireStyles
     @vite(['resources/css/app.css'])
+
+    <script>
+        // Flowbite's recommendation: On page load or when changing themes, best to add inline in `head` to avoid FOUC
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
 </head>
 
 <body>
-    <div class="antialiased bg-gray-50 dark:bg-gray-900">
+    <div class="antialiased bg-white dark:bg-gray-800">
         @livewire('components.header')
         <!-- ===== Sidebar Start ===== -->
         @livewire('components.sidebar')

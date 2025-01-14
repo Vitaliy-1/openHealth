@@ -3,6 +3,15 @@
     <x-section-navigation class="">
         <x-slot name="title">{{ __('Додати співробітника') }}</x-slot>
     </x-section-navigation>
+
+    <section class="section-form">
+        <form action="#"
+              class="form"
+        >
+            @include('livewire.employee._parts._employee2')
+        </form>
+    </section>
+
     <div class="flex bg-white  p-6 flex-col ">
         @include('livewire.employee._parts._employee')
         @include('livewire.employee._parts._documents')
