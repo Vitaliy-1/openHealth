@@ -1,6 +1,6 @@
 <div x-data="{ employeeId: @entangle('employeeId') }">
 
-    <x-section-navigation class="">
+    <x-section-navigation class="breadcrumb-form">
         <x-slot name="title">{{ __('Додати співробітника') }}</x-slot>
     </x-section-navigation>
 
