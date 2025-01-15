@@ -2,20 +2,19 @@
 
 namespace App\Livewire\Division;
 
-use App\Classes\eHealth\Api\DivisionApi;
-use App\Helpers\JsonHelper;
-use App\Livewire\Division\Api\DivisionRequestApi;
-use App\Models\Division;
-use App\Models\LegalEntity;
-use Livewire\Attributes\On;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
+use App\Models\Division;
+use Livewire\Attributes\On;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\DB;
+use App\Repositories\AddressRepository;
+use App\Livewire\Division\Api\DivisionRequestApi;
 
 class DivisionIndex extends Component
 {
-
     use WithPagination;
+
+    protected ?AddressRepository $addressRepository;
 
     public ?object $legalEntity;
 
@@ -37,7 +36,10 @@ class DivisionIndex extends Component
 
     public string $mode = 'default';
 
-    protected $listeners = ['addressDataFetched'];
+    public function boot(AddressRepository $addressRepository)
+    {
+        $this->addressRepository = $addressRepository;
+    }
 
     public function mount()
     {
@@ -86,24 +88,29 @@ class DivisionIndex extends Component
         $this->dispatch('flashMessage', ['message' => __('Інформацію успішно оновлено'), 'type' => 'success']);
     }
 
-
     public function syncDivisionsSave($responses)
     {
-        foreach ($responses as $response) {
-            $division = Division::firstOrNew(['uuid' => $response['id']]);
-            $division->fill($response);
-            $division->setAttribute('uuid', $response['id']);
-            $division->setAttribute('legal_entity_uuid', $response['legal_entity_id']);
-            $division->setAttribute('external_id', $response['external_id']);
-            $division->setAttribute('status', $response['status']);
+        DB::transaction(function () use ($responses) {
+            foreach ($responses as $response) {
+                $addressData = $response['addresses'];
+                unset($response['addresses']);
 
-            if (!empty($response['location'])) {
-                $division->setAttribute('location', json_encode($response['location']));
+                $response['phones'] = $response['phones'][0];
+
+                $division = Division::firstOrNew(['uuid' => $response['id']]);
+                $division->fill($response);
+                $division->setAttribute('uuid', $response['id']);
+                $division->setAttribute('legal_entity_uuid', $response['legal_entity_id']);
+                $division->setAttribute('external_id', $response['external_id']);
+                $division->setAttribute('status', $response['status']);
+
+                $savedDivision = $this->legalEntity->division()->save($division);
+
+                $this->addressRepository->addAddresses($savedDivision, $addressData);
             }
-
-            $this->legalEntity->division()->save($division);
-        }
+        });
     }
+
     public function activate(Division $division): void
     {
         DivisionRequestApi::activateDivisionRequest($division['uuid']);

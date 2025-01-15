@@ -17,9 +17,8 @@ return new class extends Migration
                 $table->string('external_id')->nullable();
                 $table->string('name');
                 $table->string('type')->nullable();
-                $table->boolean('mountaint_group');
-                $table->jsonb('location');
-                $table->jsonb('addresses');
+                $table->boolean('mountain_group');
+                $table->jsonb('location')->nullable();
                 $table->jsonb('phones');
                 $table->string('email');
                 $table->jsonb('working_hours')->nullable();

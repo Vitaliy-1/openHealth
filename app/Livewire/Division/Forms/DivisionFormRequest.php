@@ -13,12 +13,16 @@ use App\Rules\DivisionRules\PhoneRule;
 use App\Rules\DivisionRules\TypeRule;
 use Livewire\Attributes\Validate;
 use Illuminate\Validation\ValidationException;
+use App\Repositories\AddressRepository;
 use App\Livewire\Division\Api\DivisionRequestApi;
+use Illuminate\Support\Facades\DB;
 use App\Models\Division;
 
 // TODO: (after divide DivisionForm onto three classes) rename this one to the DivisionForm
 class DivisionFormRequest extends Form
 {
+    protected ?AddressRepository $addressRepository;
+
     #[Validate([
         'division.name' => 'required|min:6|max:255',
         'division.type' => 'required',
@@ -28,6 +32,11 @@ class DivisionFormRequest extends Form
         'division.addresses' => 'required',
     ])]
     public ?array $division = [];
+
+    public function boot(AddressRepository $addressRepository)
+    {
+        $this->addressRepository = $addressRepository;
+    }
 
     public function getDivision(): array
     {
@@ -131,7 +140,7 @@ class DivisionFormRequest extends Form
         return $failMessage;
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'division.external_id' => 'nullable|integer|gt:0',
@@ -140,7 +149,7 @@ class DivisionFormRequest extends Form
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'division.location.longitude.required_with' => __('Якщо введено широту, довгота також обов’язкова'),
@@ -189,6 +198,11 @@ class DivisionFormRequest extends Form
 
     public function saveDivision(Division $division, array $response): void
     {
+        $addressData = $response['addresses'];
+        unset($response['addresses']);
+
+        $response['phones'] = $response['phones'][0];
+
         $legalEntity = auth()->user()->legalEntity;
 
         $division->fill($response);
@@ -197,7 +211,11 @@ class DivisionFormRequest extends Form
         $division->setAttribute('external_id', $response['external_id']);
         $division->setAttribute('status', $response['status']);
 
-        $legalEntity->division()->save($division);
+        DB::transaction(function () use ($division, $addressData, $legalEntity) {
+            $savedDivision = $legalEntity->division()->save($division);
+
+            $this->addressRepository->addAddresses($savedDivision, $addressData);
+        });
     }
 
     /**
