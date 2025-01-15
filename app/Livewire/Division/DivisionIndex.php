@@ -89,7 +89,7 @@ class DivisionIndex extends Component
 
     public function syncDivisionsSave($responses)
     {
-        foreach ($responses as $index => $response) {
+        foreach ($responses as $response) {
             $division = Division::firstOrNew(['uuid' => $response['id']]);
             $division->fill($response);
             $division->setAttribute('uuid', $response['id']);

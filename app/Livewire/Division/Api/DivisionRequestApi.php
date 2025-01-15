@@ -47,7 +47,6 @@ class DivisionRequestApi extends DivisionApi
 
     public static function deactivateDivisionRequest($id):array
     {
-        // dd(self::_deactivate($id));
         return self::_deactivate($id);
     }
 

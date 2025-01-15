@@ -2,17 +2,21 @@
 
 namespace App\Livewire\Division\Forms;
 
+use App\Rules\DivisionRules\AddressRule;
 use App\Rules\DivisionRules\LegalEntityStatusRule;
 use Livewire\Features\SupportFormObjects\Form;
 use App\Rules\DivisionRules\WorkingHoursRule;
 use App\Exceptions\CustomValidationException;
 use App\Rules\DivisionRules\LocationRule;
-use App\Rules\DivisionRules\AddressRule;
 use App\Rules\DivisionRules\EmailRule;
 use App\Rules\DivisionRules\PhoneRule;
 use App\Rules\DivisionRules\TypeRule;
 use Livewire\Attributes\Validate;
+use Illuminate\Validation\ValidationException;
+use App\Livewire\Division\Api\DivisionRequestApi;
+use App\Models\Division;
 
+// TODO: (after divide DivisionForm onto three classes) rename this one to the DivisionForm
 class DivisionFormRequest extends Form
 {
     #[Validate([
@@ -24,8 +28,6 @@ class DivisionFormRequest extends Form
         'division.addresses' => 'required',
     ])]
     public ?array $division = [];
-
-    public ?array $addresses = [];
 
     public function getDivision(): array
     {
@@ -65,10 +67,8 @@ class DivisionFormRequest extends Form
             new LegalEntityStatusRule(),
             // Check that location exists in request for legal entity with type PHARMACY
             new LocationRule($this->division),
-            /**
-             * // Check that all bunch of the address' data is correct and valid
-             * new AddressRule($this->division), // TODO: uncomment after resolve the #110 ISSUE
-             */
+            // Check that all bunch of the address' data is correct and valid
+            new AddressRule($this->division),
             // Check that working hours schedule is correct
             new WorkingHoursRule($this->division),
             // Check that phone type exists in dictionaries and valid accordingly to international rules
@@ -80,6 +80,11 @@ class DivisionFormRequest extends Form
         ];
     }
 
+    /**
+     * Rules for business-logic validation
+     *
+     * @return string
+     */
     protected function customRulesValidation(): string
     {
         foreach ($this->customRules() as $rule) {
@@ -98,11 +103,28 @@ class DivisionFormRequest extends Form
      *
      * @return mixed
      */
-    public function doValidation()
+    public function doValidation(): string
     {
         $this->resetErrorBag();
 
-        $this->validate();
+        $this->division['addresses'] = $this->component->address;
+
+        $errors = [];
+
+        try {
+            $errors = $this->component->addressValidation();
+
+            $this->validate();
+
+            if (!empty($errors)) {
+                throw ValidationException::withMessages($errors);
+            }
+        } catch(ValidationException $err) {
+            $errors = array_merge($err->errors(), $errors);
+
+            // Throw an validation error from Division's side
+            throw ValidationException::withMessages($errors);
+        }
 
         $failMessage = $this->customRulesValidation();
 
@@ -129,5 +151,121 @@ class DivisionFormRequest extends Form
             'division.phones.type' => __("Поле 'Тип номера' є обов’язковим"),
             'division.phones.number' => __("Поле 'Номер телефону' є обов’язковим")
         ];
+    }
+
+    /**
+     * Working Hours may be not initiated (for creation case) or may be incomplete (for update case).
+     * Here, this method will bring address array to properly state
+     *
+     * @return void
+     */
+    public function initWorkingHours(array $weekdays): void
+    {
+        $arr = !empty($this->division['working_hours']) ? $this->division['working_hours'] : [];
+
+        foreach ($weekdays as $day => $name) {
+            if (!isset($arr[$day]) || (!empty($arr[$day][0]) && $arr[$day][0]['0'] === '00:00' && $arr[$day][0]['1'] === '00:00')) {
+                $arr[$day] = [[]];
+            }
+        }
+
+        $this->division['working_hours'] = $arr;
+    }
+
+    public function updateDivision(): array
+    {
+        $uuid = $this->division['uuid'];
+        $division = removeEmptyKeys($this->division);
+
+        return DivisionRequestApi::updateDivisionRequest($uuid, $division);
+    }
+
+    public function createDivision(): array
+    {
+        $division = removeEmptyKeys($this->division);
+
+        return DivisionRequestApi::createDivisionRequest($division);
+    }
+
+    public function saveDivision(Division $division, array $response): void
+    {
+        $legalEntity = auth()->user()->legalEntity;
+
+        $division->fill($response);
+        $division->setAttribute('uuid', $response['id']);
+        $division->setAttribute('legal_entity_uuid', $response['legal_entity_id']);
+        $division->setAttribute('external_id', $response['external_id']);
+        $division->setAttribute('status', $response['status']);
+
+        $legalEntity->division()->save($division);
+    }
+
+    /**
+     * Proceed data when day is off and hasn't the schedule at all
+     *
+     * @param mixed $day
+     * @param mixed $allDayWork
+     *
+     * @return void
+     */
+    public function notWorking($day, $allDayWork)
+    {
+        if ($allDayWork) {
+            $this->division['working_hours'][$day] = [];
+        } else {
+            if (count($this->division['working_hours'][$day]) === 0) {
+                $this->division['working_hours'][$day][] = [];
+            }
+        }
+    }
+
+    /**
+     * Add shift(s) to the current day's schedule
+     *
+     * @param string $day
+     *
+     * @return void
+     */
+    public function addAvailableShift(string $day): void
+    {
+        $this->division['working_hours'][$day][] = [];
+    }
+
+    /**
+     * Remove the selected shift from the day's schedule
+     *
+     * @param string $day   // key value aka 'mon', 'tue' etc.
+     * @param int $shift    // shift's numeric position in array
+     *
+     * @return void
+     */
+    public function deleteShift(string $day, int $shift)
+    {
+        unset($this->division['working_hours'][$day][$shift]);
+
+        // This need to recalculate numeric array keys (remove holes in numbering)
+        $this->division['working_hours'][$day] = array_values($this->division['working_hours'][$day]);
+    }
+
+    /**
+     * This method called when no shift should be present in the day's schedule.
+     * But one time range must left anyway!
+     *
+     * @param mixed $day
+     * @param mixed $isShift    // true if shift schedule is activated
+     * @return void
+     */
+    public function noShift($day, $isShift)
+    {
+        if ($isShift) {
+            $shiftCount = count($this->division['working_hours'][$day]);
+
+            // There can be only one!
+            if ($shiftCount > 1) {
+                for ($i = 1; $i < $shiftCount; $i++) {
+                    $this->deleteShift($day, $i);
+                }
+            }
+        }
     }
 }

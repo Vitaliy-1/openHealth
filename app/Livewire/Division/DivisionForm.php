@@ -2,32 +2,27 @@
 
 namespace App\Livewire\Division;
 
-use App\Livewire\Division\Forms\DivisionFormRequest;
-use App\Livewire\Division\Api\DivisionRequestApi;
-use App\Traits\WorkTimeUtilities;
-use App\Models\Division;
 use Livewire\Component;
+use App\Models\Division;
+use App\Traits\AddressSearch;
+use App\Traits\WorkTimeUtilities;
+use App\Livewire\Division\Forms\DivisionFormRequest;
 
+// TODO: divide this class onto three ones: Divisions as parent class and Division Create & DivisionUpdate extends Division
 class DivisionForm extends Component
 {
-    use WorkTimeUtilities;
+    use WorkTimeUtilities,
+        AddressSearch;
 
     public DivisionFormRequest $formService;
-
-    public ?object $legalEntity;
 
     public string $mode = 'create';
 
     public ?array $dictionaries;
 
-    public array $working_hours = [];
-
     protected ?array $division_allowed_phone_type_keys = ['MOBILE','LAND_LINE'];
 
     protected ?array $division_allowed_type_keys = ['CLINIC', 'AMBULANT_CLINIC', 'FAP'];
-
-    // TODO: remove listeners and all data/methods depend on them
-    protected $listeners = ['addressDataFetched'];
 
     public function mount($id = '')
     {
@@ -36,11 +31,7 @@ class DivisionForm extends Component
             $this->mode = 'edit';
         }
 
-        $this->working_hours = $this->weekdays;
-
-        $this->initWorkingHours();
-
-        $this->getLegalEntity();
+        $this->formService->initWorkingHours($this->weekdays);
 
         $this->dictionaries = [
             'PHONE_TYPE' => $this->filterDictionary('PHONE_TYPE', $this->division_allowed_phone_type_keys),
@@ -72,58 +63,20 @@ class DivisionForm extends Component
         return $filteredDictionary;
     }
 
-    /**
-     * Working Hours may be not initiated (for creation case) or may be incomplete (for update case).
-     * Here, this method will bring address array to properly state
-     *
-     * @return void
-     */
-    protected function initWorkingHours(): void
-    {
-        $arr = $this->formService->getDivisionParam('working_hours');
-
-        // getDivisionParam returned '' (empty string) if the param hasn't been found
-        $arr = empty($arr) ? [] : $arr;
-
-        foreach ($this->working_hours as $day => $name) {
-            if (!isset($arr[$day]) || ($arr[$day][0]['0'] === '00:00' && $arr[$day][0]['1'] === '00:00')) {
-                $arr[$day] = [[]];
-            }
-        }
-
-        $this->formService->setDivisionParam('working_hours', $arr);
-    }
-
-    public function getLegalEntity()
-    {
-        $this->legalEntity = auth()->user()->legalEntity;
-    }
-
     public function getDivision($id)
     {
         $this->formService->setDivision(Division::find($id)->toArray());
         $this->formService->setDivisionParam('phones', $this->formService->getDivisionParam('phones')[0]);
         $this->formService->setDivisionParam('addresses', $this->formService->getDivisionParam('addresses')[0]);
+        $this->address = $this->formService->getDivisionParam('addresses');
 
         if ($this->formService->isDivisionParamExistAndNull('working_hours')) {
-            $this->initWorkingHours();
+            $this->formService->initWorkingHours($this->weekdays);
         }
-    }
-
-    public function fetchDataFromAddressesComponent():void
-    {
-        $this->dispatch('fetchAddressData');
-    }
-
-    public function addressDataFetched($addressData): void
-    {
-        $this->formService->setDivisionParam('addresses', $addressData);
     }
 
     public function validateDivision(): bool
     {
-        // $this->resetErrorBag(); // TODO: remove after testing
-
         $error = $this->formService->doValidation();
 
         if ($error) {
@@ -135,32 +88,15 @@ class DivisionForm extends Component
         }
     }
 
-    public function create()
-    {
-        $this->mode = 'create';
-    }
-
     public function store()
     {
-        $this->fetchDataFromAddressesComponent();
-        $this->dispatch('address-data-fetched');
-
         if ($this->validateDivision()) {
             $this->updateOrCreate(new Division());
         }
     }
 
-    // TODO: remove this method after resolve the #110 ISSUE
-    public function checkAndProceedToNextStep(): void
-    {
-        // Dumb method for compatibility purpose
-    }
-
     public function update():void
     {
-        $this->fetchDataFromAddressesComponent();
-        $this->dispatch('address-data-fetched');
-
         if ($this->validateDivision()) {
             $division = Division::find($this->formService->getDivisionParam('id'));
 
@@ -170,12 +106,12 @@ class DivisionForm extends Component
 
     public function updateOrCreate(Division $division)
     {
-        $response = $this->mode === 'edit'
-            ? $this->updateDivision()
-            : $this->createDivision();
+         $response = $this->mode === 'edit'
+            ? $this->formService->updateDivision()
+            : $this->formService->createDivision();
 
         if ($response) {
-            $this->saveDivision($division, $response);
+            $this->formService->saveDivision($division, $response);
 
             return redirect()->route('division.index');
         }
@@ -183,33 +119,8 @@ class DivisionForm extends Component
         $this->dispatch('flashMessage', ['message' => __('Інформацію не оновлено'), 'type' => 'error']);
     }
 
-    private function updateDivision(): array
-    {
-        $uuid = $this->formService->getDivisionParam('uuid');
-        $division = removeEmptyKeys($this->formService->getDivision());
-
-        return DivisionRequestApi::updateDivisionRequest($uuid, $division);
-    }
-
-    private function createDivision(): array
-    {
-        $division = removeEmptyKeys($this->formService->getDivision());
-
-        return DivisionRequestApi::createDivisionRequest($division);
-    }
-
-    private function saveDivision(Division $division, array $response): void
-    {
-        $division->fill($response);
-        $division->setAttribute('uuid', $response['id']);
-        $division->setAttribute('legal_entity_uuid', $response['legal_entity_id']);
-        $division->setAttribute('external_id', $response['external_id']);
-        $division->setAttribute('status', $response['status']);
-
-        $this->legalEntity->division()->save($division);
-    }
-
     /**
+     * Proxy method!
      * Proceed data when day is off and hasn't the schedule at all
      *
      * @param mixed $day
@@ -219,20 +130,11 @@ class DivisionForm extends Component
      */
     public function notWorking($day, $allDayWork)
     {
-        $working_hours = $this->formService->getDivisionParam('working_hours');
-
-        if ($allDayWork) {
-            $working_hours[$day] = [];
-        } else {
-            if (count($working_hours[$day]) === 0) {
-                $working_hours[$day][] = [];
-            }
-        }
-
-        $this->formService->setDivisionParam('working_hours', $working_hours);
+        $this->formService->notWorking($day, $allDayWork);
     }
 
     /**
+     * Proxy method!
      * Add shift(s) to the current day's schedule
      *
      * @param string $day
@@ -241,14 +143,11 @@ class DivisionForm extends Component
      */
     public function addAvailableShift(string $day): void
     {
-        $working_hours = $this->formService->getDivisionParam('working_hours');
-
-        $working_hours[$day][] = [];
-
-        $this->formService->setDivisionParam('working_hours', $working_hours);
+        $this->formService->addAvailableShift($day);
     }
 
     /**
+     * Proxy method!
      * Remove the selected shift from the day's schedule
      *
      * @param string $day   // key value aka 'mon', 'tue' etc.
@@ -258,17 +157,12 @@ class DivisionForm extends Component
      */
     public function deleteShift(string $day, int $shift)
     {
-        $working_hours = $this->formService->getDivisionParam('working_hours');
-
-        unset($working_hours[$day][$shift]);
-
-        $working_hours[$day] = array_values($working_hours[$day]);
-
-        $this->formService->setDivisionParam('working_hours', $working_hours);
+        $this->formService->deleteShift($day, $shift);
     }
 
     /**
-     * This method called when no shift should be present in the day's schedule.
+     * Proxy method!
+     * Called when no shift should be present in the day's schedule.
      * But one time range must left anyway!
      *
      * @param mixed $day
@@ -277,20 +171,14 @@ class DivisionForm extends Component
      */
     public function noShift($day, $isShift)
     {
-        $working_hours = $this->formService->getDivisionParam('working_hours');
-
-        if ($isShift) {
-            $shiftCount = count($working_hours[$day]);
-
-            // There can be only one!
-            if ($shiftCount > 1) {
-                for ($i = 1; $i < $shiftCount; $i++) {
-                    $this->deleteShift($day, $i);
-                }
-            }
-        }
+        $this->formService->noShift($day, $isShift);
     }
 
+    /**
+     * Render with pagination
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function render()
     {
         $currentDivision = [];
