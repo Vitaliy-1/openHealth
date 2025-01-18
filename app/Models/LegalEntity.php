@@ -14,6 +14,8 @@ class LegalEntity extends Model
 {
     use HasFactory;
 
+    const TYPE_PRIMARY_CARE = 'PRIMARY_CARE';
+
     protected $fillable = [
         'uuid',
         'accreditation',

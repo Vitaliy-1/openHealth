@@ -10,9 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -26,7 +29,9 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    use HasRoles;
+    use HasRoles {
+        getAllPermissions as getAllPermissionsTrait;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -104,4 +109,24 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(License::class, 'legal_entity_id', 'legal_entity_id');
     }
 
+    /**
+     * Overides trait's method to exclude unused scopes
+     * @return Collection<Permission> a list of scopes associated with the user and entity type
+     */
+    public function getAllPermissions(): Collection
+    {
+        $scopes = $this->getAllPermissionsTrait();
+        $legalEntityType = $this->legalEntity->type;
+        $exclude = []; // exclude scopes not used by the entity
+        switch ($legalEntityType) {
+
+            case LegalEntity::TYPE_PRIMARY_CARE:
+                $exclude = array_merge($exclude, ['contract:', 'contract_request:']);
+                break;
+        }
+
+        return $scopes->filter(fn(Permission $permission) =>
+            !Str::startsWith($permission->name, $exclude)
+        );
+    }
 }
