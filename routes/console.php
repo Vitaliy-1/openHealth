@@ -22,6 +22,6 @@ Artisan::command('inspire', function () {
 Artisan::command('first-run', function () {
     $this->call('key:generate');
     $this->call('migrate');
-    $this->call('db:seed', ['--class' => 'RolesPermissionsSeeder']);
+    $this->call('db:seed', ['--class' => 'DatabaseSeeder']);
 //    $this->call('permission:create-role', ['name' => 'Owner']);
 })->purpose('Completes the first run of the application');

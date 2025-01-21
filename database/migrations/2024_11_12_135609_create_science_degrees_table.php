@@ -20,7 +20,8 @@ return new class extends Migration
                 $table->string('diploma_number');
                 $table->string('speciality');
                 $table->date('issued_date')->nullable();
-                $table->morphs('science_degreeable');
+                // default index name is too long for mysql
+                $table->morphs('science_degreeable', 'sd_type_sd_id_index');
                 $table->timestamps();
             });
     }

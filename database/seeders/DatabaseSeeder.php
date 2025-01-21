@@ -12,15 +12,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-
-
-
-
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $this->call([
+            /*
+             * populates permissions and roles tables, see spaties laravel-permissions docs
+             * https://spatie.be/docs/laravel-permission/v6/introduction
+             */
+            RolesPermissionsSeeder::class,
+            /*
+             * populates following tables legal_entities, users and model has roles with test data
+             * TODO shouldn't ne used in production
+             */
+            TestUserMigrate::class,
+        ]);
     }
 }
