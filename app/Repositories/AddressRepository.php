@@ -23,9 +23,10 @@ class AddressRepository
                     [
                         'addressable_type' => get_class($model),
                         'addressable_id' => $model->id
-                    ],
-                    $addressData
+                    ]
                 );
+
+                $address->fill($addressData);
 
                 $model->address()->save($address);
             }

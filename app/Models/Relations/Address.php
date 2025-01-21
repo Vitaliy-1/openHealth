@@ -7,6 +7,14 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Address extends Model
 {
+    protected $hidden = [
+        'id',
+        'created_at',
+        'updated_at',
+        'addressable_id',
+        'addressable_type'
+    ];
+
     protected $fillable = [
         'type',
         'country',

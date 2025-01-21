@@ -8,6 +8,7 @@ use App\Traits\AddressSearch;
 use App\Traits\WorkTimeUtilities;
 use App\Livewire\Division\Forms\DivisionFormRequest;
 
+
 // TODO: divide this class onto three ones: Divisions as parent class and Division Create & DivisionUpdate extends Division
 class DivisionForm extends Component
 {
@@ -65,9 +66,12 @@ class DivisionForm extends Component
 
     public function getDivision($id)
     {
-        $this->formService->setDivision(Division::find($id)->toArray());
-        $this->formService->setDivisionParam('phones', $this->formService->getDivisionParam('phones')[0]);
-        $this->formService->setDivisionParam('addresses', $this->formService->getDivisionParam('addresses')[0]);
+        $division = Division::find($id);
+
+        $this->formService->setDivision($division->toArray());
+
+        $this->formService->setDivisionParam('addresses', $division->address->toArray());
+
         $this->address = $this->formService->getDivisionParam('addresses');
 
         if ($this->formService->isDivisionParamExistAndNull('working_hours')) {

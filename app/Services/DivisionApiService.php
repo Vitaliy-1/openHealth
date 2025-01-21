@@ -57,8 +57,8 @@ class DivisionApiService
             'name' => $data['name'],
             'type' =>$data['type'],
             'email' => $data['email'],
-            'phones' => [$data['phones']],
-            'addresses' => [$data['addresses']]
+            'phones' => [$data['phones']], // ESOZ expect to get an array of the objects
+            'addresses' => [$data['addresses']], // ESOZ expect to get an array of the addresses,
         ];
 
         if (!empty($data['external_id'])) {
@@ -75,7 +75,7 @@ class DivisionApiService
         }
 
         if (!empty($data['working_hours'])) {
-            $params['working_hours'] = $this->prepareWorkingHours($data['working_hours']);;
+            $params['working_hours'] = $this->prepareWorkingHours($data['working_hours']);
         }
         else {
             foreach($this->weekdays as $day => $name) {
