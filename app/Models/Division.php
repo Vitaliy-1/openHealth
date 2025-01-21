@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use App\Casts\Division\Location;
+use App\Casts\Division\WorkingHours;
+use App\Models\Relations\Address;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Division extends Model
 {
@@ -14,9 +18,8 @@ class Division extends Model
         'external_id',
         'name',
         'type',
-        'mountaint_group',
+        'mountain_group',
         'location',
-        'addresses',
         'phones',
         'email',
         'working_hours',
@@ -27,21 +30,17 @@ class Division extends Model
     ];
 
     protected $casts = [
-        'location' => 'array',
-        'addresses' => 'array',
+        'location' => Location::class,
         'healthcare_services' => 'array',
         'phones' => 'array',
-        'working_hours' => 'array',
+        'working_hours' => WorkingHours::class,
         'is_active' => 'boolean',
     ];
 
     public $attributes = [
         'is_active' => false,
-        'mountaint_group' => false,
-        'uuid' => 'string',
-        'addresses' => '[]',
-        'location' => '[]',
-        'working_hours' =>  '[]',
+        'mountain_group' => false,
+        'uuid' => 'string'
     ];
 
     public function legalEntity()
@@ -54,8 +53,8 @@ class Division extends Model
         return $this->hasMany(HealthcareService::class);
     }
 
-    public function setLocationAttribute($value)
+    public function address(): MorphOne
     {
-        $this->attributes['location'] = $value ?: json_encode([]);
+        return $this->morphOne(Address::class, 'addressable');
     }
 }
