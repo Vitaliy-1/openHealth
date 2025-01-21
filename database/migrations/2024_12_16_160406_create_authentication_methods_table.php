@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->string('value')->nullable();
             $table->string('alias')->nullable();
-            $table->morphs('authenticatable');
+            // default index name is too long for mysql
+            $table->morphs('authenticatable', 'am_type_am_id_index');
             $table->timestamps();
         });
     }

@@ -121,5 +121,11 @@ return [
     ],
     'doctors_type' => [
         'LABORANT','DOCTOR','MED_ADMIN','ASSISTANT','MED_COORDINATOR'
-    ]
+    ],
+
+    // Set the test environment
+    'test' => [
+        'client_id' => env('TEST_CLIENT_ID'),
+        'client_secret' => env('TEST_CLIENT_SECRET')
+    ],
 ];

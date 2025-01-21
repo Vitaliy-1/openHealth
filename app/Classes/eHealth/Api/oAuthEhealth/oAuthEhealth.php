@@ -19,7 +19,7 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function callback(): \Illuminate\Http\RedirectResponse
     {
-
+        // exchange code to token
         if (config('ehealth.api.callback_prod') === false) {
             $code = request()->input('code');
             $url =  'http://localhost/ehealth/oauth?code=' . $code;
@@ -50,7 +50,7 @@ class oAuthEhealth implements oAuthEhealthInterface
                 'client_secret' => $user->legalEntity->client_secret ?? '',
                 'grant_type'    => 'authorization_code',
                 'code'          => $code,
-                'redirect_uri'  => env('EHEALTH_REDIRECT_URI'),
+                'redirect_uri'  => config('ehealth.api.redirect_uri'),
                 'scope'         => $user->getAllPermissions()->unique()->pluck('name')->join(' ')
             ]
         ];
@@ -66,12 +66,10 @@ class oAuthEhealth implements oAuthEhealthInterface
     {
         $user = User::find(\session()->get('user_id_auth_ehealth'));
 
-        $redirectUri = env('EHEALTH_REDIRECT_URI');
-
         $queryParams = [
             'app'=> [
                 'client_id'     => $user->legalEntity->client_id ?? '',
-                'redirect_uri'  => $redirectUri,
+                'redirect_uri'  => config('ehealth.api.redirect_uri'),
                 'scope'         => $user->getAllPermissions()->unique()->pluck('name')->join(' ')
             ]
         ];
