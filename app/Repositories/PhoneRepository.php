@@ -15,13 +15,11 @@ class PhoneRepository
     {
         if (!empty($phones)) {
             foreach ($phones as $phoneData) {
-                $phone = Phone::firstOrNew(
-                    [
-                        'phoneable_type' => get_class($model),
-                        'phoneable_id' => $model->id,
-                        'number' => $phoneData['number'],
-                        'type' => $phoneData['type']
-                    ],
+                $phone = Phone::updateOrCreate([
+                    'phoneable_type' => get_class($model),
+                    'phoneable_id' => $model->id,
+                    'number' => $phoneData['number']
+                ],
                     $phoneData
                 );
 

@@ -37,7 +37,6 @@ use App\Livewire\Patient\PatientIndex;
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 Route::post('/send-email', [EmailController::class, 'sendEmail'])->name('send.email');
 
-
 Route::get('/ehealth/oauth/', [oAuthEhealth::class, 'callback'])->name('ehealth.oauth.callback');
 //Route::get('/login', [LoginController::class, 'index'])->middleware('guest')->name('index.login');
 Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login');
@@ -47,7 +46,6 @@ Route::middleware([
     config('jetstream.auth_session'),
 //    'verified',
 ])->group(function () {
-
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
@@ -92,7 +90,7 @@ Route::middleware([
     Route::group(['middleware' => ['role:OWNER|ADMIN|DOCTOR']], function () {
         Route::prefix('patient')->group(function () {
             Route::get('/', PatientIndex::class)->name('patient.index');
-            Route::get('/form/{id?}', PatientForm::class)->name('patient.form');
+            Route::get('/create/{id?}', PatientForm::class)->name('patient.form');
 
             Route::prefix('encounter')->group(function () {
                 Route::get('/create', Encounter::class)->name('encounter.form');

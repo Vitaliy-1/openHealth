@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('person_requests', function (Blueprint $table) {
             $table->id();
-            $table->uuid();
-            $table->enum('status', ['NEW', 'APPROVED', 'SIGNED', 'REJECTED', 'CANCELLED']);
+            $table->uuid()->nullable();
+            $table->enum('status', ['APPLICATION', 'NEW', 'APPROVED', 'SIGNED', 'REJECTED', 'CANCELLED']);
             $table->foreignId('person_id')->nullable()->constrained('persons');
             $table->string('first_name');
             $table->string('last_name');

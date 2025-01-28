@@ -2,7 +2,6 @@
 
 namespace App\View\Components\Forms;
 
-use Closure;
 use App\Rules\Zip;
 use Illuminate\View\Component;
 use Illuminate\Validation\Rule;
@@ -50,7 +49,7 @@ class AddressesSearch extends Component
         return [
             'address.area' => ['required', 'string'],
             'address.region' => [
-                Rule::requiredIf(function () use($address) {
+                Rule::requiredIf(function () use ($address) {
                     if (empty($address['area'])) {
                         return true;
                     }
@@ -58,10 +57,10 @@ class AddressesSearch extends Component
                     return $address['area'] !== 'М.КИЇВ';
                 }),
             ],
+            'address.settlementType' => ['required', 'string'],
             'address.settlement' => ['required', 'string'],
-            'address.settlement_type' => ['required', 'string'],
-            'address.settlement_id' => ['required', 'string'],
-            'address.street_type' => ['required', 'string'],
+            'address.settlementId' => ['required', 'string'],
+            'address.streetType' => ['required', 'string'],
             'address.street' => ['required', 'string'],
             'address.building' => ['nullable', 'string'],
             'address.apartment' => ['nullable', 'string'],
@@ -74,9 +73,9 @@ class AddressesSearch extends Component
         return [
             'address.area' => __("Поле 'Область' є обов’язковим"),
             'address.region' => __("Поле 'Район' є обов’язковим"),
-            'address.settlement_type' => __("Поле 'Тип населеного пункту' є обов’язковим"),
+            'address.settlementType' => __("Поле 'Тип населеного пункту' є обов’язковим"),
             'address.settlement' => __("Поле 'Населений пункт' є обов’язковим"),
-            'address.street_type' => __("Поле 'Тип вулиці' є обов’язковим"),
+            'address.streetType' => __("Поле 'Тип вулиці' є обов’язковим"),
             'address.street' => __("Поле 'Вулиця' є обов’язковим"),
             'address.building' => __("Неправильний формат номеру будинка"),
             'address.apartment' => __("Неправильний формат номеру квартири"),
@@ -87,7 +86,7 @@ class AddressesSearch extends Component
     /**
      * Get the view / contents that represent the component.
      */
-    public function render(): View|Closure|string
+    public function render(): View
     {
         return view('components.forms.addresses-search');
     }

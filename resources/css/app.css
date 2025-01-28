@@ -7,15 +7,19 @@
 /* Ваши стили должны быть написаны после загрузки компонентов Tailwind */
 @layer components {
     .default-label {
-        @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white
+        @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white;
     }
 
     .large-label {
-        @apply block mb-12 text-xl font-bold text-gray-900 dark:text-white
+        @apply block mb-12 text-xl font-bold text-gray-900 dark:text-white;
     }
 
     .default-datepicker {
         @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
+    }
+
+    .default-checkbox {
+        @apply rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800;
     }
 
     .default-input {
@@ -38,6 +42,19 @@
         @apply bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300;
     }
 
+    .dropdown-menu {
+        @apply z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600;
+    }
+
+    .dropdown-item {
+        @apply block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white;
+    }
+
+    .dropdown-item-with-icon {
+        @apply flex gap-2 py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white;
+    }
+
+    /* Buttons */
     .default-button {
         @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800;
     }
@@ -58,7 +75,62 @@
         @apply text-gray-800 bg-gray-200 border border-gray-300 focus:outline-none hover:bg-gray-300 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700;
     }
 
-    .pagination {
-        @apply bottom-0 right-0 items-center w-full py-[35px] px-10 bg-white border-t border-gray-200 dark:bg-gray-800 dark:border-gray-700
+    .dropdown-button {
+        @apply inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100;
+    }
+
+    /* Tables */
+    .table-section {
+        @apply bg-white dark:bg-gray-900 p-3 sm:p-5;
+    }
+
+    .table-container {
+        @apply bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden;
+    }
+
+    .table-base {
+        @apply w-full text-sm text-left text-gray-500 dark:text-gray-400;
+    }
+
+    .table-header {
+        @apply text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400;
+    }
+
+    .table-cell-primary {
+        @apply px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white;
+    }
+
+    /* Table navigations */
+    .table-nav {
+        @apply flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4;
+    }
+
+    .table-nav-number {
+        @apply font-semibold text-gray-900 dark:text-white;
+    }
+
+    /* Pagination */
+    .pagination-list {
+        @apply inline-flex items-stretch -space-x-px;
+    }
+
+    .pagination-prev-button {
+        @apply flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white;
+    }
+
+    .pagination-next-button {
+        @apply flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white;
+    }
+
+    .pagination-number {
+        @apply flex items-center justify-center text-sm py-2 px-3 leading-tight border dark:border-gray-700;
+    }
+
+    .pagination-number-active {
+        @apply z-10 text-primary-600 bg-primary-50 border-primary-300 hover:bg-primary-100 hover:text-primary-700 dark:bg-gray-700 dark:text-white;
+    }
+
+    .pagination-number-inactive {
+        @apply text-gray-500 bg-white border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white;
     }
 }

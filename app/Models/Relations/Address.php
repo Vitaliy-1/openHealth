@@ -5,14 +5,17 @@ namespace App\Models\Relations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @mixin IdeHelperAddress
+ */
 class Address extends Model
 {
     protected $hidden = [
         'id',
-        'created_at',
-        'updated_at',
         'addressable_id',
-        'addressable_type'
+        'addressable_type',
+        'created_at',
+        'updated_at'
     ];
 
     protected $fillable = [
@@ -27,7 +30,9 @@ class Address extends Model
         'street',
         'building',
         'apartment',
-        'zip'
+        'zip',
+        'addressable_id',
+        'addressable_type'
     ];
 
     public function addressable(): MorphTo

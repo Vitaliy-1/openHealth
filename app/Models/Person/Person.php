@@ -5,6 +5,9 @@ namespace App\Models\Person;
 use App\Models\Employee\Employee;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @mixin IdeHelperPerson
+ */
 class Person extends BasePerson
 {
     public function __construct()

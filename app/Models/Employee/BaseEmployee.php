@@ -5,7 +5,6 @@ namespace App\Models\Employee;
 use App\Enums\Status;
 use App\Models\Declaration;
 use App\Models\Division;
-use App\Models\Employee;
 use App\Models\LegalEntity;
 use App\Models\Relations\Education;
 use App\Models\Relations\Party;
@@ -37,7 +36,6 @@ class BaseEmployee extends Model
     use HasFactory;
     use HasPersonalAttributes;
     use HasCamelCasing;
-
 
     protected $fillable = [
         'uuid',
@@ -131,7 +129,4 @@ class BaseEmployee extends Model
         $employeeData->documents = $employeeData->party->documents()->get()->toArray() ?? [];
         return $employeeData->toArray();
     }
-
-
-
 }
