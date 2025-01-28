@@ -5,7 +5,11 @@ namespace App\Models\Relations;
 use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @mixin IdeHelperScienceDegree
+ */
 class ScienceDegree extends Model
 {
     use HasFactory;
@@ -22,7 +26,7 @@ class ScienceDegree extends Model
         'issuedDate'
     ];
 
-    public function science_degreeable()
+    public function science_degreeable(): MorphTo
     {
         return $this->morphTo();
     }

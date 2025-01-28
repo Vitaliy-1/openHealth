@@ -7,8 +7,13 @@ use App\Casts\Division\WorkingHours;
 use App\Models\Relations\Address;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
+/**
+ * @mixin IdeHelperDivision
+ */
 class Division extends Model
 {
     use HasFactory;
@@ -43,12 +48,12 @@ class Division extends Model
         'uuid' => 'string'
     ];
 
-    public function legalEntity()
+    public function legalEntity(): HasOne
     {
         return $this->hasOne(LegalEntity::class);
     }
 
-    public function healthcareService()
+    public function healthcareService(): HasMany
     {
         return $this->hasMany(HealthcareService::class);
     }

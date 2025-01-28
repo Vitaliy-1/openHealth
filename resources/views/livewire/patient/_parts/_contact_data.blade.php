@@ -1,69 +1,58 @@
-<div>
-    <div
-        class="w-full mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {{ __('forms.contactData') }}
-        </h5>
+<fieldset class="fieldset">
+    <legend class="legend">
+        {{ __('forms.contactData') }}
+    </legend>
 
-        <x-forms.form-row cols="flex-col" gap="gap-0">
-            <x-forms.label name="label" class="default-label">
-                {{ __('forms.phones') }}
-            </x-forms.label>
+    <x-forms.form-row cols="flex-col" gap="gap-0">
+        <x-forms.form-phone :phones="$patientRequest->patient['phones'] ?? []"
+                            :property="'patientRequest.patient'"
+        />
 
-            <x-forms.form-phone :phones="$patientRequest->patient['phones'] ?? []"
-                                :property="'patientRequest.patient'"
+        <label for="phones" class="label">
+            {{ __('forms.phones') }}
+        </label>
+    </x-forms.form-row>
+
+    <div class="form-row-3">
+        <div class="form-group group">
+            <input wire:model="patientRequest.patient.email"
+                   type="email"
+                   name="email"
+                   id="email"
+                   class="input peer @error('patientRequest.patient.email') input-error @enderror"
+                   placeholder=" "
+                   autocomplete="off"
             />
-        </x-forms.form-row>
+            <label for="email" class="label">
+                {{ __('forms.email') }}
+            </label>
 
-        <x-forms.form-row>
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
-                    <x-forms.label for="email" class="default-label">
-                        {{ __('forms.email') }}
-                    </x-forms.label>
-                </x-slot>
+            @error('patientRequest.patient.email')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
+        </div>
 
-                <x-slot name="input">
-                    <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.email"
-                                   type="email"
-                                   id="email"
-                                   placeholder="{{ __('E-mail') }}"
-                    />
-                </x-slot>
+        <div class="form-group group">
+            <input wire:model="patientRequest.patient.secret"
+                   type="text"
+                   name="secret"
+                   id="secret"
+                   class="input peer @error('patientRequest.patient.secret') input-error @enderror"
+                   placeholder=" "
+                   required
+                   autocomplete="off"
+            />
+            <label for="secret" class="label">
+                {{ __('forms.secret') }}
+            </label>
 
-                @error('patientRequest.patient.email')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{ $message }}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
-                    <x-forms.label for="secret" class="default-label">
-                        {{ __('forms.secret') }} *
-                    </x-forms.label>
-                </x-slot>
-
-                <x-slot name="input">
-                    <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.secret"
-                                   type="text"
-                                   id="secret"
-                    />
-                </x-slot>
-
-                @error('patientRequest.patient.secret')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{ $message }}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-        </x-forms.form-row>
+            @error('patientRequest.patient.secret')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
+        </div>
     </div>
-</div>
+</fieldset>

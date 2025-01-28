@@ -3,18 +3,21 @@
 namespace App\Models;
 
 use App\Enums\Declaration\DeclarationStatus;
+use App\Models\Employee\Employee;
 use App\Models\Person\Person;
 use App\Traits\FormTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @mixin IdeHelperDeclaration
+ */
 class Declaration extends Model
 {
     use HasFactory,FormTrait;
 
     public $timestamps = false;
-
 
     protected $fillable = [
         'id',
@@ -83,7 +86,6 @@ class Declaration extends Model
         return $this->belongsTo(Division::class);
     }
 
-
     /**
      * Get the FullNameAttribute for the Declaration person.
      *
@@ -122,7 +124,6 @@ class Declaration extends Model
         return humanFormatDate($this->end_date ?? '');
     }
 
-
     /**
      * Get Full name Doctor for the Declaration person.
      * @return string
@@ -136,6 +137,5 @@ class Declaration extends Model
     {
         return ($this->person['phones'][0]['number'] ?? '');
     }
-
 }
 

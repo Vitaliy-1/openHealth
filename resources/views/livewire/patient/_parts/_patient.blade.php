@@ -1,216 +1,174 @@
-<div>
-    <div
-        class="w-full mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {{ __('forms.patientInformation') }}
-        </h5>
+<fieldset class="fieldset">
+    <legend class="legend">
+        {{ __('forms.patientInformation') }}
+    </legend>
 
-        <x-forms.form-row>
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
-                    <x-forms.label for="patient_first_name" class="default-label">
-                        {{ __('forms.firstName') }} *
-                    </x-forms.label>
-                </x-slot>
+    <div class="form-row-3">
+        <div class="form-group group">
+            <input wire:model="patientRequest.patient.firstName"
+                   type="text"
+                   name="patientFirstName"
+                   id="patientFirstName"
+                   class="input peer @error('patientRequest.patient.firstName') input-error @enderror"
+                   placeholder=" "
+                   required
+                   autocomplete="off"
+            />
+            <label for="patientFirstName" class="label">
+                {{ __('forms.firstName') }}
+            </label>
 
-                <x-slot name="input">
-                    <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.firstName"
-                                   type="text"
-                                   id="patient_first_name"
-                    />
-                </x-slot>
+            @error('patientRequest.patient.firstName')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
+        </div>
 
-                @error('patientRequest.patient.firstName')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{ $message }}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
+        <div class="form-group group">
+            <input wire:model="patientRequest.patient.lastName"
+                   type="text"
+                   name="patientLastName"
+                   id="patientLastName"
+                   class="input peer @error('patientRequest.patient.lastName') input-error @enderror"
+                   placeholder=" "
+                   required
+                   autocomplete="off"
+            />
+            <label for="patientLastName" class="label">
+                {{ __('forms.lastName') }}
+            </label>
 
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
-                    <x-forms.label for="patient_last_name" class="default-label">
-                        {{ __('forms.lastName') }} *
-                    </x-forms.label>
-                </x-slot>
+            @error('patientRequest.patient.lastName')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
+        </div>
 
-                <x-slot name="input">
-                    <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.lastName"
-                                   type="text"
-                                   id="patient_last_name"
-                    />
-                </x-slot>
+        <div class="form-group group">
+            <input wire:model="patientRequest.patient.secondName"
+                   type="text"
+                   name="patientSecondName"
+                   id="patientSecondName"
+                   class="input peer @error('patientRequest.patient.secondName') input-error @enderror"
+                   placeholder=" "
+                   autocomplete="off"
+            />
+            <label for="patientSecondName" class="label">
+                {{ __('forms.secondName') }}
+            </label>
 
-                @error('patientRequest.patient.lastName')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{ $message }}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
-                    <x-forms.label for="patient_second_name" class="default-label">
-                        {{ __('forms.secondName') }}
-                    </x-forms.label>
-                </x-slot>
-
-                <x-slot name="input">
-                    <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.secondName"
-                                   type="text"
-                                   id="patient_second_name"
-                    />
-                </x-slot>
-
-                @error('patientRequest.patient.secondName')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{ $message }}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-        </x-forms.form-row>
-
-        <x-forms.form-row>
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
-                    <x-forms.label for="birth_date" class="default-label">
-                        {{ __('forms.birthDate') }} *
-                    </x-forms.label>
-                </x-slot>
-
-                <x-slot name="input">
-                    <x-forms.input-date wire:model="patientRequest.patient.birthDate"
-                                        :maxDate="now()->format('Y-m-d')"
-                                        id="birth_date"
-                    />
-                </x-slot>
-
-                @error('patientRequest.patient.birthDate')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{ $message }}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
-                    <x-forms.label for="birth_country" class="default-label">
-                        {{ __('forms.birthCountry') }} *
-                    </x-forms.label>
-                </x-slot>
-
-                <x-slot name="input">
-                    <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.birthCountry"
-                                   type="text"
-                                   id="birth_country"
-                    />
-                </x-slot>
-
-                @error('patientRequest.patient.birthCountry')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{ $message }}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
-                    <x-forms.label for="birth_settlement" class="default-label">
-                        {{ __('forms.birthSettlement') }} *
-                    </x-forms.label>
-                </x-slot>
-
-                <x-slot name="input">
-                    <x-forms.input class="default-input"
-                                   wire:model="patientRequest.patient.birthSettlement"
-                                   type="text"
-                                   id="birth_settlement"
-                    />
-                </x-slot>
-
-                @error('patientRequest.patient.birthSettlement')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{ $message }}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-        </x-forms.form-row>
-
-        <x-forms.form-row>
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
-                    <x-forms.label for="gender" class="default-label">
-                        {{ __('forms.gender') }} *
-                    </x-forms.label>
-                </x-slot>
-
-                <x-slot name="input">
-                    <x-forms.select class="default-input"
-                                    wire:model="patientRequest.patient.gender"
-                                    type="text"
-                                    id="gender"
-                    >
-                        <x-slot name="option">
-                            <option>
-                                {{ __('forms.select') }} {{ __('forms.gender') }}
-                            </option>
-
-                            @foreach($this->dictionaries['GENDER'] as $key => $gender)
-                                <option value="{{ $key }}" wire:key="{{ $key }}">{{ $gender }}</option>
-                            @endforeach
-                        </x-slot>
-                    </x-forms.select>
-                </x-slot>
-
-                @error('patientRequest.patient.gender')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{ $message }}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-
-            <x-forms.form-group class="xl:w-1/3">
-                <x-slot name="label">
-                    <x-forms.label for="unzr" class="default-label">
-                        {{ __('forms.UNZR') }}
-                    </x-forms.label>
-                </x-slot>
-
-                <x-slot name="input">
-                    <x-forms.input class="default-input"
-                                   maxlength="14"
-                                   wire:model="patientRequest.patient.unzr"
-                                   type="text"
-                                   id="unzr"
-                    />
-                </x-slot>
-
-                @error('patientRequest.patient.unzr')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{ $message }}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-        </x-forms.form-row>
+            @error('patientRequest.patient.secondName')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
+        </div>
     </div>
-</div>
+
+    <div class="form-row-3">
+        <div class="form-group group">
+            <x-forms.input-date :maxDate="now()->subYears(14)->format('Y-m-d')"
+                                id="birthDate"
+                                wire:model="patientRequest.patient.birthDate"
+                                type="text"
+                                placeholder="{{ __('forms.birthDate') }}"
+                                autocomplete="off"
+            />
+
+            @error('patientRequest.patient.birthDate')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
+        </div>
+
+        <div class="form-group group">
+            <input wire:model="patientRequest.patient.birthCountry"
+                   type="text"
+                   name="birthCountry"
+                   id="birthCountry"
+                   class="input peer @error('patientRequest.patient.birthCountry') input-error @enderror"
+                   placeholder=" "
+                   required
+                   autocomplete="off"
+            />
+            <label for="birthCountry" class="label">
+                {{ __('forms.birthCountry') }}
+            </label>
+
+            @error('patientRequest.patient.birthCountry')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
+        </div>
+
+        <div class="form-group group">
+            <input wire:model="patientRequest.patient.birthSettlement"
+                   type="text"
+                   name="birthSettlement"
+                   id="birthSettlement"
+                   class="input peer @error('patientRequest.patient.birthSettlement') input-error @enderror"
+                   placeholder=" "
+                   required
+                   autocomplete="off"
+            />
+            <label for="birthSettlement" class="label">
+                {{ __('forms.birthSettlement') }}
+            </label>
+
+            @error('patientRequest.patient.birthSettlement')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
+        </div>
+    </div>
+
+    <div class="form-row-3">
+        <div class="form-group group">
+            <label for="patientGender" class="sr-only">
+                {{__('forms.select')}} {{__('forms.gender')}}
+            </label>
+            <select wire:model="patientRequest.patient.gender"
+                    id="patientGender"
+                    class="input-select peer"
+                    required
+            >
+                <option selected>{{__('forms.gender')}} *</option>
+                @foreach($this->dictionaries['GENDER'] as $key => $gender)
+                    <option value="{{ $key }}" wire:key="{{ $key }}">{{ $gender }}</option>
+                @endforeach
+            </select>
+
+            @error('patientRequest.patient.gender')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
+        </div>
+
+        <div class="form-group group">
+            <input wire:model="patientRequest.patient.unzr"
+                   type="text"
+                   name="unzr"
+                   id="unzr"
+                   class="input peer @error('patientRequest.patient.unzr') input-error @enderror"
+                   placeholder=" "
+                   maxlength="14"
+                   autocomplete="off"
+            />
+            <label for="unzr" class="label">
+                {{ __('forms.UNZR') }}
+            </label>
+
+            @error('patientRequest.patient.unzr')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
+        </div>
+    </div>
+</fieldset>

@@ -48,9 +48,9 @@
                         </x-forms.label>
                     </x-slot>
                     <x-slot name="input">
-                        <x-forms.input  x-data id="declarations_filter_declaration_number"
-                                        wire:model.live="declarations_filter.declaration_number" type="text"
-                                        autocomplete="off"/>
+                        <x-forms.input id="declarations_filter_declaration_number"
+                                       wire:model.live="declarations_filter.declaration_number" type="text"
+                                       autocomplete="off"/>
                     </x-slot>
                 </x-forms.form-group>
                 <x-forms.form-group>
@@ -61,9 +61,9 @@
                     </x-slot>
                     <x-slot name="input">
 
-                        <x-forms.input  id="declarations_filter_phone"
-                                        wire:model.live="declarations_filter.phone" type="text"
-                                        autocomplete="off"/>
+                        <x-forms.input id="declarations_filter_phone"
+                                       wire:model.live="declarations_filter.phone" type="text"
+                                       autocomplete="off"/>
                     </x-slot>
                 </x-forms.form-group>
                 <x-forms.form-group>

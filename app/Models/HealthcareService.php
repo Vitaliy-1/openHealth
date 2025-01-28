@@ -4,7 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @mixin IdeHelperHealthcareService
+ */
 class HealthcareService extends Model
 {
     use HasFactory;
@@ -30,15 +34,13 @@ class HealthcareService extends Model
         'not_available' => 'json',
     ];
 
-    public function division()
+    public function division(): BelongsTo
     {
         return $this->belongsTo(Division::class);
     }
 
-    public function getHealthcareCategoryAttribute(){
-
+    public function getHealthcareCategoryAttribute()
+    {
         return $this->category['coding'][0]['code'] ?? '';
     }
-
-
 }

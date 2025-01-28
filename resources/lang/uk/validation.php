@@ -36,7 +36,7 @@ return [
     'different' => 'Поля :attribute та :other повинні бути різними.',
     'digits' => 'Довжина цифрового поля :attribute повинна дорівнювати :digits.',
     'digitsBetween' => 'Довжина цифрового поля :attribute повинна бути від :min до :max.',
-    'dimensions' => 'Поле :attribute містіть неприпустимі розміри зображення.',
+    'dimensions' => 'Поле :attribute містить неприпустимі розміри зображення.',
     'distinct' => 'Поле :attribute містить значення, яке дублюється.',
     'email' => 'Поле :attribute повинне містити коректну електронну адресу.',
     'file' => 'Поле :attribute має містити файл.',
@@ -164,7 +164,7 @@ return [
         'name' => 'ім\'я',
         'phone' => 'телефон',
         'password' => 'пароль',
-        'keyContainerUpload' => 'контейнер ключа',
+        'keyContainerUpload' => 'контейнер ключа',
         'knedp' => 'КНЕДП',
         'Token' => 'токен CSRF',
         'edrpou' => 'ЄДРПОУ',
@@ -185,9 +185,8 @@ return [
             'taxId' => 'РНОКПП',
             'documents' => [
                 'type' => 'Тип документа',
-                'number' => 'Cерія/номер документа',
-            ],
-
+                'number' => 'Серія/номер документа'
+            ]
         ],
         'party' => [
             'firstName' => 'Ім’я',
@@ -226,18 +225,15 @@ return [
             'emergencyContact' => [
                 'firstName' => 'ім’я',
                 'lastName' => 'прізвище',
-                'secondName' => 'по батькові',
-                'phones' => [
-                    'type' => 'тип телефону',
-                    'number' => 'номер телефону'
-                ]
-            ],
-
-            'authenticationMethods' => [
-                'type' => 'метод автентифікації',
-                'phoneNumber' => 'номер телефону'
+                'secondName' => 'по батькові'
             ],
         ],
+        'patient.emergencyContact.phones.*.type' => 'тип телефону',
+        'patient.emergencyContact.phones.*.number' => 'номер телефону',
+
+        'patient.authenticationMethods.*.type' => 'метод автентифікації',
+        'patient.authenticationMethods.*.phoneNumber' => 'номер телефону',
+
         'addresses' => [
             'area' => 'область',
             'settlement' => 'місто',
@@ -264,14 +260,18 @@ return [
         'patientsFilter' => [
             'firstName' => 'ім’я',
             'lastName' => 'прізвище',
-            'birthDate' => 'дата народження'
+            'birthDate' => 'дата народження',
+            'secondName' => 'по батькові',
+            'taxId' => 'РНОКПП(ІПН)',
+            'phoneNumber' => 'номер телефону',
+            'birthCertificate' => 'свідоцтво про народження'
         ],
         'document' => [
             'type' => 'Тип документа',
             'number' => 'Серія/номер документа',
             'issuedBy' => 'Орган яким виданий документ',
             'issuedAt' => 'Дата видачі документа',
-            'expirationDate' => 'дійсний до',
+            'expirationDate' => 'дійсний до'
         ],
         'passportData' => [
             'firstName' => 'Ім’я',
@@ -284,11 +284,10 @@ return [
             'taxId' => 'РНОКПП',
             'documents' => [
                 'type' => 'Тип документа',
-                'number' => 'Cерія/номер документа',
-            ],
-
+                'number' => 'Серія/номер документа'
+            ]
         ],
-        'owner.phones.*.number' => 'елефон',
+        'owner.phones.*.number' => 'телефон',
         'owner.phones.*.type' => 'Тип Номера',
         'country' => 'Країна',
         'region' => 'Область',
@@ -364,11 +363,11 @@ return [
                     'providingCondition' => 'Така послуга вже є для цього місця надання послуг',
                 ],
                 'category' => [
-                    'license' => 'Дана категорія не має хоча б однієї відповідної ліцензції'
+                    'license' => 'Дана категорія не має хоча б однієї відповідної ліцензії'
                 ],
                 'time' => [
                     'available' => 'Закінчення часу доступності менше часу початку',
-                    'notAvailable' => 'Кінцева дата часу недоступеності менше початкової'
+                    'notAvailable' => 'Кінцева дата часу недоступності менше початкової'
                 ]
             ]
         ],
@@ -443,7 +442,7 @@ return [
         'expiryDate' => 'дата завершення дії ліцензії',
         'whatLicensed' => 'напрям діяльності, що ліцензовано',
 
-        'uploadedDocuments.*.documentsRelationship' => 'для завантаження файлів',
+        'uploadedDocuments.*' => 'для завантаження файлів',
         'verificationCode' => 'код підтвердження з СМС'
     ],
     'consentText' => 'Я погоджуюсь з умовами',

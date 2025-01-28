@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Models\Relations\Document;
@@ -17,13 +19,11 @@ class DocumentRepository
     {
         if (!empty($documents)) {
             foreach ($documents as $documentData) {
-                $document = Document::firstOrNew(
-                    [
-                        'documentable_type' => get_class($model),
-                        'documentable_id' => $model->id,
-                        'type' => $documentData['type'],
-                        'number' => $documentData['number']
-                    ],
+                $document = Document::updateOrCreate([
+                    'documentable_type' => get_class($model),
+                    'documentable_id' => $model->id,
+                    'type' => $documentData['type']
+                ],
                     $documentData
                 );
 

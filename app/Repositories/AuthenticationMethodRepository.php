@@ -12,11 +12,10 @@ class AuthenticationMethodRepository
     {
         if (!empty($authenticationMethods)) {
             foreach ($authenticationMethods as $authenticationMethodData) {
-                $authenticationMethod = AuthenticationMethod::firstOrNew(
-                    [
-                        'authenticatable_type' => get_class($model),
-                        'authenticatable_id' => $model->id
-                    ],
+                $authenticationMethod = AuthenticationMethod::updateOrCreate([
+                    'authenticatable_type' => get_class($model),
+                    'authenticatable_id' => $model->id
+                ],
                     $authenticationMethodData
                 );
 

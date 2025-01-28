@@ -42,11 +42,10 @@ if (!function_exists("get_day_value")) {
     }
 }
 
-if (!function_exists("get_day_name"))
-{
+if (!function_exists("get_day_name")) {
     function get_day_name($k)
     {
-        foreach(all_day() as $day) {
+        foreach (all_day() as $day) {
             if ($k === $day['key']) {
                 return $day['value'];
             }
@@ -83,11 +82,11 @@ if (!function_exists("available_time")) {
                 "days_of_week" => checkAndConvertArrayToString(
                     $value["days_of_week"]
                 ),
-                "all_day"              => $value["all_day"],
+                "all_day" => $value["all_day"],
                 "available_start_time" => empty($value["all_day"])
                     ? addSecondsToTime($value["available_start_time"])
                     : '',
-                "available_end_time"   => empty($value["all_day"])
+                "available_end_time" => empty($value["all_day"])
                     ? addSecondsToTime($value["available_end_time"])
                     : '',
             ];
@@ -155,7 +154,7 @@ if (!function_exists('replacePhone')) {
     function removeSpacePhones($phones): array
     {
         return collect($phones)->map(function ($phone) {
-            $phone['number'] = '+'.str_replace(' ', '', $phone['number']);
+            $phone['number'] = '+' . str_replace(' ', '', $phone['number']);
             return $phone;
         })->toArray();
     }
@@ -201,6 +200,24 @@ if (!function_exists('arrayKeysToCamel')) {
             // If value is an array, recursively convert its keys
             $result[$camelKey] = is_array($value)
                 ? arrayKeysToCamel($value)
+                : $value;
+        }
+
+        return $result;
+    }
+}
+
+if (!function_exists('arrayKeysToSnake')) {
+    function arrayKeysToSnake(array $array): array
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            $snakeKey = Str::snake($key);
+
+            // If value is an array, recursively convert its keys
+            $result[$snakeKey] = is_array($value)
+                ? arrayKeysToSnake($value)
                 : $value;
         }
 

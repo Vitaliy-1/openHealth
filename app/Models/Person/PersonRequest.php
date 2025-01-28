@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\Person;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @method static Builder showPersonRequest(string $id)
+ * @mixin IdeHelperPersonRequest
  */
 class PersonRequest extends BasePerson
 {
@@ -21,7 +23,7 @@ class PersonRequest extends BasePerson
         return $this->belongsTo(Person::class);
     }
 
-    public function scopeShowPersonRequest(Builder $query, string $id): array
+    public function scopeShowPersonRequest(Builder $query, int $id): array
     {
         /** @var PersonRequest $patientData */
         $patientData = $query->findOrFail($id);
@@ -32,14 +34,14 @@ class PersonRequest extends BasePerson
         $patient['authentication_methods'] = $patientData->authenticationMethod()->get()->toArray() ?? [];
 
         $patientData->documents = $patientData->documents()->get()->toArray() ?? [];
-        $patientData->addresses = $patientData->address()->get()->toArray() ?? [];
-        $patientData->documentsRelationship = $patientData->confidantPerson()->get()->toArray() ?? [];
+        $patientData->address = $patientData->address()->get()->toArray() ?? [];
+        $patientData->confidantPerson = $patientData->confidantPerson()->get()->toArray() ?? [];
 
         $result = [
             'patient' => $patient,
             'documents' => $patientData->documents,
-            'addresses' => $patientData->addresses[0],
-            'documentsRelationship' => $patientData->documentsRelationship
+            'address' => $patientData->address[0],
+            'confidantPerson' => $patientData->confidantPerson
         ];
 
         return arrayKeysToCamel($result);

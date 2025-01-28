@@ -39,17 +39,44 @@ class PersonRepository
         try {
             $personRequest = $this->createOrUpdate($response, $modelClass, $personUuid);
 
-            $this->documentRepository->addDocuments($personRequest, $response['person']['documents']);
-            $this->addressRepository->addAddresses($personRequest, $response['person']['addresses']);
-            $this->phoneRepository->addPhones($personRequest, $response['person']['phones'] ?? []);
-            $this->authenticationMethodRepository->addAuthenticationMethod(
-                $personRequest,
-                $response['person']['authentication_methods']
-            );
-            $this->confidantPersonRepository->addConfidantPerson(
-                $personRequest,
-                $response['person']['confidant_person'] ?? []
-            );
+            $documents = $response['person']['documents'] ?? $response['documents'] ?? null;
+            if ($documents) {
+                $this->documentRepository->addDocuments($personRequest, $documents);
+            }
+
+            $addresses = $response['person']['addresses'] ?? [$response['addresses']] ?? null;
+            if ($addresses) {
+                $this->addressRepository->addAddresses($personRequest, $addresses);
+            }
+
+            $phones = $response['person']['phones'] ?? $response['patient']['phones'] ?? null;
+            if ($phones) {
+                $this->phoneRepository->addPhones($personRequest, $phones);
+            }
+
+            $authenticationMethods = $response['person']['authentication_methods'] ?? $response['patient']['authentication_methods'] ?? null;
+            if ($authenticationMethods) {
+                $this->authenticationMethodRepository->addAuthenticationMethod($personRequest, $authenticationMethods);
+            }
+
+            if (isset($response['confidant_person'])) {
+                $confidantData = [
+                    'documents_relationship' => $response['documents_relationship'],
+                    'confidantPersonInfo' => $response['confidant_person'][0]
+                ];
+
+                $this->confidantPersonRepository->addConfidantPerson(
+                    $personRequest,
+                    $confidantData
+                );
+            }
+
+            if (isset($response['person']['confidant_person'])) {
+                $this->confidantPersonRepository->addConfidantPerson(
+                    $personRequest,
+                    $response['person']['confidant_person']
+                );
+            }
 
             DB::commit();
 
@@ -76,8 +103,12 @@ class PersonRepository
      */
     protected function createOrUpdate(array $data, string $modelClass, ?string $personUuid = null): PersonRequest|Person
     {
+        if (isset($data['patient'])) {
+            $data['person'] = $data['patient'];
+        }
+
         $personData = [
-            'uuid' => $personUuid ?? $data['id'],
+            'uuid' => $personUuid ?? $data['id'] ?? null,
             'first_name' => $data['person']['first_name'],
             'last_name' => $data['person']['last_name'],
             'second_name' => $data['person']['second_name'] ?? null,
@@ -91,17 +122,19 @@ class PersonRepository
             'secret' => $data['person']['secret'],
             'unzr' => $data['person']['unzr'] ?? null,
             'emergency_contact' => $data['person']['emergency_contact'],
-            'patient_signed' => $data['patient_signed'],
-            'process_disclosure_data_consent' => $data['process_disclosure_data_consent']
+            'patient_signed' => $data['patient_signed'] ?? false,
+            'process_disclosure_data_consent' => $data['process_disclosure_data_consent'] ?? true
         ];
 
         if ($modelClass === PersonRequest::class) {
-            $personData['status'] = $data['status'];
+            $personData['status'] = $data['status'] ?? 'APPLICATION';
         }
 
+        // Update or create data based on id or uuid
         return $modelClass::updateOrCreate(
             [
-                'uuid' => $personData['uuid']
+                'uuid' => $personData['uuid'] ?? null,
+                'id' => isset($data['dbId']) && !$personData['uuid'] ? $data['dbId'] : null
             ],
             $personData
         );
