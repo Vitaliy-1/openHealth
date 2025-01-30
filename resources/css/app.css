@@ -47,7 +47,7 @@
     }
 
     .fieldset {
-        @apply p-4 sm:p-8 border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700
+        @apply p-4 sm:p-8 sm:pb-10 mb-8 border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700
     }
 
     .legend {
@@ -55,7 +55,7 @@
     }
 
     .form-row-4 {
-        @apply grid gap-4 md:gap-6 lg:grid-cols-4 md:grid-cols-2 md:mb-5 mb-4
+        @apply grid gap-4 md:gap-6 xl:grid-cols-4 lg:grid-cols-2 md:grid-cols-2 md:mb-5 mb-4
     }
 
     .form-row-3 {
@@ -84,6 +84,20 @@
 
     .text-error {
         @apply mt-2 text-sm text-red-600 dark:text-red-500
+    }
+
+    /* Button */
+
+    button.item-remove {
+        @apply text-red-600 dark:text-red-400 text-sm cursor-pointer font-medium
+    }
+
+    button.item-add {
+        @apply text-blue-600 dark:text-blue-400 text-sm cursor-pointer font-medium
+    }
+
+    button.item-remove svg, button.item-add svg {
+        @apply inline-block w-3.5 h-3.5
     }
 
     /* General */
