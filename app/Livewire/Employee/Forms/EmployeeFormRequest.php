@@ -32,6 +32,7 @@ class EmployeeFormRequest extends Form
     ])]
     public ?array $party = [
         'position' => '',
+        'phones' => []
     ];
 
     #[Validate([
