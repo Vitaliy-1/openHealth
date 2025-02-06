@@ -47,11 +47,19 @@
     }
 
     .fieldset {
-        @apply p-4 sm:p-8 sm:pb-10 mb-8 border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700
+        @apply p-4 sm:p-8 sm:pb-10 mb-10 border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700
+    }
+
+    .fieldset-table {
+        @apply pb-4 sm:pb-10 mb-10 relative overflow-x-auto
     }
 
     .legend {
         @apply text-xl font-bold text-gray-900 dark:text-white
+    }
+
+    .fieldset-table .legend {
+        @apply p-4
     }
 
     .form-row-4 {
@@ -60,6 +68,10 @@
 
     .form-row-3 {
         @apply grid gap-4 md:gap-6 lg:grid-cols-3 md:grid-cols-2 md:mb-5 mb-4
+    }
+
+    .form-row {
+        @apply md:mb-5 mb-4
     }
 
     .form-group {
@@ -84,6 +96,30 @@
 
     .text-error {
         @apply mt-2 text-sm text-red-600 dark:text-red-500
+    }
+
+    .textarea {
+        @apply block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
+    }
+
+    .label-secondary {
+        @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white
+    }
+
+    .table-input {
+        @apply my-3 w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400
+    }
+
+    .thead-input {
+        @apply text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400
+    }
+
+    .th-input {
+        @apply px-6 py-3
+    }
+
+    .td-input {
+        @apply px-6 py-4
     }
 
     /* Button */

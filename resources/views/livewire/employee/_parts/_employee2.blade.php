@@ -1,262 +1,289 @@
-<fieldset class="fieldset">
-    <legend class="legend">
-        {{__('forms.personalData')}}
-    </legend>
-
-    <div class="form-row-3">
-        <div class="form-group group relative">
-            <input
-                wire:model="employeeRequest.party.lastName"
-                type="text"
-                name="lastName"
-                id="lastName"
-                class="input peer @error('employeeRequest.party.lastName') input-error @enderror"
-                placeholder=" "
-                required
-            />
-
-            <label for="lastName" class="label">
-                {{__('forms.lastName')}}
-            </label>
-
-            @error('employeeRequest.party.lastName')
-                <p class="text-error">
-                    {{$message}}
-                </p>
-            @enderror
-        </div>
-
-        <div class="form-group group">
-            <input wire:model="employeeRequest.party.firstName"
-                   type="text"
-                   name="firstName"
-                   id="firstName"
-                   class="input peer @error('employeeRequest.party.firstName') input-error @enderror"
-                   placeholder=" "
-                   required
-            />
-            <label for="firstName" class="label">
-                {{__('forms.firstName')}}
-            </label>
-
-            @error('employeeRequest.party.firstName')
-                <p class="text-error">
-                    {{$message}}
-                </p>
-            @enderror
-        </div>
-
-        <div class="form-group group">
-            <input
-                wire:model="employeeRequest.party.secondName"
-                type="text"
-                name="secondName"
-                id="secondName"
-                class="input peer @error('employeeRequest.party.secondName') input-error @enderror"
-                placeholder=" "
-                required
-            />
-            <label for="secondName" class="label">
-                {{__('forms.secondName')}}
-            </label>
-
-            @error('employeeRequest.party.secondName')
-                <p class="text-error">
-                    {{$message}}
-                </p>
-            @enderror
-        </div>
-    </div>
-
-    <div class="form-row-4">
-        <div class="form-group group">
-            <label for="employeeGender" class="sr-only">{{__('forms.select')}} {{__('forms.gender')}}</label>
-            <select wire:model="employeeRequest.party.gender" id="employeeGender" class="input-select peer" required>
-                <option selected>{{__('forms.gender')}} *</option>
-                @foreach($this->dictionaries['GENDER'] as $k=>$gender )
-                    <option value="{{$k}}">{{$gender}}</option>
-                @endforeach
-            </select>
-
-            @error('employeeRequest.party.gender')
-            <p class="text-error">
-                {{$message}}
-            </p>
-            @enderror
-        </div>
-
-        <div class="form-group group">
-            <svg class="svg-input" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-            </svg>
-
-            <input wire:model="employeeRequest.party.birthDate"
-                   datepicker
-                   type="text"
-                   name="birthDate"
-                   id="birthDate"
-                   class="input default-datepicker peer @error('employeeRequest.party.birthDate') input-error @enderror"
-                   placeholder=" "
-                   required
-            />
-
-            <label for="birthDate" class="label">
-                {{__('forms.birthDate')}}
-            </label>
-
-            @error('employeeRequest.party.birthDate')
-                <p class="text-error">
-                    {{$message}}
-                </p>
-            @enderror
-        </div>
-
-
-        <div class="form-group group">
-            <svg class="svg-input w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M2.038 5.61A2.01 2.01 0 0 0 2 6v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6c0-.12-.01-.238-.03-.352l-.866.65-7.89 6.032a2 2 0 0 1-2.429 0L2.884 6.288l-.846-.677Z"/>
-                <path d="M20.677 4.117A1.996 1.996 0 0 0 20 4H4c-.225 0-.44.037-.642.105l.758.607L12 10.742 19.9 4.7l.777-.583Z"/>
-            </svg>
-
-            <input wire:model="employeeRequest.party.email"
-                   type="text"
-                   name="email"
-                   id="email"
-                   class="input peer @error('employeeRequest.party.email') input-error @enderror"
-                   placeholder=" "
-                   required
-            />
-            <label for="email" class="label">
-                {{__('forms.email')}}
-            </label>
-
-            @error('employeeRequest.party.email')
-                <p class="text-error">
-                    {{$message}}
-                </p>
-            @enderror
-        </div>
-
-        <div class="form-group group">
-            <input wire:model="employeeRequest.party.taxId"
-                   type="text"
-                   id="taxId"
-                   name="taxId"
-                   class="input peer @error('employeeRequest.party.taxId') input-error @enderror"
-                   placeholder=" "
-                   required
-            />
-
-            <label for="taxId" class="label">
-                {{__('forms.number')}} {{__('forms.RNOCPP')}}
-            </label>
-
-            @error('employeeRequest.party.taxId')
-            <p class="text-error">
-                {{$message}}
-            </p>
-            @enderror
-        </div>
-    </div>
-
-    <div class="form-row-4">
-
-        <div class="form-group group">
-            <label for="employeeGender" class="sr-only">{{__('forms.select')}} {{__('forms.role')}}</label>
-            <select wire:model.live="employeeRequest.party.employeeType"
-                    wire:update="getEmployeeDictionaryPosition()"
-                    id="employeeGender"
-                    class="input-select peer @error('employeeRequest.party.employeeType') input-error @enderror"
-                    required
-            >
-                <option selected>{{__('forms.select')}} {{__('forms.role')}} *</option>
-                @foreach($this->dictionaries['EMPLOYEE_TYPE'] as $k=>$employeeType)
-                    <option value="{{$k}}">{{$employeeType}}</option>
-                @endforeach
-            </select>
-
-            @error('employeeRequest.party.employeeType')
-            <p class="text-error">
-                {{$message}}
-            </p>
-            @enderror
-        </div>
-
-    </div>
-
-
-    {{-- Using Alpine to dynamically add and remove phone input fields --}}
-    <div class="mb-4" x-data="{ phones: $wire.entangle('employeeRequest.party.phones')}">
-
-        <template x-for="(phone, index) in phones">
-            <div class="form-row-3 md:mb-0">
-
-                <div class="form-group group">
-                    <label for="phoneType" class="sr-only">{{__('forms.typeMobile')}}</label>
-                    <select x-model = "phone.type" id="phoneType" class="input-select peer" required>
-                        <option selected>{{__('forms.typeMobile')}} *</option>
-                        @foreach($this->dictionaries['PHONE_TYPE'] as $k => $phoneType )
-                            <option value="{{$k}}">{{$phoneType}}</option>
-                        @endforeach
-                    </select>
-
-                    @error('employeeRequest.party.phones.type')
-                        <p class="text-error">
-                            {{$message}}
-                        </p>
-                    @enderror
-                </div>
-
-                <div class="form-group group">
-                    <svg class="svg-input w-5 top-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M7.978 4a2.553 2.553 0 0 0-1.926.877C4.233 6.7 3.699 8.751 4.153 10.814c.44 1.995 1.778 3.893 3.456 5.572 1.68 1.679 3.577 3.018 5.57 3.459 2.062.456 4.115-.073 5.94-1.885a2.556 2.556 0 0 0 .001-3.861l-1.21-1.21a2.689 2.689 0 0 0-3.802 0l-.617.618a.806.806 0 0 1-1.14 0l-1.854-1.855a.807.807 0 0 1 0-1.14l.618-.62a2.692 2.692 0 0 0 0-3.803l-1.21-1.211A2.555 2.555 0 0 0 7.978 4Z"/>
-                    </svg>
-
-                    <input x-model="phone.number"
-                           type="tel"
-                           name="phone"
-                           id="phone"
-                           class="input peer @error('employeeRequest.party.phones.number') input-error @enderror"
-                           placeholder=" "
-                           required
-                    />
-                    <label for="phone" class="label">
-                        {{__('forms.phone')}}
-                    </label>
-
-                    @error('employeeRequest.party.phones.number')
-                    <p class="text-error">
+<div>
+    <div
+        class="w-full mb-8 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            {{__('forms.personalData')}}
+        </h5>
+        <x-forms.form-row class=" ">
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label for="lastName" class="default-label">
+                        {{__('forms.lastName')}} *
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+                    <x-forms.input class="default-input" wire:model="employeeRequest.party.lastName" type="text"
+                                   id="lastName"/>
+                </x-slot>
+                @error('employeeRequest.party.lastName')
+                <x-slot name="error">
+                    <x-forms.error>
                         {{$message}}
-                    </p>
-                    @enderror
-                </div>
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label for="firstName" class="default-label">
+                        {{__('forms.firstName')}} *
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+                    <x-forms.input class="default-input" wire:model="employeeRequest.party.firstName" type="text"
+                                   id="firstName"/>
+                </x-slot>
+                @error('employeeRequest.party.firstName')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label for="secondName" class="default-label">
+                        {{__('forms.secondName')}} *
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+                    <x-forms.input class="default-input" wire:model="employeeRequest.party.secondName" type="text"
+                                   id="secondName"/>
+                </x-slot>
+                @error('employeeRequest.party.secondName')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+        </x-forms.form-row>
 
-                <template x-if="index == phones.length - 1 & index != 0">
-                    <button x-on:click="phones.pop(), index--" {{-- Remove a phone if button is clicked --}}
-                            class="item-remove"
+        <x-forms.form-row class=" ">
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label for="birthDate" class="default-label">
+                        {{__('forms.birthDate')}} *
+                    </x-forms.label>
+                </x-slot>
+
+                <x-slot name="input">
+                    <x-forms.input-date :maxDate="now()->subYears(18)->format('Y-m-d')" id="birthDate"
+                                        wire:model="employeeRequest.party.birthDate"/>
+                </x-slot>
+                @error('employeeRequest.party.birthDate')
+                <x-slot name="error">
+
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label for="email" class="default-label">
+                        {{__('forms.email')}} *
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+                    <x-forms.input class="default-input" wire:model="employeeRequest.party.email" type="text"
+                                   id="email" placeholder="{{__('E-mail')}}"/>
+                </x-slot>
+                @error('employeeRequest.party.email')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label class="default-label" for="taxId">
+                        {{__('forms.number')}} {{__('forms.RNOCPP')}} *
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+                    <x-forms.input maxlength="10" class="default-input" checked
+                                   wire:model="employeeRequest.party.taxId" type="text" id="taxId" name="taxId"/>
+                </x-slot>
+                @error('employeeRequest.party.taxId')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+        </x-forms.form-row>
+        <x-forms.form-row class="">
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label for="employeeType" class="default-label">
+                        {{__('forms.role')}}*
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+                    <x-forms.select
+                        class="default-input" wire:update="getEmployeeDictionaryPosition()" wire:model.live="employeeRequest.party.employeeType"
+                        id="employeeType"
                     >
-                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"/>
-                        </svg>
+                        <x-slot name="option">
+                            <option> {{__('forms.select')}} {{__('forms.role')}}</option>
+                            @foreach($this->dictionaries['EMPLOYEE_TYPE'] as $k=>$employeeType)
+                                <option value="{{$k}}">{{$employeeType}}</option>
+                            @endforeach
+                        </x-slot>
+                    </x-forms.select>
 
-                        {{__('forms.removePhone')}}
-                    </button>
-                </template>
-
-                <template x-if="index == phones.length - 1">
-                    <button x-on:click="phones.push({ type: '', number: '' })" {{-- Add new phone if button is clicked --}}
-                            class="item-add lg:justify-self-start"
-                            :class="{ 'lg:justify-self-start': index > 0 }" {{-- Apply this style only if it's not a first phone group --}}
+                </x-slot>
+                @error('employeeRequest.party.employeeType')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label for="position" class="default-label">
+                        {{__('forms.position')}} *
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+                    <x-forms.select
+                        class="default-input" wire:model="employeeRequest.party.position"
+                        id="position"
                     >
-                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
-                        </svg>
+                        <x-slot name="option">
+                            <option> {{__('forms.select')}} {{__('forms.position')}}</option>
+                            @if( isset($this->dictionaries['POSITION_EMPLOYEE_TYPE']) )
+                                @foreach($this->dictionaries['POSITION_EMPLOYEE_TYPE'] as $k=>$position)
+                                    <option value="{{$k}}">{{$position}}</option>
+                        @endforeach
+                        </x-slot>
+                        @endif
+                    </x-forms.select>
+{{--                    <x-forms.dynamic-select :options="$dictionaries['POSITION_EMPLOYEE_TYPE'] ?? []"--}}
+{{--                                            property="employeeRequest.party.position"/>--}}
+                </x-slot>
+                @error('employeeRequest.party.position')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
 
-                        {{__('forms.addPhone')}}
-                    </button>
-                </template>
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label for="startDate" class="default-label">
+                        {{__('forms.startDateWork')}}
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+
+                    <x-forms.input-date id="startDate"
+                                        wire:model="employeeRequest.party.startDate"
+                    />
+                </x-slot>
+                @error('employeeRequest.party.startDate')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label for="workingExperience" class="default-label">
+                        {{__('forms.workingExperience')}}
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+                    <x-forms.input class="default-input" wire:model="employeeRequest.party.workingExperience"
+                                   type="text"
+                                   id="workingExperience"/>
+                </x-slot>
+                @error('employeeRequest.party.workingExperience')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+        </x-forms.form-row>
+        <x-forms.form-row class=" ">
+            <x-forms.form-group class="w-full">
+                <x-slot name="label">
+                    <x-forms.label class="default-label" for="aboutMyself">
+                        {{__('forms.aboutMyself')}}
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+                    <x-forms.textarea
+                        class="default-input" checked wire:model="employeeRequest.party.aboutMyself" type="text"
+                        id="aboutMyself" name="taxId"/>
+                </x-slot>
+                @error('employeeRequest.party.aboutMyself')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+        </x-forms.form-row>
+        <x-forms.form-row :cols="'flex-col'" :gap="'gap-1'">
+            <x-forms.form-group class="xl:w-1/3">
+                <x-slot name="label">
+                    <x-forms.label name="employeeGender">
+                        {{__('forms.gender')}} *
+                    </x-forms.label>
+                </x-slot>
+                <x-slot name="input">
+                    <x-forms.select
+                        class="default-input" wire:model="employeeRequest.party.gender"
+                        id="employeeGender"
+                    >
+                        <x-slot name="option">
+                            <option>{{__('forms.select')}} {{__('forms.gender')}}</option>
+                            @foreach($this->dictionaries['GENDER'] as $k=>$gender )
+                                <option value="{{$k}}">{{$gender}}</option>
+                            @endforeach
+                        </x-slot>
+                    </x-forms.select>
+                </x-slot>
+                @error('employeeRequest.party.gender')
+                <x-slot name="error">
+                    <x-forms.error>
+                        {{$message}}
+                    </x-forms.error>
+                </x-slot>
+                @enderror
+            </x-forms.form-group>
+        </x-forms.form-row>
+        <x-forms.form-row :cols="'flex-col'" :gap="'gap-0'">
+            <x-forms.label name="label" class="default-label">
+                {{__('forms.phones')}} *
+            </x-forms.label>
+            <x-forms.form-phone :phones="$employeeRequest->party['phones'] ?? []" :property="'employeeRequest.party'"/>
+        </x-forms.form-row>
+        <x-forms.form-row class="justify-end">
+            <div class="xl:w-1/4 text-right">
+                <x-button x-show="!employeeId" wire:click="store('party')" type="submit"
+                          class="default-button max-w-[150px]">
+                    {{__('forms.save')}}
+                </x-button>
             </div>
-        </template>
-
+        </x-forms.form-row>
     </div>
-</fieldset>
+
+</div>
