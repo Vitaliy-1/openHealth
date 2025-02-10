@@ -1,4 +1,19 @@
-<fieldset class="fieldset">
+<fieldset class="fieldset"
+          x-data="{
+              noTaxId: $wire.patientRequest.patient.noTaxId || false,
+              init() {
+                  $wire.patientRequest.patient.noTaxId = this.noTaxId;
+              },
+              handleNoTaxIdChange() {
+                  if (this.noTaxId) {
+                      $wire.patientRequest.patient.noTaxId = true;
+                      delete $wire.patientRequest.patient.taxId;
+                  } else {
+                      $wire.patientRequest.patient.noTaxId = false;
+                  }
+              }
+          }"
+>
     <legend class="legend">
         {{ __('forms.patientIdentityDocuments') }}
     </legend>
@@ -7,7 +22,8 @@
         <label for="noTaxId" class="default-label">
             {{ __('forms.rnokppNotFound') }}
         </label>
-        <input wire:model.live="noTaxId"
+        <input x-model="noTaxId"
+               @change="handleNoTaxIdChange"
                type="checkbox"
                name="noTaxId"
                id="noTaxId"
@@ -15,7 +31,7 @@
         />
     </div>
 
-    @if(!$noTaxId)
+    <template x-if="!noTaxId">
         <div class="form-row-4">
             <div class="form-group group">
                 <input wire:model="patientRequest.patient.taxId"
@@ -39,5 +55,5 @@
                 @enderror
             </div>
         </div>
-    @endif
+    </template>
 </fieldset>

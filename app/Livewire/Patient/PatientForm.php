@@ -27,7 +27,14 @@ class PatientForm extends Component
 {
     use FormTrait, InteractsWithCache, WithFileUploads, Cipher, AddressSearch;
 
-    protected PersonRepository $personRepository;
+    /**
+     * Allowed model modals name.
+     */
+    private const array ALLOWED_MODAL_MODELS = [
+        'documents',
+        'documentsRelationship'
+    ];
+
     #[Locked]
     public int $patientId;
 
@@ -91,12 +98,6 @@ class PatientForm extends Component
     public bool $isInformed = false;
 
     /**
-     * Check is patient refused to provide RNOCPP/IPN.
-     * @var bool
-     */
-    public bool $noTaxId = false;
-
-    /**
      * Is patient incapable or child less than 14 y.o.
      * @var bool
      */
@@ -134,17 +135,6 @@ class PatientForm extends Component
     ];
 
     /**
-     * Boot the component with required dependencies.
-     *
-     * @param  PersonRepository  $personRepository
-     * @return void
-     */
-    public function boot(PersonRepository $personRepository): void
-    {
-        $this->personRepository = $personRepository;
-    }
-
-    /**
      * Initialize the component with required data.
      *
      * @param  int|null  $id
@@ -154,6 +144,13 @@ class PatientForm extends Component
     public function mount(?int $id = null): void
     {
         if ($id !== null) {
+            $fromDatabase = PersonRequest::find($id);
+
+            // Make sure the ID in the URL matches the patient's ID.
+            if ($fromDatabase->id !== $id) {
+                abort(403);
+            }
+
             $this->patientId = $id;
 
             // Check if the patient has a related confidant person
@@ -177,9 +174,12 @@ class PatientForm extends Component
      *
      * @param  string  $model  The model type to initialize for creation.
      * @return void
+     * @throws ValidationException
      */
     public function create(string $model): void
     {
+        $this->validateModel($model);
+
         $this->mode = 'create';
         $this->patientRequest->{$model} = [];
         $this->openModal($model);
@@ -194,7 +194,9 @@ class PatientForm extends Component
      */
     public function store(string $model): void
     {
+        $this->validateModel($model);
         $this->patientRequest->rulesForModelValidate($model);
+
         $this->{$model}[] = $this->patientRequest->{$model};
         $this->closeModal();
     }
@@ -205,9 +207,12 @@ class PatientForm extends Component
      * @param  string  $model  The model type to initialize for editing.
      * @param  int  $keyProperty  The key property used to identify the specific item to edit.
      * @return void
+     * @throws ValidationException
      */
     public function edit(string $model, int $keyProperty): void
     {
+        $this->validateModel($model);
+
         $this->keyProperty = $keyProperty;
         $this->mode = 'edit';
         $this->openModal($model);
@@ -226,6 +231,7 @@ class PatientForm extends Component
      */
     public function update(string $model, int $keyProperty): void
     {
+        $this->validateModel($model);
         $this->patientRequest->rulesForModelValidate($model);
 
         $this->{$model}[$keyProperty] = $this->patientRequest->{$model};
@@ -238,9 +244,12 @@ class PatientForm extends Component
      * @param  string  $model
      * @param  int  $keyProperty
      * @return void
+     * @throws ValidationException
      */
     public function remove(string $model, int $keyProperty): void
     {
+        $this->validateModel($model);
+
         $this->keyProperty = $keyProperty;
         unset($this->{$model}[$keyProperty]);
     }
@@ -258,19 +267,6 @@ class PatientForm extends Component
         }
 
         $this->closeModal();
-    }
-
-    /**
-     * Set empty string to taxId if patient refused to provide RNOCPP/IPN.
-     *
-     * @param  bool  $noTaxId
-     * @return void
-     */
-    public function updatedNoTaxId(bool $noTaxId): void
-    {
-        if ($noTaxId) {
-            $this->patientRequest->patient['taxId'] = '';
-        }
     }
 
     /**
@@ -353,7 +349,7 @@ class PatientForm extends Component
                 $response['data']['person']['confidant_person']['confidantPersonInfo'] = arrayKeysToSnake($this->confidantPerson[0]);
             }
             // save in DB
-            $personSaved = $this->personRepository->savePersonResponseData($response['data'], PersonRequest::class);
+            $personSaved = PersonRepository::savePersonResponseData($response['data'], PersonRequest::class);
             if (!$personSaved) {
                 $this->dispatch('flashMessage', [
                     'message' => 'Виникла помилка, зверніться до адміністратора.',
@@ -380,9 +376,8 @@ class PatientForm extends Component
     {
         $this->preparePersonRequest();
         $this->validatePersonRequest($model);
-        $this->patientRequest->patient['noTaxId'] = $this->noTaxId;
 
-        $response = $this->personRepository->savePersonResponseData(
+        $response = PersonRepository::savePersonResponseData(
             arrayKeysToSnake($this->patientRequest->toArray()),
             PersonRequest::class
         );
@@ -553,7 +548,7 @@ class PatientForm extends Component
         }
 
         if ($response['status'] === 'APPROVED') {
-            $this->personRepository->updatePersonRequestStatusByUuid($response);
+            PersonRepository::updatePersonRequestStatusByUuid($response);
             $this->isApproved = true;
 
             // save a leaflet and open the modal
@@ -623,13 +618,13 @@ class PatientForm extends Component
 
         if ($signResponse['status'] === 'SIGNED') {
             // create related person, update status
-            $personSaved = $this->personRepository->savePersonResponseData(
+            $personSaved = PersonRepository::savePersonResponseData(
                 $getPatientById['data'],
                 Person::class,
                 $signResponse['person_id']
             );
-            $statusUpdated = $this->personRepository->updatePersonRequestStatusByUuid($signResponse);
-            $relationCreated = $this->personRepository->createRelation($signResponse);
+            $statusUpdated = PersonRepository::updatePersonRequestStatusByUuid($signResponse);
+            $relationCreated = PersonRepository::createRelation($signResponse);
 
             if (!$personSaved || !$statusUpdated || !$relationCreated) {
                 $this->dispatch('flashMessage', [
@@ -684,7 +679,6 @@ class PatientForm extends Component
      */
     protected function sendPersonRequest(array $patientData): array
     {
-        $patientData['patient']['noTaxId'] = $this->noTaxId;
         $patientData['patient']['documents'] = $patientData['documents'];
         $patientData['patient']['addresses'][] = $patientData['addresses'];
 
@@ -719,32 +713,41 @@ class PatientForm extends Component
      * Validate person request data.
      *
      * @param  string  $model
-     * @return array|null Returns error array if validation fails, null if success
      * @throws ValidationException
      */
-    private function validatePersonRequest(string $model): ?array
+    private function validatePersonRequest(string $model): void
     {
         try {
             $this->patientRequest->rulesForModelValidate($model);
+            $this->patientRequest->validateBeforeSendApi();
         } catch (ValidationException $e) {
             $this->dispatch('flashMessage', [
-                'message' => 'Помилка валідації.',
+                'message' => $e->validator->errors()->first(),
                 'type' => 'error'
             ]);
 
             throw $e;
         }
+    }
 
-        $validationResult = $this->patientRequest->validateBeforeSendApi();
-        if ($validationResult['error']) {
+    /**
+     * Validate model name from modals.
+     *
+     * @param  string  $model
+     * @return void
+     * @throws ValidationException
+     */
+    private function validateModel(string $model): void
+    {
+        if (!in_array($model, self::ALLOWED_MODAL_MODELS, true)) {
             $this->dispatch('flashMessage', [
-                'message' => $validationResult['messages'][0],
+                'message' => 'Недопустиме значення моделі',
                 'type' => 'error'
             ]);
 
-            return $validationResult;
+            throw ValidationException::withMessages([
+                'model' => 'Недопустиме значення моделі'
+            ]);
         }
-
-        return null;
     }
 }

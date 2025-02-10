@@ -95,7 +95,7 @@ return [
     'present' => 'Поле :attribute повинне бути присутнє.',
     'regex' => 'Поле :attribute має хибний формат.',
     'required' => "Поле :attribute є обов'язковим для заповнення.",
-    'requiredIf' => "Поле :attribute є обов'язковим для заповнення, коли :other є рівним :value.",
+    'required_if' => "Поле :attribute є обов'язковим для заповнення, коли :other є рівним :value.",
     'requiredUnless' => "Поле :attribute є обов'язковим для заповнення, коли :other відрізняється від :values",
     'requiredWith' => "Поле :attribute є обов'язковим для заповнення, коли :values вказано.",
     'requiredWithAll' => "Поле :attribute є обов'язковим для заповнення, коли :values вказано.",
@@ -146,6 +146,13 @@ return [
             'drfouDiffer' => 'ІПН ключа електронного підпису відрізняється від вказаного',
             'kepTimeExpired' => 'Термін дії ключа електронного підпису закінчився',
             'kepNotValid' => 'Завантажений ключ не може використовуватись для електронного підпису'
+        ],
+        'patient' => [
+            'confidantPersonRequiredForChildren' => "Довірена особа є обов'язковою для дітей.",
+            'confidantPersonRequiredForMinor' => "Довірена особа є обов'язковою для неповнолітніх пацієнтів.",
+            'confidantPersonMustBeCapable' => 'Довіреною особою не може бути особа, яка має документ, що підтверджує її дієздатність.',
+            'birthDocumentsRequired' => 'Документи повинні містити один з наступних документів: СВІДОЦТВО ПРО НАРОДЖЕННЯ, ЗАКОРДОННЕ СВІДОЦТВО ПРО НАРОДЖЕННЯ.',
+            'personalDocumentsRequired' => 'Необхідно подати документ, що підтверджує персональні дані.'
         ]
     ],
 
@@ -214,13 +221,9 @@ return [
             'gender' => 'стать',
             'email' => 'E-mail',
             'unzr' => 'УНЗР',
+            'noTaxId' => 'РНОКПП/ІПН відсутній',
             'taxId' => 'номер РНОКПП',
             'secret' => 'кодове слово',
-
-            'phones' => [
-                'type' => 'тип телефону',
-                'number' => 'номер телефону'
-            ],
 
             'emergencyContact' => [
                 'firstName' => 'ім’я',
@@ -228,9 +231,10 @@ return [
                 'secondName' => 'по батькові'
             ],
         ],
+        'patient.phones.*.type' => 'тип телефону',
+        'patient.phones.*.number' => 'номер телефону',
         'patient.emergencyContact.phones.*.type' => 'тип телефону',
         'patient.emergencyContact.phones.*.number' => 'номер телефону',
-
         'patient.authenticationMethods.*.type' => 'метод автентифікації',
         'patient.authenticationMethods.*.phoneNumber' => 'номер телефону',
 
