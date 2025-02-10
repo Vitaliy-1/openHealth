@@ -10,6 +10,8 @@ use App\Rules\TwoLettersFourToSixDigitsOrComplex;
 use App\Rules\TwoLettersSixDigits;
 use App\Rules\EightDigitsHyphenFiveDigits;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -29,21 +31,22 @@ class PatientFormRequest extends Form
         'patient.birthSettlement' => ['required', 'string'],
         'patient.gender' => ['required', 'string'],
         'patient.unzr' => ['nullable', new EightDigitsHyphenFiveDigits()],
-        'patient.taxId' => ['nullable', 'numeric', 'digits:10'],
+        'patient.noTaxId' => ['nullable', 'boolean'],
+        'patient.taxId' => ['required_if:patient.noTaxId,false', 'numeric', 'digits:10'],
         'patient.secret' => ['required', 'string', 'min:6'],
         'patient.email' => ['nullable', 'email', 'string'],
 
         'patient.phones.*.type' => ['nullable', 'string'],
-        'patient.phones.*.number' => ['nullable', 'string', 'min:13', 'max:13'],
+        'patient.phones.*.number' => ['nullable', 'string', 'regex:/^\+38[0-9]{10}$/'],
 
         'patient.emergencyContact.firstName' => ['required', 'min:3', new Cyrillic()],
         'patient.emergencyContact.lastName' => ['required', 'min:3', new Cyrillic()],
         'patient.emergencyContact.secondName' => ['nullable', 'min:3', new Cyrillic()],
         'patient.emergencyContact.phones.*.type' => ['required', 'string'],
-        'patient.emergencyContact.phones.*.number' => ['required', 'string', 'min:13', 'max:13'],
+        'patient.emergencyContact.phones.*.number' => ['required', 'string', 'regex:/^\+38[0-9]{10}$/'],
 
         'patient.authenticationMethods.*.type' => ['required', 'string'],
-        'patient.authenticationMethods.*.phoneNumber' => ['nullable', 'string', 'min:13', 'max:13'],
+        'patient.authenticationMethods.*.phoneNumber' => ['nullable', 'regex:/^\+38[0-9]{10}$/'],
         'patient.authenticationMethods.*.value' => ['nullable', 'string'],
         'patient.authenticationMethods.*.alias' => ['nullable', 'string']
     ])]
@@ -124,43 +127,37 @@ class PatientFormRequest extends Form
     /**
      * Validate data before sending API request.
      *
-     * @return array
+     * @return void
+     * @throws ValidationException
      */
-    public function validateBeforeSendApi(): array
+    public function validateBeforeSendApi(): void
     {
-        $validationErrors = [];
+        $errors = new MessageBag();
 
         // Validate documents for minor patients
         $minorPatientValidation = $this->validateDocumentsForMinorPatient();
         if ($minorPatientValidation['error']) {
-            $validationErrors[] = $minorPatientValidation['message'];
+            $errors->add('minor_patient', $minorPatientValidation['message']);
         }
 
         // Validate necessity of confidant person
         $confidantPersonValidation = $this->validateNecessityOfConfidantPerson();
         if ($confidantPersonValidation['error']) {
-            $validationErrors[] = $confidantPersonValidation['message'];
+            $errors->add('confidant_person', $confidantPersonValidation['message']);
         }
 
         // Validate person's documents
         $documentValidation = $this->validatePersonDocuments();
         if ($documentValidation['error']) {
-            $validationErrors[] = $documentValidation['message'];
+            $errors->add('documents', $documentValidation['message']);
         }
 
-        // Return validation errors if any
-        if (!empty($validationErrors)) {
-            return [
-                'error' => true,
-                'messages' => $validationErrors
-            ];
-        }
+        if ($errors->isNotEmpty()) {
+            $validator = Validator::make([], []); // Empty validator
+            $validator->errors()->merge($errors);
 
-        // No errors found
-        return [
-            'error' => false,
-            'messages' => []
-        ];
+            throw new ValidationException($validator);
+        }
     }
 
     /**
@@ -253,7 +250,7 @@ class PatientFormRequest extends Form
         if ($personAge < self::NO_SELF_REGISTRATION_AGE && empty($this->documentsRelationship['personId'])) {
             return [
                 'error' => true,
-                'message' => __("Довірена особа є обов'язковою для дітей.")
+                'message' => __('validation.custom.patient.confidantPersonRequiredForChildren')
             ];
         }
 
@@ -277,7 +274,7 @@ class PatientFormRequest extends Form
             if (!$hasLegalCapacityDocument && empty($this->documentsRelationship['personId'])) {
                 return [
                     'error' => true,
-                    'message' => __("Довірена особа є обов'язковою для неповнолітніх пацієнтів.")
+                    'message' => __('validation.custom.patient.confidantPersonRequiredForMinor')
                 ];
             }
 
@@ -285,7 +282,7 @@ class PatientFormRequest extends Form
             if ($hasLegalCapacityDocument && !empty($this->documentsRelationship['personId'])) {
                 return [
                     'error' => true,
-                    'message' => __('Довіреною особою не може бути особа, яка має документ, що підтверджує її дієздатність.')
+                    'message' => __('validation.custom.patient.confidantPersonMustBeCapable')
                 ];
             }
         }
@@ -321,14 +318,14 @@ class PatientFormRequest extends Form
             if (!$hasRequiredDocument) {
                 return [
                     'error' => true,
-                    'message' => __('Документи повинні містити один з наступних документів: СВІДОЦТВО ПРО НАРОДЖЕННЯ, ЗАКОРДОННЕ СВІДОЦТВО ПРО НАРОДЖЕННЯ.'),
+                    'message' => __('validation.custom.patient.birthDocumentsRequired')
                 ];
             }
         }
 
         return [
             'error' => false,
-            'message' => '',
+            'message' => ''
         ];
     }
 
@@ -382,7 +379,7 @@ class PatientFormRequest extends Form
             if ($hasLegalCapacityDocument && !$hasRegistrationDocument) {
                 return [
                     'error' => true,
-                    'message' => __('Необхідно подати документ, що підтверджує персональні дані.')
+                    'message' => __('validation.custom.patient.personalDocumentsRequired')
                 ];
             }
         }

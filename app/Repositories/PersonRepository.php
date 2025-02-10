@@ -14,13 +14,29 @@ use Throwable;
 
 class PersonRepository
 {
-    public function __construct(
-        protected AddressRepository $addressRepository,
-        protected PhoneRepository $phoneRepository,
-        protected DocumentRepository $documentRepository,
-        protected AuthenticationMethodRepository $authenticationMethodRepository,
-        protected ConfidantPersonRepository $confidantPersonRepository
-    ) {
+    public static function address(): AddressRepository
+    {
+        return app(AddressRepository::class);
+    }
+
+    public static function phone(): PhoneRepository
+    {
+        return app(PhoneRepository::class);
+    }
+
+    public static function document(): DocumentRepository
+    {
+        return app(DocumentRepository::class);
+    }
+
+    public static function authenticationMethod(): AuthenticationMethodRepository
+    {
+        return app(AuthenticationMethodRepository::class);
+    }
+
+    public static function confidantPerson(): ConfidantPersonRepository
+    {
+        return app(ConfidantPersonRepository::class);
     }
 
     /**
@@ -32,31 +48,31 @@ class PersonRepository
      * @return bool
      * @throws Throwable
      */
-    public function savePersonResponseData(array $response, string $modelClass, ?string $personUuid = null): bool
+    public static function savePersonResponseData(array $response, string $modelClass, ?string $personUuid = null): bool
     {
         DB::beginTransaction();
 
         try {
-            $personRequest = $this->createOrUpdate($response, $modelClass, $personUuid);
+            $personRequest = self::createOrUpdate($response, $modelClass, $personUuid);
 
             $documents = $response['person']['documents'] ?? $response['documents'] ?? null;
             if ($documents) {
-                $this->documentRepository->addDocuments($personRequest, $documents);
+                self::document()->addDocuments($personRequest, $documents);
             }
 
             $addresses = $response['person']['addresses'] ?? [$response['addresses']] ?? null;
             if ($addresses) {
-                $this->addressRepository->addAddresses($personRequest, $addresses);
+                self::address()->addAddresses($personRequest, $addresses);
             }
 
             $phones = $response['person']['phones'] ?? $response['patient']['phones'] ?? null;
             if ($phones) {
-                $this->phoneRepository->addPhones($personRequest, $phones);
+                self::phone()->addPhones($personRequest, $phones);
             }
 
             $authenticationMethods = $response['person']['authentication_methods'] ?? $response['patient']['authentication_methods'] ?? null;
             if ($authenticationMethods) {
-                $this->authenticationMethodRepository->addAuthenticationMethod($personRequest, $authenticationMethods);
+                self::authenticationMethod()->addAuthenticationMethod($personRequest, $authenticationMethods);
             }
 
             if (isset($response['confidant_person'])) {
@@ -65,17 +81,11 @@ class PersonRepository
                     'confidantPersonInfo' => $response['confidant_person'][0]
                 ];
 
-                $this->confidantPersonRepository->addConfidantPerson(
-                    $personRequest,
-                    $confidantData
-                );
+                self::confidantPerson()->addConfidantPerson($personRequest, $confidantData);
             }
 
             if (isset($response['person']['confidant_person'])) {
-                $this->confidantPersonRepository->addConfidantPerson(
-                    $personRequest,
-                    $response['person']['confidant_person']
-                );
+                self::confidantPerson()->addConfidantPerson($personRequest, $response['person']['confidant_person']);
             }
 
             DB::commit();
@@ -101,8 +111,11 @@ class PersonRepository
      * @param  string|null  $personUuid
      * @return PersonRequest|Person
      */
-    protected function createOrUpdate(array $data, string $modelClass, ?string $personUuid = null): PersonRequest|Person
-    {
+    protected static function createOrUpdate(
+        array $data,
+        string $modelClass,
+        ?string $personUuid = null
+    ): PersonRequest|Person {
         if (isset($data['patient'])) {
             $data['person'] = $data['patient'];
         }
@@ -146,7 +159,7 @@ class PersonRepository
      * @param  array  $response
      * @return bool
      */
-    public function updatePersonRequestStatusByUuid(array $response): bool
+    public static function updatePersonRequestStatusByUuid(array $response): bool
     {
         try {
             PersonRequest::where('uuid', $response['id'])->update([
@@ -171,7 +184,7 @@ class PersonRepository
      * @return bool
      * @throws Exception
      */
-    public function createRelation(array $response): bool
+    public static function createRelation(array $response): bool
     {
         try {
             $personRequest = PersonRequest::where('uuid', $response['id'])->firstOrFail();
