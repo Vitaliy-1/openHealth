@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('persons', function (Blueprint $table) {
             $table->id();
             $table->uuid();
+            $table->enum('verification_status', ['CHANGES_NEEDED', 'IN_REVIEW', 'NOT_VERIFIED', 'VERIFICATION_NEEDED', 'VERIFICATION_NOT_NEEDED', 'VERIFIED'])->default('IN_REVIEW');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('second_name')->nullable();

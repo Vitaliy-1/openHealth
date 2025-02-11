@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enums\Person;
 
 use Illuminate\Support\Facades\Lang;
@@ -21,6 +23,6 @@ enum AuthenticationMethod: string
 
     public static function getOptions(): array
     {
-        return array_map(fn($case) => $case->label(), self::cases());
+        return array_map(static fn($case) => $case->label(), self::cases());
     }
 }

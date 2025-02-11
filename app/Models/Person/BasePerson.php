@@ -17,10 +17,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  */
 class BasePerson extends Model
 {
-    protected $hidden = [
-        'id'
-    ];
-
     protected $fillable = [
         'uuid',
         'first_name',

@@ -19,6 +19,7 @@ use App\Livewire\License\Forms\LicenseForms;
 use App\Livewire\License\Forms\CreateNewLicense;
 use App\Livewire\LegalEntity\EditLegalEntity;
 use App\Livewire\Patient\PatientForm;
+use App\Livewire\Patient\PatientTabs;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EmailController;
@@ -93,6 +94,9 @@ Route::middleware([
         Route::prefix('patient')->group(function () {
             Route::get('/', PatientIndex::class)->name('patient.index');
             Route::get('/create/{id?}', PatientForm::class)->name('patient.form');
+            Route::get('/{id}/tab/{tab}', PatientTabs::class)
+                ->name('patient.tabs')
+                ->where('tab', 'patient-data|summary|episodes');
 
             Route::prefix('encounter')->group(function () {
                 Route::get('/create', EncounterCreate::class)->name('encounter.form');

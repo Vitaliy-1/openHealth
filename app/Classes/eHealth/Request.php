@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Classes\eHealth;
 
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealthInterface;
 use App\Classes\eHealth\Errors\ErrorHandler;
 use App\Classes\eHealth\Exceptions\ApiException;
+use App\Enums\HttpMethod;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -18,7 +21,7 @@ class Request
     //private bool $isApiKey;
 
     public function __construct(
-        private string $method,
+        private string|HttpMethod $method,
         private string $url,
         private array $params,
         private bool $isToken = true,

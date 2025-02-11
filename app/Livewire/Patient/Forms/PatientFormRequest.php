@@ -50,7 +50,19 @@ class PatientFormRequest extends Form
         'patient.authenticationMethods.*.value' => ['nullable', 'string'],
         'patient.authenticationMethods.*.alias' => ['nullable', 'string']
     ])]
-    public array $patient = [];
+    public array $patient = [
+        'phones' => [
+            ['type' => null, 'number' => null]
+        ],
+        'emergencyContact' => [
+            'phones' => [
+                ['type' => null, 'number' => null]
+            ]
+        ],
+        'authenticationMethods' => [
+            ['type' => '', 'phoneNumber' => null, 'value' => null, 'alias' => null]
+        ]
+    ];
 
     #[Validate([
         'patientsFilter.firstName' => ['required', 'min:3', new Cyrillic()],
@@ -396,7 +408,7 @@ class PatientFormRequest extends Form
      * @return void
      * @throws ValidationException
      */
-    private function validateAddressees():void
+    private function validateAddressees(): void
     {
         $errors = $this->component->addressValidation();
 

@@ -8,15 +8,16 @@
             @include('livewire.patient._parts._search_filter')
 
             @if(empty($selectedConfidantPatientId))
-                <x-forms.form-group class="py-4">
-                    <x-slot name="label">
-                        <x-forms.button-with-icon wire:click.prevent="searchForPerson('patientsFilter')"
-                                                  class="default-button"
-                                                  label="{{ __('Шукати представника') }}"
-                                                  svgId="svg-search"
-                        />
-                    </x-slot>
-                </x-forms.form-group>
+                <div class="py-4">
+                    <button wire:click.prevent="searchForPerson('patientsFilter')"
+                            class="flex items-center gap-2 default-button"
+                    >
+                        <svg width="16" height="16">
+                            <use xlink:href="#svg-search"></use>
+                        </svg>
+                        <span>{{ __('Шукати представника') }}</span>
+                    </button>
+                </div>
             @endif
         </x-slot>
     </x-section-navigation>
@@ -95,8 +96,7 @@
         @elseif($searchPerformed && empty($confidantPerson))
             <div class="rounded-lg p-4 bg-gray-100">
                 <div class="flex items-center gap-2">
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-                         xmlns="http://www.w3.org/2000/svg">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M9 6V9M9 12H9.0075M16.5 9C16.5 13.1421 13.1421 16.5 9 16.5C4.85786 16.5 1.5 13.1421 1.5 9C1.5 4.85786 4.85786 1.5 9 1.5C13.1421 1.5 16.5 4.85786 16.5 9Z"
                             stroke="#1E1E1E" stroke-width="2" stroke-linecap="round"
