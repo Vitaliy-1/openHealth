@@ -18,6 +18,19 @@ class PersonRequest extends BasePerson
         $this->mergeFillable(['status', 'person_id', 'authorize_with']);
     }
 
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        // Cascade delete
+        static::deleting(static function (PersonRequest $personRequest) {
+            $personRequest->address()->delete();
+            $personRequest->documents()->delete();
+            $personRequest->phones()->delete();
+            $personRequest->authenticationMethod()->delete();
+        });
+    }
+
     public function person(): BelongsTo
     {
         return $this->belongsTo(Person::class);

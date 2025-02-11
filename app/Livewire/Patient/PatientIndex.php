@@ -48,6 +48,15 @@ class PatientIndex extends Component
         $this->setTableHeaders();
     }
 
+    public function render(): View
+    {
+        $paginatedPatients = $this->createPaginator($this->patients);
+
+        return view('livewire.patient.index', [
+            'paginatedPatients' => $paginatedPatients
+        ]);
+    }
+
     /**
      * Search for person with provided filters.
      *
@@ -63,6 +72,8 @@ class PatientIndex extends Component
         $buildSearchRequest = PatientRequestApi::buildSearchForPerson($this->patientRequest->patientsFilter);
         $patientsFromEHealth = PersonApi::searchForPersonByParams($buildSearchRequest);
 
+        // Don't use phone when searching locally.
+        unset($this->patientRequest->patientsFilter['phoneNumber']);
         // Search for application
         $personRequests = PersonRequest::where(arrayKeysToSnake($this->patientRequest->patientsFilter))
             ->where('status', 'APPLICATION')
@@ -80,22 +91,42 @@ class PatientIndex extends Component
             $persons = [];
         }
 
+        $personsWithStatuses = array_map(function ($person) {
+            return $this->setPersonStatus([$person], $person['verification_status']);
+        }, $persons);
+
         $this->patients = array_merge(
-            $this->setPersonStatus($patientsFromEHealth, 'ЕСОЗ'),
-            $this->setPersonStatus($personRequests, 'ЗАЯВКА'),
-            $this->setPersonStatus($persons, 'ВНУТРІШНІЙ')
+            $this->setPersonStatus($patientsFromEHealth, 'eHEALTH'),
+            $this->setPersonStatus($personRequests, 'APPLICATION'),
+            ...$personsWithStatuses
         );
 
         $this->searchPerformed = true;
     }
 
-    public function render(): View
+    /**
+     * Stores patient data in the session and redirects to the patient's data tab.
+     *
+     * @param  array  $patientData  The associative array containing patient details.
+     * @return void
+     */
+    public function redirectToPatient(array $patientData): void
     {
-        $paginatedPatients = $this->createPaginator($this->patients);
+        session(["temp_patient_data_" . $patientData['id'] => $patientData]);
 
-        return view('livewire.patient.index', [
-            'paginatedPatients' => $paginatedPatients
-        ]);
+        $this->redirectRoute('patient.tabs', ['id' => $patientData['id'], 'tab' => 'patient-data']);
+    }
+
+    /**
+     * Delete person request.
+     *
+     * @param  int  $id
+     * @return void
+     */
+    public function removeApplication(int $id): void
+    {
+        PersonRequest::destroy($id);
+        $this->dispatch('patientRemoved', $id);
     }
 
     /**

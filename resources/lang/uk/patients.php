@@ -34,5 +34,13 @@ return [
         'court_decision' => 'Рішення суду',
         'document' => 'Документ'
     ],
-    'encounter_create' => 'Створення медичного запису'
+    'encounter_create' => 'Створення медичного запису',
+
+    // PERSON_VERIFICATION_STATUSES
+    "CHANGES_NEEDED" => "Неуспішно верифіковано (потребує змін)",
+    "IN_REVIEW" => "На опрацюванні",
+    "NOT_VERIFIED" => "Не верифіковано",
+    "VERIFICATION_NEEDED" => "Потребує верифікації",
+    "VERIFICATION_NOT_NEEDED" => "Не потребує верифікації",
+    "VERIFIED" => "Верифіковано"
 ];
