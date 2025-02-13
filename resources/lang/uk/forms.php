@@ -240,6 +240,8 @@ return [
     'specialityQualificationType' => 'Тип навчальної діяльності',
     'specialityAttestationName' => 'Назва навчальної діяльності',
     'specialityAttestationDate' => 'Дата навчальної діяльності',
-    'actions' => 'Діі',
-    'delete' => 'Видалити'
+    'actions' => 'Дії',
+    'delete' => 'Видалити',
+    'modalClose' => 'Закрити модальне вікно',
+    'fieldEmpty' => 'Це поле не має бути пустим'
 ];
