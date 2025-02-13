@@ -14,31 +14,6 @@ use Throwable;
 
 class PersonRepository
 {
-    public static function address(): AddressRepository
-    {
-        return app(AddressRepository::class);
-    }
-
-    public static function phone(): PhoneRepository
-    {
-        return app(PhoneRepository::class);
-    }
-
-    public static function document(): DocumentRepository
-    {
-        return app(DocumentRepository::class);
-    }
-
-    public static function authenticationMethod(): AuthenticationMethodRepository
-    {
-        return app(AuthenticationMethodRepository::class);
-    }
-
-    public static function confidantPerson(): ConfidantPersonRepository
-    {
-        return app(ConfidantPersonRepository::class);
-    }
-
     /**
      * Save person request response to DB.
      *
@@ -57,22 +32,22 @@ class PersonRepository
 
             $documents = $response['person']['documents'] ?? $response['documents'] ?? null;
             if ($documents) {
-                self::document()->addDocuments($personRequest, $documents);
+                Repository::document()->addDocuments($personRequest, $documents);
             }
 
             $addresses = $response['person']['addresses'] ?? [$response['addresses']] ?? null;
             if ($addresses) {
-                self::address()->addAddresses($personRequest, $addresses);
+                Repository::address()->addAddresses($personRequest, $addresses);
             }
 
             $phones = $response['person']['phones'] ?? $response['patient']['phones'] ?? null;
             if ($phones) {
-                self::phone()->addPhones($personRequest, $phones);
+                Repository::phone()->addPhones($personRequest, $phones);
             }
 
             $authenticationMethods = $response['person']['authentication_methods'] ?? $response['patient']['authentication_methods'] ?? null;
             if ($authenticationMethods) {
-                self::authenticationMethod()->addAuthenticationMethod($personRequest, $authenticationMethods);
+                Repository::authenticationMethod()->addAuthenticationMethod($personRequest, $authenticationMethods);
             }
 
             if (isset($response['confidant_person'])) {
@@ -81,11 +56,12 @@ class PersonRepository
                     'confidantPersonInfo' => $response['confidant_person'][0]
                 ];
 
-                self::confidantPerson()->addConfidantPerson($personRequest, $confidantData);
+                Repository::confidantPerson()->addConfidantPerson($personRequest, $confidantData);
             }
 
             if (isset($response['person']['confidant_person'])) {
-                self::confidantPerson()->addConfidantPerson($personRequest, $response['person']['confidant_person']);
+                Repository::confidantPerson()->addConfidantPerson($personRequest,
+                    $response['person']['confidant_person']);
             }
 
             DB::commit();
