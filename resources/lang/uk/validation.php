@@ -36,7 +36,7 @@ return [
     'different' => 'Поля :attribute та :other повинні бути різними.',
     'digits' => 'Довжина цифрового поля :attribute повинна дорівнювати :digits.',
     'digitsBetween' => 'Довжина цифрового поля :attribute повинна бути від :min до :max.',
-    'dimensions' => 'Поле :attribute містіть неприпустимі розміри зображення.',
+    'dimensions' => 'Поле :attribute містить неприпустимі розміри зображення.',
     'distinct' => 'Поле :attribute містить значення, яке дублюється.',
     'email' => 'Поле :attribute повинне містити коректну електронну адресу.',
     'file' => 'Поле :attribute має містити файл.',
@@ -95,7 +95,7 @@ return [
     'present' => 'Поле :attribute повинне бути присутнє.',
     'regex' => 'Поле :attribute має хибний формат.',
     'required' => "Поле :attribute є обов'язковим для заповнення.",
-    'requiredIf' => "Поле :attribute є обов'язковим для заповнення, коли :other є рівним :value.",
+    'required_if' => "Поле :attribute є обов'язковим для заповнення, коли :other є рівним :value.",
     'requiredUnless' => "Поле :attribute є обов'язковим для заповнення, коли :other відрізняється від :values",
     'requiredWith' => "Поле :attribute є обов'язковим для заповнення, коли :values вказано.",
     'requiredWithAll' => "Поле :attribute є обов'язковим для заповнення, коли :values вказано.",
@@ -146,6 +146,13 @@ return [
             'drfouDiffer' => 'ІПН ключа електронного підпису відрізняється від вказаного',
             'kepTimeExpired' => 'Термін дії ключа електронного підпису закінчився',
             'kepNotValid' => 'Завантажений ключ не може використовуватись для електронного підпису'
+        ],
+        'patient' => [
+            'confidantPersonRequiredForChildren' => "Довірена особа є обов'язковою для дітей.",
+            'confidantPersonRequiredForMinor' => "Довірена особа є обов'язковою для неповнолітніх пацієнтів.",
+            'confidantPersonMustBeCapable' => 'Довіреною особою не може бути особа, яка має документ, що підтверджує її дієздатність.',
+            'birthDocumentsRequired' => 'Документи повинні містити один з наступних документів: СВІДОЦТВО ПРО НАРОДЖЕННЯ, ЗАКОРДОННЕ СВІДОЦТВО ПРО НАРОДЖЕННЯ.',
+            'personalDocumentsRequired' => 'Необхідно подати документ, що підтверджує персональні дані.'
         ]
     ],
 
@@ -164,7 +171,7 @@ return [
         'name' => 'ім\'я',
         'phone' => 'телефон',
         'password' => 'пароль',
-        'keyContainerUpload' => 'контейнер ключа',
+        'keyContainerUpload' => 'контейнер ключа',
         'knedp' => 'КНЕДП',
         'Token' => 'токен CSRF',
         'edrpou' => 'ЄДРПОУ',
@@ -185,9 +192,8 @@ return [
             'taxId' => 'РНОКПП',
             'documents' => [
                 'type' => 'Тип документа',
-                'number' => 'Cерія/номер документа',
-            ],
-
+                'number' => 'Серія/номер документа'
+            ]
         ],
         'party' => [
             'firstName' => 'Ім’я',
@@ -215,29 +221,23 @@ return [
             'gender' => 'стать',
             'email' => 'E-mail',
             'unzr' => 'УНЗР',
+            'noTaxId' => 'РНОКПП/ІПН відсутній',
             'taxId' => 'номер РНОКПП',
             'secret' => 'кодове слово',
-
-            'phones' => [
-                'type' => 'тип телефону',
-                'number' => 'номер телефону'
-            ],
 
             'emergencyContact' => [
                 'firstName' => 'ім’я',
                 'lastName' => 'прізвище',
-                'secondName' => 'по батькові',
-                'phones' => [
-                    'type' => 'тип телефону',
-                    'number' => 'номер телефону'
-                ]
-            ],
-
-            'authenticationMethods' => [
-                'type' => 'метод автентифікації',
-                'phoneNumber' => 'номер телефону'
+                'secondName' => 'по батькові'
             ],
         ],
+        'patient.phones.*.type' => 'тип телефону',
+        'patient.phones.*.number' => 'номер телефону',
+        'patient.emergencyContact.phones.*.type' => 'тип телефону',
+        'patient.emergencyContact.phones.*.number' => 'номер телефону',
+        'patient.authenticationMethods.*.type' => 'метод автентифікації',
+        'patient.authenticationMethods.*.phoneNumber' => 'номер телефону',
+
         'addresses' => [
             'area' => 'область',
             'settlement' => 'місто',
@@ -264,14 +264,18 @@ return [
         'patientsFilter' => [
             'firstName' => 'ім’я',
             'lastName' => 'прізвище',
-            'birthDate' => 'дата народження'
+            'birthDate' => 'дата народження',
+            'secondName' => 'по батькові',
+            'taxId' => 'РНОКПП(ІПН)',
+            'phoneNumber' => 'номер телефону',
+            'birthCertificate' => 'свідоцтво про народження'
         ],
         'document' => [
             'type' => 'Тип документа',
             'number' => 'Серія/номер документа',
             'issuedBy' => 'Орган яким виданий документ',
             'issuedAt' => 'Дата видачі документа',
-            'expirationDate' => 'дійсний до',
+            'expirationDate' => 'дійсний до'
         ],
         'passportData' => [
             'firstName' => 'Ім’я',
@@ -284,11 +288,10 @@ return [
             'taxId' => 'РНОКПП',
             'documents' => [
                 'type' => 'Тип документа',
-                'number' => 'Cерія/номер документа',
-            ],
-
+                'number' => 'Серія/номер документа'
+            ]
         ],
-        'owner.phones.*.number' => 'елефон',
+        'owner.phones.*.number' => 'телефон',
         'owner.phones.*.type' => 'Тип Номера',
         'country' => 'Країна',
         'region' => 'Область',
@@ -364,11 +367,11 @@ return [
                     'providingCondition' => 'Така послуга вже є для цього місця надання послуг',
                 ],
                 'category' => [
-                    'license' => 'Дана категорія не має хоча б однієї відповідної ліцензції'
+                    'license' => 'Дана категорія не має хоча б однієї відповідної ліцензії'
                 ],
                 'time' => [
                     'available' => 'Закінчення часу доступності менше часу початку',
-                    'notAvailable' => 'Кінцева дата часу недоступеності менше початкової'
+                    'notAvailable' => 'Кінцева дата часу недоступності менше початкової'
                 ]
             ]
         ],
@@ -443,7 +446,7 @@ return [
         'expiryDate' => 'дата завершення дії ліцензії',
         'whatLicensed' => 'напрям діяльності, що ліцензовано',
 
-        'uploadedDocuments.*.documentsRelationship' => 'для завантаження файлів',
+        'uploadedDocuments.*' => 'для завантаження файлів',
         'verificationCode' => 'код підтвердження з СМС'
     ],
     'consentText' => 'Я погоджуюсь з умовами',

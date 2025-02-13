@@ -9,7 +9,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-
+/**
+ * @mixin IdeHelperLegalEntity
+ */
 class LegalEntity extends Model
 {
     use HasFactory;
@@ -79,10 +81,10 @@ class LegalEntity extends Model
         $this->attributes['addresses'] = json_encode($value);
     }
 
-    public function setKvedsAttribute($value){
+    public function setKvedsAttribute($value)
+    {
         $this->attributes['kveds'] = json_encode($value);
     }
-
 
     public function division(): HasMany
     {
@@ -91,7 +93,7 @@ class LegalEntity extends Model
 
     public function contract(): HasMany
     {
-        return $this->hasMany(Contract::class,'legal_entity_id','id');
+        return $this->hasMany(Contract::class, 'legal_entity_id', 'id');
     }
 
     public function licenses(): HasMany
@@ -99,40 +101,35 @@ class LegalEntity extends Model
         return $this->hasMany(License::class);
     }
 
-    public function getId():int
+    public function getId(): int
     {
         return $this->id;
     }
 
-
     // Get Legal Entity UUID
-    public function getUuid():string
+    public function getUuid(): string
     {
         return $this->uuid;
     }
 
-    public function getClientId():string
+    public function getClientId(): string
     {
         return $this->client_id;
     }
 
-
     // Get Owner Legal Entity
-    public function getOwner():?object
+    public function getOwner(): ?object
     {
         return $this->employees()->where('employee_type', 'OWNER')->first();
     }
 
-    public function getActiveDivisions():Collection
+    public function getActiveDivisions(): Collection
     {
         return $this->division()->has('healthcareService')->where('status', 'ACTIVE')->get();
     }
 
-    public function getEdr():array
+    public function getEdr(): array
     {
         return $this->edr;
     }
-
-
-
 }

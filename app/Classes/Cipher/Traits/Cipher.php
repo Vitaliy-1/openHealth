@@ -7,11 +7,13 @@ use App\Classes\Cipher\Exceptions\ApiException;
 use App\Classes\Cipher\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Livewire\WithFileUploads;
 
 trait Cipher
 {
-    // КНЕДП
+    /**
+     * КНЕДП.
+     * @var string|null
+     */
     public ?string $knedp;
 
     public $keyContainerUpload;
@@ -28,15 +30,25 @@ trait Cipher
     public function rules(): array
     {
         return [
-            'knedp'                                  => 'required|string',
-            'keyContainerUpload'                     => 'required|file',
-            'password'                               => 'required|string|max:255'
+            'knedp' => 'required|string',
+            'keyContainerUpload' => 'required|file',
+            'password' => 'required|string|max:255'
         ];
     }
 
-    //Send Encrypted Data
-    protected function sendEncryptedData(array $data, string $taxId, string $signatoryInitiator = CipherApi::SIGNATORY_INITIATOR_PERSON): string|array
-    {
+    /**
+     * Send Encrypted Data.
+     *
+     * @param  array  $data
+     * @param  string  $taxId
+     * @param  string  $signatoryInitiator
+     * @return string|array
+     */
+    protected function sendEncryptedData(
+        array $data,
+        string $taxId,
+        string $signatoryInitiator = CipherApi::SIGNATORY_INITIATOR_PERSON
+    ): string|array {
         $this->validate($this->rules());
 
         return (new CipherApi())->sendSession(
@@ -49,38 +61,49 @@ trait Cipher
         );
     }
 
-    //Convert KEP to Base64
+    /**
+     * Convert KEP to Base64.
+     *
+     * @return string|null
+     */
     public function convertFileToBase64(): ?string
     {
         if ($this->keyContainerUpload && $this->keyContainerUpload->exists()) {
             $fileExtension = $this->keyContainerUpload->getClientOriginalExtension();
             $filePath = $this->keyContainerUpload->storeAs('uploads/kep', 'kep.' . $fileExtension, 'public');
+
             if ($filePath) {
                 $fileContents = file_get_contents(storage_path('app/public/' . $filePath));
                 if ($fileContents !== false) {
                     $base64Content = base64_encode($fileContents);
                     Storage::disk('public')->delete($filePath);
+
                     return $base64Content;
                 }
             }
         }
+
         return null;
     }
 
-    //Get Certificate Authority
-
     /**
+     * Get Certificate Authority
+     *
+     * @return array
      * @throws ApiException
      */
     public function getCertificateAuthority(): array
     {
         if (!Cache::has('knedp_certificate_authority')) {
             $data = (new Request('get', '/certificateAuthority/supported', ''))->sendRequest();
+
             if ($data === false) {
                 throw new \RuntimeException('Failed to fetch data from the API.');
             }
+
             $this->getCertificateAuthority = Cache::put('knedp_certificate_authority', $data['ca'], now()->addDays(7));
         }
+
         return $this->getCertificateAuthority = Cache::get('knedp_certificate_authority');
     }
 }

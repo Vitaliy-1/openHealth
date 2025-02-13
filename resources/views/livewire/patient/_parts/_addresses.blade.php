@@ -1,5 +1,9 @@
 <div>
-    <livewire:components.addresses-search :addresses="$patientRequest->addresses ?? []"
-                                          class="mb-4 flex wrap flex-col flex-wrap gap-6 xl:flex-row"
+    <x-forms.addresses-search
+        :address="$address"
+        :districts="$districts"
+        :settlements="$settlements"
+        :streets="$streets"
+        class="mb-4 flex justify-between wrap flex-col flex-wrap gap-6 xl:flex-row"
     />
 </div>

@@ -42,7 +42,7 @@ trait AddressSearch
 
     public function addressValidation(): array
     {
-        $errors=[];
+        $errors = [];
 
         try {
             $this->validate(AddressesSearch::getAddressRules($this->address), AddressesSearch::getAddressMessages());
@@ -53,14 +53,13 @@ trait AddressSearch
         return $errors;
     }
 
-
     public function updatedAddressArea($value)
     {
         if ($value === 'М.КИЇВ') {
             $this->address['region'] = '';
             $this->address['settlement'] = 'Київ';
             $this->address['settlement_type'] = 'CITY';
-            $this->address['settlement_id'] = 'adaa4abf-f530-461c-bcbf-a0ac210d955b';
+            $this->address['settlementId'] = 'adaa4abf-f530-461c-bcbf-a0ac210d955b';
         }
     }
 
@@ -82,8 +81,8 @@ trait AddressSearch
     public function updated($field)
     {
         $fieldsToReset = match (substr($field, strrpos($field, '.') + 1)) {
-            'area' => ['region', 'settlement', 'settlement_id', 'settlement_type', 'street_type', 'street', 'building', 'apartment', 'zip'],
-            'region' => ['settlement', 'settlement_id', 'settlement_type', 'street_type', 'street', 'building', 'apartment', 'zip'],
+            'area' => ['region', 'settlement', 'settlementId', 'settlement_type', 'street_type', 'street', 'building', 'apartment', 'zip'],
+            'region' => ['settlement', 'settlementId', 'settlement_type', 'street_type', 'street', 'building', 'apartment', 'zip'],
             'settlement' => ['street_type', 'street', 'building', 'apartment', 'zip'],
             'street' => ['building', 'apartment', 'zip'],
             default => []
@@ -139,7 +138,7 @@ trait AddressSearch
     public function selectSettlements($name, $id)
     {
         $this->address['settlement'] = $name;
-        $this->address['settlement_id'] = $id;
+        $this->address['settlementId'] = $id;
         $this->settlements = [];
     }
 
@@ -173,18 +172,16 @@ trait AddressSearch
             $this->address['settlement']);
     }
 
-
     public function getStreets(): void
     {
-        if (empty($this->address['settlement_id'])) {
+        if (empty($this->address['settlementId'])) {
             return;
         }
 
         $this->streets = AdressesApi::_streets(
-            $this->address['settlement_id'],
-            $this->address['street_type'],
+            $this->address['settlementId'],
+            $this->address['streetType'],
             $this->address['street']
         );
     }
-
 }

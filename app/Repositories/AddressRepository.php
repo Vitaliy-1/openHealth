@@ -19,14 +19,12 @@ class AddressRepository
     {
         if (!empty($addresses)) {
             foreach ($addresses as $addressData) {
-                $address = Address::firstOrNew(
-                    [
-                        'addressable_type' => get_class($model),
-                        'addressable_id' => $model->id
-                    ]
+                $address = Address::updateOrCreate([
+                    'addressable_type' => get_class($model),
+                    'addressable_id' => $model->id
+                ],
+                    $addressData
                 );
-
-                $address->fill($addressData);
 
                 $model->address()->save($address);
             }

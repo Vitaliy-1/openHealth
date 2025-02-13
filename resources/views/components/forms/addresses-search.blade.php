@@ -119,7 +119,7 @@
         <x-slot name="label">
             <x-forms.label
                 class="default-label"
-                for="settlement_type"
+                for="settlementType"
                 name="label"
             >
                 {{ __('forms.settlementType') }} *
@@ -129,15 +129,15 @@
             <x-forms.select
                 class="default-input"
                 x-bind:disabled="{{ empty($address['region']) ? 'true' : 'false' }}"
-                wire:model.live="address.settlement_type"
-                id="settlement_type"
+                wire:model.live="address.settlementType"
+                id="settlementType"
             >
                 <x-slot name="option">
                     <option value="">{{ __('forms.select') }}</option>
                     @isset($dictionaries['SETTLEMENT_TYPE'])
-                        @foreach($dictionaries['SETTLEMENT_TYPE'] as $k => $type)
+                        @foreach($dictionaries['SETTLEMENT_TYPE'] as $key => $type)
                             <option class="normal-case"
-                                {{ isset($address['settlement_type']) && $address['settlement_type'] == $k ? 'selected': ''}} value="{{ $k }}">{{ $type }}
+                                {{ isset($address['settlementType']) && $address['settlementType'] === $key ? 'selected': ''}} value="{{ $key }}">{{ $type }}
                             </option>
                         @endforeach
                     @endif
@@ -145,12 +145,10 @@
             </x-forms.select>
         </x-slot>
 
-        @error('address.settlement_type')
-        <x-slot name="error">
-            <x-forms.error>
-                {{ $message }}
-            </x-forms.error>
-        </x-slot>
+        @error('address.settlementType')
+        <p class="text-error">
+            {{ $message }}
+        </p>
         @enderror
     </x-forms.form-group>
 
@@ -181,7 +179,7 @@
                 x-on:mouseleave="timeout = setTimeout(() => { showTo = false }, 800)"
             >
                 <x-forms.input
-                    x-bind:disabled="{{ empty($address['settlement_type']) || $address['area'] === 'М.КИЇВ' ? 'true' : 'false' }}"
+                    x-bind:disabled="{{ empty($address['settlementType']) || $address['area'] === 'М.КИЇВ' ? 'true' : 'false' }}"
                     wire:model.live.debounce.400ms="address.settlement"
                     class="default-input"
                     x-ref="settlementField"
@@ -246,7 +244,7 @@
             <x-forms.select
                 class="default-input"
                 x-bind:disabled="{{ empty($address['settlement']) ? 'true' : 'false' }}"
-                wire:model.live="address.street_type"
+                wire:model.live="address.streetType"
                 id="street_type"
 
             >
@@ -297,7 +295,7 @@
                 x-on:mouseleave="timeout = setTimeout(() => { showTo = false }, 800)"
             >
                 <x-forms.input
-                    x-bind:disabled="{{ empty($address['settlement_type']) ? 'true' : 'false' }}"
+                    x-bind:disabled="{{ empty($address['settlementType']) ? 'true' : 'false' }}"
                     wire:model.live.debounce.400ms="address.street"
                     class="default-input"
                     autocomplete="off"
