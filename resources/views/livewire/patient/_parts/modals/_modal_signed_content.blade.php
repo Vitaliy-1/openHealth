@@ -1,4 +1,4 @@
-<x-dialog-modal maxWidth="3xl" class="w-3 h-full" wire:model.live="showModal">
+<x-dialog-modal maxWidth="3xl" wire:model="showModal">
     <x-slot name="title">
         {{__('Накласти КЕП')}}
     </x-slot>

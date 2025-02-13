@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Patient\Forms;
 
 use App\Rules\AlphaNumericWithSymbols;
@@ -8,6 +10,8 @@ use App\Rules\TwoLettersFourToSixDigitsOrComplex;
 use App\Rules\TwoLettersSixDigits;
 use App\Rules\EightDigitsHyphenFiveDigits;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -27,25 +31,37 @@ class PatientFormRequest extends Form
         'patient.birthSettlement' => ['required', 'string'],
         'patient.gender' => ['required', 'string'],
         'patient.unzr' => ['nullable', new EightDigitsHyphenFiveDigits()],
-        'patient.taxId' => ['nullable', 'numeric', 'digits:10'],
+        'patient.noTaxId' => ['nullable', 'boolean'],
+        'patient.taxId' => ['required_if:patient.noTaxId,false', 'numeric', 'digits:10'],
         'patient.secret' => ['required', 'string', 'min:6'],
         'patient.email' => ['nullable', 'email', 'string'],
 
         'patient.phones.*.type' => ['nullable', 'string'],
-        'patient.phones.*.number' => ['nullable', 'string', 'min:13', 'max:13'],
+        'patient.phones.*.number' => ['nullable', 'string', 'regex:/^\+38[0-9]{10}$/'],
 
         'patient.emergencyContact.firstName' => ['required', 'min:3', new Cyrillic()],
         'patient.emergencyContact.lastName' => ['required', 'min:3', new Cyrillic()],
         'patient.emergencyContact.secondName' => ['nullable', 'min:3', new Cyrillic()],
         'patient.emergencyContact.phones.*.type' => ['required', 'string'],
-        'patient.emergencyContact.phones.*.number' => ['required', 'string', 'min:13', 'max:13'],
+        'patient.emergencyContact.phones.*.number' => ['required', 'string', 'regex:/^\+38[0-9]{10}$/'],
 
         'patient.authenticationMethods.*.type' => ['required', 'string'],
-        'patient.authenticationMethods.*.phoneNumber' => ['nullable', 'string', 'min:13', 'max:13'],
+        'patient.authenticationMethods.*.phoneNumber' => ['nullable', 'regex:/^\+38[0-9]{10}$/'],
         'patient.authenticationMethods.*.value' => ['nullable', 'string'],
         'patient.authenticationMethods.*.alias' => ['nullable', 'string']
     ])]
     public array $patient = [];
+
+    #[Validate([
+        'patientsFilter.firstName' => ['required', 'min:3', new Cyrillic()],
+        'patientsFilter.lastName' => ['required', 'min:3', new Cyrillic()],
+        'patientsFilter.secondName' => ['nullable', 'min:3', new Cyrillic()],
+        'patientsFilter.birthDate' => ['required', 'date'],
+        'patientsFilter.taxId' => ['nullable', 'numeric', 'digits:10'],
+        'patientsFilter.phoneNumber' => ['nullable', 'string', 'min:13', 'max:13'],
+        'patientsFilter.birthCertificate' => ['nullable', 'string']
+    ])]
+    public array $patientsFilter = [];
 
     #[Validate([
         'documents.type' => ['required', 'string'],
@@ -67,13 +83,15 @@ class PatientFormRequest extends Form
     ])]
     public array $documentsRelationship = [];
 
+    public array $confidantPerson = [];
+
     #[Validate([
         'verificationCode' => ['required', 'numeric', 'digits:4']
     ])]
     public string $verificationCode;
 
     #[Validate([
-        'uploadedDocuments.*.documentsRelationship' => ['nullable', 'file', 'mimes:jpeg,jpg', 'max:10000']
+        'uploadedDocuments.*' => ['nullable', 'file', 'mimes:jpeg,jpg', 'max:10000']
     ])]
     public array $uploadedDocuments;
 
@@ -100,6 +118,7 @@ class PatientFormRequest extends Form
         if ($model === 'patient') {
             $this->addNoTaxIdValidation($rules);
             $this->addUnzrRuleIfRequired($rules);
+            $this->validateAddressees();
         }
 
         return $this->validate($rules);
@@ -108,43 +127,37 @@ class PatientFormRequest extends Form
     /**
      * Validate data before sending API request.
      *
-     * @return array
+     * @return void
+     * @throws ValidationException
      */
-    public function validateBeforeSendApi(): array
+    public function validateBeforeSendApi(): void
     {
-        $validationErrors = [];
+        $errors = new MessageBag();
 
         // Validate documents for minor patients
         $minorPatientValidation = $this->validateDocumentsForMinorPatient();
         if ($minorPatientValidation['error']) {
-            $validationErrors[] = $minorPatientValidation['message'];
+            $errors->add('minor_patient', $minorPatientValidation['message']);
         }
 
         // Validate necessity of confidant person
         $confidantPersonValidation = $this->validateNecessityOfConfidantPerson();
         if ($confidantPersonValidation['error']) {
-            $validationErrors[] = $confidantPersonValidation['message'];
+            $errors->add('confidant_person', $confidantPersonValidation['message']);
         }
 
         // Validate person's documents
         $documentValidation = $this->validatePersonDocuments();
         if ($documentValidation['error']) {
-            $validationErrors[] = $documentValidation['message'];
+            $errors->add('documents', $documentValidation['message']);
         }
 
-        // Return validation errors if any
-        if (!empty($validationErrors)) {
-            return [
-                'error' => true,
-                'messages' => $validationErrors
-            ];
-        }
+        if ($errors->isNotEmpty()) {
+            $validator = Validator::make([], []); // Empty validator
+            $validator->errors()->merge($errors);
 
-        // No errors found
-        return [
-            'error' => false,
-            'messages' => []
-        ];
+            throw new ValidationException($validator);
+        }
     }
 
     /**
@@ -237,7 +250,7 @@ class PatientFormRequest extends Form
         if ($personAge < self::NO_SELF_REGISTRATION_AGE && empty($this->documentsRelationship['personId'])) {
             return [
                 'error' => true,
-                'message' => __('Confidant person is mandatory for children.')
+                'message' => __('validation.custom.patient.confidantPersonRequiredForChildren')
             ];
         }
 
@@ -261,7 +274,7 @@ class PatientFormRequest extends Form
             if (!$hasLegalCapacityDocument && empty($this->documentsRelationship['personId'])) {
                 return [
                     'error' => true,
-                    'message' => __('Confidant person is mandatory for minor patients.')
+                    'message' => __('validation.custom.patient.confidantPersonRequiredForMinor')
                 ];
             }
 
@@ -269,7 +282,7 @@ class PatientFormRequest extends Form
             if ($hasLegalCapacityDocument && !empty($this->documentsRelationship['personId'])) {
                 return [
                     'error' => true,
-                    'message' => __('Confidant can not be submitted for person who has document that proves legal capacity.')
+                    'message' => __('validation.custom.patient.confidantPersonMustBeCapable')
                 ];
             }
         }
@@ -305,14 +318,14 @@ class PatientFormRequest extends Form
             if (!$hasRequiredDocument) {
                 return [
                     'error' => true,
-                    'message' => __('Documents should contain one of: BIRTH_CERTIFICATE, BIRTH_CERTIFICATE_FOREIGN.'),
+                    'message' => __('validation.custom.patient.birthDocumentsRequired')
                 ];
             }
         }
 
         return [
             'error' => false,
-            'message' => '',
+            'message' => ''
         ];
     }
 
@@ -337,7 +350,7 @@ class PatientFormRequest extends Form
                         // return the first found document type
                         return [
                             'error' => true,
-                            'message' => __("{$document['type']} can not be submitted for this person")
+                            'message' => __("{$document['type']} не може бути подана для цієї особи.")
                         ];
                     }
                 }
@@ -366,7 +379,7 @@ class PatientFormRequest extends Form
             if ($hasLegalCapacityDocument && !$hasRegistrationDocument) {
                 return [
                     'error' => true,
-                    'message' => __('Document that proves personal data must be submitted.')
+                    'message' => __('validation.custom.patient.personalDocumentsRequired')
                 ];
             }
         }
@@ -375,5 +388,20 @@ class PatientFormRequest extends Form
             'error' => false,
             'message' => ''
         ];
+    }
+
+    /**
+     * Validate addressees.
+     *
+     * @return void
+     * @throws ValidationException
+     */
+    private function validateAddressees():void
+    {
+        $errors = $this->component->addressValidation();
+
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
     }
 }

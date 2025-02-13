@@ -19,8 +19,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
- * @property LegalEntity|null $legalEntity
- *
+ * @mixin IdeHelperUser
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -77,14 +76,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_photo_url',
     ];
 
-
     /**
      * The relationships that should always be loaded.
      *
      * @var array
      */
     protected $with = ['legalEntity', 'person'];
-
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\belongsTo

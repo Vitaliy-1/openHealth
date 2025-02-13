@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Patient;
 
 use App\Classes\Cipher\Traits\Cipher;
@@ -10,32 +12,43 @@ use App\Livewire\Patient\Forms\PatientFormRequest;
 use App\Models\Person\Person;
 use App\Models\Person\PersonRequest;
 use App\Repositories\PersonRepository;
+use App\Traits\AddressSearch;
 use App\Traits\FormTrait;
 use App\Traits\InteractsWithCache;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Livewire\Attributes\On;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Throwable;
 
 class PatientForm extends Component
 {
-    use FormTrait, InteractsWithCache, WithFileUploads, Cipher;
+    use FormTrait, InteractsWithCache, WithFileUploads, Cipher, AddressSearch;
 
-    private const string CACHE_PREFIX = 'register_patient_form';
+    /**
+     * Allowed model modals name.
+     */
+    private const array ALLOWED_MODAL_MODELS = [
+        'documents',
+        'documentsRelationship'
+    ];
 
-    protected PersonRepository $personRepository;
-    protected string $patientCacheKey;
-    public string $patientId;
+    #[Locked]
+    public int $patientId;
 
     public array $documents = [];
     public array $documentsRelationship = [];
     public string $mode = 'create';
     public PatientFormRequest $patientRequest;
-    public Person $patient;
+
+    /**
+     * List of founded confidant person.
+     * @var array
+     */
+    public array $confidantPerson = [];
+
     public array $uploadedDocuments = [];
 
     /**
@@ -43,7 +56,20 @@ class PatientForm extends Component
      * @var string
      */
     public string $leafletContent;
-    public string $requestId;
+
+    /**
+     * Check if the search person's request found someone.
+     *
+     * @var bool
+     */
+    public bool $searchPerformed = false;
+
+    /**
+     * ID selected confidant person.
+     * @var string|null
+     */
+    public ?string $selectedConfidantPatientId = null;
+
     public int $keyProperty;
     public string $viewState = 'default';
 
@@ -72,12 +98,6 @@ class PatientForm extends Component
     public bool $isInformed = false;
 
     /**
-     * Check is patient refused to provide RNOCPP/IPN.
-     * @var bool
-     */
-    public bool $noTaxId = false;
-
-    /**
      * Is patient incapable or child less than 14 y.o.
      * @var bool
      */
@@ -88,6 +108,12 @@ class PatientForm extends Component
      * @var bool
      */
     public bool $isApproved = false;
+
+    /**
+     * Toggle displaying additional parameters.
+     * @var bool
+     */
+    public bool $showAdditionalParams = false;
 
     /**
      * KEP key.
@@ -101,8 +127,6 @@ class PatientForm extends Component
      */
     public int $resendCooldown = 60;
 
-    protected $listeners = ['addressDataFetched'];
-
     public array $dictionaries_field = [
         'DOCUMENT_TYPE',
         'DOCUMENT_RELATIONSHIP_TYPE',
@@ -111,33 +135,28 @@ class PatientForm extends Component
     ];
 
     /**
-     * Boot the component with required dependencies.
-     *
-     * @param  PersonRepository  $personRepository
-     * @return void
-     */
-    public function boot(PersonRepository $personRepository): void
-    {
-        $this->personRepository = $personRepository;
-        $this->patientCacheKey = self::CACHE_PREFIX . '-' . Auth::user()->legalEntity->uuid;
-    }
-
-    /**
      * Initialize the component with required data.
      *
-     * @param  Request  $request
-     * @param  string  $id
+     * @param  int|null  $id
      * @return void
      * @throws \App\Classes\Cipher\Exceptions\ApiException
      */
-    public function mount(Request $request, string $id = ''): void
+    public function mount(?int $id = null): void
     {
-        if ($request->has('storeId')) {
-            $this->requestId = $request->input('storeId');
-        }
+        if ($id !== null) {
+            $fromDatabase = PersonRequest::find($id);
 
-        if (!empty($id)) {
+            // Make sure the ID in the URL matches the patient's ID.
+            if ($fromDatabase->id !== $id) {
+                abort(403);
+            }
+
             $this->patientId = $id;
+
+            // Check if the patient has a related confidant person
+            $this->isIncapable = PersonRequest::where('id', $id)
+                ->whereHas('confidantPerson')
+                ->exists();
         }
 
         $this->getPatient();
@@ -151,57 +170,16 @@ class PatientForm extends Component
     }
 
     /**
-     * Save the chosen confidant person to cache and form.
-     *
-     * @param  array  $patientData
-     * @return void
-     */
-    #[On('confidant-person-selected')]
-    public function confidantPersonSelected(array $patientData): void
-    {
-        $cacheData = $this->getCache($this->patientCacheKey) ?? [];
-
-        $cacheData[$this->requestId]['documentsRelationship']['personId'] = $patientData['id'];
-        $cacheData[$this->requestId]['patient']['authenticationMethods'][0]['value'] = $patientData['id'];
-        $cacheData[$this->requestId]['patient']['confidantPersonInfo'] = $patientData;
-
-        $this->patientRequest->documentsRelationship['personId'] = $patientData['id'];
-        $this->patientRequest->patient['authenticationMethods'][0]['value'] = $patientData['id'];
-        $this->patientRequest->patient['confidantPersonInfo'] = $patientData;
-
-        $this->putCache($this->patientCacheKey, $cacheData);
-    }
-
-    /**
-     * Remove the confidant person from the cache and form.
-     *
-     * @return void
-     */
-    #[On('confidant-person-removed')]
-    public function confidantPersonRemoved(): void
-    {
-        $cacheData = $this->getCache($this->patientCacheKey) ?? [];
-
-        unset($cacheData[$this->requestId]['documentsRelationship'],
-            $cacheData[$this->requestId]['patient']['authenticationMethods'],
-            $cacheData[$this->requestId]['confidantPersonInfo']
-        );
-
-        $this->patientRequest->documentsRelationship['personId'] = null;
-        $this->patientRequest->patient['authenticationMethods'][0]['value'] = null;
-        $this->patientRequest->patient['confidantPersonInfo'] = null;
-
-        $this->putCache($this->patientCacheKey, $cacheData);
-    }
-
-    /**
      * Initialize the creation mode for a specific model.
      *
      * @param  string  $model  The model type to initialize for creation.
      * @return void
+     * @throws ValidationException
      */
     public function create(string $model): void
     {
+        $this->validateModel($model);
+
         $this->mode = 'create';
         $this->patientRequest->{$model} = [];
         $this->openModal($model);
@@ -212,77 +190,146 @@ class PatientForm extends Component
      *
      * @param  string  $model  The model type to store data for.
      * @return void
-     * @throws ValidationException
+     * @throws ValidationException|Throwable
      */
     public function store(string $model): void
     {
-        try {
-            $this->patientRequest->rulesForModelValidate($model);
-            $this->fetchDataFromAddressesComponent();
-            $this->resetErrorBag();
+        $this->validateModel($model);
+        $this->patientRequest->rulesForModelValidate($model);
 
-            if (isset($this->requestId)) {
-                if (isset($this->patientRequest->documentsRelationship['personId'])) {
-                    unset($this->patientRequest->documentsRelationship['personId']);
-                }
-
-                $this->storeCachePatient($model);
-            }
-
-            $this->closeModalModel();
-            $this->dispatch('flashMessage', [
-                'message' => __('Інформацію успішно оновлено'),
-                'type' => 'success'
-            ]);
-
-            $this->getPatient();
-            // allow to create person
-            if ($model === 'patient') {
-                $this->isPatientStored = true;
-            }
-        } catch (ValidationException $e) {
-            $this->dispatch('flashMessage', [
-                'message' => __('Помилка валідації'),
-                'type' => 'error'
-            ]);
-
-            if (isset($this->requestId) && $model === 'patient') {
-                $this->storeCachePatient($model);
-            }
-
-            throw $e;
-        }
+        $this->{$model}[] = $this->patientRequest->{$model};
+        $this->closeModal();
     }
 
     /**
-     * Store patient data in cache for a specific model.
+     * Initialize the edit mode for a specific model.
      *
-     * @param  string  $model  The model type to store data for.
+     * @param  string  $model  The model type to initialize for editing.
+     * @param  int  $keyProperty  The key property used to identify the specific item to edit.
+     * @return void
+     * @throws ValidationException
+     */
+    public function edit(string $model, int $keyProperty): void
+    {
+        $this->validateModel($model);
+
+        $this->keyProperty = $keyProperty;
+        $this->mode = 'edit';
+        $this->openModal($model);
+
+        // show data in form
+        $this->patientRequest->{$model} = $this->{$model}[$keyProperty];
+    }
+
+    /**
+     * Update the data for a specific model and key property.
+     *
+     * @param  string  $model  The model type to update the data for.
+     * @param  int  $keyProperty  The key property used to identify the specific item to update.
+     * @return void
+     * @throws ValidationException
+     */
+    public function update(string $model, int $keyProperty): void
+    {
+        $this->validateModel($model);
+        $this->patientRequest->rulesForModelValidate($model);
+
+        $this->{$model}[$keyProperty] = $this->patientRequest->{$model};
+        $this->closeModalModel($model);
+    }
+
+    /**
+     * Remove an item from the model by key in the cache.
+     *
+     * @param  string  $model
+     * @param  int  $keyProperty
+     * @return void
+     * @throws ValidationException
+     */
+    public function remove(string $model, int $keyProperty): void
+    {
+        $this->validateModel($model);
+
+        $this->keyProperty = $keyProperty;
+        unset($this->{$model}[$keyProperty]);
+    }
+
+    /**
+     * Close the modal and optionally reset the data for a specific model.
+     *
+     * @param  string|null  $model  The model type to reset the data for (optional).
      * @return void
      */
-    protected function storeCachePatient(string $model): void
+    public function closeModalModel(string $model = null): void
     {
-        $this->storeCacheData($this->patientCacheKey, $model, 'patientRequest', ['patient']);
+        if (!empty($model)) {
+            $this->patientRequest->{$model} = [];
+        }
+
+        $this->closeModal();
+    }
+
+    /**
+     * Choose a confidant person from the provided list.
+     *
+     * @param  string  $id
+     * @return void
+     */
+    public function chooseConfidantPerson(string $id): void
+    {
+        $patientData = collect($this->confidantPerson)->firstWhere('id', $id);
+
+        if ($patientData) {
+            $this->selectedConfidantPatientId = $id;
+            $this->confidantPerson = [$patientData];
+            $this->patientRequest->patient['authenticationMethods'][0]['value'] = $patientData['id'];
+        }
+
+        $this->searchPerformed = true;
+    }
+
+    /**
+     * Remove selected confidant person from the cache and form.
+     *
+     * @return void
+     */
+    public function removeConfidantPerson(): void
+    {
+        $this->patientRequest->patient['authenticationMethods'][0]['value'] = null;
+
+        $this->confidantPerson = [];
+        $this->selectedConfidantPatientId = null;
+        $this->searchPerformed = false;
+    }
+
+    /**
+     * Search for person with provided filters.
+     *
+     * @param  string  $model
+     * @return void
+     * @throws ApiException|ValidationException
+     */
+    public function searchForPerson(string $model): void
+    {
+        $this->patientRequest->rulesForModelValidate($model);
+
+        $buildSearchRequest = PatientRequestApi::buildSearchForPerson($this->patientRequest->patientsFilter);
+
+        $this->confidantPerson = arrayKeysToCamel(PersonApi::searchForPersonByParams($buildSearchRequest));
+        $this->searchPerformed = true;
     }
 
     /**
      * Send API request 'Create Person v2' and show the next page if data is validated.
      *
+     * @param $model
      * @return void
-     * @throws Throwable
+     * @throws ApiException|Throwable
      */
-    public function createPerson(): void
+    public function createPerson($model): void
     {
-        $open = $this->patientRequest->validateBeforeSendApi();
-
-        if ($open['error']) {
-            $this->dispatch('flashMessage', [
-                'message' => $open['messages'][0],
-                'type' => 'error'
-            ]);
-
-            return;
-        }
+        $this->preparePersonRequest();
+        $this->validatePersonRequest($model);
 
         $response = $this->sendPersonRequest(removeEmptyKeys($this->patientRequest->toArray()));
 
@@ -294,10 +341,15 @@ class PatientForm extends Component
         }
 
         if ($response['meta']['code'] === 201) {
-            $response['data']['person']['confidant_person']['confidantPersonInfo'] = $this->patientRequest->patient['confidantPersonInfo'];
-            // save in DB
-            $personSaved = $this->personRepository->savePersonResponseData($response['data'], PersonRequest::class);
+            if (isset($this->patientId)) {
+                $response['data']['dbId'] = $this->patientId;
+            }
 
+            if (isset($response['data']['person']['confidant_person'])) {
+                $response['data']['person']['confidant_person']['confidantPersonInfo'] = arrayKeysToSnake($this->confidantPerson[0]);
+            }
+            // save in DB
+            $personSaved = PersonRepository::savePersonResponseData($response['data'], PersonRequest::class);
             if (!$personSaved) {
                 $this->dispatch('flashMessage', [
                     'message' => 'Виникла помилка, зверніться до адміністратора.',
@@ -307,26 +359,67 @@ class PatientForm extends Component
                 return;
             }
 
-            $this->cleanAndUpdateCache($response);
-
+            $this->patientRequest->patient['id'] = $response['data']['id'];
             $this->uploadedDocuments = $response['urgent']['documents'];
             $this->viewState = 'new';
         }
     }
 
     /**
+     * Create data about person request in DB.
+     *
+     * @param  string  $model
+     * @return void
+     * @throws Throwable
+     */
+    public function createApplication(string $model): void
+    {
+        $this->preparePersonRequest();
+        $this->validatePersonRequest($model);
+
+        $response = PersonRepository::savePersonResponseData(
+            arrayKeysToSnake($this->patientRequest->toArray()),
+            PersonRequest::class
+        );
+
+        if ($response === false) {
+            $this->dispatch('flashMessage', [
+                'message' => 'Виникла помилка, зверніться до адміністратора.',
+                'type' => 'error'
+            ]);
+
+            return;
+        }
+
+        to_route('patient.index')->with('flashMessage', [
+            'message' => 'Пацієнт успішно створений',
+            'type' => 'success'
+        ]);
+    }
+
+    /**
      * Validate uploaded files and save.
      *
-     * @param  string  $propertyName
+     * @param  string  $field
      * @return void
      * @throws ValidationException
      */
-    public function updated(string $propertyName): void
+    public function updated(string $field): void
     {
-        if (str_starts_with($propertyName, 'patientRequest.uploadedDocuments')) {
+        if (str_starts_with($field, 'patientRequest.uploadedDocuments')) {
             $this->patientRequest->rulesForModelValidate('uploadedDocuments');
-            $this->uploadedDocuments = $this->patientRequest->uploadedDocuments;
         }
+    }
+
+    /**
+     * Delete uploaded file.
+     *
+     * @param  int  $key
+     * @return void
+     */
+    public function deleteDocument(int $key): void
+    {
+        unset($this->patientRequest->uploadedDocuments[$key]);
     }
 
     /**
@@ -340,11 +433,9 @@ class PatientForm extends Component
     {
         $this->patientRequest->rulesForModelValidate($model);
 
-        // Check that all files were uploaded
-        $allDocumentsUploaded = collect($this->patientRequest->uploadedDocuments)
-            ->every(fn($document) => isset($document['documentsRelationship']));
-
-        if (!$allDocumentsUploaded) {
+        $totalFiles = count($this->patientRequest->uploadedDocuments);
+        // Check that all provided files were uploaded
+        if ($totalFiles !== count($this->uploadedDocuments)) {
             $this->dispatch('flashMessage', [
                 'message' => 'Будь ласка завантажте всі файли!',
                 'type' => 'error',
@@ -354,16 +445,13 @@ class PatientForm extends Component
         }
 
         $successCount = 0;
-        $totalFiles = count($this->patientRequest->uploadedDocuments);
-
         foreach ($this->patientRequest->uploadedDocuments as $key => $document) {
-            if (!isset($document['documentsRelationship'])) {
-                continue;
-            }
-
             try {
-                $requestData = PatientRequestApi::buildUploadFileRequest($document['documentsRelationship']);
-                $uploadResponse = PersonApi::uploadFileRequest($document['url'], $requestData);
+                $requestData = PatientRequestApi::buildUploadFileRequest($document);
+                $uploadResponse = PersonApi::uploadFileRequest(
+                    trim($this->uploadedDocuments[$key]['url']),
+                    $requestData
+                );
 
                 if (isset($uploadResponse['status']) && $uploadResponse['status'] === 200) {
                     $successCount++;
@@ -377,7 +465,7 @@ class PatientForm extends Component
 
                     $this->uploadedFiles[$key] = false;
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 $this->dispatch('flashMessage', [
                     'message' => 'Виникла помилка, зверніться до адміністратора',
                     'type' => 'error',
@@ -395,167 +483,6 @@ class PatientForm extends Component
                 'message' => 'Всі файли успішно завантажено',
                 'type' => 'success',
             ]);
-        }
-    }
-
-    /**
-     * Delete uploaded file.
-     *
-     * @param  int  $key
-     * @return void
-     */
-    public function deleteDocument(int $key): void
-    {
-        unset($this->patientRequest->uploadedDocuments[$key]['documentsRelationship']);
-        $this->uploadedDocuments = $this->patientRequest->uploadedDocuments;
-    }
-
-    /**
-     * Build and send API request 'Approve Person v2' and show the next page if data is validated.
-     *
-     * @param  string  $model
-     * @return void
-     * @throws ValidationException|Throwable
-     */
-    public function approvePerson(string $model): void
-    {
-        $this->patientRequest->rulesForModelValidate($model);
-
-        $preRequest = [
-            'verification_code' => (int) $this->patientRequest->verificationCode
-        ];
-        $requestData = schemaService()
-            ->setDataSchema($preRequest, app(PersonApi::class))
-            ->requestSchemaNormalize('approveSchemaRequest')
-            ->getNormalizedData();
-
-        $cacheData = $this->getCache($this->patientCacheKey);
-        $response = PersonApi::approvePersonRequest($cacheData[$this->requestId]['patient']['id'], $requestData);
-
-        if ($response['status'] !== 'APPROVED') {
-            $this->dispatch('flashMessage', [
-                'message' => 'Виникла помилка, зверніться до адміністратора.',
-                'type' => 'error'
-            ]);
-        }
-
-        if ($response['status'] === 'APPROVED') {
-            $this->personRepository->updatePersonRequestStatusByUuid($response);
-            $this->isApproved = true;
-
-            // save a leaflet and open the modal
-            $this->leafletContent = $response['content'];
-            $cacheData[$this->requestId]['content'] = $response['content'];
-            $this->putCache($this->patientCacheKey, $cacheData);
-
-            $this->openModal('patientLeaflet');
-        }
-    }
-
-    /**
-     * Inform the patient about processing his data and close the modal.
-     *
-     * @return void
-     */
-    public function informAndCloseModal(): void
-    {
-        $this->isInformed = true;
-        $this->isApproved = true;
-        $this->closeModalModel();
-    }
-
-    /**
-     * Build and send API request 'Sign Person v2' and redirect to page if data is validated.
-     *
-     * @return void
-     * @throws ApiException|Throwable
-     */
-    public function signPerson(): void
-    {
-        $cacheData = $this->getCache($this->patientCacheKey);
-        $patientId = $cacheData[$this->requestId]['patient']['id'];
-
-        $getPatientById = PersonApi::getCreatedPersonById($patientId);
-        unset($getPatientById['meta'], $getPatientById['urgent']);
-        $getPatientById['data']['patient_signed'] = $this->isInformed;
-
-        // encrypt data
-        $encryptedRequestData = schemaService()
-            ->setDataSchema($getPatientById['data'], app(PersonApi::class))
-            ->requestSchemaNormalize('encryptSignSchemaRequest')
-            ->getNormalizedData();
-
-        $base64EncryptedData = $this->sendEncryptedData($encryptedRequestData, Auth::user()->tax_id);
-
-        // sign person request
-        $preRequest = [
-            'signed_content' => $base64EncryptedData
-        ];
-        $signRequestData = schemaService()
-            ->setDataSchema($preRequest, app(PersonApi::class))
-            ->requestSchemaNormalize('signSchemaRequest')
-            ->getNormalizedData();
-
-        $signResponse = PersonApi::singPersonRequest($patientId, $signRequestData, Auth::user()->tax_id);
-
-        if ($signResponse['status'] !== 'SIGNED') {
-            $this->dispatch('flashMessage', [
-                'message' => 'Виникла помилка, зверніться до адміністратора.',
-                'type' => 'error',
-            ]);
-        }
-
-        if ($signResponse['status'] === 'SIGNED') {
-            // create related person, update status
-            $personSaved = $this->personRepository->savePersonResponseData(
-                $getPatientById['data'],
-                Person::class,
-                $signResponse['person_id']
-            );
-            $statusUpdated = $this->personRepository->updatePersonRequestStatusByUuid($signResponse);
-            $relationCreated = $this->personRepository->createRelation($signResponse);
-
-            if (!$personSaved || !$statusUpdated || !$relationCreated) {
-                $this->dispatch('flashMessage', [
-                    'message' => 'Виникла помилка, зверніться до адміністратора.',
-                    'type' => 'error'
-                ]);
-
-                return;
-            }
-
-            $this->forgetCache($this->patientCacheKey);
-
-            to_route('patient.index')->with('flashMessage', [
-                'message' => 'Пацієнт успішно створений',
-                'type' => 'success'
-            ]);
-        }
-    }
-
-    /**
-     * @throws \App\Classes\Cipher\Exceptions\ApiException
-     */
-    public function setCertificateAuthority(): array|null
-    {
-        return $this->getCertificateAuthority = $this->getCertificateAuthority();
-    }
-
-    public function updatedFile(): void
-    {
-        $this->keyContainerUpload = $this->file;
-    }
-
-    /**
-     * Set empty string to taxId if patient refused to provide RNOCPP/IPN.
-     *
-     * @param  bool  $noTaxId
-     * @return void
-     */
-    public function updatedNoTaxId(bool $noTaxId): void
-    {
-        if ($noTaxId) {
-            $this->patientRequest->patient['taxId'] = '';
         }
     }
 
@@ -584,6 +511,166 @@ class PatientForm extends Component
     }
 
     /**
+     * Build and send API request 'Approve Person v2' and show the next page if data is validated.
+     *
+     * @param  string  $model
+     * @return void
+     * @throws Throwable
+     */
+    public function approvePerson(string $model): void
+    {
+        try {
+            $this->patientRequest->rulesForModelValidate($model);
+        } catch (ValidationException $e) {
+            $this->dispatch('flashMessage', [
+                'message' => 'Помилка валідації.',
+                'type' => 'error'
+            ]);
+
+            throw $e;
+        }
+
+        $preRequest = [
+            'verification_code' => (int) $this->patientRequest->verificationCode
+        ];
+        $requestData = schemaService()
+            ->setDataSchema($preRequest, app(PersonApi::class))
+            ->requestSchemaNormalize('approveSchemaRequest')
+            ->getNormalizedData();
+
+        $response = PersonApi::approvePersonRequest($this->patientRequest->patient['id'], $requestData);
+
+        if ($response['status'] !== 'APPROVED') {
+            $this->dispatch('flashMessage', [
+                'message' => 'Виникла помилка, зверніться до адміністратора.',
+                'type' => 'error'
+            ]);
+        }
+
+        if ($response['status'] === 'APPROVED') {
+            PersonRepository::updatePersonRequestStatusByUuid($response);
+            $this->isApproved = true;
+
+            // save a leaflet and open the modal
+            $this->leafletContent = $response['content'];
+            $this->openModal('patientLeaflet');
+        }
+    }
+
+    /**
+     * Inform the patient about processing his data and close the modal.
+     *
+     * @return void
+     */
+    public function informAndCloseModal(): void
+    {
+        $this->isInformed = true;
+        $this->isApproved = true;
+        $this->closeModalModel();
+    }
+
+    public function updatedFile(): void
+    {
+        $this->keyContainerUpload = $this->file;
+    }
+
+    /**
+     * Build and send API request 'Sign Person v2' and redirect to page if data is validated.
+     *
+     * @return void
+     * @throws ApiException|Throwable
+     */
+    public function signPerson(): void
+    {
+        $getPatientById = PersonApi::getCreatedPersonById($this->patientRequest->patient['id']);
+        unset($getPatientById['meta'], $getPatientById['urgent']);
+        $getPatientById['data']['patient_signed'] = $this->isInformed;
+
+        // encrypt data
+        $encryptedRequestData = schemaService()
+            ->setDataSchema($getPatientById['data'], app(PersonApi::class))
+            ->requestSchemaNormalize('encryptSignSchemaRequest')
+            ->getNormalizedData();
+
+        $base64EncryptedData = $this->sendEncryptedData($encryptedRequestData, Auth::user()->tax_id);
+
+        // sign person request
+        $preRequest = [
+            'signed_content' => $base64EncryptedData
+        ];
+        $signRequestData = schemaService()
+            ->setDataSchema($preRequest, app(PersonApi::class))
+            ->requestSchemaNormalize('signSchemaRequest')
+            ->getNormalizedData();
+
+        $signResponse = PersonApi::singPersonRequest(
+            $this->patientRequest->patient['id'],
+            $signRequestData,
+            Auth::user()->tax_id
+        );
+
+        if ($signResponse['status'] !== 'SIGNED') {
+            $this->dispatch('flashMessage', [
+                'message' => 'Виникла помилка, зверніться до адміністратора.',
+                'type' => 'error',
+            ]);
+        }
+
+        if ($signResponse['status'] === 'SIGNED') {
+            // create related person, update status
+            $personSaved = PersonRepository::savePersonResponseData(
+                $getPatientById['data'],
+                Person::class,
+                $signResponse['person_id']
+            );
+            $statusUpdated = PersonRepository::updatePersonRequestStatusByUuid($signResponse);
+            $relationCreated = PersonRepository::createRelation($signResponse);
+
+            if (!$personSaved || !$statusUpdated || !$relationCreated) {
+                $this->dispatch('flashMessage', [
+                    'message' => 'Виникла помилка, зверніться до адміністратора.',
+                    'type' => 'error'
+                ]);
+
+                return;
+            }
+
+            to_route('patient.index')->with('flashMessage', [
+                'message' => 'Пацієнт успішно створений',
+                'type' => 'success'
+            ]);
+        }
+    }
+
+    /**
+     * Get all data about the patient from the DB.
+     *
+     * @return void
+     */
+    protected function getPatient(): void
+    {
+        if (isset($this->patientId)) {
+            $patientData = PersonRequest::showPersonRequest($this->patientId);
+            $this->patientRequest->fill($patientData);
+            $this->documents = $patientData['documents'] ?? [];
+            $this->documentsRelationship = $patientData['confidantPerson'][0]['documentsRelationship'] ?? [];
+            $this->address = $patientData['address'];
+            $this->confidantPerson = $patientData['confidantPerson'] ?? [];
+        }
+    }
+
+    /**
+     * Get Certificate Authority from API.
+     *
+     * @return array
+     * @throws \App\Classes\Cipher\Exceptions\ApiException
+     */
+    private function setCertificateAuthority(): array
+    {
+        return $this->getCertificateAuthority = $this->getCertificateAuthority();
+    }
+
+    /**
      * Build and send API request for create person.
      *
      * @param  array  $patientData
@@ -592,13 +679,11 @@ class PatientForm extends Component
      */
     protected function sendPersonRequest(array $patientData): array
     {
-        $patientData['patient']['noTaxId'] = $this->noTaxId;
         $patientData['patient']['documents'] = $patientData['documents'];
         $patientData['patient']['addresses'][] = $patientData['addresses'];
 
-        if (!empty($patientData['documentsRelationship'])) {
-            $patientData['patient']['confidantPerson']['personId'] = $patientData['documentsRelationship']['personId'];
-            unset($patientData['documentsRelationship']['personId']);
+        if (!empty($patientData['confidantPerson'])) {
+            $patientData['patient']['confidantPerson']['personId'] = $patientData['confidantPerson'][0]['personUuid'] ?? $patientData['confidantPerson'][0]['id'];
             $patientData['patient']['confidantPerson']['documentsRelationship'] = $patientData['documentsRelationship'];
         }
 
@@ -614,191 +699,55 @@ class PatientForm extends Component
     }
 
     /**
-     * Get all data about the patient from the DB or cache.
-     *
-     * @return void
+     * Prepare person request data
      */
-    protected function getPatient(): void
+    private function preparePersonRequest(): void
     {
-        if (isset($this->patientId)) {
-            $patientData = PersonRequest::showPersonRequest($this->patientId);
-            $this->patientRequest->fill($patientData);
-            $this->documents = $patientData['documents'] ?? [];
-            $this->documentsRelationship = $patientData['documentsRelationship'][0]['documentsRelationship'] ?? [];
-        }
-
-        if (isset($this->requestId) && $this->hasCache($this->patientCacheKey)) {
-            $patientData = $this->getCache($this->patientCacheKey);
-            if (isset($patientData[$this->requestId])) {
-                $this->patientRequest->fill($patientData[$this->requestId]);
-                $this->documents = $this->patientRequest->documents ?? [];
-                $this->documentsRelationship = $this->patientRequest->documentsRelationship ?? [];
-            }
-        }
+        $this->patientRequest->addresses = $this->address;
+        $this->patientRequest->documents = $this->documents;
+        $this->patientRequest->documentsRelationship = $this->documentsRelationship;
+        $this->patientRequest->confidantPerson = $this->confidantPerson;
     }
 
     /**
-     * Initialize the edit mode for a specific model.
+     * Validate person request data.
      *
-     * @param  string  $model  The model type to initialize for editing.
-     * @param  int  $keyProperty  The key property used to identify the specific item to edit.
-     * @return void
+     * @param  string  $model
+     * @throws ValidationException
      */
-    public function edit(string $model, int $keyProperty): void
+    private function validatePersonRequest(string $model): void
     {
-        $this->keyProperty = $keyProperty;
-        $this->mode = 'edit';
-        $this->openModal($model);
+        try {
+            $this->patientRequest->rulesForModelValidate($model);
+            $this->patientRequest->validateBeforeSendApi();
+        } catch (ValidationException $e) {
+            $this->dispatch('flashMessage', [
+                'message' => $e->validator->errors()->first(),
+                'type' => 'error'
+            ]);
 
-        if (isset($this->requestId)) {
-            $this->editCachePatient($model, $keyProperty);
+            throw $e;
         }
     }
 
     /**
-     * Update the patient request data with cached data for a specific model.
+     * Validate model name from modals.
      *
-     * @param  string  $model  The model type to update the data for.
-     * @param  int  $keyProperty  The key property used to identify the specific item to update (optional).
-     * @return void
-     */
-    protected function editCachePatient(string $model, int $keyProperty): void
-    {
-        $cacheData = $this->getCache($this->patientCacheKey);
-
-        if (empty($keyProperty) && $keyProperty !== 0) {
-            $this->patientRequest->{$model} = $cacheData[$this->requestId][$model];
-        } else {
-            $this->patientRequest->{$model} = $cacheData[$this->requestId][$model][$keyProperty];
-        }
-    }
-
-    /**
-     * Dispatch an event to fetch address data from the addresses component.
-     *
-     * @return void
-     */
-    public function fetchDataFromAddressesComponent(): void
-    {
-        $this->dispatch('fetchAddressData');
-    }
-
-    /**
-     * Updates the patient request with fetched address data and stores it in the cache.
-     *
-     * @param  array  $addressData  An associative array containing address data for the patient.
-     * @return void
-     */
-    public function addressDataFetched(array $addressData): void
-    {
-        $this->patientRequest->addresses = $addressData;
-        $this->putAddressesInCache('addresses', $addressData);
-    }
-
-    /**
-     * Updates the cache with the provided data under a specific key for the current request ID.
-     *
-     * @param  string  $key  The key under which the data should be stored in the cache
-     * @param  array  $data  The data to be stored in the cache.
-     * @return void
-     */
-    private function putAddressesInCache(string $key, array $data): void
-    {
-        $cacheData = $this->getCache($this->patientCacheKey) ?? [];
-        $cacheData[$this->requestId][$key] = $data;
-
-        $this->putCache($this->patientCacheKey, $cacheData);
-    }
-
-    /**
-     * Update the data for a specific model and key property.
-     *
-     * @param  string  $model  The model type to update the data for.
-     * @param  int  $keyProperty  The key property used to identify the specific item to update.
+     * @param  string  $model
      * @return void
      * @throws ValidationException
      */
-    public function update(string $model, int $keyProperty): void
+    private function validateModel(string $model): void
     {
-        $this->patientRequest->rulesForModelValidate($model);
-        $this->resetErrorBag();
+        if (!in_array($model, self::ALLOWED_MODAL_MODELS, true)) {
+            $this->dispatch('flashMessage', [
+                'message' => 'Недопустиме значення моделі',
+                'type' => 'error'
+            ]);
 
-        if (isset($this->requestId)) {
-            $this->updateCachePatient($model, $keyProperty);
+            throw ValidationException::withMessages([
+                'model' => 'Недопустиме значення моделі'
+            ]);
         }
-
-        $this->closeModalModel($model);
-        $this->getPatient();
-    }
-
-    /**
-     * Update the cached data for a specific model and key property.
-     *
-     * @param  string  $model  The model type to update the data for.
-     * @param  int  $keyProperty  The key property used to identify the specific item to update.
-     * @return void
-     */
-    protected function updateCachePatient(string $model, int $keyProperty): void
-    {
-        if ($this->hasCache($this->patientCacheKey)) {
-            $cacheData = $this->getCache($this->patientCacheKey);
-            $cacheData[$this->requestId][$model][$keyProperty] = $this->patientRequest->{$model};
-
-            $this->putCache($this->patientCacheKey, $cacheData);
-        }
-    }
-
-    /**
-     * Close the modal and optionally reset the data for a specific model.
-     *
-     * @param  string|null  $model  The model type to reset the data for (optional).
-     * @return void
-     */
-    public function closeModalModel(string $model = null): void
-    {
-        if (!empty($model)) {
-            $this->patientRequest->{$model} = [];
-        }
-
-        $this->closeModal();
-    }
-
-    /**
-     * Remove an item from the model by key in the cache.
-     *
-     * @param  string  $model
-     * @param  string  $keyProperty
-     * @return void
-     */
-    public function remove(string $model, string $keyProperty = ''): void
-    {
-        $cacheData = $this->getCache($this->patientCacheKey);
-
-        if (isset($cacheData[$this->requestId][$model][$keyProperty])) {
-            unset($cacheData[$this->requestId][$model][$keyProperty]);
-        }
-
-        $this->putCache($this->patientCacheKey, $cacheData);
-        $this->getPatient();
-    }
-
-    /**
-     * Cleans cache data keeping only uploaded documents and patient ID.
-     *
-     * @param  array  $response  API response
-     * @return void
-     */
-    private function cleanAndUpdateCache(array $response): void
-    {
-        $cacheData = $this->getCache($this->patientCacheKey);
-
-        $cacheData[$this->requestId] = [
-            'uploadedDocuments' => $response['urgent']['documents'],
-            'patient' => [
-                'id' => $response['data']['id']
-            ],
-        ];
-
-        $this->putCache($this->patientCacheKey, $cacheData);
     }
 }

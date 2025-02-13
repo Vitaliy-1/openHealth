@@ -5,7 +5,11 @@ namespace App\Models\Relations;
 use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @mixin IdeHelperQualification
+ */
 class Qualification extends Model
 {
     use HasFactory;
@@ -21,7 +25,7 @@ class Qualification extends Model
         'additionalInfo',
     ];
 
-    public function qualificationable()
+    public function qualificationable(): MorphTo
     {
         return $this->morphTo();
     }

@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
+/**
+ * @mixin IdeHelperParty
+ */
 class Party extends Model
 {
-    use HasFactory;
     use HasCamelCasing;
-
+    use HasFactory;
 
     protected $fillable = [
         'uuid',
@@ -45,5 +47,4 @@ class Party extends Model
     {
         return $this->morphMany(Phone::class, 'phoneable');
     }
-
 }

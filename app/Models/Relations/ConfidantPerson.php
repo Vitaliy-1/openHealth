@@ -7,9 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
+/**
+ * @mixin IdeHelperConfidantPerson
+ */
 class ConfidantPerson extends Model
 {
     protected $table = 'confidant_persons';
+
+    protected $hidden = [
+        'id',
+        'created_at',
+        'updated_at'
+    ];
 
     protected $fillable = [
         'person_request_id',

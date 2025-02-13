@@ -12,8 +12,15 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
+/**
+ * @mixin IdeHelperBasePerson
+ */
 class BasePerson extends Model
 {
+    protected $hidden = [
+        'id'
+    ];
+
     protected $fillable = [
         'uuid',
         'first_name',

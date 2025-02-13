@@ -13,22 +13,22 @@ class ConfidantPersonRepository
     {
         if (!empty($confidantPersons)) {
             // Get person_id by uuid
-            $person = Person::where('uuid', $confidantPersons['person_id'])->first();
+            if (isset($confidantPersons['person_id'])) {
+                $person = Person::where('uuid', $confidantPersons['person_id'])->first();
+            }
 
-            // formatting data array
+            // Formatting data array
             $confidantPersonData = $confidantPersons['confidantPersonInfo'];
             $confidantPersonData['person_request_id'] = $model->id;
             $confidantPersonData['person_id'] = $person->id ?? null;
-            $confidantPersonData['person_uuid'] = $confidantPersonData['id'];
+            $confidantPersonData['person_uuid'] = $confidantPersonData['id'] ?? $confidantPersonData['person_uuid'];
             unset($confidantPersonData['id']);
 
             $confidantPersonData['documents_relationship'] = $confidantPersons['documents_relationship'];
 
-            $confidantPerson = ConfidantPerson::updateOrCreate(
-                [
-                    'person_uuid' => $confidantPersonData['person_uuid'],
-                    'person_request_id' => $model->id,
-                ],
+            $confidantPerson = ConfidantPerson::updateOrCreate([
+                'person_request_id' => $model->id
+            ],
                 $confidantPersonData
             );
 
