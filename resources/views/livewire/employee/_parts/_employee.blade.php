@@ -1,6 +1,6 @@
-<fieldset class="fieldset" xmlns="http://www.w3.org/1999/html">
+<fieldset class="fieldset">
     <legend class="legend">
-        {{__('forms.personalData')}}
+        <h2>{{__('forms.personalData')}}</h2>
     </legend>
 
     <div class="form-row-3">

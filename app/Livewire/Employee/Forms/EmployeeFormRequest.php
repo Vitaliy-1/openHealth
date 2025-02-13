@@ -14,7 +14,6 @@ use function Livewire\of;
 class EmployeeFormRequest extends Form
 {
 
-
     public string $status = 'NEW';
 
     #[Validate([
