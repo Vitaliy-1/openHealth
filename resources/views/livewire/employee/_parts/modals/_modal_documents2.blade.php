@@ -13,29 +13,7 @@
                 </button>
             </div>
 
-            <form action="#">
-                <div class="form-row-modal">
-                    <div>
-                        <label for="documentType" class="label-modal">{{__('forms.documentType')}}</label>
-                        <input type="text" name="documentType" id="documentType" class="input-modal" required>
-                    </div>
-                    <div>
-                        <label for="documentNumber" class="label-modal">{{__('forms.documentNumber')}}</label>
-                        <input type="text" name="documentNumber" id="documentNumber" class="input-modal" required>
-                    </div>
-                    <div>
-                        <label for="documentIssuedBy" class="label-modal">{{__('forms.documentIssuedBy')}}</label>
-                        <input type="text" name="documentIssuedBy" id="documentIssuedBy" class="input-modal">
-                    </div>
-                    <div>
-                        <label for="documentIssuedAt" class="label-modal">{{__('forms.documentIssuedAt')}}</label>
-                        <input type="text" name="documentIssuedAt" id="documentIssuedAt" class="input-modal">
-                    </div>
-                </div>
-                <button type="submit" class="button-primary mt-4">
-                    {{__('forms.save')}}
-                </button>
-            </form>
+            з
         </div>
     </div>
 

@@ -4,14 +4,13 @@ namespace App\Livewire\Employee\Forms;
 
 use App\Rules\AgeCheck;
 use App\Rules\Cyrillic;
-use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
 use function Livewire\of;
 
-class EmployeeFormRequest extends Form
+class EmployeeForm extends Form
 {
 
     public string $status = 'NEW';

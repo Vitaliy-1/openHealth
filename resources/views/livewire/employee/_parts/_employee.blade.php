@@ -190,7 +190,7 @@
                     required
             >
                 <option selected>{{__('forms.positionChoose')}} *</option>
-                @foreach($this->dictionaries['POSITION_EMPLOYEE_TYPE'] as $k => $position)
+                @foreach($this->dictionaries['POSITION'] as $k => $position)
                     <option value="{{$k}}">{{$position}}</option>
                 @endforeach
             </select>

@@ -29,7 +29,7 @@
                     </x-forms.form-group>
                 </div>
                 <div class="button-group border-0 ">
-                    <a href="{{route('employee.form',['storeId' => $storeId])}}" type="button"
+                    <a href="{{route('employee.create')}}" type="button"
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                         {{__('Додати Співробітника')}}
                     </a>
@@ -131,12 +131,12 @@
                                                 style="display: none;"
                                                 class="absolute right-0 mt-2 w-40 rounded-md bg-white shadow-md z-50">
                                                 @if(!isset($employee->id) && empty($employee->id))
-                                                <a href="{{route('employee.form', ['storeId' => $k])}}"
+                                                <a href="{{route('employee.edit', $employee->id)}}"
                                                    class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">
                                                     {{__('forms.edit')}}
                                                 </a>
                                                 @else
-                                                    <a href="{{route('employee.form', $employee->id)}}"
+                                                    <a href="{{route('employee.edit', $employee->id)}}"
                                                        class="flex items-center gap-2 w-full first-of-type:rounded-t-md last-of-type:rounded-b-md px-4 py-2.5 text-left text-sm hover:bg-gray-50 disabled:text-gray-500">
                                                         {{__('forms.edit')}}
                                                     </a>

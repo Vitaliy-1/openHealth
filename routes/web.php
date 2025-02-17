@@ -8,7 +8,8 @@ use App\Livewire\Declaration\DeclarationIndex;
 use App\Livewire\Division\DivisionForm;
 use App\Livewire\Division\DivisionIndex;
 use App\Livewire\Division\HealthcareServiceForm;
-use App\Livewire\Employee\EmployeeForm;
+use App\Livewire\Employee\EmployeeCreate;
+use App\Livewire\Employee\EmployeeEdit;
 use App\Livewire\Employee\EmployeeIndex;
 use App\Livewire\Encounter\EncounterCreate;
 use App\Livewire\LegalEntity\LegalEntities;
@@ -65,7 +66,8 @@ Route::middleware([
 
         Route::prefix('employee')->group(function () {
             Route::get('/', EmployeeIndex::class)->name('employee.index');
-            Route::get('/form/{id?}', EmployeeForm::class)->name('employee.form');
+            Route::get('/{id}', EmployeeEdit::class)->name('employee.edit');
+            Route::get('/create', EmployeeCreate::class)->name('employee.create');
         });
 
         Route::prefix('contract')->group(function () {

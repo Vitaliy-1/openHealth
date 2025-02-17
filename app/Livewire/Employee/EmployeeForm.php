@@ -4,7 +4,7 @@ namespace App\Livewire\Employee;
 
 use App\Classes\eHealth\Api\EmployeeApi;
 use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
-use App\Livewire\Employee\Forms\EmployeeFormRequest;
+use App\Livewire\Employee\Forms\EmployeeForm as Form;
 use App\Models\Division;
 use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeRequest;
@@ -27,7 +27,7 @@ class EmployeeForm extends Component
 
     const CACHE_PREFIX = 'register_employee_form';
 
-    public EmployeeFormRequest $employeeRequest;
+    public Form $employeeRequest;
 
     protected string $employeeCacheKey;
 
@@ -413,7 +413,7 @@ class EmployeeForm extends Component
 
     public function render()
     {
-        return view('livewire.employee.employee-form');
+        return view('livewire.employee.employee-create');
     }
 
 
