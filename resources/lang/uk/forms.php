@@ -124,6 +124,7 @@ return [
     'archivePlace' => 'Адреса будівлі, де знаходяться паперові документи',
     'employeeType' => 'Тип працівника',
     'position' => 'Посада',
+    'positionChoose' => 'Обрати посаду',
     'specialityLevel' => 'Рівень спеціалізації',
     'qualificationCategory' => 'Категорія кваліфікації',
     'qualification' => 'Кваліфікація',
@@ -154,6 +155,7 @@ return [
     'workingExperience' => 'Досвід роботи',
     'selectCountry' => 'Обрати країну',
     'role' => 'Роль',
+    'roleChoose' => 'Обрати роль',
     'qualificationType' => 'Тип кваліфікації',
     'addButton' => 'Додати',
     'healthcareService' => 'Послуга здоров\'я',
@@ -238,6 +240,8 @@ return [
     'specialityQualificationType' => 'Тип навчальної діяльності',
     'specialityAttestationName' => 'Назва навчальної діяльності',
     'specialityAttestationDate' => 'Дата навчальної діяльності',
-    'actions' => 'Діі',
-    'delete' => 'Видалити'
+    'actions' => 'Дії',
+    'delete' => 'Видалити',
+    'modalClose' => 'Закрити модальне вікно',
+    'fieldEmpty' => 'Це поле не має бути пустим'
 ];
