@@ -50,7 +50,7 @@ class EncounterCreate extends Component
      */
     public ?object $file = null;
 
-    public array $dictionaries_field = [
+    public array $dictionaryNames = [
         'eHealth/resources',
         'eHealth/encounter_statuses',
         'eHealth/encounter_classes',
