@@ -5,7 +5,7 @@
               {{-- Binding documents to Alpine, it will be re-used in the modal.
                 Note that it's necessary for modal to work properly --}}
               x-data="{
-                  documents: $wire.entangle('employeeRequest.documents'),
+                  documents: $wire.entangle('form.documents'),
                   openModal:false,
                   modalDocument: new Doc(),
                   newDocument: false,

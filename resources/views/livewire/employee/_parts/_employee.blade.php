@@ -6,11 +6,11 @@
     <div class="form-row-3">
         <div class="form-group group relative">
             <input
-                wire:model="employeeRequest.party.lastName"
+                wire:model="form.party.lastName"
                 type="text"
                 name="lastName"
                 id="lastName"
-                class="input peer @error('employeeRequest.party.lastName') input-error @enderror"
+                class="input peer @error('form.party.lastName') input-error @enderror"
                 placeholder=" "
                 required
             />
@@ -19,7 +19,7 @@
                 {{__('forms.last_name')}}
             </label>
 
-            @error('employeeRequest.party.lastName')
+            @error('form.party.lastName')
                 <p class="text-error">
                     {{$message}}
                 </p>
@@ -27,11 +27,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="employeeRequest.party.firstName"
+            <input wire:model="form.party.firstName"
                    type="text"
                    name="firstName"
                    id="firstName"
-                   class="input peer @error('employeeRequest.party.firstName') input-error @enderror"
+                   class="input peer @error('form.party.firstName') input-error @enderror"
                    placeholder=" "
                    required
             />
@@ -39,7 +39,7 @@
                 {{__('forms.first_name')}}
             </label>
 
-            @error('employeeRequest.party.firstName')
+            @error('form.party.firstName')
                 <p class="text-error">
                     {{$message}}
                 </p>
@@ -48,19 +48,18 @@
 
         <div class="form-group group">
             <input
-                wire:model="employeeRequest.party.secondName"
+                wire:model="form.party.secondName"
                 type="text"
                 name="secondName"
                 id="secondName"
-                class="input peer @error('employeeRequest.party.secondName') input-error @enderror"
+                class="input peer @error('form.party.secondName') input-error @enderror"
                 placeholder=" "
-                required
             />
             <label for="secondName" class="label">
                 {{__('forms.second_name')}}
             </label>
 
-            @error('employeeRequest.party.secondName')
+            @error('form.party.secondName')
                 <p class="text-error">
                     {{$message}}
                 </p>
@@ -71,14 +70,14 @@
     <div class="form-row-4">
         <div class="form-group group">
             <label for="employeeGender" class="sr-only">{{__('forms.select')}} {{__('forms.gender')}}</label>
-            <select wire:model="employeeRequest.party.gender" id="employeeGender" class="input-select peer" required>
+            <select wire:model="form.party.gender" id="employeeGender" class="input-select peer" required>
                 <option selected>{{__('forms.gender')}} *</option>
                 @foreach($this->dictionaries['GENDER'] as $k=>$gender )
                     <option value="{{$k}}">{{$gender}}</option>
                 @endforeach
             </select>
 
-            @error('employeeRequest.party.gender')
+            @error('form.party.gender')
             <p class="text-error">
                 {{$message}}
             </p>
@@ -90,12 +89,12 @@
                 <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
             </svg>
 
-            <input wire:model="employeeRequest.party.birthDate"
+            <input wire:model="form.party.birthDate"
                    datepicker
                    type="text"
                    name="birthDate"
                    id="birthDate"
-                   class="input default-datepicker peer @error('employeeRequest.party.birthDate') input-error @enderror"
+                   class="input default-datepicker peer @error('form.party.birthDate') input-error @enderror"
                    placeholder=" "
                    required
             />
@@ -104,7 +103,7 @@
                 {{__('forms.birthDate')}}
             </label>
 
-            @error('employeeRequest.party.birthDate')
+            @error('form.party.birthDate')
                 <p class="text-error">
                     {{$message}}
                 </p>
@@ -118,11 +117,11 @@
                 <path d="M20.677 4.117A1.996 1.996 0 0 0 20 4H4c-.225 0-.44.037-.642.105l.758.607L12 10.742 19.9 4.7l.777-.583Z"/>
             </svg>
 
-            <input wire:model="employeeRequest.party.email"
+            <input wire:model="form.party.email"
                    type="text"
                    name="email"
                    id="email"
-                   class="input peer @error('employeeRequest.party.email') input-error @enderror"
+                   class="input peer @error('form.party.email') input-error @enderror"
                    placeholder=" "
                    required
             />
@@ -130,7 +129,7 @@
                 {{__('forms.email')}}
             </label>
 
-            @error('employeeRequest.party.email')
+            @error('form.party.email')
                 <p class="text-error">
                     {{$message}}
                 </p>
@@ -138,11 +137,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="employeeRequest.party.taxId"
+            <input wire:model="form.party.taxId"
                    type="text"
                    id="taxId"
                    name="taxId"
-                   class="input peer @error('employeeRequest.party.taxId') input-error @enderror"
+                   class="input peer @error('form.party.taxId') input-error @enderror"
                    placeholder=" "
                    required
             />
@@ -151,7 +150,7 @@
                 {{ __('forms.tax_id') }}
             </label>
 
-            @error('employeeRequest.party.taxId')
+            @error('form.party.taxId')
             <p class="text-error">
                 {{$message}}
             </p>
@@ -159,14 +158,18 @@
         </div>
     </div>
 
-    <div class="form-row-4">
+    <div class="form-row-4" x-data="{
+        employeePosition: $wire.entangle('form.party.position'),
+        {{-- See entangled employee type in the parent template as it's required to control which documents to show --}}
+        employeeTypePosition: $wire.employeeTypePosition,
+        availablePositions: null
+    }">
 
         <div class="form-group group">
             <label for="employeeType" class="sr-only">{{__('forms.roleChoose')}}</label>
-            <select wire:model.live="employeeRequest.party.employeeType"
-                    wire:update="getEmployeeDictionaryPosition()"
+            <select x-model="employeeType"
                     id="employeeType"
-                    class="input-select peer @error('employeeRequest.party.employeeType') input-error @enderror"
+                    class="input-select peer @error('form.party.employeeType') input-error @enderror"
                     required
             >
                 <option selected>{{__('forms.roleChoose')}} *</option>
@@ -175,7 +178,7 @@
                 @endforeach
             </select>
 
-            @error('employeeRequest.party.employeeType')
+            @error('form.party.employeeType')
             <p class="text-error">
                 {{$message}}
             </p>
@@ -184,15 +187,17 @@
 
         <div class="form-group group">
             <label for="position" class="sr-only">{{__('forms.positionChoose')}}</label>
-            <select wire:model="employeeRequest.party.position"
+            <select x-model="employeePosition"
                     id="position"
-                    class="input-select peer @error('employeeRequest.party.position') input-error @enderror"
+                    class="input-select peer @error('form.party.position') input-error @enderror"
                     required
             >
                 <option selected>{{__('forms.positionChoose')}} *</option>
-                @foreach($this->dictionaries['POSITION'] as $k => $position)
-                    <option value="{{$k}}">{{$position}}</option>
-                @endforeach
+                {{-- Only show positions associated with certain employee types --}}
+                <template x-for="(position, index) in employeeTypePosition[employeeType]">
+                    <option :value="index" x-text="position"></option>
+                </template>
+
             </select>
         </div>
 
@@ -201,12 +206,12 @@
                 <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
             </svg>
 
-            <input wire:model="employeeRequest.party.startDate"
+            <input wire:model="form.party.startDate"
                    datepicker
                    type="text"
                    name="startDate"
                    id="startDate"
-                   class="input default-datepicker peer @error('employeeRequest.party.startDate') input-error @enderror"
+                   class="input default-datepicker peer @error('form.party.startDate') input-error @enderror"
                    placeholder=" "
                    required
             />
@@ -215,7 +220,7 @@
                 {{__('forms.startDateWork')}}
             </label>
 
-            @error('employeeRequest.party.startDate')
+            @error('form.party.startDate')
                 <p class="text-error">
                     {{$message}}
                 </p>
@@ -223,11 +228,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="employeeRequest.party.workingExperience"
+            <input wire:model="form.party.workingExperience"
                    type="number"
                    id="workingExperience"
                    name="workingExperience"
-                   class="input peer @error('employeeRequest.party.workingExperience') input-error @enderror"
+                   class="input peer @error('form.party.workingExperience') input-error @enderror"
                    placeholder=" "
                    data-input-counter
                    data-input-counter-min="0"
@@ -237,7 +242,7 @@
                 {{__('forms.workingExperience')}}
             </label>
 
-            @error('employeeRequest.party.workingExperience')
+            @error('form.party.workingExperience')
                 <p class="text-error">
                     {{$message}}
                 </p>
@@ -251,7 +256,7 @@
                 {{__('forms.aboutMyself')}}
             </label>
 
-            <textarea wire:model="employeeRequest.party.aboutMyself"
+            <textarea wire:model="form.party.aboutMyself"
                       id="aboutMyself"
                       class="textarea"
                       rows="4"
@@ -262,7 +267,7 @@
     </div>
 
     {{-- Using Alpine to dynamically add and remove phone input fields --}}
-    <div class="mb-4" x-data="{ phones: $wire.entangle('employeeRequest.party.phones') }">
+    <div class="mb-4" x-data="{ phones: $wire.entangle('form.party.phones') }">
 
         <template x-for="(phone, index) in phones">
             <div class="form-row-3 md:mb-0">
@@ -276,7 +281,7 @@
                         @endforeach
                     </select>
 
-                    @error('employeeRequest.party.phones.type')
+                    @error('form.party.phones.type')
                         <p class="text-error">
                             {{$message}}
                         </p>
@@ -292,7 +297,7 @@
                            type="tel"
                            name="phone"
                            id="phone"
-                           class="input peer @error('employeeRequest.party.phones.number') input-error @enderror"
+                           class="input peer @error('form.party.phones.number') input-error @enderror"
                            placeholder=" "
                            required
                     />
@@ -300,7 +305,7 @@
                         {{__('forms.phone')}}
                     </label>
 
-                    @error('employeeRequest.party.phones.number')
+                    @error('form.party.phones.number')
                     <p class="text-error">
                         {{$message}}
                     </p>
