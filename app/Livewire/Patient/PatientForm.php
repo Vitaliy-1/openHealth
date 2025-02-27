@@ -6,6 +6,7 @@ namespace App\Livewire\Patient;
 
 use App\Classes\Cipher\Traits\Cipher;
 use App\Classes\eHealth\Api\PersonApi;
+use App\Classes\eHealth\Api\PersonRequestApi;
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Livewire\Patient\Forms\Api\PatientRequestApi;
 use App\Livewire\Patient\Forms\PatientFormRequest;
@@ -101,19 +102,13 @@ class PatientForm extends Component
      * Is patient incapable or child less than 14 y.o.
      * @var bool
      */
-    public bool $isIncapable = false;
+    public bool $isIncapacitated = false;
 
     /**
      * Check is person approved.
      * @var bool
      */
     public bool $isApproved = false;
-
-    /**
-     * Toggle displaying additional parameters.
-     * @var bool
-     */
-    public bool $showAdditionalParams = false;
 
     /**
      * KEP key.
@@ -152,11 +147,7 @@ class PatientForm extends Component
             }
 
             $this->patientId = $id;
-
-            // Check if the patient has a related confidant person
-            $this->isIncapable = PersonRequest::where('id', $id)
-                ->whereHas('confidantPerson')
-                ->exists();
+            $this->checkIfIncapacitated();
         }
 
         $this->getPatient();
@@ -448,7 +439,7 @@ class PatientForm extends Component
         foreach ($this->patientRequest->uploadedDocuments as $key => $document) {
             try {
                 $requestData = PatientRequestApi::buildUploadFileRequest($document);
-                $uploadResponse = PersonApi::uploadFileRequest(
+                $uploadResponse = PersonRequestApi::uploadFileRequest(
                     trim($this->uploadedDocuments[$key]['url']),
                     $requestData
                 );
@@ -498,7 +489,7 @@ class PatientForm extends Component
             return;
         }
 
-        $response = PersonApi::resendAuthorizationSms($this->patientRequest->patient['id']);
+        $response = PersonRequestApi::resendAuthorizationSms($this->patientRequest->patient['id']);
 
         if ($response['status'] === 'new') {
             $this->dispatch('flashMessage', [
@@ -534,11 +525,11 @@ class PatientForm extends Component
             'verification_code' => (int) $this->patientRequest->verificationCode
         ];
         $requestData = schemaService()
-            ->setDataSchema($preRequest, app(PersonApi::class))
+            ->setDataSchema($preRequest, app(PersonRequestApi::class))
             ->requestSchemaNormalize('approveSchemaRequest')
             ->getNormalizedData();
 
-        $response = PersonApi::approvePersonRequest($this->patientRequest->patient['id'], $requestData);
+        $response = PersonRequestApi::approvePersonRequest($this->patientRequest->patient['id'], $requestData);
 
         if ($response['status'] !== 'APPROVED') {
             $this->dispatch('flashMessage', [
@@ -582,13 +573,13 @@ class PatientForm extends Component
      */
     public function signPerson(): void
     {
-        $getPatientById = PersonApi::getCreatedPersonById($this->patientRequest->patient['id']);
+        $getPatientById = PersonRequestApi::getCreatedPersonById($this->patientRequest->patient['id']);
         unset($getPatientById['meta'], $getPatientById['urgent']);
         $getPatientById['data']['patient_signed'] = $this->isInformed;
 
         // encrypt data
         $encryptedRequestData = schemaService()
-            ->setDataSchema($getPatientById['data'], app(PersonApi::class))
+            ->setDataSchema($getPatientById['data'], app(PersonRequestApi::class))
             ->requestSchemaNormalize('encryptSignSchemaRequest')
             ->getNormalizedData();
 
@@ -599,11 +590,11 @@ class PatientForm extends Component
             'signed_content' => $base64EncryptedData
         ];
         $signRequestData = schemaService()
-            ->setDataSchema($preRequest, app(PersonApi::class))
+            ->setDataSchema($preRequest, app(PersonRequestApi::class))
             ->requestSchemaNormalize('signSchemaRequest')
             ->getNormalizedData();
 
-        $signResponse = PersonApi::singPersonRequest(
+        $signResponse = PersonRequestApi::singPersonRequest(
             $this->patientRequest->patient['id'],
             $signRequestData,
             Auth::user()->tax_id
@@ -640,6 +631,18 @@ class PatientForm extends Component
                 'type' => 'success'
             ]);
         }
+    }
+
+    /**
+     * Check if the patient has a related confidant person.
+     *
+     * @return void
+     */
+    protected function checkIfIncapacitated(): void
+    {
+        $this->isIncapacitated = PersonRequest::where('id', $this->patientId)
+            ->whereHas('confidantPerson')
+            ->exists();
     }
 
     /**
@@ -682,24 +685,30 @@ class PatientForm extends Component
         $patientData['patient']['documents'] = $patientData['documents'];
         $patientData['patient']['addresses'][] = $patientData['addresses'];
 
+        if (isset($patientData['patient']['id'])) {
+            unset($patientData['patient']['id']);
+        }
+
         if (!empty($patientData['confidantPerson'])) {
             $patientData['patient']['confidantPerson']['personId'] = $patientData['confidantPerson'][0]['personUuid'] ?? $patientData['confidantPerson'][0]['id'];
             $patientData['patient']['confidantPerson']['documentsRelationship'] = $patientData['documentsRelationship'];
         }
 
         $preRequest = schemaService()
-            ->setDataSchema(['person' => $patientData['patient']], app(PersonApi::class))
+            ->setDataSchema(['person' => $patientData['patient']], app(PersonRequestApi::class))
             ->requestSchemaNormalize()
             ->getNormalizedData();
 
         $preRequest['patient_signed'] = $this->isInformed;
         $preRequest['process_disclosure_data_consent'] = true;
 
-        return PersonApi::createPersonRequest($preRequest);
+        return PersonRequestApi::createPersonRequest($preRequest);
     }
 
     /**
-     * Prepare person request data
+     * Prepare person request data.
+     *
+     * @return void
      */
     private function preparePersonRequest(): void
     {

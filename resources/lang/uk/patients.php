@@ -12,11 +12,12 @@ return [
     |
     */
 
-    'add_patient' => 'Додати пацієнта',
+    // Used not once.
     'patients' => 'Пацієнти',
-    'firstName' => 'Ім’я',
-    'lastName' => 'Прізвище',
-    'secondName' => 'По батькові',
+    'patient_legal_representative' => 'Законний представник пацієнта',
+    'add_patient' => 'Додати пацієнта',
+    'start_interacting' => 'Розпочати взаємодію',
+
     'relation_type' => [
         'primary' => 'Основний',
         'secondary' => 'Не основний'
@@ -34,5 +35,36 @@ return [
         'court_decision' => 'Рішення суду',
         'document' => 'Документ'
     ],
-    'encounter_create' => 'Створення медичного запису'
+    'encounter_create' => 'Створення медичного запису',
+
+    // PERSON_VERIFICATION_STATUSES
+    'CHANGES_NEEDED' => 'Неуспішно верифіковано (потребує змін)',
+    'IN_REVIEW' => 'На опрацюванні',
+    'NOT_VERIFIED' => 'Не верифіковано',
+    'VERIFICATION_NEEDED' => 'Потребує верифікації',
+    'VERIFICATION_NOT_NEEDED' => 'Не потребує верифікації',
+    'VERIFIED' => 'Верифіковано',
+
+    // patient-data
+    'patient_data' => 'Дані пацієнта',
+    'verification_in_eHealth' => 'Верифікація в ЕСОЗ',
+    'update_status' => 'Оновити статус',
+    'passport_data' => 'Паспортні дані',
+    'contact_data' => 'Контактні дані',
+    'confidant_person_not_exist' => 'Законний представник не був вказаний.',
+    'authentication_methods' => 'Методи автентифікації',
+    'auth_method' => 'Метод автентифікації',
+
+    // summary
+    'summary' => 'Зведені дані',
+    'get_access_to_medical_data' => 'Отримати доступ до медичних даних',
+
+    //episodes
+    'episodes' => 'Епізоди',
+
+    //diagnoses
+    'diagnoses' => 'Діагнози',
+
+    // observations
+    'observations' => 'Обстеження'
 ];

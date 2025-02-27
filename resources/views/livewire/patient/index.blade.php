@@ -1,5 +1,14 @@
 @php
     $svgSprite = file_get_contents(resource_path('images/sprite.svg'));
+    $tableHeaders = [
+            __('forms.full_name'),
+            __('forms.phone'),
+            __('Д.Н.'),
+            __('forms.RNOCPP') . '(' . __('forms.ipn') . ')',
+            __('forms.birthCertificate'),
+            __('forms.status'),
+            __('forms.action')
+        ];
 @endphp
 
 <div>
@@ -26,7 +35,7 @@
                     </div>
                 </div>
 
-                <div class="mb-7 flex items-center gap-1 font-semibold text-gray-900">
+                <div class="mb-8 flex items-center gap-1 font-semibold text-gray-900">
                     <svg width="17" height="17">
                         <use xlink:href="#svg-search-outline"></use>
                     </svg>
@@ -55,19 +64,30 @@
                          filteredPatients() {
                              if (this.activeFilter === 'all') return this.patients;
                              return this.patients.filter(patient => patient.status === this.activeFilter);
+                         },
+
+                         init() {
+                              Livewire.on('patientsUpdated', (updatedPatients) => {
+                                  this.patients = updatedPatients[0];
+                              });
+
+                             Livewire.on('patientRemoved', (id) => {
+                                 this.patients = this.patients.filter(patient => patient.id !== id[0]);
+                             });
                          }
-                     }">
+                     }"
+            >
                 <div class="mb-6 flex items-center gap-7">
                     <button @click="activeFilter = 'all'"
                             :class="activeFilter === 'all' ? 'default-button' : 'light-button'">
                         {{ __('Всі') }}
                     </button>
-                    <button @click="activeFilter = 'ЕСОЗ'"
-                            :class="activeFilter === 'ЕСОЗ' ? 'default-button' : 'light-button'">
+                    <button @click="activeFilter = 'eHEALTH'"
+                            :class="activeFilter === 'eHEALTH' ? 'default-button' : 'light-button'">
                         {{ __('Пацієнти') }}
                     </button>
-                    <button @click="activeFilter = 'ЗАЯВКА'"
-                            :class="activeFilter === 'ЗАЯВКА' ? 'default-button' : 'light-button'">
+                    <button @click="activeFilter = 'APPLICATION'"
+                            :class="activeFilter === 'APPLICATION' ? 'default-button' : 'light-button'">
                         {{ __('Заявки') }}
                     </button>
                 </div>
@@ -89,43 +109,74 @@
                                     <th scope="row" class="table-cell-primary">
                                         <div
                                             x-text="`${patient.last_name} ${patient.first_name} ${patient.second_name || ''}`"></div>
-                                        <div class="flex gap-2 mt-2">
-                                            <button type="button" class="default-button">
-                                                {{ __('Переглянути карту') }}
-                                            </button>
-                                            <button type="button"
-                                                    class="flex items-center gap-2 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                                                <svg width="16" height="16">
-                                                    <use xlink:href="#svg-plus"></use>
-                                                </svg>
-                                                {{ __('Розпочати взаємодію') }}
-                                            </button>
-                                        </div>
+                                        <template x-if="patient.status === 'APPLICATION'">
+                                            <div class="flex gap-2 mt-2">
+                                                <a :href="`{{ route('patient.form', ['id' => '']) }}/${patient.id}`"
+                                                   class="default-button">
+                                                    {{ __('Продовжити реєстрацію') }}
+                                                </a>
+                                            </div>
+                                        </template>
+                                        <template x-if="patient.status !== 'APPLICATION'">
+                                            <div class="flex gap-2 mt-2">
+                                                <button @click.prevent="$wire.redirectToPatient(patient)"
+                                                        type="button"
+                                                        class="default-button"
+                                                >
+                                                    {{ __('Переглянути карту') }}
+                                                </button>
+                                                <button type="button"
+                                                        class="flex items-center gap-2 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                                                    <svg width="16" height="16">
+                                                        <use xlink:href="#svg-plus"></use>
+                                                    </svg>
+                                                    {{ __('patients.start_interacting') }}
+                                                </button>
+                                            </div>
+                                        </template>
                                     </th>
                                     <td class="px-4 py-3" x-text="patient.phones?.[0]?.number || '-'"></td>
                                     <td class="px-4 py-3" x-text="patient.birth_date"></td>
                                     <td class="px-4 py-3" x-text="patient.tax_id || '-'"></td>
                                     <td class="px-4 py-3" x-text="patient.birth_certificate || '-'"></td>
-                                    <td class="px-4 py-3" x-text="patient.status || '-'"></td>
+                                    <td class="px-4 py-3">
+                                        <span x-text="
+                                                  patient.status === 'APPLICATION' ? 'ЗАЯВКА' :
+                                                  patient.status === 'eHEALTH' ? 'ЕСОЗ' :
+                                                  patient.status === 'IN_REVIEW' ? 'ОБРОБЛЯЄТЬСЯ' :
+                                                  '-'
+                                              "
+                                              :class="{
+                                                  'badge-purple': patient.status === 'APPLICATION',
+                                                  'badge-green': patient.status === 'eHEALTH',
+                                                  'badge-yellow': patient.status === 'IN_REVIEW'
+                                              }"
+                                        ></span>
+                                    </td>
                                     <td class="px-4 py-3">
                                         <div x-data="{ open: false }">
-                                            <button @click="open = !open"
+                                            <button @click="if (patient.status === 'APPLICATION') open = !open"
                                                     class="dropdown-button"
-                                                    type="button">
+                                                    type="button"
+                                            >
                                                 <svg width="24" height="25">
                                                     <use xlink:href="#svg-edit-user-outline"></use>
                                                 </svg>
                                             </button>
                                             <div x-show="open"
                                                  @click.away="open = false"
-                                                 class="dropdown-menu absolute right-0 mt-3">
+                                                 class="dropdown-menu absolute right-0 mt-3"
+                                            >
                                                 <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
                                                     <li>
-                                                        <a href="#" class="dropdown-item-with-icon">
+                                                        <a @click.prevent="$wire.removeApplication(patient.id)"
+                                                           href="#"
+                                                           class="dropdown-item-with-icon"
+                                                        >
                                                             <svg width="18" height="19">
                                                                 <use xlink:href="#svg-edit"></use>
                                                             </svg>
-                                                            {{ __('Редагувати') }}
+                                                            {{ __('Видалити') }}
                                                         </a>
                                                     </li>
                                                 </ul>
