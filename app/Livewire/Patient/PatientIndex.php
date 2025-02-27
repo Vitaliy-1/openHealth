@@ -10,8 +10,10 @@ use App\Livewire\Patient\Forms\Api\PatientRequestApi;
 use App\Livewire\Patient\Forms\PatientFormRequest;
 use App\Models\Person\Person;
 use App\Models\Person\PersonRequest;
+use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
@@ -22,13 +24,14 @@ class PatientIndex extends Component
      * @var array
      */
     public array $patients = [];
-    public PatientFormRequest $patientRequest;
 
     /**
-     * List of table headers.
+     * Patient data from eHealth response.
      * @var array
      */
-    public array $tableHeaders = [];
+    public array $originalPatients = [];
+
+    public PatientFormRequest $patientRequest;
 
     /**
      * Check if the search person's request found someone.
@@ -37,15 +40,13 @@ class PatientIndex extends Component
      */
     public bool $searchPerformed = false;
 
-    /**
-     * Toggle displaying additional parameters.
-     * @var bool
-     */
-    public bool $showAdditionalParams = false;
-
-    public function mount(): void
+    public function render(): View
     {
-        $this->setTableHeaders();
+        $paginatedPatients = $this->createPaginator($this->patients);
+
+        return view('livewire.patient.index', [
+            'paginatedPatients' => $paginatedPatients
+        ]);
     }
 
     /**
@@ -61,8 +62,10 @@ class PatientIndex extends Component
 
         // Search in eHealth
         $buildSearchRequest = PatientRequestApi::buildSearchForPerson($this->patientRequest->patientsFilter);
-        $patientsFromEHealth = PersonApi::searchForPersonByParams($buildSearchRequest);
+        $this->originalPatients = PersonApi::searchForPersonByParams($buildSearchRequest);
 
+        // Don't use phone when searching locally.
+        unset($this->patientRequest->patientsFilter['phoneNumber']);
         // Search for application
         $personRequests = PersonRequest::where(arrayKeysToSnake($this->patientRequest->patientsFilter))
             ->where('status', 'APPLICATION')
@@ -71,31 +74,115 @@ class PatientIndex extends Component
             ->get()
             ->toArray();
 
-        if (empty($patientsFromEHealth)) {
-            $persons = Person::where(arrayKeysToSnake($this->patientRequest->patientsFilter))
+        if (!empty($this->originalPatients)) {
+            $this->patients = array_merge(
+                $this->setPersonStatus($personRequests, 'APPLICATION'),
+                $this->originalPatients = $this->setPersonStatus($this->originalPatients, 'eHEALTH'),
+            );
+        } else {
+            $this->originalPatients = Person::where(arrayKeysToSnake($this->patientRequest->patientsFilter))
                 ->with('phones')
+                ->select([
+                    'id', 'uuid', 'first_name', 'last_name', 'second_name', 'birth_date', 'tax_id', 'verification_status'
+                ])
                 ->get()
                 ->toArray();
-        } else {
-            $persons = [];
+
+            $this->patients = array_merge(
+                $this->setPersonStatus($personRequests, 'APPLICATION'),
+                $this->originalPatients = array_map(function ($patient) {
+                    return array_merge($patient, ['status' => $patient['verification_status']]);
+                }, $this->originalPatients)
+            );
         }
 
-        $this->patients = array_merge(
-            $this->setPersonStatus($patientsFromEHealth, 'ЕСОЗ'),
-            $this->setPersonStatus($personRequests, 'ЗАЯВКА'),
-            $this->setPersonStatus($persons, 'ВНУТРІШНІЙ')
-        );
-
         $this->searchPerformed = true;
+        $this->dispatch('patientsUpdated', $this->patients);
     }
 
-    public function render(): View
+    /**
+     * Stores patient data in the DB and redirects to the patient's data tab.
+     *
+     * @param  array  $patientData  The associative array containing patient details.
+     * @return void
+     */
+    public function redirectToPatient(array $patientData): void
     {
-        $paginatedPatients = $this->createPaginator($this->patients);
+        $originalPatientData = collect($this->getOriginalPatients())
+            ->first(function ($patient) use ($patientData) {
+                return (isset($patientData['id']) && $patient['id'] === $patientData['id']) ||
+                    (isset($patientData['uuid']) && $patient['uuid'] === $patientData['uuid']);
+            });
 
-        return view('livewire.patient.index', [
-            'paginatedPatients' => $paginatedPatients
-        ]);
+        // Check if the array has not changed and if the UUID is valid.
+        if (($patientData !== $originalPatientData) && uuid_is_valid($originalPatientData['uuid'] ?? $originalPatientData['id'])) {
+            $this->dispatch('flashMessage', [
+                'message' => 'Виникла помилка, зверніться до адміністратора.',
+                'type' => 'error'
+            ]);
+
+            return;
+        }
+
+        $person = Person::firstWhere('uuid', $originalPatientData['uuid'] ?? $originalPatientData['id']);
+
+        // Crete person in DB if not exist.
+        if (!$person) {
+            $this->storeNewPerson($originalPatientData);
+        }
+
+        $this->redirectRoute('patient.patient-data', ['id' => $person->id]);
+    }
+
+    /**
+     * Delete person request.
+     *
+     * @param  int  $id
+     * @return void
+     */
+    public function removeApplication(int $id): void
+    {
+        PersonRequest::destroy($id);
+        $this->dispatch('patientRemoved', $id);
+    }
+
+    /**
+     * Get the original patient's data.
+     *
+     * @return array
+     */
+    private function getOriginalPatients(): array
+    {
+        return $this->originalPatients;
+    }
+
+    /**
+     * Store new person from eHealth in DB.
+     *
+     * @param  array  $originalPatientData
+     * @return void
+     */
+    private function storeNewPerson(array $originalPatientData): void
+    {
+        try {
+            $person = Person::firstOrCreate(
+                ['uuid' => $originalPatientData['uuid'] ?? $originalPatientData['id']],
+                $originalPatientData
+            );
+
+            if (isset($patientData['phones'])) {
+                $person->phones()->createMany($originalPatientData['phones']);
+            }
+        } catch (Exception $e) {
+            $this->dispatch('flashMessage', [
+                'message' => 'Виникла помилка, зверніться до адміністратора.',
+                'type' => 'error'
+            ]);
+
+            Log::channel('db_errors')->error('Error while creating new person', [
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -116,24 +203,6 @@ class PatientIndex extends Component
             $perPage,
             $currentPage
         );
-    }
-
-    /**
-     * Set headers for the persons table.
-     *
-     * @return void
-     */
-    private function setTableHeaders(): void
-    {
-        $this->tableHeaders = [
-            __('ПІБ'),
-            __('forms.phones'),
-            __('Д.Н.'),
-            __('forms.RNOCPP') . '(' . __('forms.ipn') . ')',
-            __('forms.birthCertificate'),
-            __('forms.status'),
-            __('forms.action')
-        ];
     }
 
     /**

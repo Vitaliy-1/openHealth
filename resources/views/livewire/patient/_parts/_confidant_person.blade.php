@@ -5,7 +5,7 @@
 
     <x-tables.table>
         <x-slot name="headers"
-                :list="[__('forms.documentType'), __('forms.number'), __('forms.issuedBy'), __('forms.issuedAt'), __('forms.activeTo'), __('forms.action')]">
+                :list="[__('forms.documentType'), __('forms.number'), __('forms.issuedBy'), __('forms.issuedAt'), __('forms.active_to'), __('forms.action')]">
         </x-slot>
 
         <x-slot name="tbody">

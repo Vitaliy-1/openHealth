@@ -179,4 +179,36 @@ class PersonRepository
             return false;
         }
     }
+
+    /**
+     * Update verification status by provided ID or UUID.
+     *
+     * @param  int|string  $personId
+     * @param  string  $verificationStatus
+     * @return bool
+     */
+    public static function updateVerificationStatusById(int|string $personId, string $verificationStatus): bool
+    {
+        try {
+            $query = Person::query();
+
+            if (is_numeric($personId)) {
+                $query->where('id', $personId);
+            } else {
+                $query->where('uuid', $personId);
+            }
+
+            $query->update(['verification_status' => $verificationStatus]);
+
+            return true;
+        } catch (Exception $e) {
+            Log::channel('db_errors')->error('Error updating person verification status', [
+                'error' => $e->getMessage(),
+                'person_id' => $personId,
+                'verification_status' => $verificationStatus
+            ]);
+
+            return false;
+        }
+    }
 }

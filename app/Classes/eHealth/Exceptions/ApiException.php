@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Classes\eHealth\Exceptions;
+
 use Exception;
 
 class ApiException extends Exception
@@ -12,7 +15,6 @@ class ApiException extends Exception
 
     public function render(): string
     {
-        return "API Exception: {$this->message}";
+        return "API Exception: $this->message";
     }
-
 }

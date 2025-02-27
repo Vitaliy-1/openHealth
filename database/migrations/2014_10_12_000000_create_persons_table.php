@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('persons', function (Blueprint $table) {
             $table->id();
             $table->uuid();
+            $table->enum('verification_status', ['CHANGES_NEEDED', 'IN_REVIEW', 'NOT_VERIFIED', 'VERIFICATION_NEEDED', 'VERIFICATION_NOT_NEEDED', 'VERIFIED'])->default('IN_REVIEW');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('second_name')->nullable();
@@ -22,11 +23,11 @@ return new class extends Migration
             $table->string('birth_settlement')->nullable();
             $table->enum('gender', ['MALE', 'FEMALE']);
             $table->string('email')->unique()->nullable();
-            $table->boolean('no_tax_id');
+            $table->boolean('no_tax_id')->nullable();
             $table->string('tax_id')->unique()->nullable();
-            $table->string('secret');
+            $table->string('secret')->nullable();
             $table->string('unzr')->unique()->nullable();
-            $table->jsonb('emergency_contact');
+            $table->jsonb('emergency_contact')->nullable();
             $table->boolean('patient_signed')->default(false)->comment("Person's evidence of sign the person request");
             $table->boolean('process_disclosure_data_consent')->default(true)->comment("Person's evidence of information about consent to data disclosure");
             $table->date('death_date')->nullable();

@@ -69,13 +69,23 @@
 
     <div class="form-row-3">
         <div class="form-group group">
-            <x-forms.input-date :maxDate="now()->subYears(14)->format('Y-m-d')"
-                                id="birthDate"
-                                wire:model="patientRequest.patient.birthDate"
-                                type="text"
-                                placeholder="{{ __('forms.birthDate') }}"
-                                autocomplete="off"
+            <svg class="svg-input" width="20" height="20">
+                <use xlink:href="#svg-calendar-week"></use>
+            </svg>
+
+            <input wire:model="patientRequest.patient.birthDate"
+                   type="text"
+                   name="birthDate"
+                   id="birthDate"
+                   class="datepicker-input input peer @error('patientRequest.patient.birthDate') input-error @enderror"
+                   placeholder=" "
+                   required
+                   autocomplete="off"
             />
+
+            <label for="birthDate" class="label">
+                {{__('forms.birthDate')}}
+            </label>
 
             @error('patientRequest.patient.birthDate')
             <p class="text-error">
@@ -134,7 +144,7 @@
             </label>
             <select wire:model="patientRequest.patient.gender"
                     id="patientGender"
-                    class="input-select peer"
+                    class="input-select peer @error('patientRequest.patient.gender') input-error @enderror"
                     required
             >
                 <option selected>{{__('forms.gender')}} *</option>

@@ -19,23 +19,7 @@
                 @include('livewire.patient._parts._identity')
                 @include('livewire.patient._parts._contact_data')
                 @include('livewire.patient._parts._emergency_contact')
-
-                <fieldset class="fieldset">
-                    <legend class="legend flex items-baseline gap-2">
-                        <x-checkbox class="default-checkbox mb-2"
-                                    wire:model.live="isIncapable"
-                                    id="isIncapable"
-                        />
-
-                        {{ __('forms.incapable') }}
-                    </legend>
-
-                    @if($isIncapable)
-                        @include('livewire.patient._parts._search_confidant_person')
-                        @include('livewire.patient._parts._confidant_person')
-                    @endif
-                </fieldset>
-
+                @include('livewire.patient._parts._incapacitated')
                 @include('livewire.patient._parts._authentication_methods')
 
                 <x-forms.form-row class="flex-col justify-between items-center">

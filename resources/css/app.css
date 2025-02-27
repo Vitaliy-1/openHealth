@@ -122,6 +122,10 @@
         @apply px-6 py-4
     }
 
+    .default-p {
+        @apply text-gray-900 dark:text-white;
+    }
+
     /* Dropdown panel */
 
     .dropdown-panel {
