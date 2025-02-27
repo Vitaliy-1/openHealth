@@ -4,17 +4,6 @@
           x-data="{
               authenticationMethods: $wire.entangle('patientRequest.patient.authenticationMethods'),
               isIncapacitated: $wire.entangle('isIncapacitated'),
-              init() {
-                  if (!this.authenticationMethods || this.authenticationMethods.length === 0) {
-                      this.authenticationMethods = [{ type: '', phoneNumber: '', value: '', alias: '' }];
-                  }
-
-                  if ($wire.patientId !== null) {
-                      $wire.call('checkIfIncapacitated').then(result => {
-                          this.isIncapacitated = result;
-                      });
-                  }
-              },
 
               get availableAuthMethods() {
                   if (this.isIncapacitated) {
@@ -76,7 +65,7 @@
                        autocomplete="off"
                 />
                 <label for="phoneNumber" class="label">
-                    {{ __('forms.phone') }}
+                    {{ __('forms.phone_number') }}
                 </label>
 
                 @error("patientRequest.patient.authenticationMethods.*.phoneNumber")

@@ -2,40 +2,29 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Patient;
+namespace App\Livewire\Patient\Records;
 
 use App\Classes\eHealth\Api\PersonApi;
 use App\Classes\eHealth\Exceptions\ApiException;
-use App\Enums\Person\AuthenticationMethod;
 use App\Livewire\Patient\Forms\Api\PatientRequestApi;
 use App\Models\Person\Person;
 use App\Repositories\PersonRepository;
 use Illuminate\Contracts\View\View;
-use Livewire\Component;
 
-class PatientData extends Component
+class PatientData extends BasePatientComponent
 {
-    /**
-     * Info about the patient.
-     * @var array
-     */
-    public array $patient;
+    public array $phones = [];
+    public array $confidantPersonRelationships;
+    public array $authenticationMethods;
 
-    protected string|int $patientUuid;
-
-    /**
-     * Boot the component with required dependencies.
-     *
-     * @return void
-     */
-    public function boot(): void
+    protected function initializeComponent(): void
     {
-        $this->patientUuid = $this->getPatientUuid();
-    }
+        $patient = Person::with('phones')
+            ->where('id', $this->id)
+            ->first()
+            ?->toArray();
 
-    public function mount(array $patient): void
-    {
-        $this->patient = $patient;
+        $this->phones = $patient['phones'] ?? [];
     }
 
     public function render(): View
@@ -51,13 +40,13 @@ class PatientData extends Component
     public function getVerificationStatus(): void
     {
         try {
-            $personVerificationDetails = PersonApi::getPersonVerificationDetails($this->patientUuid);
+            $personVerificationDetails = PersonApi::getPersonVerificationDetails($this->uuid);
             PersonRepository::updateVerificationStatusById(
-                $this->patientUuid,
+                $this->uuid,
                 $personVerificationDetails['verification_status']
             );
 
-            $this->patient['status'] = $personVerificationDetails['verification_status'];
+            $this->verificationStatus = $personVerificationDetails['verification_status'];
         } catch (ApiException) {
             $this->dispatch('flashMessage', [
                 'message' => __('Не вдалося отримати верифікаційний статус. Спробуйте пізніше.'),
@@ -76,11 +65,11 @@ class PatientData extends Component
         try {
             $buildConfidantRelationshipRequest = PatientRequestApi::buildGetConfidantPersonRelationships(false);
             $confidantPersonRelationships = PersonApi::getConfidantPersonRelationships(
-                $this->patientUuid,
+                $this->uuid,
                 $buildConfidantRelationshipRequest
             );
 
-            $this->patient['confidantPersonRelationships'] = $confidantPersonRelationships;
+            $this->confidantPersonRelationships = $confidantPersonRelationships;
         } catch (ApiException) {
             $this->dispatch('flashMessage', [
                 'message' => __('Не вдалося отримати законного представника. Спробуйте пізніше.'),
@@ -97,27 +86,14 @@ class PatientData extends Component
     public function getAuthenticationMethods(): void
     {
         try {
-            $authenticationMethods = PersonApi::getAuthenticationMethods($this->patientUuid);
-            $authenticationMethod = AuthenticationMethod::tryFrom($authenticationMethods[0]['type'])?->label();
+            $authenticationMethods = PersonApi::getAuthenticationMethods($this->uuid);
 
-            $this->patient['authenticationMethod'] = $authenticationMethod;
+            $this->authenticationMethods = $authenticationMethods;
         } catch (ApiException) {
             $this->dispatch('flashMessage', [
                 'message' => __('Не вдалося отримати методи автентифікації. Спробуйте пізніше.'),
                 'type' => 'error'
             ]);
         }
-    }
-
-    /**
-     * Get the patient UUID from the URL or find it by ID in the DB.
-     *
-     * @return string
-     */
-    protected function getPatientUuid(): string
-    {
-        return uuid_is_valid($this->patient['id'])
-            ? $this->patient['id']
-            : Person::find($this->patient['id'])->uuid;
     }
 }

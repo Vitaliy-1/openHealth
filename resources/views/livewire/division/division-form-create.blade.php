@@ -157,7 +157,7 @@
                             <x-forms.form-group>
                                 <x-slot name='label'>
                                     <x-forms.label for='phone' class='default-label'>
-                                        {{ __('forms.phone') }} *
+                                        {{ __('forms.phone_number') }} *
                                     </x-forms.label>
                                 </x-slot>
                                 <x-slot name='input'>

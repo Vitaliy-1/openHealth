@@ -29,7 +29,7 @@
                     </svg>
 
                     <label :for="'phoneNumber-' + index" class="label">
-                        {{__('forms.phone')}}
+                        {{__('forms.phone_number')}}
                     </label>
                     <input x-model="phone.number"
                            type="tel"

@@ -38,9 +38,8 @@ return [
     'externalId' => 'Зовнішній ідентифікатор',
     'emergencyContact' => 'Контакт для екстреного зв’язку',
     'patientAddress' => 'Адреса пацієнта',
-    'patientLegalRepresentative' => 'Законний представник пацієнта',
     'confidantPersonDocuments' => 'Документи особи',
-    'phone' => 'Номер телефону',
+    'phone_number' => 'Номер телефону',
     'openedBy' => 'Відчиняється о',
     'closedBy' => 'Закривається о',
     'doesNotWork' => 'Не працює',
@@ -70,7 +69,7 @@ return [
     'UNZR' => 'УНЗР',
     //Form fields
     'alias' => 'Роль',
-    'activeTo' => 'Активний до',
+    'active_to' => 'Активний до',
     'edrpou' => 'ЄДРПОУ',
     'firstName' => 'Ім’я',
     'lastName' => 'Прізвище',
@@ -139,7 +138,7 @@ return [
     'specialityCode' => 'Код спеціальності',
     'specialityName' => 'Назва спеціальності',
     'phoneType' => 'Тип телефону',
-    'phones' => 'Телефон',
+    'phone' => 'Телефон',
     'issuedDate' => 'Дата видачі',
     'levelSpeciality' => 'Рівень спеціалізації',
     'attestationName' => 'Назва атестації',
@@ -243,5 +242,6 @@ return [
     'actions' => 'Дії',
     'delete' => 'Видалити',
     'modalClose' => 'Закрити модальне вікно',
-    'fieldEmpty' => 'Це поле не має бути пустим'
+    'fieldEmpty' => 'Це поле не має бути пустим',
+    'full_name' => 'ПІБ'
 ];

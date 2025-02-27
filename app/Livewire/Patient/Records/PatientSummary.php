@@ -2,29 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Patient;
+namespace App\Livewire\Patient\Records;
 
 use App\Classes\eHealth\Api\PatientApi;
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Livewire\Patient\Forms\Api\PatientRequestApi;
-use App\Models\Person\Person;
 use Illuminate\Contracts\View\View;
-use Livewire\Component;
 
-class PatientSummary extends Component
+class PatientSummary extends BasePatientComponent
 {
-    /**
-     * Info about the patient.
-     * @var array
-     */
-    public array $patient;
-
-    protected string|int $patientUuid;
-
-    public function boot(): void
-    {
-        $this->patientUuid = $this->getPatientUuid();
-    }
+    public array $episodes;
+    public array $diagnoses;
+    public array $observations;
 
     public function render(): View
     {
@@ -40,9 +29,9 @@ class PatientSummary extends Component
     {
         try {
             $buildGetShortEpisodes = PatientRequestApi::buildGetShortEpisodes();
-            $shortEpisodes = PatientApi::getShortEpisodes($this->patientUuid, $buildGetShortEpisodes);
+            $shortEpisodes = PatientApi::getShortEpisodes($this->uuid, $buildGetShortEpisodes);
 
-            $this->patient['episodes'] = $shortEpisodes;
+            $this->episodes = $shortEpisodes;
         } catch (ApiException) {
             $this->dispatch('flashMessage', [
                 'message' => __('Не вдалося отримати епізоди. Спробуйте пізніше.'),
@@ -60,9 +49,9 @@ class PatientSummary extends Component
     {
         try {
             $buildGetActiveDiagnoses = PatientRequestApi::buildGetActiveDiagnoses();
-            $activeDiagnoses = PatientApi::getActiveDiagnoses($this->patientUuid, $buildGetActiveDiagnoses);
+            $activeDiagnoses = PatientApi::getActiveDiagnoses($this->uuid, $buildGetActiveDiagnoses);
 
-            $this->patient['diagnoses'] = $activeDiagnoses;
+            $this->diagnoses = $activeDiagnoses;
         } catch (ApiException) {
             $this->dispatch('flashMessage', [
                 'message' => __('Не вдалося отримати діагнози. Спробуйте пізніше.'),
@@ -80,26 +69,14 @@ class PatientSummary extends Component
     {
         try {
             $buildGetObservations = PatientRequestApi::buildGetObservations();
-            $observations = PatientApi::getObservations($this->patientUuid, $buildGetObservations);
+            $observations = PatientApi::getObservations($this->uuid, $buildGetObservations);
 
-            $this->patient['observations'] = $observations;
+            $this->observations = $observations;
         } catch (ApiException) {
             $this->dispatch('flashMessage', [
                 'message' => __('Не вдалося отримати обстеження. Спробуйте пізніше.'),
                 'type' => 'error'
             ]);
         }
-    }
-
-    /**
-     * Get the patient UUID from the URL or find it by ID in the DB.
-     *
-     * @return string
-     */
-    protected function getPatientUuid(): string
-    {
-        return uuid_is_valid($this->patient['id'])
-            ? $this->patient['id']
-            : Person::find($this->patient['id'])->uuid;
     }
 }

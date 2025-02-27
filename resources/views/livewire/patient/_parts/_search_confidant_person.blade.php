@@ -4,7 +4,7 @@
     <x-section-navigation class="!p-0">
         <x-slot name="navigation">
             <!-- Search input fields -->
-            <div class="text-gray-900 text-xl leading-normal mb-6">{{ __('forms.patientLegalRepresentative') }}</div>
+            <div class="text-gray-900 text-xl leading-normal mb-6">{{ __('patients.patient_legal_representative') }}</div>
             @include('livewire.patient._parts._search_filter')
 
             @if(empty($selectedConfidantPatientId))
@@ -30,7 +30,7 @@
                     <div class="overflow-hidden shadow">
                         <x-tables.table align="left">
                             <x-slot name="headers"
-                                    :list="[__('ПІБ'), __('forms.phones'), __('Д.Н.'), __('forms.RNOCPP') . '(' . __('forms.ipn') . ')', __('forms.action')]">
+                                    :list="[__('forms.full_name'), __('forms.phone'), __('Д.Н.'), __('forms.RNOCPP') . '(' . __('forms.ipn') . ')', __('forms.action')]">
                             </x-slot>
                             <x-slot name="tbody">
                                 @foreach($confidantPerson as $confidantPatient)

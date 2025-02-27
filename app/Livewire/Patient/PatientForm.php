@@ -147,6 +147,7 @@ class PatientForm extends Component
             }
 
             $this->patientId = $id;
+            $this->checkIfIncapacitated();
         }
 
         $this->getPatient();
@@ -157,22 +158,6 @@ class PatientForm extends Component
     public function render(): View
     {
         return view('livewire.patient.patient-form');
-    }
-
-    /**
-     * Check if the patient has a related confidant person.
-     *
-     * @return bool
-     */
-    public function checkIfIncapacitated(): bool
-    {
-        if (!$this->patientId) {
-            return false;
-        }
-
-        return PersonRequest::where('id', $this->patientId)
-            ->whereHas('confidantPerson')
-            ->exists();
     }
 
     /**
@@ -646,6 +631,18 @@ class PatientForm extends Component
                 'type' => 'success'
             ]);
         }
+    }
+
+    /**
+     * Check if the patient has a related confidant person.
+     *
+     * @return void
+     */
+    protected function checkIfIncapacitated(): void
+    {
+        $this->isIncapacitated = PersonRequest::where('id', $this->patientId)
+            ->whereHas('confidantPerson')
+            ->exists();
     }
 
     /**
