@@ -1,12 +1,5 @@
 <fieldset class="fieldset"
-          x-data="{
-               isIncapacitated: $wire.entangle('isIncapacitated'),
-               async init() {
-                   if ($wire.patientId !== null) {
-                       this.isIncapacitated = await $wire.call('checkIfIncapacitated');
-                   }
-               }
-          }"
+          x-data="{ isIncapacitated: $wire.entangle('isIncapacitated') }"
 >
     <legend class="legend flex items-baseline gap-2">
         <x-checkbox class="default-checkbox mb-2"

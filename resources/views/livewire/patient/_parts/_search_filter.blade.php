@@ -50,7 +50,6 @@
             </svg>
 
             <input wire:model="patientRequest.patientsFilter.birthDate"
-                   datepicker-max-date="{{ now()->subYears(14)->format('Y-m-d') }}"
                    type="text"
                    name="filterBirthDate"
                    id="filterBirthDate"
@@ -141,7 +140,7 @@
                         />
 
                         <label for="filterPhoneNumber" class="label">
-                            {{ __('forms.phone') }}
+                            {{ __('forms.phone_number') }}
                         </label>
 
                         @error('patientRequest.patientsFilter.phoneNumber')

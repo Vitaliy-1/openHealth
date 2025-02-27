@@ -117,7 +117,7 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="active_to" class="default-label">
-                                {{ __('forms.activeTo') }}
+                                {{ __('forms.active_to') }}
                             </x-forms.label>
                         </x-slot>
 

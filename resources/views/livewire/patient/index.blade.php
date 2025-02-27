@@ -1,5 +1,14 @@
 @php
     $svgSprite = file_get_contents(resource_path('images/sprite.svg'));
+    $tableHeaders = [
+            __('forms.full_name'),
+            __('forms.phone'),
+            __('Д.Н.'),
+            __('forms.RNOCPP') . '(' . __('forms.ipn') . ')',
+            __('forms.birthCertificate'),
+            __('forms.status'),
+            __('forms.action')
+        ];
 @endphp
 
 <div>
@@ -58,6 +67,10 @@
                          },
 
                          init() {
+                              Livewire.on('patientsUpdated', (updatedPatients) => {
+                                  this.patients = updatedPatients[0];
+                              });
+
                              Livewire.on('patientRemoved', (id) => {
                                  this.patients = this.patients.filter(patient => patient.id !== id[0]);
                              });
@@ -117,7 +130,7 @@
                                                     <svg width="16" height="16">
                                                         <use xlink:href="#svg-plus"></use>
                                                     </svg>
-                                                    {{ __('Розпочати взаємодію') }}
+                                                    {{ __('patients.start_interacting') }}
                                                 </button>
                                             </div>
                                         </template>

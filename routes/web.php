@@ -2,6 +2,8 @@
 
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\EmailController;
+use App\Http\Controllers\HomeController;
 use App\Livewire\Contract\ContractForm;
 use App\Livewire\Contract\ContractIndex;
 use App\Livewire\Declaration\DeclarationIndex;
@@ -12,18 +14,18 @@ use App\Livewire\Employee\EmployeeCreate;
 use App\Livewire\Employee\EmployeeEdit;
 use App\Livewire\Employee\EmployeeIndex;
 use App\Livewire\Encounter\EncounterCreate;
+use App\Livewire\LegalEntity\EditLegalEntity;
 use App\Livewire\LegalEntity\LegalEntities;
+use App\Livewire\License\Forms\CreateNewLicense;
+use App\Livewire\License\Forms\LicenseForms;
 use App\Livewire\License\LicenseIndex;
 use App\Livewire\License\LicenseShow;
-use App\Livewire\License\Forms\LicenseForms;
-use App\Livewire\License\Forms\CreateNewLicense;
-use App\Livewire\LegalEntity\EditLegalEntity;
 use App\Livewire\Patient\PatientForm;
-use App\Livewire\Patient\PatientTabs;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\EmailController;
 use App\Livewire\Patient\PatientIndex;
+use App\Livewire\Patient\Records\PatientData;
+use App\Livewire\Patient\Records\PatientEpisodes;
+use App\Livewire\Patient\Records\PatientSummary;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,9 +96,9 @@ Route::middleware([
         Route::prefix('patient')->group(function () {
             Route::get('/', PatientIndex::class)->name('patient.index');
             Route::get('/create/{id?}', PatientForm::class)->name('patient.form');
-            Route::get('/{id}/tab/{tab}', PatientTabs::class)
-                ->name('patient.tabs')
-                ->where('tab', 'patient-data|summary|episodes');
+            Route::get('/{id}/patient-data', PatientData::class)->name('patient.patient-data');
+            Route::get('/{id}/summary', PatientSummary::class)->name('patient.summary');
+            Route::get('/{id}/episodes', PatientEpisodes::class)->name('patient.episodes');
 
             Route::prefix('encounter')->group(function () {
                 Route::get('/create', EncounterCreate::class)->name('encounter.form');
