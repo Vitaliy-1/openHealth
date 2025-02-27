@@ -40,7 +40,7 @@ class CreateContractsTable extends Migration
             $table->uuid('inserted_by')->nullable();
             $table->timestamp('inserted_at');
             $table->uuid('updated_by')->nullable();
-            $table->timestamp('updated_at');
+            $table->timestamp('updated_at')->nullable();
             $table->jsonb('medical_programs')->nullable();
             $table->string('type')->nullable();
             $table->boolean('contractor_signed')->default(false);
