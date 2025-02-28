@@ -17,10 +17,10 @@
                             class="xl:w-1/2 block text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                             id="file_input_{{ $key }}"
                             type="file"
-                            wire:model.live="patientRequest.uploadedDocuments.{{ $key }}"
+                            wire:model.live="form.uploadedDocuments.{{ $key }}"
                         >
 
-                        @if(isset($patientRequest->uploadedDocuments[$key]) && !$errors->has("patientRequest.uploadedDocuments.$key"))
+                        @if(isset($patientRequest->uploadedDocuments[$key]) && !$errors->has("form.uploadedDocuments.$key"))
                             @if(!isset($uploadedFiles[$key]) || $uploadedFiles[$key] === false)
                                 <button class="flex items-center gap-1"
                                         wire:click.prevent="deleteDocument({{ $key }})"
@@ -44,7 +44,7 @@
                         {{ __('Розмір завантажуваного файлу не більше 10МБ у форматі jpeg') }}
                     </p>
 
-                    @error("patientRequest.uploadedDocuments.$key")
+                    @error("form.uploadedDocuments.$key")
                     <p class="text-error">
                         {{ $message }}
                     </p>
@@ -73,11 +73,11 @@
 
         <div class="flex flex-col md:flex-row gap-4 md:gap-6 {{ empty($uploadedDocuments) ? 'mt-0' : 'mt-8' }} mb-14">
             <div class="relative z-0 md:min-w-[33%] md:max-w-[33%]">
-                <input wire:model="patientRequest.verificationCode"
+                <input wire:model="form.verificationCode"
                        type="text"
                        name="verificationCode"
                        id="verificationCode"
-                       class="input peer @error('patientRequest.verificationCode') input-error @enderror"
+                       class="input peer @error('form.verificationCode') input-error @enderror"
                        placeholder=" "
                        required
                        maxlength="4"
@@ -87,7 +87,7 @@
                     {{ __('Код підтвердження з СМС') }}
                 </label>
 
-                @error('patientRequest.verificationCode')
+                @error('form.verificationCode')
                 <p class="text-error">
                     {{ $message }}
                 </p>

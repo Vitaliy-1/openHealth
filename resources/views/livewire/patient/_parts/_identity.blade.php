@@ -1,15 +1,15 @@
 <fieldset class="fieldset"
           x-data="{
-              noTaxId: $wire.patientRequest.patient.noTaxId || false,
+              noTaxId: $wire.form.patient.noTaxId || false,
               init() {
-                  $wire.patientRequest.patient.noTaxId = this.noTaxId;
+                  $wire.form.patient.noTaxId = this.noTaxId;
               },
               handleNoTaxIdChange() {
                   if (this.noTaxId) {
-                      $wire.patientRequest.patient.noTaxId = true;
-                      delete $wire.patientRequest.patient.taxId;
+                      $wire.form.patient.noTaxId = true;
+                      delete $wire.form.patient.taxId;
                   } else {
-                      $wire.patientRequest.patient.noTaxId = false;
+                      $wire.form.patient.noTaxId = false;
                   }
               }
           }"
@@ -35,11 +35,11 @@
     <template x-if="!noTaxId">
         <div class="form-row-4">
             <div class="form-group group">
-                <input wire:model="patientRequest.patient.taxId"
+                <input wire:model="form.patient.taxId"
                        type="text"
                        name="taxId"
                        id="taxId"
-                       class="input peer @error('patientRequest.patient.taxId') input-error @enderror"
+                       class="input peer @error('form.patient.taxId') input-error @enderror"
                        placeholder=" "
                        required
                        maxlength="10"
@@ -49,7 +49,7 @@
                     {{ __('forms.tax_id') }}
                 </label>
 
-                @error('patientRequest.patient.taxId')
+                @error('form.patient.taxId')
                 <p class="text-error">
                     {{ $message }}
                 </p>

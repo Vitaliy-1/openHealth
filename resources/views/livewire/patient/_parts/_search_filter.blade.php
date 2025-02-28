@@ -1,11 +1,11 @@
 <div x-show="showFilter">
     <div class="form-row-3">
         <div class="form-group group">
-            <input wire:model="patientRequest.patientsFilter.firstName"
+            <input wire:model="form.patientsFilter.firstName"
                    type="text"
                    name="filterFirstName"
                    id="filterFirstName"
-                   class="input peer @error('patientRequest.patientsFilter.firstName') input-error @enderror"
+                   class="input peer @error('form.patientsFilter.firstName') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
@@ -15,7 +15,7 @@
                 {{ __('forms.first_name') }}
             </label>
 
-            @error('patientRequest.patientsFilter.firstName')
+            @error('form.patientsFilter.firstName')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -23,11 +23,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="patientRequest.patientsFilter.lastName"
+            <input wire:model="form.patientsFilter.lastName"
                    type="text"
                    name="filterLastName"
                    id="filterLastName"
-                   class="input peer @error('patientRequest.patientsFilter.lastName') input-error @enderror"
+                   class="input peer @error('form.patientsFilter.lastName') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
@@ -37,7 +37,7 @@
                 {{ __('forms.last_name') }}
             </label>
 
-            @error('patientRequest.patientsFilter.lastName')
+            @error('form.patientsFilter.lastName')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -49,12 +49,12 @@
                 <use xlink:href="#svg-calendar-week"></use>
             </svg>
 
-            <input wire:model="patientRequest.patientsFilter.birthDate"
+            <input wire:model="form.patientsFilter.birthDate"
                    datepicker-max-date="{{ now()->format('Y-m-d') }}"
                    type="text"
                    name="filterBirthDate"
                    id="filterBirthDate"
-                   class="datepicker-input input peer @error('patientRequest.patientsFilter.birthDate') input-error @enderror"
+                   class="datepicker-input input peer @error('form.patientsFilter.birthDate') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
@@ -64,7 +64,7 @@
                 {{ __('forms.birth_date') }}
             </label>
 
-            @error('patientRequest.patientsFilter.birthDate')
+            @error('form.patientsFilter.birthDate')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -86,11 +86,11 @@
             <div>
                 <div class="form-row-3">
                     <div class="form-group group">
-                        <input wire:model="patientRequest.patientsFilter.secondName"
+                        <input wire:model="form.patientsFilter.secondName"
                                type="text"
                                name="filterSecondName"
                                id="filterSecondName"
-                               class="input peer @error('patientRequest.patientsFilter.secondName') input-error @enderror"
+                               class="input peer @error('form.patientsFilter.secondName') input-error @enderror"
                                placeholder=" "
                                autocomplete="off"
                         />
@@ -99,7 +99,7 @@
                             {{ __('forms.second_name') }}
                         </label>
 
-                        @error('patientRequest.patientsFilter.secondName')
+                        @error('form.patientsFilter.secondName')
                         <p class="text-error">
                             {{ $message }}
                         </p>
@@ -107,11 +107,11 @@
                     </div>
 
                     <div class="form-group group">
-                        <input wire:model="patientRequest.patientsFilter.taxId"
+                        <input wire:model="form.patientsFilter.taxId"
                                type="text"
                                name="filterTaxId"
                                id="filterTaxId"
-                               class="input peer @error('patientRequest.patientsFilter.taxId') input-error @enderror"
+                               class="input peer @error('form.patientsFilter.taxId') input-error @enderror"
                                placeholder=" "
                                maxlength="10"
                                autocomplete="off"
@@ -121,7 +121,7 @@
                             {{ __('forms.rnokpp') }} ({{ __('forms.ipn') }})
                         </label>
 
-                        @error('patientRequest.patientsFilter.taxId')
+                        @error('form.patientsFilter.taxId')
                         <p class="text-error">
                             {{ $message }}
                         </p>
@@ -131,11 +131,11 @@
 
                 <div class="form-row-3">
                     <div class="form-group group">
-                        <input wire:model="patientRequest.patientsFilter.phoneNumber"
+                        <input wire:model="form.patientsFilter.phoneNumber"
                                name="filterPhoneNumber"
                                id="filterPhoneNumber"
                                type="text"
-                               class="input peer @error('patientRequest.patientsFilter.phoneNumber') input-error @enderror"
+                               class="input peer @error('form.patientsFilter.phoneNumber') input-error @enderror"
                                placeholder=" "
                                autocomplete="off"
                         />
@@ -144,7 +144,7 @@
                             {{ __('forms.phone_number') }}
                         </label>
 
-                        @error('patientRequest.patientsFilter.phoneNumber')
+                        @error('form.patientsFilter.phoneNumber')
                         <p class="text-error">
                             {{ $message }}
                         </p>
@@ -152,11 +152,11 @@
                     </div>
 
                     <div class="form-group group">
-                        <input wire:model="patientRequest.patientsFilter.birthCertificate"
+                        <input wire:model="form.patientsFilter.birthCertificate"
                                type="text"
                                name="filterBirthCertificate"
                                id="filterBirthCertificate"
-                               class="input peer @error('patientRequest.patientsFilter.birthCertificate') input-error @enderror"
+                               class="input peer @error('form.patientsFilter.birthCertificate') input-error @enderror"
                                placeholder=" "
                                autocomplete="off"
                         />
@@ -165,7 +165,7 @@
                             {{ __('forms.birth_certificate') }}
                         </label>
 
-                        @error('patientRequest.patientsFilter.birthCertificate')
+                        @error('form.patientsFilter.birthCertificate')
                         <p class="text-error">
                             {{ $message }}
                         </p>

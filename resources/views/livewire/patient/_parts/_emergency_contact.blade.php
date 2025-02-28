@@ -5,11 +5,11 @@
 
     <div class="form-row-3">
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.emergencyContact.firstName"
+            <input wire:model="form.patient.emergencyContact.firstName"
                    type="text"
                    name="patientFirstName"
                    id="emergencyContactFirstName"
-                   class="input peer @error('patientRequest.patient.emergencyContact.firstName') input-error @enderror"
+                   class="input peer @error('form.patient.emergencyContact.firstName') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
@@ -18,7 +18,7 @@
                 {{ __('forms.first_name') }}
             </label>
 
-            @error('patientRequest.patient.emergencyContact.firstName')
+            @error('form.patient.emergencyContact.firstName')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -26,11 +26,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.emergencyContact.lastName"
+            <input wire:model="form.patient.emergencyContact.lastName"
                    type="text"
                    name="patientFirstName"
                    id="emergencyContactLastName"
-                   class="input peer @error('patientRequest.patient.emergencyContact.lastName') input-error @enderror"
+                   class="input peer @error('form.patient.emergencyContact.lastName') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
@@ -39,7 +39,7 @@
                 {{ __('forms.last_name') }}
             </label>
 
-            @error('patientRequest.patient.emergencyContact.lastName')
+            @error('form.patient.emergencyContact.lastName')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -47,11 +47,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.emergencyContact.secondName"
+            <input wire:model="form.patient.emergencyContact.secondName"
                    type="text"
                    name="emergencyContactSecondName"
                    id="emergencyContactSecondName"
-                   class="input peer @error('patientRequest.patient.secondName') input-error @enderror"
+                   class="input peer @error('form.patient.secondName') input-error @enderror"
                    placeholder=" "
                    autocomplete="off"
             />
@@ -59,7 +59,7 @@
                 {{ __('forms.second_name') }}
             </label>
 
-            @error('patientRequest.patient.emergencyContact.secondName')
+            @error('form.patient.emergencyContact.secondName')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -68,7 +68,7 @@
     </div>
 
     {{-- Using Alpine to dynamically add and remove phone input fields --}}
-    <div class="mb-4" x-data="{ emergencyContactPhones: $wire.entangle('patientRequest.patient.emergencyContact.phones') }">
+    <div class="mb-4" x-data="{ emergencyContactPhones: $wire.entangle('form.patient.emergencyContact.phones') }">
         <template x-for="(phone, index) in emergencyContactPhones">
             <div class="form-row-3 md:mb-0">
                 <div class="form-group group">
@@ -80,7 +80,7 @@
                         @endforeach
                     </select>
 
-                    @error('patientRequest.patient.emergencyContact.phones.*.type')
+                    @error('form.patient.emergencyContact.phones.*.type')
                     <p class="text-error">
                         {{ $message }}
                     </p>
@@ -95,7 +95,7 @@
                            type="tel"
                            name="emergencyContactPhone"
                            :id="'emergencyContactPhone-' + index"
-                           class="input peer @error('patientRequest.patient.emergencyContact.phones.*.number') input-error @enderror"
+                           class="input peer @error('form.patient.emergencyContact.phones.*.number') input-error @enderror"
                            placeholder=" "
                            required
                     />
@@ -103,7 +103,7 @@
                         {{ __('forms.phone_number') }}
                     </label>
 
-                    @error('patientRequest.patient.emergencyContact.phones.*.number')
+                    @error('form.patient.emergencyContact.phones.*.number')
                     <p class="text-error">
                         {{ $message }}
                     </p>

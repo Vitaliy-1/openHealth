@@ -2,7 +2,7 @@
 
 <fieldset class="fieldset"
           x-data="{
-              authenticationMethods: $wire.entangle('patientRequest.patient.authenticationMethods'),
+              authenticationMethods: $wire.entangle('form.patient.authenticationMethods'),
               isIncapacitated: $wire.entangle('isIncapacitated'),
 
               get availableAuthMethods() {
@@ -39,7 +39,7 @@
             </label>
             <select x-model="authenticationMethods[0].type"
                     id="relationType"
-                    class="input-select peer @error('patientRequest.patient.authenticationMethods.*.type') input-error @enderror"
+                    class="input-select peer @error('form.patient.authenticationMethods.*.type') input-error @enderror"
                     required
             >
                 <option selected>
@@ -50,7 +50,7 @@
                 </template>
             </select>
 
-            @error('patientRequest.patient.authenticationMethods.*.type')
+            @error('form.patient.authenticationMethods.*.type')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -65,7 +65,7 @@
                        type="text"
                        name="phoneNumber"
                        id="phoneNumber"
-                       class="input peer @error('patientRequest.patient.authenticationMethods.*.phoneNumber') input-error @enderror"
+                       class="input peer @error('form.patient.authenticationMethods.*.phoneNumber') input-error @enderror"
                        placeholder=" "
                        required
                        autocomplete="off"
@@ -74,7 +74,7 @@
                     {{ __('forms.phone_number') }}
                 </label>
 
-                @error('patientRequest.patient.authenticationMethods.*.phoneNumber')
+                @error('form.patient.authenticationMethods.*.phoneNumber')
                 <p class="text-error">
                     {{ $message }}
                 </p>
@@ -90,7 +90,7 @@
                        type="text"
                        name="alias"
                        id="alias"
-                       class="input peer @error('patientRequest.patient.authenticationMethods.*.alias') input-error @enderror"
+                       class="input peer @error('form.patient.authenticationMethods.*.alias') input-error @enderror"
                        placeholder=" "
                        required
                        autocomplete="off"
@@ -99,7 +99,7 @@
                     {{ __('patients.alias') }}
                 </label>
 
-                @error('patientRequest.patient.authenticationMethods.*.alias')
+                @error('form.patient.authenticationMethods.*.alias')
                 <p class="text-error">
                     {{ $message }}
                 </p>

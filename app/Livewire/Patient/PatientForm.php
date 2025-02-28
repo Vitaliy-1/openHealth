@@ -41,7 +41,7 @@ class PatientForm extends Component
     public array $documents = [];
     public array $documentsRelationship = [];
     public string $mode = 'create';
-    public PatientFormRequest $patientRequest;
+    public PatientFormRequest $form;
 
     /**
      * List of founded confidant person.
@@ -171,7 +171,7 @@ class PatientForm extends Component
         $this->validateModel($model);
 
         $this->mode = 'create';
-        $this->patientRequest->{$model} = [];
+        $this->form->{$model} = [];
         $this->openModal($model);
     }
 
@@ -185,9 +185,9 @@ class PatientForm extends Component
     public function store(string $model): void
     {
         $this->validateModel($model);
-        $this->patientRequest->rulesForModelValidate($model);
+        $this->form->rulesForModelValidate($model);
 
-        $this->{$model}[] = $this->patientRequest->{$model};
+        $this->{$model}[] = $this->form->{$model};
         $this->closeModal();
     }
 
@@ -208,7 +208,7 @@ class PatientForm extends Component
         $this->openModal($model);
 
         // show data in form
-        $this->patientRequest->{$model} = $this->{$model}[$keyProperty];
+        $this->form->{$model} = $this->{$model}[$keyProperty];
     }
 
     /**
@@ -222,9 +222,9 @@ class PatientForm extends Component
     public function update(string $model, int $keyProperty): void
     {
         $this->validateModel($model);
-        $this->patientRequest->rulesForModelValidate($model);
+        $this->form->rulesForModelValidate($model);
 
-        $this->{$model}[$keyProperty] = $this->patientRequest->{$model};
+        $this->{$model}[$keyProperty] = $this->form->{$model};
         $this->closeModalModel($model);
     }
 
@@ -253,7 +253,7 @@ class PatientForm extends Component
     public function closeModalModel(string $model = null): void
     {
         if (!empty($model)) {
-            $this->patientRequest->{$model} = [];
+            $this->form->{$model} = [];
         }
 
         $this->closeModal();
@@ -272,7 +272,7 @@ class PatientForm extends Component
         if ($patientData) {
             $this->selectedConfidantPatientId = $id;
             $this->confidantPerson = [$patientData];
-            $this->patientRequest->patient['authenticationMethods'][0]['value'] = $patientData['id'];
+            $this->form->patient['authenticationMethods'][0]['value'] = $patientData['id'];
         }
 
         $this->searchPerformed = true;
@@ -285,7 +285,7 @@ class PatientForm extends Component
      */
     public function removeConfidantPerson(): void
     {
-        $this->patientRequest->patient['authenticationMethods'][0]['value'] = null;
+        $this->form->patient['authenticationMethods'][0]['value'] = null;
 
         $this->confidantPerson = [];
         $this->selectedConfidantPatientId = null;
@@ -301,9 +301,9 @@ class PatientForm extends Component
      */
     public function searchForPerson(string $model): void
     {
-        $this->patientRequest->rulesForModelValidate($model);
+        $this->form->rulesForModelValidate($model);
 
-        $buildSearchRequest = PatientRequestApi::buildSearchForPerson($this->patientRequest->patientsFilter);
+        $buildSearchRequest = PatientRequestApi::buildSearchForPerson($this->form->patientsFilter);
 
         $this->confidantPerson = arrayKeysToCamel(PersonApi::searchForPersonByParams($buildSearchRequest));
         $this->searchPerformed = true;
@@ -318,10 +318,19 @@ class PatientForm extends Component
      */
     public function createPerson($model): void
     {
+        if (!auth()->user()->can('createPerson', Person::class)) {
+            $this->dispatch('flashMessage', [
+                'message' => 'У вас немає дозволу на створення пацієнта.',
+                'type' => 'error'
+            ]);
+
+            return;
+        }
+
         $this->preparePersonRequest();
         $this->validatePersonRequest($model);
 
-        $response = $this->sendPersonRequest(removeEmptyKeys($this->patientRequest->toArray()));
+        $response = $this->sendPersonRequest(removeEmptyKeys($this->form->toArray()));
 
         if ($response['meta']['code'] !== 201) {
             $this->dispatch('flashMessage', [
@@ -349,7 +358,7 @@ class PatientForm extends Component
                 return;
             }
 
-            $this->patientRequest->patient['id'] = $response['data']['id'];
+            $this->form->patient['id'] = $response['data']['id'];
             $this->uploadedDocuments = $response['urgent']['documents'];
             $this->viewState = 'new';
         }
@@ -364,11 +373,20 @@ class PatientForm extends Component
      */
     public function createApplication(string $model): void
     {
+        if (!auth()->user()->can('createApplication', PersonRequest::class)) {
+            $this->dispatch('flashMessage', [
+                'message' => 'У вас немає дозволу на створення пацієнта.',
+                'type' => 'error'
+            ]);
+
+            return;
+        }
+
         $this->preparePersonRequest();
         $this->validatePersonRequest($model);
 
         $response = PersonRepository::savePersonResponseData(
-            arrayKeysToSnake($this->patientRequest->toArray()),
+            arrayKeysToSnake($this->form->toArray()),
             PersonRequest::class
         );
 
@@ -396,8 +414,8 @@ class PatientForm extends Component
      */
     public function updated(string $field): void
     {
-        if (str_starts_with($field, 'patientRequest.uploadedDocuments')) {
-            $this->patientRequest->rulesForModelValidate('uploadedDocuments');
+        if (str_starts_with($field, 'form.uploadedDocuments')) {
+            $this->form->rulesForModelValidate('uploadedDocuments');
         }
     }
 
@@ -409,7 +427,7 @@ class PatientForm extends Component
      */
     public function deleteDocument(int $key): void
     {
-        unset($this->patientRequest->uploadedDocuments[$key]);
+        unset($this->form->uploadedDocuments[$key]);
     }
 
     /**
@@ -421,9 +439,9 @@ class PatientForm extends Component
      */
     public function sendFiles(string $model): void
     {
-        $this->patientRequest->rulesForModelValidate($model);
+        $this->form->rulesForModelValidate($model);
 
-        $totalFiles = count($this->patientRequest->uploadedDocuments);
+        $totalFiles = count($this->form->uploadedDocuments);
         // Check that all provided files were uploaded
         if ($totalFiles !== count($this->uploadedDocuments)) {
             $this->dispatch('flashMessage', [
@@ -435,7 +453,7 @@ class PatientForm extends Component
         }
 
         $successCount = 0;
-        foreach ($this->patientRequest->uploadedDocuments as $key => $document) {
+        foreach ($this->form->uploadedDocuments as $key => $document) {
             try {
                 $requestData = PatientRequestApi::buildUploadFileRequest($document);
                 $uploadResponse = PersonRequestApi::uploadFileRequest(
@@ -488,7 +506,7 @@ class PatientForm extends Component
             return;
         }
 
-        $response = PersonRequestApi::resendAuthorizationSms($this->patientRequest->patient['id']);
+        $response = PersonRequestApi::resendAuthorizationSms($this->form->patient['id']);
 
         if ($response['status'] === 'new') {
             $this->dispatch('flashMessage', [
@@ -510,7 +528,7 @@ class PatientForm extends Component
     public function approvePerson(string $model): void
     {
         try {
-            $this->patientRequest->rulesForModelValidate($model);
+            $this->form->rulesForModelValidate($model);
         } catch (ValidationException $e) {
             $this->dispatch('flashMessage', [
                 'message' => 'Помилка валідації.',
@@ -521,14 +539,14 @@ class PatientForm extends Component
         }
 
         $preRequest = [
-            'verification_code' => (int) $this->patientRequest->verificationCode
+            'verification_code' => (int) $this->form->verificationCode
         ];
         $requestData = schemaService()
             ->setDataSchema($preRequest, app(PersonRequestApi::class))
             ->requestSchemaNormalize('approveSchemaRequest')
             ->getNormalizedData();
 
-        $response = PersonRequestApi::approvePersonRequest($this->patientRequest->patient['id'], $requestData);
+        $response = PersonRequestApi::approvePersonRequest($this->form->patient['id'], $requestData);
 
         if ($response['status'] !== 'APPROVED') {
             $this->dispatch('flashMessage', [
@@ -572,7 +590,7 @@ class PatientForm extends Component
      */
     public function signPerson(): void
     {
-        $getPatientById = PersonRequestApi::getCreatedPersonById($this->patientRequest->patient['id']);
+        $getPatientById = PersonRequestApi::getCreatedPersonById($this->form->patient['id']);
         unset($getPatientById['meta'], $getPatientById['urgent']);
         $getPatientById['data']['patient_signed'] = $this->isInformed;
 
@@ -594,7 +612,7 @@ class PatientForm extends Component
             ->getNormalizedData();
 
         $signResponse = PersonRequestApi::singPersonRequest(
-            $this->patientRequest->patient['id'],
+            $this->form->patient['id'],
             $signRequestData,
             Auth::user()->tax_id
         );
@@ -653,7 +671,7 @@ class PatientForm extends Component
     {
         if (isset($this->patientId)) {
             $patientData = PersonRequest::showPersonRequest($this->patientId);
-            $this->patientRequest->fill($patientData);
+            $this->form->fill($patientData);
             $this->documents = $patientData['documents'] ?? [];
             $this->documentsRelationship = $patientData['confidantPerson'][0]['documentsRelationship'] ?? [];
             $this->address = $patientData['address'];
@@ -711,10 +729,10 @@ class PatientForm extends Component
      */
     private function preparePersonRequest(): void
     {
-        $this->patientRequest->addresses = $this->address;
-        $this->patientRequest->documents = $this->documents;
-        $this->patientRequest->documentsRelationship = $this->documentsRelationship;
-        $this->patientRequest->confidantPerson = $this->confidantPerson;
+        $this->form->addresses = $this->address;
+        $this->form->documents = $this->documents;
+        $this->form->documentsRelationship = $this->documentsRelationship;
+        $this->form->confidantPerson = $this->confidantPerson;
     }
 
     /**
@@ -726,8 +744,8 @@ class PatientForm extends Component
     private function validatePersonRequest(string $model): void
     {
         try {
-            $this->patientRequest->rulesForModelValidate($model);
-            $this->patientRequest->validateBeforeSendApi();
+            $this->form->rulesForModelValidate($model);
+            $this->form->validateBeforeSendApi();
         } catch (ValidationException $e) {
             $this->dispatch('flashMessage', [
                 'message' => $e->validator->errors()->first(),

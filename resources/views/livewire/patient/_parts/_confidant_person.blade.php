@@ -56,11 +56,10 @@
     </x-tables.table>
 
     <div class="mb-6 mt-6 flex flex-wrap xl:gap-7.5">
-        <a wire:click.prevent="create('documentsRelationship')"
+        <button wire:click.prevent="create('documentsRelationship')"
            class="text-sm inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
-           href="#"
         >
             {{ __('forms.add_document') }}
-        </a>
+        </button>
     </div>
 </fieldset>

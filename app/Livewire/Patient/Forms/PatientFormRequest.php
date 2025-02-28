@@ -45,10 +45,10 @@ class PatientFormRequest extends Form
         'patient.emergencyContact.phones.*.type' => ['required', 'string'],
         'patient.emergencyContact.phones.*.number' => ['required', 'string', 'regex:/^\+38[0-9]{10}$/'],
 
-        'patient.authenticationMethods.*.type' => ['required', 'string'],
-        'patient.authenticationMethods.*.phoneNumber' => ['nullable', 'regex:/^\+38[0-9]{10}$/'],
-        'patient.authenticationMethods.*.value' => ['nullable', 'string'],
-        'patient.authenticationMethods.*.alias' => ['nullable', 'string']
+        'patient.authenticationMethods.*.type' => ['required', 'string', 'nullable' => false],
+        'patient.authenticationMethods.*.phoneNumber' => ['required_if:patient.authenticationMethods.*.type,OTP', 'regex:/^\+38[0-9]{10}$/'],
+        'patient.authenticationMethods.*.value' => ['required_if:patient.authenticationMethods.*.type,THIRD_PERSON', 'string'],
+        'patient.authenticationMethods.*.alias' => ['required_if:patient.authenticationMethods.*.type,THIRD_PERSON', 'string']
     ])]
     public array $patient = [
         'phones' => [
@@ -60,7 +60,7 @@ class PatientFormRequest extends Form
             ]
         ],
         'authenticationMethods' => [
-            ['type' => '', 'phoneNumber' => null, 'value' => null, 'alias' => null]
+            ['type' => null]
         ]
     ];
 
