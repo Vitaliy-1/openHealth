@@ -11,7 +11,7 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="documents_type" class="default-label">
-                                {{ __('forms.documentType') }} *
+                                {{ __('forms.document_type') }} *
                             </x-forms.label>
                         </x-slot>
 

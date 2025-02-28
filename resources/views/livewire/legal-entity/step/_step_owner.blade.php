@@ -166,7 +166,7 @@
                                 <x-forms.select wire:model.defer="legal_entity_form.owner.phones.{{$key}}.type"
                                                 class="default-select">
                                     <x-slot name="option">
-                                        <option>{{__('forms.typeMobile')}}</option>
+                                        <option>{{__('forms.type_mobile')}}</option>
                                         @foreach($this->dictionaries['PHONE_TYPE'] as $k=>$phone_type)
                                             <option value="{{$k}}">{{$phone_type}}</option>
                                         @endforeach
@@ -192,7 +192,7 @@
                                 @if($key != 0)
                                     <a wire:click="removePhone({{$key}},'owner')"
                                        class="text-red-600 text-xs cursor-pointer"
-                                       >{{__('forms.removePhone')}}</a>
+                                       >{{__('forms.remove_phone')}}</a>
                                 @endif
 
                             </div>
@@ -208,7 +208,7 @@
                             <x-forms.select wire:model.defer="legal_entity_form.owner.phones.0.type"
                                             class="default-select">
                                 <x-slot name="option">
-                                    <option>{{__('forms.typeMobile')}}</option>
+                                    <option>{{__('forms.type_mobile')}}</option>
                                     @foreach($this->dictionaries['PHONE_TYPE'] as $k=>$phone_type)
                                         <option value="{{$k}}">{{$phone_type}}</option>
                                     @endforeach
@@ -237,14 +237,14 @@
         @endif
 
         <a wire:click.prevent="addRowPhone('owner')" class="text-xs inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
-           href="#">{{__('forms.addPhone')}}</a>
+           href="#">{{__('forms.add_phone')}}</a>
 
 </x-forms.form-row>
 <x-forms.form-row >
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
             <x-forms.label class="default-label" for="tax_id">
-                {{__('forms.number')}} {{__('forms.ipn_rnokpp')}}
+                {{ __('forms.tax_id') }}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">

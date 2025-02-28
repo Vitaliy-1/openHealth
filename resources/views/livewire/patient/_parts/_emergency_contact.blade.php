@@ -1,6 +1,6 @@
 <fieldset class="fieldset">
     <legend class="legend">
-        {{ __('forms.emergencyContact') }}
+        {{ __('patients.emergency_contact') }}
     </legend>
 
     <div class="form-row-3">
@@ -15,7 +15,7 @@
                    autocomplete="off"
             />
             <label for="emergencyContactFirstName" class="label">
-                {{ __('forms.firstName') }}
+                {{ __('forms.first_name') }}
             </label>
 
             @error('patientRequest.patient.emergencyContact.firstName')
@@ -36,7 +36,7 @@
                    autocomplete="off"
             />
             <label for="emergencyContactLastName" class="label">
-                {{ __('forms.lastName') }}
+                {{ __('forms.last_name') }}
             </label>
 
             @error('patientRequest.patient.emergencyContact.lastName')
@@ -56,7 +56,7 @@
                    autocomplete="off"
             />
             <label for="emergencyContactSecondName" class="label">
-                {{ __('forms.secondName') }}
+                {{ __('forms.second_name') }}
             </label>
 
             @error('patientRequest.patient.emergencyContact.secondName')
@@ -72,9 +72,9 @@
         <template x-for="(phone, index) in emergencyContactPhones">
             <div class="form-row-3 md:mb-0">
                 <div class="form-group group">
-                    <label :for="'emergencyContactPhoneType-' + index" class="sr-only">{{ __('forms.typeMobile') }}</label>
+                    <label :for="'emergencyContactPhoneType-' + index" class="sr-only">{{ __('forms.type_mobile') }}</label>
                     <select x-model="phone.type" :id="'emergencyContactPhoneType-' + index" class="input-select peer" required>
-                        <option selected>{{ __('forms.typeMobile') }} *</option>
+                        <option selected>{{ __('forms.type_mobile') }} *</option>
                         @foreach($this->dictionaries['PHONE_TYPE'] as $key => $phoneType)
                             <option value="{{ $key }}">{{ $phoneType }}</option>
                         @endforeach
@@ -91,10 +91,6 @@
                     <svg class="svg-input w-5 top-2.5" width="24" height="24">
                         <use xlink:href="#svg-phone"></use>
                     </svg>
-
-                    <label :for="'emergencyContactPhone-' + index" class="label">
-                        {{__('forms.phone_number')}}
-                    </label>
                     <input x-model="phone.number"
                            type="tel"
                            name="emergencyContactPhone"
@@ -103,10 +99,13 @@
                            placeholder=" "
                            required
                     />
+                    <label :for="'emergencyContactPhone-' + index" class="label">
+                        {{ __('forms.phone_number') }}
+                    </label>
 
                     @error('patientRequest.patient.emergencyContact.phones.*.number')
                     <p class="text-error">
-                        {{$message}}
+                        {{ $message }}
                     </p>
                     @enderror
                 </div>
@@ -116,7 +115,7 @@
                         <svg>
                             <use xlink:href="#svg-minus"></use>
                         </svg>
-                        {{ __('forms.removePhone') }}
+                        {{ __('forms.remove_phone') }}
                     </button>
                 </template>
                 <template x-if="index == emergencyContactPhones.length - 1">
@@ -128,7 +127,7 @@
                         <svg>
                             <use xlink:href="#svg-plus"></use>
                         </svg>
-                        {{ __('forms.addPhone') }}
+                        {{ __('forms.add_phone') }}
                     </button>
                 </template>
             </div>

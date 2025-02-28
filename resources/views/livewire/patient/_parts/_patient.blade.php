@@ -1,6 +1,6 @@
 <fieldset class="fieldset">
     <legend class="legend">
-        {{ __('forms.patientInformation') }}
+        {{ __('patients.patient_information') }}
     </legend>
 
     <div class="form-row-3">
@@ -15,7 +15,7 @@
                    autocomplete="off"
             />
             <label for="patientFirstName" class="label">
-                {{ __('forms.firstName') }}
+                {{ __('forms.first_name') }}
             </label>
 
             @error('patientRequest.patient.firstName')
@@ -36,7 +36,7 @@
                    autocomplete="off"
             />
             <label for="patientLastName" class="label">
-                {{ __('forms.lastName') }}
+                {{ __('forms.last_name') }}
             </label>
 
             @error('patientRequest.patient.lastName')
@@ -56,7 +56,7 @@
                    autocomplete="off"
             />
             <label for="patientSecondName" class="label">
-                {{ __('forms.secondName') }}
+                {{ __('forms.second_name') }}
             </label>
 
             @error('patientRequest.patient.secondName')
@@ -74,6 +74,7 @@
             </svg>
 
             <input wire:model="patientRequest.patient.birthDate"
+                   datepicker-max-date="{{ now()->format('Y-m-d') }}"
                    type="text"
                    name="birthDate"
                    id="birthDate"
@@ -84,7 +85,7 @@
             />
 
             <label for="birthDate" class="label">
-                {{__('forms.birthDate')}}
+                {{ __('forms.birth_date') }}
             </label>
 
             @error('patientRequest.patient.birthDate')
@@ -105,7 +106,7 @@
                    autocomplete="off"
             />
             <label for="birthCountry" class="label">
-                {{ __('forms.birthCountry') }}
+                {{ __('forms.birth_country') }}
             </label>
 
             @error('patientRequest.patient.birthCountry')
@@ -126,7 +127,7 @@
                    autocomplete="off"
             />
             <label for="birthSettlement" class="label">
-                {{ __('forms.birthSettlement') }}
+                {{ __('forms.birth_settlement') }}
             </label>
 
             @error('patientRequest.patient.birthSettlement')
@@ -139,15 +140,13 @@
 
     <div class="form-row-3">
         <div class="form-group group">
-            <label for="patientGender" class="sr-only">
-                {{__('forms.select')}} {{__('forms.gender')}}
-            </label>
             <select wire:model="patientRequest.patient.gender"
                     id="patientGender"
+                    name="patientGender"
                     class="input-select peer @error('patientRequest.patient.gender') input-error @enderror"
                     required
             >
-                <option selected>{{__('forms.gender')}} *</option>
+                <option selected>{{ __('forms.gender') }} *</option>
                 @foreach($this->dictionaries['GENDER'] as $key => $gender)
                     <option value="{{ $key }}" wire:key="{{ $key }}">{{ $gender }}</option>
                 @endforeach
@@ -171,7 +170,7 @@
                    autocomplete="off"
             />
             <label for="unzr" class="label">
-                {{ __('forms.UNZR') }}
+                {{ __('patients.unzr') }}
             </label>
 
             @error('patientRequest.patient.unzr')

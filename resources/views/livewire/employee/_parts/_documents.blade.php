@@ -20,10 +20,10 @@
         <table class="table-input w-inherit">
             <thead class="thead-input">
                 <tr>
-                    <th scope="col" class="th-input">{{ __('forms.documentType') }}</th>
+                    <th scope="col" class="th-input">{{ __('forms.document_type') }}</th>
                     <th scope="col" class="th-input">{{ __('forms.number') }} </th>
-                    <th scope="col" class="th-input">{{ __('forms.issuedBy') }}</th>
-                    <th scope="col" class="th-input">{{ __('forms.issuedAt') }}</th>
+                    <th scope="col" class="th-input">{{ __('forms.issued_by') }}</th>
+                    <th scope="col" class="th-input">{{ __('forms.issued_at') }}</th>
                     <th scope="col" class="th-input">{{ __('forms.actions') }}</th>
                 </tr>
             </thead>
@@ -132,7 +132,7 @@
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
                 </svg>
 
-                {{__('forms.addDocument')}}
+                {{__('forms.add_document')}}
             </button>
 
             {{-- Modal --}}
@@ -161,15 +161,15 @@
                              class="modal-content h-fit"
                         >
                             {{-- Title --}}
-                            <h3 class="modal-header" :id="$id('modal-title')">{{__('forms.addDocument')}}</h3>
+                            <h3 class="modal-header" :id="$id('modal-title')">{{__('forms.add_document')}}</h3>
 
                             {{-- Content --}}
                             <form>
                                 <div class="form-row-modal">
                                     <div>
-                                        <label for="documentType" class="label-modal">{{__('forms.documentType')}}</label>
+                                        <label for="documentType" class="label-modal">{{__('forms.document_type')}}</label>
                                         <select x-model="modalDocument.type" id="documentType" class="input-modal" type="text" required>
-                                            <option selected>{{__('forms.documentType')}}</option>
+                                            <option selected>{{__('forms.document_type')}}</option>
                                             @foreach($this->dictionaries['DOCUMENT_TYPE'] as $typeValue => $typeDescription)
                                                 <option value="{{$typeValue}}">{{$typeDescription}}</option>
                                             @endforeach
@@ -188,7 +188,7 @@
                                     </div>
                                     <div>
                                         <label for="documentIssuedAt" class="label-modal">{{__('forms.documentIssuedAt')}}</label>
-                                        <input x-model="modalDocument.issuedAt" type="text" name="documentIssuedAt" id="documentIssuedAt" class="input-modal">
+                                        <input x-model="modalDocument.issuedAt" type="text" name="documentIssuedAt" id="documentIssuedAt" class="input-modal datepicker-input" autocomplete="off">
                                     </div>
                                 </div>
 

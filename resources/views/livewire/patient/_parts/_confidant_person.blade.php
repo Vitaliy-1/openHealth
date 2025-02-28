@@ -1,11 +1,12 @@
 <fieldset class="fieldset">
     <legend class="legend">
-        {{ __('forms.confidantPersonDocumentsRelationship') }}
+        {{ __('patients.confidant_person_documents_relationship') }}
     </legend>
 
     <x-tables.table>
         <x-slot name="headers"
-                :list="[__('forms.documentType'), __('forms.number'), __('forms.issuedBy'), __('forms.issuedAt'), __('forms.active_to'), __('forms.action')]">
+                :list="[__('forms.document_type'), __('forms.number'), __('forms.issued_by'), __('forms.issued_at'), __('forms.active_to'), __('forms.action')]"
+        >
         </x-slot>
 
         <x-slot name="tbody">
@@ -57,8 +58,9 @@
     <div class="mb-6 mt-6 flex flex-wrap xl:gap-7.5">
         <a wire:click.prevent="create('documentsRelationship')"
            class="text-sm inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
-           href="#">
-            {{ __('forms.addDocument') }}
+           href="#"
+        >
+            {{ __('forms.add_document') }}
         </a>
     </div>
 </fieldset>

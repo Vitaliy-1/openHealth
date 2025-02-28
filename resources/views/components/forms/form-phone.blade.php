@@ -11,7 +11,7 @@
                         <x-forms.select wire:model="{{ $property }}.phones.{{ $key }}.type"
                                         class="default-select">
                             <x-slot name="option">
-                                <option>{{__('forms.typeMobile')}}</option>
+                                <option>{{__('forms.type_mobile')}}</option>
                                 @foreach($this->dictionaries['PHONE_TYPE'] as $k => $phoneType)
                                     <option value="{{ $k }}">{{ $phoneType }}</option>
                                 @endforeach
@@ -50,7 +50,7 @@
                         @if($key != 0)
                             <button wire:click="removePhone({{ $key }}, '{{ $property }}')"
                                     class="text-red-600 text-xs cursor-pointer">
-                                {{__('forms.removePhone')}}
+                                {{__('forms.remove_phone')}}
                             </button>
                         @endif
                     </x-slot>
@@ -61,6 +61,6 @@
     <button wire:click="addRowPhone('{{ $property }}')"
             class="text-xs inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
     >
-        {{__('forms.addPhone')}}
+        {{__('forms.add_phone')}}
     </button>
 </div>

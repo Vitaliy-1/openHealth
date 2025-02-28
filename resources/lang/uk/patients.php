@@ -17,6 +17,9 @@ return [
     'patient_legal_representative' => 'Законний представник пацієнта',
     'add_patient' => 'Додати пацієнта',
     'start_interacting' => 'Розпочати взаємодію',
+    'nobody_found' => 'Нікого не знайдено',
+    'try_change_search_parameters' => 'Спробуйте змінити параметри пошуку',
+    'contact_data' => 'Контактні дані',
 
     'relation_type' => [
         'primary' => 'Основний',
@@ -36,6 +39,30 @@ return [
         'document' => 'Документ'
     ],
     'encounter_create' => 'Створення медичного запису',
+    'save_to_application' => 'Зберегти в заявки',
+
+    // patient search
+    'patient_search' => 'Пошук пацієнта',
+    'search' => 'Шукати',
+    'all' => 'Всі',
+    'applications' => 'Заявки',
+    'continue_registration' => 'Продовжити реєстрацію',
+    'view_record' => 'Переглянути карту',
+
+    // Create patient
+    'patient_information' => 'Інформація про пацієнта',
+    'unzr' => 'УНЗР',
+    'patient_identity_documents' => 'Документи пацієнта, що підтверджують особу',
+    'rnokpp_not_found' => 'РНОКПП/ІПН відсутній',
+    'secret' => 'Кодове слово',
+    'emergency_contact' => 'Контакт для екстреного зв’язку',
+    'incapacitated' => 'Недієздатний пацієнт або дитина до 14 років',
+    'search_for_confidant' => 'Шукати представника',
+    'confidant_person_documents_relationship' => 'Документи, що підтверджують законність представництва',
+    'authentication' => 'Автентифікація',
+    'alias' => 'Роль',
+    'leaflet' => "Пам’ятка",
+    'print_leaflet_for_patient' => "Роздрукувати пам’ятку для ознайомлення пацієнтом",
 
     // PERSON_VERIFICATION_STATUSES
     'CHANGES_NEEDED' => 'Неуспішно верифіковано (потребує змін)',
@@ -50,21 +77,20 @@ return [
     'verification_in_eHealth' => 'Верифікація в ЕСОЗ',
     'update_status' => 'Оновити статус',
     'passport_data' => 'Паспортні дані',
-    'contact_data' => 'Контактні дані',
     'confidant_person_not_exist' => 'Законний представник не був вказаний.',
     'authentication_methods' => 'Методи автентифікації',
     'auth_method' => 'Метод автентифікації',
 
-    // summary
+    // Summary record
     'summary' => 'Зведені дані',
     'get_access_to_medical_data' => 'Отримати доступ до медичних даних',
 
-    //episodes
+    // Episodes record
     'episodes' => 'Епізоди',
 
-    //diagnoses
+    // Diagnoses record
     'diagnoses' => 'Діагнози',
 
-    // observations
-    'observations' => 'Обстеження'
+    // Observations record
+    'observations' => 'Обстеження',
 ];

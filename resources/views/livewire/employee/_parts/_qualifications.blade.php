@@ -3,7 +3,7 @@
         {{__('forms.qualifications')}}
     </h5>
     <x-tables.table>
-        <x-slot name="headers" :list="[__('forms.documentType'),__('forms.institutionName'),__('forms.speciality'),__('forms.certificateNumber'),__('forms.actions')]"></x-slot>
+        <x-slot name="headers" :list="[__('forms.document_type'),__('forms.institutionName'),__('forms.speciality'),__('forms.certificateNumber'),__('forms.actions')]"></x-slot>
         <x-slot name="tbody">
             @isset($employeeRequest->qualifications)
                 @foreach($employeeRequest->qualifications as $k=>$qualification)

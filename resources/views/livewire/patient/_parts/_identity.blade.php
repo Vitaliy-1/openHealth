@@ -14,13 +14,14 @@
               }
           }"
 >
+
     <legend class="legend">
-        {{ __('forms.patientIdentityDocuments') }}
+        {{ __('patients.patient_identity_documents') }}
     </legend>
 
     <div class="flex items-center gap-2 mb-4">
         <label for="noTaxId" class="default-label">
-            {{ __('forms.rnokppNotFound') }}
+            {{ __('patients.rnokpp_not_found') }}
         </label>
         <input x-model="noTaxId"
                @change="handleNoTaxIdChange"
@@ -45,7 +46,7 @@
                        autocomplete="off"
                 />
                 <label for="taxId" class="label">
-                    {{ __('forms.number') }} {{ __('forms.RNOCPP') }}
+                    {{ __('forms.tax_id') }}
                 </label>
 
                 @error('patientRequest.patient.taxId')
