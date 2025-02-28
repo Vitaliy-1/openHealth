@@ -12,7 +12,7 @@
             />
 
             <label for="filterFirstName" class="label">
-                {{ __('forms.firstName') }}
+                {{ __('forms.first_name') }}
             </label>
 
             @error('patientRequest.patientsFilter.firstName')
@@ -34,7 +34,7 @@
             />
 
             <label for="filterFirstName" class="label">
-                {{ __('forms.lastName') }}
+                {{ __('forms.last_name') }}
             </label>
 
             @error('patientRequest.patientsFilter.lastName')
@@ -50,6 +50,7 @@
             </svg>
 
             <input wire:model="patientRequest.patientsFilter.birthDate"
+                   datepicker-max-date="{{ now()->format('Y-m-d') }}"
                    type="text"
                    name="filterBirthDate"
                    id="filterBirthDate"
@@ -60,7 +61,7 @@
             />
 
             <label for="filterBirthDate" class="label">
-                {{__('forms.birthDate')}}
+                {{ __('forms.birth_date') }}
             </label>
 
             @error('patientRequest.patientsFilter.birthDate')
@@ -73,7 +74,7 @@
 
     <div x-data="{ showAdditionalParams: false }">
         <button class="flex items-center gap-2 gray-button"
-                @click="showAdditionalParams = !showAdditionalParams"
+                @click.prevent="showAdditionalParams = !showAdditionalParams"
         >
             <svg width="16" height="16">
                 <use xlink:href="#svg-adjustments"></use>
@@ -95,7 +96,7 @@
                         />
 
                         <label for="filterSecondName" class="label">
-                            {{ __('forms.secondName') }}
+                            {{ __('forms.second_name') }}
                         </label>
 
                         @error('patientRequest.patientsFilter.secondName')
@@ -117,7 +118,7 @@
                         />
 
                         <label for="filterTaxId" class="label">
-                            {{ __('forms.RNOCPP') }} ({{ __('forms.ipn') }})
+                            {{ __('forms.rnokpp') }} ({{ __('forms.ipn') }})
                         </label>
 
                         @error('patientRequest.patientsFilter.taxId')
@@ -161,7 +162,7 @@
                         />
 
                         <label for="filterBirthCertificate" class="label">
-                            {{ __('forms.birthCertificate') }}
+                            {{ __('forms.birth_certificate') }}
                         </label>
 
                         @error('patientRequest.patientsFilter.birthCertificate')

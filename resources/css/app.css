@@ -228,7 +228,7 @@
     }
 
     .accordion-content {
-        @apply p-5 border border-gray-200 dark:border-gray-700;
+        @apply p-5 border border-gray-200 dark:border-gray-700 dark:bg-gray-900;
     }
 
     .badge-green {
@@ -278,7 +278,7 @@
 
     /* Tables */
     .table-section {
-        @apply bg-white dark:bg-gray-900 p-3 sm:p-5;
+        @apply bg-gray-100 dark:bg-gray-900 p-3 sm:p-5;
     }
 
     .table-container {

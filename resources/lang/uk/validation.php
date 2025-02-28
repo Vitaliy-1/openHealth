@@ -237,6 +237,8 @@ return [
         'patient.emergencyContact.phones.*.number' => 'номер телефону',
         'patient.authenticationMethods.*.type' => 'метод автентифікації',
         'patient.authenticationMethods.*.phoneNumber' => 'номер телефону',
+        'patient.authenticationMethods.*.value' => 'законний представник пацієнта',
+        'patient.authenticationMethods.*.alias' => 'роль',
 
         'addresses' => [
             'area' => 'область',

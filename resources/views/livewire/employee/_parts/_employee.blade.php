@@ -16,7 +16,7 @@
             />
 
             <label for="lastName" class="label">
-                {{__('forms.lastName')}}
+                {{__('forms.last_name')}}
             </label>
 
             @error('employeeRequest.party.lastName')
@@ -36,7 +36,7 @@
                    required
             />
             <label for="firstName" class="label">
-                {{__('forms.firstName')}}
+                {{__('forms.first_name')}}
             </label>
 
             @error('employeeRequest.party.firstName')
@@ -57,7 +57,7 @@
                 required
             />
             <label for="secondName" class="label">
-                {{__('forms.secondName')}}
+                {{__('forms.second_name')}}
             </label>
 
             @error('employeeRequest.party.secondName')
@@ -148,7 +148,7 @@
             />
 
             <label for="taxId" class="label">
-                {{__('forms.number')}} {{__('forms.RNOCPP')}}
+                {{ __('forms.tax_id') }}
             </label>
 
             @error('employeeRequest.party.taxId')
@@ -268,9 +268,9 @@
             <div class="form-row-3 md:mb-0">
 
                 <div class="form-group group">
-                    <label for="phoneType" class="sr-only">{{__('forms.typeMobile')}}</label>
+                    <label for="phoneType" class="sr-only">{{__('forms.type_mobile')}}</label>
                     <select x-model = "phone.type" id="phoneType" class="input-select peer" required>
-                        <option selected>{{__('forms.typeMobile')}} *</option>
+                        <option selected>{{__('forms.type_mobile')}} *</option>
                         @foreach($this->dictionaries['PHONE_TYPE'] as $k => $phoneType )
                             <option value="{{$k}}">{{$phoneType}}</option>
                         @endforeach
@@ -315,7 +315,7 @@
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"/>
                         </svg>
 
-                        {{__('forms.removePhone')}}
+                        {{__('forms.remove_phone')}}
                     </button>
                 </template>
 
@@ -328,7 +328,7 @@
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
                         </svg>
 
-                        {{__('forms.addPhone')}}
+                        {{__('forms.add_phone')}}
                     </button>
                 </template>
             </div>

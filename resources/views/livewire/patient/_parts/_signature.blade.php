@@ -25,7 +25,7 @@
                                 <button class="flex items-center gap-1"
                                         wire:click.prevent="deleteDocument({{ $key }})"
                                 >
-                                    <svg width="14" height="14">
+                                    <svg width="14" height="14" class="text-red-600">
                                         <use xlink:href="#svg-trash"></use>
                                     </svg>
                                     <span class="font-medium text-red-600 text-sm">{{ __('forms.delete') }}</span>

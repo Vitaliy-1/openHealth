@@ -30,7 +30,7 @@
                 </button>
             </h2>
             <div id="accordion-open-body-1" class="hidden" aria-labelledby="accordion-open-heading-1" wire:ignore.self>
-                <div class="accordion-content dark:bg-gray-900 border-b-0">
+                <div class="accordion-content border-b-0">
                     <div class="form-row-4 items-baseline">
 
                     </div>
@@ -52,7 +52,7 @@
                 </button>
             </h2>
             <div id="accordion-open-body-2" class="hidden" aria-labelledby="accordion-open-heading-2" wire:ignore.self>
-                <div class="accordion-content dark:bg-gray-900 border-b-0">
+                <div class="accordion-content border-b-0">
                     <div class="form-row-4 items-baseline">
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                 </button>
             </h2>
             <div id="accordion-open-body-3" class="hidden" aria-labelledby="accordion-open-heading-3" wire:ignore.self>
-                <div class="accordion-content dark:bg-gray-900 border-t-0">
+                <div class="accordion-content border-t-0">
                     <div class="form-row-4 items-baseline">
 
                     </div>

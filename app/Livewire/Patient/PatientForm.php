@@ -15,7 +15,6 @@ use App\Models\Person\PersonRequest;
 use App\Repositories\PersonRepository;
 use App\Traits\AddressSearch;
 use App\Traits\FormTrait;
-use App\Traits\InteractsWithCache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -26,7 +25,7 @@ use Throwable;
 
 class PatientForm extends Component
 {
-    use FormTrait, InteractsWithCache, WithFileUploads, Cipher, AddressSearch;
+    use FormTrait, WithFileUploads, Cipher, AddressSearch;
 
     /**
      * Allowed model modals name.

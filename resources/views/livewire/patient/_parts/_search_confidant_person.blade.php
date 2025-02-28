@@ -4,7 +4,7 @@
     <x-section-navigation class="!p-0">
         <x-slot name="navigation">
             <!-- Search input fields -->
-            <div class="text-gray-900 text-xl leading-normal mb-6">{{ __('patients.patient_legal_representative') }}</div>
+            <div class="text-gray-900 dark:text-white text-xl leading-normal mb-6">{{ __('patients.patient_legal_representative') }}</div>
             @include('livewire.patient._parts._search_filter')
 
             @if(empty($selectedConfidantPatientId))
@@ -15,7 +15,7 @@
                         <svg width="16" height="16">
                             <use xlink:href="#svg-search"></use>
                         </svg>
-                        <span>{{ __('Шукати представника') }}</span>
+                        <span>{{ __('patients.search_for_confidant') }}</span>
                     </button>
                 </div>
             @endif
@@ -30,7 +30,7 @@
                     <div class="overflow-hidden shadow">
                         <x-tables.table align="left">
                             <x-slot name="headers"
-                                    :list="[__('forms.full_name'), __('forms.phone'), __('Д.Н.'), __('forms.RNOCPP') . '(' . __('forms.ipn') . ')', __('forms.action')]">
+                                    :list="[__('forms.full_name'), __('forms.phone'), __('Д.Н.'), __('forms.rnokpp') . '(' . __('forms.ipn') . ')', __('forms.action')]">
                             </x-slot>
                             <x-slot name="tbody">
                                 @foreach($confidantPerson as $confidantPatient)
@@ -67,7 +67,7 @@
                                                     <span class="text-sm font-medium text-red-600"
                                                           wire:click.prevent="removeConfidantPerson"
                                                           @click="showFilter = true">
-                                                    {{ __('Видалити') }}
+                                                    {{ __('forms.delete') }}
                                                 </span>
                                                 @else
                                                     <svg width="40" height="41" viewBox="0 0 40 41" fill="none"
@@ -102,9 +102,9 @@
                             stroke="#1E1E1E" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round"/>
                     </svg>
-                    <p class="font-semibold text-gray-900">{{ __('Нікого не знайдено') }}</p>
+                    <p class="font-semibold default-p">{{ __('patients.nobody_found') }}</p>
                 </div>
-                <span class="text-gray-900">{{ __('Спробуйте змінити параметри пошуку') }}</span>
+                <span class="default-p">{{ __('patients.try_change_search_parameters') }}</span>
             </div>
         @endif
     </div>
