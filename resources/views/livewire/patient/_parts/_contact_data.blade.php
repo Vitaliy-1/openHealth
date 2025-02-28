@@ -4,7 +4,7 @@
     </legend>
 
     {{-- Using Alpine to dynamically add and remove phone input fields --}}
-    <div class="mb-4" x-data="{ phones: $wire.entangle('patientRequest.patient.phones') }">
+    <div class="mb-4" x-data="{ phones: $wire.entangle('form.patient.phones') }">
         <template x-for="(phone, index) in phones">
             <div class="form-row-3 md:mb-0">
                 <div class="form-group group">
@@ -16,7 +16,7 @@
                         @endforeach
                     </select>
 
-                    @error('patientRequest.patient.phones.*.type')
+                    @error('form.patient.phones.*.type')
                     <p class="text-error">
                         {{ $message }}
                     </p>
@@ -31,14 +31,14 @@
                            type="tel"
                            name="phoneNumber"
                            :id="'phoneNumber-' + index"
-                           class="input peer @error('patientRequest.patient.phones.*.number') input-error @enderror"
+                           class="input peer @error('form.patient.phones.*.number') input-error @enderror"
                            placeholder=" "
                     />
                     <label :for="'phoneNumber-' + index" class="label">
                         {{ __('forms.phone_number') }}
                     </label>
 
-                    @error('patientRequest.patient.phones.*.number')
+                    @error('form.patient.phones.*.number')
                     <p class="text-error">
                         {{ $message }}
                     </p>
@@ -71,11 +71,11 @@
 
     <div class="form-row-3">
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.email"
+            <input wire:model="form.patient.email"
                    type="email"
                    name="email"
                    id="email"
-                   class="input peer @error('patientRequest.patient.email') input-error @enderror"
+                   class="input peer @error('form.patient.email') input-error @enderror"
                    placeholder=" "
                    autocomplete="off"
             />
@@ -83,7 +83,7 @@
                 {{ __('forms.email') }}
             </label>
 
-            @error('patientRequest.patient.email')
+            @error('form.patient.email')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -91,11 +91,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.secret"
+            <input wire:model="form.patient.secret"
                    type="text"
                    name="secret"
                    id="secret"
-                   class="input peer @error('patientRequest.patient.secret') input-error @enderror"
+                   class="input peer @error('form.patient.secret') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
@@ -104,7 +104,7 @@
                 {{ __('patients.secret') }}
             </label>
 
-            @error('patientRequest.patient.secret')
+            @error('form.patient.secret')
             <p class="text-error">
                 {{ $message }}
             </p>

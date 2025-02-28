@@ -31,7 +31,7 @@ class PatientIndex extends Component
      */
     public array $originalPatients = [];
 
-    public PatientFormRequest $patientRequest;
+    public PatientFormRequest $form;
 
     /**
      * Check if the search person's request found someone.
@@ -58,16 +58,16 @@ class PatientIndex extends Component
      */
     public function searchForPerson(string $model): void
     {
-        $this->patientRequest->rulesForModelValidate($model);
+        $this->form->rulesForModelValidate($model);
 
         // Search in eHealth
-        $buildSearchRequest = PatientRequestApi::buildSearchForPerson($this->patientRequest->patientsFilter);
+        $buildSearchRequest = PatientRequestApi::buildSearchForPerson($this->form->patientsFilter);
         $this->originalPatients = PersonApi::searchForPersonByParams($buildSearchRequest);
 
         // Don't use phone when searching locally.
-        unset($this->patientRequest->patientsFilter['phoneNumber']);
+        unset($this->form->patientsFilter['phoneNumber']);
         // Search for application
-        $personRequests = PersonRequest::where(arrayKeysToSnake($this->patientRequest->patientsFilter))
+        $personRequests = PersonRequest::where(arrayKeysToSnake($this->form->patientsFilter))
             ->where('status', 'APPLICATION')
             ->with('phones')
             ->select(['id', 'status', 'first_name', 'last_name', 'second_name', 'birth_date', 'tax_id'])
@@ -80,7 +80,7 @@ class PatientIndex extends Component
                 $this->originalPatients = $this->setPersonStatus($this->originalPatients, 'eHEALTH'),
             );
         } else {
-            $this->originalPatients = Person::where(arrayKeysToSnake($this->patientRequest->patientsFilter))
+            $this->originalPatients = Person::where(arrayKeysToSnake($this->form->patientsFilter))
                 ->with('phones')
                 ->select([
                     'id', 'uuid', 'first_name', 'last_name', 'second_name', 'birth_date', 'tax_id', 'verification_status'
@@ -101,12 +101,47 @@ class PatientIndex extends Component
     }
 
     /**
-     * Stores patient data in the DB and redirects to the patient's data tab.
+     * Redirect to patient data route.
      *
      * @param  array  $patientData  The associative array containing patient details.
      * @return void
      */
     public function redirectToPatient(array $patientData): void
+    {
+        $this->handleRedirect($patientData, 'patient.patient-data');
+    }
+
+    /**
+     * Redirect to create encounter route.
+     *
+     * @param  array  $patientData  The associative array containing patient details.
+     * @return void
+     */
+    public function redirectToEncounter(array $patientData): void
+    {
+        $this->handleRedirect($patientData, 'encounter.form');
+    }
+
+    /**
+     * Delete person request.
+     *
+     * @param  int  $id
+     * @return void
+     */
+    public function removeApplication(int $id): void
+    {
+        PersonRequest::destroy($id);
+        $this->dispatch('patientRemoved', $id);
+    }
+
+    /**
+     * Stores patient data in the DB and redirects to route by name.
+     *
+     * @param  array  $patientData  The associative array containing patient details.
+     * @param  string  $routeName
+     * @return void
+     */
+    private function handleRedirect(array $patientData, string $routeName): void
     {
         $originalPatientData = collect($this->getOriginalPatients())
             ->first(function ($patient) use ($patientData) {
@@ -120,7 +155,6 @@ class PatientIndex extends Component
                 'message' => 'Виникла помилка, зверніться до адміністратора.',
                 'type' => 'error'
             ]);
-
             return;
         }
 
@@ -128,22 +162,10 @@ class PatientIndex extends Component
 
         // Crete person in DB if not exist.
         if (!$person) {
-            $this->storeNewPerson($originalPatientData);
+            $person = $this->storeNewPerson($originalPatientData);
         }
 
-        $this->redirectRoute('patient.patient-data', ['id' => $person->id]);
-    }
-
-    /**
-     * Delete person request.
-     *
-     * @param  int  $id
-     * @return void
-     */
-    public function removeApplication(int $id): void
-    {
-        PersonRequest::destroy($id);
-        $this->dispatch('patientRemoved', $id);
+        $this->redirectRoute($routeName, ['id' => $person->id]);
     }
 
     /**
@@ -160,9 +182,9 @@ class PatientIndex extends Component
      * Store new person from eHealth in DB.
      *
      * @param  array  $originalPatientData
-     * @return void
+     * @return Person|null
      */
-    private function storeNewPerson(array $originalPatientData): void
+    private function storeNewPerson(array $originalPatientData): ?Person
     {
         try {
             $person = Person::firstOrCreate(
@@ -173,6 +195,8 @@ class PatientIndex extends Component
             if (isset($patientData['phones'])) {
                 $person->phones()->createMany($originalPatientData['phones']);
             }
+
+            return $person;
         } catch (Exception $e) {
             $this->dispatch('flashMessage', [
                 'message' => 'Виникла помилка, зверніться до адміністратора.',
@@ -182,6 +206,8 @@ class PatientIndex extends Component
             Log::channel('db_errors')->error('Error while creating new person', [
                 'error' => $e->getMessage()
             ]);
+
+            return null;
         }
     }
 

@@ -5,11 +5,11 @@
 
     <div class="form-row-3">
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.firstName"
+            <input wire:model="form.patient.firstName"
                    type="text"
                    name="patientFirstName"
                    id="patientFirstName"
-                   class="input peer @error('patientRequest.patient.firstName') input-error @enderror"
+                   class="input peer @error('form.patient.firstName') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
@@ -18,7 +18,7 @@
                 {{ __('forms.first_name') }}
             </label>
 
-            @error('patientRequest.patient.firstName')
+            @error('form.patient.firstName')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -26,11 +26,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.lastName"
+            <input wire:model="form.patient.lastName"
                    type="text"
                    name="patientLastName"
                    id="patientLastName"
-                   class="input peer @error('patientRequest.patient.lastName') input-error @enderror"
+                   class="input peer @error('form.patient.lastName') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
@@ -39,7 +39,7 @@
                 {{ __('forms.last_name') }}
             </label>
 
-            @error('patientRequest.patient.lastName')
+            @error('form.patient.lastName')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -47,11 +47,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.secondName"
+            <input wire:model="form.patient.secondName"
                    type="text"
                    name="patientSecondName"
                    id="patientSecondName"
-                   class="input peer @error('patientRequest.patient.secondName') input-error @enderror"
+                   class="input peer @error('form.patient.secondName') input-error @enderror"
                    placeholder=" "
                    autocomplete="off"
             />
@@ -59,7 +59,7 @@
                 {{ __('forms.second_name') }}
             </label>
 
-            @error('patientRequest.patient.secondName')
+            @error('form.patient.secondName')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -73,12 +73,12 @@
                 <use xlink:href="#svg-calendar-week"></use>
             </svg>
 
-            <input wire:model="patientRequest.patient.birthDate"
+            <input wire:model="form.patient.birthDate"
                    datepicker-max-date="{{ now()->format('Y-m-d') }}"
                    type="text"
                    name="birthDate"
                    id="birthDate"
-                   class="datepicker-input input peer @error('patientRequest.patient.birthDate') input-error @enderror"
+                   class="datepicker-input input peer @error('form.patient.birthDate') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
@@ -88,7 +88,7 @@
                 {{ __('forms.birth_date') }}
             </label>
 
-            @error('patientRequest.patient.birthDate')
+            @error('form.patient.birthDate')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -96,11 +96,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.birthCountry"
+            <input wire:model="form.patient.birthCountry"
                    type="text"
                    name="birthCountry"
                    id="birthCountry"
-                   class="input peer @error('patientRequest.patient.birthCountry') input-error @enderror"
+                   class="input peer @error('form.patient.birthCountry') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
@@ -109,7 +109,7 @@
                 {{ __('forms.birth_country') }}
             </label>
 
-            @error('patientRequest.patient.birthCountry')
+            @error('form.patient.birthCountry')
             <p class="text-error">
                 {{ $message }}
             </p>

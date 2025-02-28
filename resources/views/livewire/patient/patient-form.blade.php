@@ -13,7 +13,7 @@
 
     @if($viewState === 'default')
         <section class="section-form">
-            <form action="#" class="form">
+            <form class="form">
                 @include('livewire.patient._parts._patient')
                 @include('livewire.patient._parts._documents')
                 @include('livewire.patient._parts._identity')
@@ -31,7 +31,7 @@
                             {{ __('forms.send_for_approval') }}
                         </button>
                     @endif
-                    @if(auth()->user()->hasRole('DOCTOR|RECEPTIONIST'))
+                    @if(auth()->user()->hasRole(['DOCTOR', 'RECEPTIONIST']))
                         <button wire:click.prevent="createApplication('patient')" class="button-primary">
                             {{ __('patients.save_to_application') }}
                         </button>
@@ -42,7 +42,7 @@
 
     @elseif($viewState === 'new')
         <section class="section-form">
-            <form action="#" class="form">
+            <form class="form">
                 @include('livewire.patient._parts._signature')
             </form>
         </section>
