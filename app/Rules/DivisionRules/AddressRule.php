@@ -89,7 +89,7 @@ class AddressRule implements ValidationRule
      */
     protected function checkSettlementType(): bool
     {
-        $settlementType = $this->division['addresses']['settlement_type'];
+        $settlementType = $this->division['addresses']['settlementType'];
 
         if (!in_array($settlementType, array_keys($this->dictionaries['SETTLEMENT_TYPE']))) {
             $this->setMessage(__('validation.attributes.healthcareService.error.division.address.settlementType'));
@@ -107,7 +107,7 @@ class AddressRule implements ValidationRule
      */
     protected function checkStreetType(): bool
     {
-        $streetType= $this->division['addresses']['street_type'];
+        $streetType= $this->division['addresses']['streetType'];
 
         if (!in_array($streetType, array_keys($this->dictionaries['STREET_TYPE']))) {
             $this->setMessage(__('validation.attributes.healthcareService.error.division.address.streetType'));

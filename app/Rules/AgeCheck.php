@@ -32,7 +32,8 @@ class AgeCheck implements ValidationRule
         try {
             $dateOfBirth = Carbon::parse($value);
         } catch (\Exception $e) {
-            $fail(':attribute is not a valid date format.');
+            $fail('Birth date has not a valid date format');
+
             return;
         }
 
@@ -41,7 +42,7 @@ class AgeCheck implements ValidationRule
 
         // Check if the age meets the minimum requirement
         if ($age < $this->minAge) {
-            $fail(':attribute повинна бути не менше ' . $this->minAge . ' років');
+            $fail('Вік має бути не менше ' . $this->minAge . ' років');
         }
     }
 }

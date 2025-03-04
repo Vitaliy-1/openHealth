@@ -1,90 +1,88 @@
-<x-forms.form-row :cols="'flex-col'">
-    <x-forms.form-group class="xl:w-1/3">
-        <x-slot name="label">
-            <x-forms.label class="default-label" for="knedp"
-                           name="label">
-                {{__('forms.KNEDP')}} *
-            </x-forms.label>
-        </x-slot>
-        <x-slot name="input">
-            <x-forms.select class="default-input"
-                            wire:model="knedp"
-                            id="knedp">
-                <x-slot name="option">
-                    <option value="">{{__('forms.select')}}</option>
-                    @foreach($getCertificateAuthority as $k =>$certificate_type)
-                        <option value="{{$certificate_type['id']}}">{{$certificate_type['name']}}</option>
-                    @endforeach
-                </x-slot>
-            </x-forms.select>
-        </x-slot>
+@php
+    $hasPublicOfferKnedpError = $errors->has('knedp');
+    $hasPublicOfferPasswordError = $errors->has('password');
+    $hasPublicOfferFileError = $errors->has('keyContainerUpload');
+@endphp
 
-        @error('knedp')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
-        @enderror
-    </x-forms.form-group>
+<fieldset
+    class="fieldset"
+    xmlns="http://www.w3.org/1999/html"
+    x-data="{ title: '{{ __('forms.complete') }}', index: 8 }"
+    x-init="typeof addHeader !== 'undefined' && addHeader(title, index)"
+    x-show="activeStep === index  || isEdit"
+    x-cloak
+    :key="`step-${index}`"
+>
+    <template x-if="isEdit">
+        <legend x-text="title" class="legend"></legend>
+    </template>
 
-    <x-forms.form-group class="xl:w-1/3">
-        <x-slot name="label">
-            <x-forms.label class="default-label" for="keyContainerUpload"
-                           name="label">
-                {{__('forms.keyContainerUpload')}} *
-            </x-forms.label>
-        </x-slot>
-        <x-slot name="input">
-            <x-forms.file wire:model="file"
-                          :id="'keyContainerUpload'"/>
-        </x-slot>
-        @error('keyContainerUpload')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
-        @enderror
-    </x-forms.form-group>
+    <div class='form-row lg:w-1/2 sm:w-1/2'>
+        <div class="form-group group pb-4">
+            <select
+                required
+                id="publicOfferKnedp"
+                wire:model="knedp"
+                {{-- aria-describedby="{{ $hasPublicOfferKnedpError ? 'publicOfferKnedpErrorHelp' : '' }}" --}}
+                class="input-select text-gray-800 {{ $hasPublicOfferKnedpError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+            >
+                <option value="_placeholder_" selected hidden>-- {{ __('forms.select') }} --</option>
 
-    <x-forms.form-group class="xl:w-1/3">
-        <x-slot name="label">
-            <x-forms.label class="default-label" for="password"
-                           name="label">
-                {{__('forms.password')}} *
-            </x-forms.label>
-        </x-slot>
-        <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="password"
-                           type="password" id="password"/>
-        </x-slot>
-        @error('password')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
-        @enderror
-    </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/3">
-        <x-slot name="input">
-            <div class="flex items-center mb-4">
-                <x-forms.checkbox wire:model="legal_entity_form.public_offer.consent" value="true" type="checkbox"
-                                  id="public_offer_consent"/>
-                <label for="public_offer_consent"
-                       class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                    {{__('forms.agree')}}
-                </label>
-            </div>
-        </x-slot>
-        @error('legal_entity_form.public_offer.consent')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
-        @enderror
-    </x-forms.form-group>
+                @foreach($getCertificateAuthority as $k => $certificate_type)
+                    <option value="{{ $certificate_type['id'] }}">{{ $certificate_type['name'] }}</option>
+                @endforeach
+            </select>
 
-</x-forms.form-row>
+            @if($hasPublicOfferKnedpError)
+                <p id="publicOfferKnedpErrorHelp" class="text-error">
+                    {{ $errors->first('knedp') }}
+                </p>
+            @endif
+
+            <label for="publicOfferKnedp" class="label z-10">
+                {{ __('forms.KNEDP') }}
+            </label>
+        </div>
+
+        <div class="form-group group py-4">
+            <x-forms.file
+                required
+                wire:model="keyContainerUpload"
+                file="{{ $keyContainerUpload?->getClientOriginalName() }}"
+                :id="'keyContainerUpload'"
+            />
+
+            @if($hasPublicOfferFileError)
+                <p id="publicOfferFileErrorHelp" class="text-error">
+                    {{ $errors->first('keyContainerUpload') }}
+                </p>
+            @endif
+
+            <label for="keyContainerUpload" class="label z-10">
+                {{ __('forms.keyContainerUpload') }} *
+            </label>
+        </div>
+
+        <div class="form-group group">
+            <input
+                required
+                type="password"
+                placeholder=" "
+                id="publicOfferPassword"
+                wire:model="password"
+                {{-- aria-describedby="{{ $hasPublicOfferPasswordError ? 'publicOfferPasswordErrorHelp' : '' }}" --}}
+                class="input {{ $hasPublicOfferPasswordError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+            />
+
+            @if($hasPublicOfferPasswordError)
+                <p id="publicOfferPasswordErrorHelp" class="text-error">
+                    {{ $errors->first('password') }}
+                </p>
+            @endif
+
+            <label for="publicOfferPassword" class="label z-10">
+                {{ __('forms.password') }}
+            </label>
+        </div>
+    </div>
+</fieldset>

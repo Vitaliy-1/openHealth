@@ -1,151 +1,196 @@
-<x-forms.form-row class="flex-wrap">
-    <x-forms.form-group class="xl:w-1/4">
-        <x-slot name="label">
-            <x-forms.label class="default-label" for="license_type"
-                           name="label">
-                {{__('forms.license_type')}} *
-            </x-forms.label>
-        </x-slot>
-        <x-slot name="input">
-            <x-forms.select readonly class="default-input"
-                            wire:model.defer="legal_entity_form.license.type"
-                            disabled
-                            type="text" id="license_type">
-                <x-slot name="option">
-                    @foreach($dictionaries['LICENSE_TYPE'] as $k => $license_type)
-                        <option value="{{ $k }}" {{ $k === 'MSP' ? 'selected' : '' }}>
-                            {{ $license_type }}
-                        </option>
-                    @endforeach
-                </x-slot>
-            </x-forms.select>
-        </x-slot>
-        @error('legal_entity_form.license.type')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
-        @enderror
-    </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/4">
-        <x-slot name="label">
-            <x-forms.label class="default-label" for="license_license_number"
-                           name="label">
-                {{__('forms.license_number')}}
-            </x-forms.label>
-        </x-slot>
-        <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.license.license_number"
-                           type="text" id="license_license_number"/>
-        </x-slot>
-        @error('legal_entity_form.license.license_number')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
-        @enderror
-    </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/4">
-        <x-slot name="label">
-            <x-forms.label class="default-label" for="license_issued_by"
-                           name="label">
-                {{__('forms.license_issued_by')}} *
-            </x-forms.label>
-        </x-slot>
-        <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.license.issued_by"
-                           type="text" id="license_issued_by"/>
-        </x-slot>
-        @error('legal_entity_form.license.issued_by')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
-        @enderror
-    </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/4">
-        <x-slot name="label">
-            <x-forms.label class="default-label" for="license_issued_date"
-                           name="label">
-                {{__('forms.license_issued_date')}} *
-            </x-forms.label>
-        </x-slot>
-        <x-slot name="input">
-            <x-forms.input-date  wire:model="legal_entity_form.license.issued_date"
-                            id="license_issued_date"/>
-        </x-slot>
-        @error('legal_entity_form.license.issued_date')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
-        @enderror
-    </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/4">
-        <x-slot name="label">
-            <x-forms.label class="default-label" for="license_active_from_date"
-                           name="label">
-                {{__('forms.license_active_from_date')}} *
-            </x-forms.label>
-        </x-slot>
-        <x-slot name="input">
-            <x-forms.input-date  wire:model="legal_entity_form.license.active_from_date"
-                           id="license_active_from_date"/>
-        </x-slot>
-        @error('legal_entity_form.license.active_from_date')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
-        @enderror
-    </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/4">
-        <x-slot name="label">
-            <x-forms.label class="default-label" for="license_expiry_date"
-                           name="label">
-                {{__('forms.license_expiry_date')}}
-            </x-forms.label>
-        </x-slot>
-        <x-slot name="input">
-            <x-forms.input-date wire:model="legal_entity_form.license.expiry_date"
-                           id="license_expiry_date"/>
-        </x-slot>
-    </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/4">
-        <x-slot name="label">
-            <x-forms.label class="default-label" for="license_what_licensed"
-                           name="label">
-                {{__('forms.license_what_licensed')}}
-            </x-forms.label>
-        </x-slot>
-        <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.license.what_licensed"
-                           type="text" id="license_what_licensed"/>
-        </x-slot>
-    </x-forms.form-group>
-    <x-forms.form-group class="xl:w-1/4">
-        <x-slot name="label">
-            <x-forms.label class="default-label" for="license_order_no"
-                           name="label">
-                {{__('forms.license_order_no')}} *
-            </x-forms.label>
-        </x-slot>
-        <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="legal_entity_form.license.order_no"
-                           type="text" id="license_order_no"/>
-        </x-slot>
-        @error('legal_entity_form.license.order_no')
-        <x-slot name="error">
-            <x-forms.error>
-                {{$message}}
-            </x-forms.error>
-        </x-slot>
-        @enderror
-    </x-forms.form-group>
+@php
+    $hasLicenseTypeError = $errors->has('legalEntityForm.license.type');
+    $hasLicenseIssuedByError = $errors->has('legalEntityForm.license.issued_by');
+    $hasLicenseIssuedDateError = $errors->has('legalEntityForm.license.issued_date');
+    $hasLicenseActiveFromDateError = $errors->has('legalEntityForm.license.active_from_date');
+    $hasLicenseOrderNumberError = $errors->has('legalEntityForm.license.order_no');
+@endphp
 
-</x-forms.form-row>
+<fieldset
+    class="fieldset"
+    xmlns="http://www.w3.org/1999/html"
+    x-data="{ title: '{{ __('forms.licenses') }}', index: 6 }"
+    x-init="typeof addHeader !== 'undefined' && addHeader(title, index)"
+    x-show="activeStep === index || isEdit"
+    x-cloak
+    :key="`step-${index}`"
+>
+    <template x-if="isEdit">
+        <legend x-text="title" class="legend"></legend>
+    </template>
+
+    <div class='form-row-3'>
+        <div class="form-group group">
+            <select
+                required
+                id="licenseType"
+                wire:model.defer="legalEntityForm.license.type"
+                {{-- aria-describedby="{{ $hasLicenseTypeError ? 'licenseTypeErrorHelp' : '' }}" --}}
+                class="input-select text-gray-800 {{ $hasLicenseTypeError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+            >
+                <option value="_placeholder_" selected hidden>-- {{ __('forms.select') }} --</option>
+
+                @foreach($dictionaries['LICENSE_TYPE'] as $k => $license_type)
+                    <option value="{{ $k }}" {{ $k === 'MSP' ? 'selected' : '' }}>
+                        {{ $license_type }}
+                    </option>
+                @endforeach
+            </select>
+
+            @if($hasLicenseTypeError)
+                <p id="licenseTypeErrorHelp" class="text-error">
+                    {{ $errors->first('legalEntityForm.license.type') }}
+                </p>
+            @endif
+
+            <label for="licenseType" class="label z-10">
+                {{ __('forms.licenseType') }}
+            </label>
+        </div>
+
+        <div class="form-group group">
+            <input
+                type="text"
+                placeholder=" "
+                id="licenseNumber"
+                wire:model="legalEntityForm.license.licenseNumber"
+                {{-- aria-describedby="{{ $hasAccreditationOrderNumberError ? 'licenseNumberErrorHelp' : '' }}" --}}
+                class="input peer"
+            />
+
+            <label for="licenseNumber" class="label z-10">
+                {{ __('forms.licenseNumber') }}
+            </label>
+        </div>
+
+        <div class="form-group group">
+            <input
+                required
+                type="text"
+                placeholder=" "
+                id="licenseIssuedBy"
+                wire:model="legalEntityForm.license.issuedBy"
+                {{-- aria-describedby="{{ $hasLicenseIssuedByError ? 'licenseIssuedByErrorHelp' : '' }}" --}}
+                class="input {{ $hasLicenseIssuedByError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+            />
+
+            @if($hasLicenseIssuedByError)
+                <p id="licenseIssuedByErrorHelp" class="text-error">
+                    {{ $errors->first('legalEntityForm.license.issuedBy') }}
+                </p>
+            @endif
+
+            <label for="licenseIssuedBy" class="label z-10">
+                {{ __('forms.licenseIssuedBy') }}
+            </label>
+        </div>
+
+        <div class="form-group group">
+            <svg class="svg-input" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+            </svg>
+
+            <input
+                required
+                type="text"
+                placeholder=" "
+                id="licenseIssuedDate"
+                wire:model="legalEntityForm.license.issuedDate"
+                {{-- aria-describedby="{{ $hasLicenseIssuedDateError ? 'licenseIssuedDateErrorHelp' : '' }}" --}}
+                class="input datepicker-input {{ $hasLicenseIssuedDateError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+            />
+
+            @if($hasLicenseIssuedDateError)
+                <p id="licenseIssuedDateErrorHelp" class="text-error">
+                    {{ $errors->first('legalEntityForm.license.issuedDate') }}
+                </p>
+            @endif
+
+            <label for="licenseIssuedDate" class="label z-10">
+                {{ __('forms.licenseIssuedDate') }}
+            </label>
+        </div>
+
+        <div class="form-group group">
+            <svg class="svg-input" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+            </svg>
+
+            <input
+                required
+                type="text"
+                placeholder=" "
+                id="licenseActiveFromDate"
+                wire:model="legalEntityForm.license.activeFromDate"
+                {{-- aria-describedby="{{ $hasLicenseActiveFromDateError ? 'licenseActiveFromDateErrorHelp' : '' }}" --}}
+                class="input datepicker-input {{ $hasLicenseActiveFromDateError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+            />
+
+            @if($hasLicenseActiveFromDateError)
+                <p id="licenseActiveFromDateErrorHelp" class="text-error">
+                    {{ $errors->first('legalEntityForm.license.activeFromDate') }}
+                </p>
+            @endif
+
+            <label for="licenseActiveFromDate" class="label z-10">
+                {{ __('forms.licenseActiveFromDate') }}
+            </label>
+        </div>
+
+        <div class="form-group group">
+            <svg class="svg-input" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+            </svg>
+
+            <input
+                type="text"
+                placeholder=" "
+                id="licenseExpiryDate"
+                wire:model="legalEntityForm.license.expiryDate"
+                {{-- aria-describedby="{{ $hasLicenseActiveFromDateError ? 'licenseActiveFromDateErrorHelp' : '' }}" --}}
+                class="input datepicker-input peer"
+            />
+
+            <label for="licenseExpiryDate" class="label z-10">
+                {{ __('forms.licenseExpiryDate') }}
+            </label>
+        </div>
+
+        <div class="form-group group">
+            <input
+                type="text"
+                placeholder=" "
+                id="licenseWhatLicensed"
+                wire:model="legalEntityForm.license.whatLicensed"
+                {{-- aria-describedby="{{ $hasAccreditationOrderNumberError ? 'licenseNumberErrorHelp' : '' }}" --}}
+                class="input peer"
+            />
+
+            <label for="licenseWhatLicensed" class="label z-10">
+                {{ __('forms.licenseWhatLicensed') }}
+            </label>
+        </div>
+
+        <div class="form-group group">
+            <input
+                required
+                type="text"
+                placeholder=" "
+                id="licenseOrderNumber"
+                wire:model="legalEntityForm.license.orderNo"
+                {{-- aria-describedby="{{ $hasLicenseOrderNumberError ? 'licenseOrderNumberErrorHelp' : '' }}" --}}
+                class="input {{ $hasLicenseOrderNumberError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+            />
+
+            @if($hasLicenseOrderNumberError)
+                <p id="licenseOrderNumberErrorHelp" class="text-error">
+                    {{ $errors->first('legalEntityForm.license.orderNo') }}
+                </p>
+            @endif
+
+            <label for="licenseOrderNumber" class="label z-10">
+                {{ __('forms.licenseOrderNo') }}
+            </label>
+        </div>
+    </div>
+</fieldset>

@@ -2,6 +2,7 @@
 
 namespace App\Models\Relations;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
@@ -14,8 +15,9 @@ class Address extends Model
         'id',
         'addressable_id',
         'addressable_type',
-        'created_at',
-        'updated_at'
+        'settlement_type',
+        'settlement_id',
+        'street_type',
     ];
 
     protected $fillable = [
@@ -32,11 +34,47 @@ class Address extends Model
         'apartment',
         'zip',
         'addressable_id',
-        'addressable_type'
+        'addressable_type',
+    ];
+
+    protected $appends = [
+        'settlementId',
+        'settlementType',
+        'streetType',
     ];
 
     public function addressable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function getSettlementIdAttribute()
+    {
+        return $this->attributes['settlement_id'] ?? null;
+    }
+
+    public function getSettlementTypeAttribute()
+    {
+        return $this->attributes['settlement_type'] ?? null;
+    }
+
+    public function getStreetTypeAttribute()
+    {
+        return $this->attributes['street_type'] ?? null;
+    }
+
+    public function fill(array $attributes)
+    {
+        $convertedAttributes = [];
+
+        foreach ($attributes as $key => $value) {
+            if (!in_array($key, $this->fillable)) {
+                $key = Str::snake($key);
+            }
+
+            $convertedAttributes[$key] = $value;
+        }
+
+        return parent::fill($convertedAttributes);
     }
 }

@@ -14,6 +14,7 @@ use App\Livewire\Employee\EmployeeCreate;
 use App\Livewire\Employee\EmployeeEdit;
 use App\Livewire\Employee\EmployeeIndex;
 use App\Livewire\Encounter\EncounterCreate;
+use App\Livewire\LegalEntity\CreateLegalEntity;
 use App\Livewire\LegalEntity\EditLegalEntity;
 use App\Livewire\LegalEntity\LegalEntities;
 use App\Livewire\License\Forms\CreateNewLicense;
@@ -54,7 +55,7 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    Route::get('/dashboard/legal-entities/create', LegalEntities::class)->name('create.legalEntities');
+    Route::get('/dashboard/legal-entities/create', CreateLegalEntity::class)->name('create.legalEntities');
 
     Route::group(['middleware' => ['role:OWNER|ADMIN'], 'prefix' => 'dashboard'], function () {
         Route::prefix('legal-entities')->group(function () {
