@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property Carbon $start_date
  * @property Carbon $end_date
  * @property string $employee_type
+ * @mixin IdeHelperBaseEmployee
  */
 class BaseEmployee extends Model
 {
