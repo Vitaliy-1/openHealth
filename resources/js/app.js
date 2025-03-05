@@ -3,74 +3,71 @@ import './bootstrap';
 import './common';
 import './index';
 
-// import { initFlowbite } from 'flowbite';
-
 import Datepicker from 'flowbite-datepicker/Datepicker';
+import uk from '../../node_modules/flowbite-datepicker/js/i18n/locales/uk.js';
 
-(function () {
-    Datepicker.locales.uk = {
-        days: ["Неділя", "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота"],
-        daysShort: ["Нед", "Пнд", "Втр", "Срд", "Чтв", "Птн", "Суб"],
-        daysMin: ["Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
-        months: ["Cічень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"],
-        monthsShort: ["Січ", "Лют", "Бер", "Кві", "Тра", "Чер", "Лип", "Сер", "Вер", "Жов", "Лис", "Гру"],
-        today: "Сьогодні",
-        clear: "Очистити",
-        format: "dd.mm.yyyy",
-        weekStart: 1
-    };
-}());
-const initializeDatepickers = () => {
-    const datepickerElements = document.querySelectorAll('.default-datepicker');
+// Selecting all elements with the 'datepicker-input' class
+document.addEventListener('DOMContentLoaded', () => {
+    function initDatepickers() {
+        document.querySelectorAll('.datepicker-input:not([data-initialized])').forEach((datepickerEl) => {
+            Datepicker.locales.uk = uk.uk;
 
-    datepickerElements.forEach(element => {
-        if (!element.classList.contains('datepicker-initialized')) {
-            const minDate = element.getAttribute('data-min') ? new Date(element.getAttribute('data-min')) : null;
-            const maxDate = element.getAttribute('data-max') ? new Date(element.getAttribute('data-max')) : null;
+            const minDate = datepickerEl.getAttribute('datepicker-min-date') || null;
+            const maxDate = datepickerEl.getAttribute('datepicker-max-date') || null;
+            const format = datepickerEl.getAttribute('datepicker-format') || 'yyyy-mm-dd';
 
-            const datepicker = new Datepicker(element, {
-                format: 'yyyy-mm-dd',
-                language: 'uk',
+            const shouldAutoSelectToday = datepickerEl.hasAttribute('datepicker-autoselect-today');
+            const todayDate = new Date().toISOString().split('T')[0];
+
+            if (shouldAutoSelectToday && !datepickerEl.value) {
+                datepickerEl.value = todayDate;
+                datepickerEl.dispatchEvent(new InputEvent('input', {
+                    bubbles: true,
+                    composed: true
+                }));
+            }
+
+            new Datepicker(datepickerEl, {
+                defaultViewDate: datepickerEl.value,
                 minDate: minDate,
                 maxDate: maxDate,
+                format: format,
+                language: 'uk'
             });
 
-            element.classList.add('datepicker-initialized');
-
-            element.addEventListener('changeDate', function(event) {
-                const selectedDate = event.target.value;
-                const wireModel = element.getAttribute('wire:model');
-                const componentId = element.closest('[wire\\:id]').getAttribute('wire:id');
-                if (Livewire.find(componentId)) {
-                    Livewire.find(componentId).set(wireModel, selectedDate);
-                }
+            datepickerEl.setAttribute('data-initialized', 'true'); // Avoidance of reinitialisation
+            datepickerEl.addEventListener('changeDate', () => {
+                const inputEvent = new InputEvent('input', {
+                    bubbles: true,
+                    composed: true
+                });
+                datepickerEl.dispatchEvent(inputEvent);
             });
-        }
+        });
+    }
+
+    // Call when the page loads
+    initDatepickers();
+
+    // Monitor changes in the DOM (if new datepickers are added)
+    const observer = new MutationObserver(() => {
+        initDatepickers();
     });
-};
+    observer.observe(document.body, { childList: true, subtree: true });
+});
 
 document.addEventListener('livewire:load', () => {
-    initializeDatepickers();
-
     Livewire.hook('message.sent', (message) => {
         if (message.actionQueue[0].payload.method === 'update') {
             document.getElementById('preloader').style.display = 'block';
         }
     });
+
     Livewire.hook('message.processed', (message) => {
         if (message.actionQueue[0].payload.method === 'update') {
             document.getElementById('preloader').style.display = 'none';
         }
     });
-});
-
-
-document.addEventListener("livewire:initialized", () => {
-    initializeDatepickers();
-
-    Livewire.hook('element.init', ({ component, el }) => {
-        initializeDatepickers();
-    })
 });
 
 // See Flowbite instruction on the dark mode switcher: https://flowbite.com/docs/customize/dark-mode/

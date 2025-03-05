@@ -94,7 +94,7 @@
         <x-slot name="label">
             <x-forms.label class="default-label" for="type"
                            name="label">
-                {{__('forms.settlementType')}} *
+                {{__('forms.settlement_type')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -186,7 +186,7 @@
         <x-slot name="label">
             <x-forms.label class="default-label" for="area"
                            name="label">
-                {{__('forms.streetType')}} *
+                {{__('forms.street_type')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -282,7 +282,7 @@
         <x-slot name="label">
             <x-forms.label class="default-label" for="zip"
                            name="label">
-                {{__('forms.zipCode')}}
+                {{__('forms.zip_code')}}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">

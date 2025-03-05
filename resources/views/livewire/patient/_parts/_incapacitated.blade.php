@@ -6,7 +6,7 @@
                     x-model="isIncapacitated"
                     id="isIncapacitated"
         />
-        {{ __('forms.incapacitated') }}
+        {{ __('patients.incapacitated') }}
     </legend>
 
     <template x-if="isIncapacitated">

@@ -96,7 +96,7 @@
                                 </li>
                             @empty
                                 <li class="cursor-default px-4 py-2">
-                                    {{ __('Нічого не знайдено') }}
+                                    {{ __('forms.nothing_found') }}
                                 </li>
                             @endforelse
                         </ul>
@@ -122,7 +122,7 @@
                 for="settlementType"
                 name="label"
             >
-                {{ __('forms.settlementType') }} *
+                {{ __('forms.settlement_type') }} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -209,7 +209,7 @@
                                 </li>
                             @empty
                                 <li class="cursor-default px-4 py-2">
-                                    {{ __('Нічого не знайдено') }}
+                                    {{ __('forms.nothing_found') }}
                                 </li>
                             @endforelse
                         </ul>
@@ -236,7 +236,7 @@
                 for="street_type"
                 name="label"
             >
-                {{__('forms.streetType')}} *
+                {{__('forms.street_type')}} *
             </x-forms.label>
         </x-slot>
 
@@ -325,7 +325,7 @@
                                 </li>
                             @empty
                                 <li class="cursor-default px-4 py-2">
-                                    {{ __('Нічого не знайдено') }}
+                                    {{ __('forms.nothing_found') }}
                                 </li>
                             @endforelse
                         </ul>
@@ -411,7 +411,7 @@
                 for="zip"
                 name="label"
             >
-                {{__('forms.zipCode')}}
+                {{__('forms.zip_code')}}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">

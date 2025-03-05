@@ -13,7 +13,7 @@
 
     @if($viewState === 'default')
         <section class="section-form">
-            <form action="#" class="form">
+            <form class="form">
                 @include('livewire.patient._parts._patient')
                 @include('livewire.patient._parts._documents')
                 @include('livewire.patient._parts._identity')
@@ -22,32 +22,27 @@
                 @include('livewire.patient._parts._incapacitated')
                 @include('livewire.patient._parts._authentication_methods')
 
-                <x-forms.form-row class="flex-col justify-between items-center">
-                    <div class="xl:w-1/4 text-left">
-                        <x-secondary-button wire:click="closeModal">
-                            {{ __('Назад') }}
-                        </x-secondary-button>
-                    </div>
-
-                    <div class="xl:w-1/4 text-right">
-                        <button wire:click.prevent="createPerson('patient')" type="button"
-                                class="btn-primary">
-                            {{ __('Відправити на затвердження') }}
+                <div class="flex xl:flex-row gap-6 justify-between items-center">
+                    <a href="{{ route('patient.index') }}" class="button-minor">
+                        {{ __('forms.back') }}
+                    </a>
+                    @if(auth()->user()->hasRole('DOCTOR'))
+                        <button wire:click.prevent="createPerson('patient')" class="button-primary">
+                            {{ __('forms.send_for_approval') }}
                         </button>
-                    </div>
-
-                    <div class="xl:w-1/4">
-                        <button wire:click.prevent="createApplication('patient')" type="button" class="btn-primary">
-                            {{ __('Зберегти в заявки') }}
+                    @endif
+                    @if(auth()->user()->hasRole(['DOCTOR', 'RECEPTIONIST']))
+                        <button wire:click.prevent="createApplication('patient')" class="button-primary">
+                            {{ __('patients.save_to_application') }}
                         </button>
-                    </div>
-                </x-forms.form-row>
+                    @endif
+                </div>
             </form>
         </section>
 
     @elseif($viewState === 'new')
         <section class="section-form">
-            <form action="#" class="form">
+            <form class="form">
                 @include('livewire.patient._parts._signature')
             </form>
         </section>
@@ -58,4 +53,6 @@
     @elseif($showModal === 'documentsRelationship')
         @include('livewire.patient._parts.modals._modal_document_relationship')
     @endif
+
+    <x-forms.loading/>
 </div>

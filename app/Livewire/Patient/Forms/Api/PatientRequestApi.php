@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Livewire\Patient\Forms\Api;
 
 use App\Classes\eHealth\Api\PersonApi;
