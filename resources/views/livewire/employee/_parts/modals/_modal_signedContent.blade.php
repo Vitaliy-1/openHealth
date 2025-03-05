@@ -75,7 +75,7 @@
     </div>
     <div class="xl:w-1/2 text-right">
         <button wire:click="sendApiRequest()" type="button" class="default-button">
-            {{__('Відправити на затвердження ')}}
+            {{__('forms.send_for_approval')}}
         </button>
     </div>
 </x-forms.form-row>

@@ -1,6 +1,6 @@
 <x-dialog-modal maxWidth="3xl" wire:model="showModal">
     <x-slot name="title">
-        {{__('Накласти КЕП')}}
+        {{ __('Накласти КЕП') }}
     </x-slot>
 
     <x-slot name="content">
@@ -9,7 +9,7 @@
             <x-forms.form-group class="">
                 <x-slot name="label">
                     <x-forms.label class="default-label" for="knedp" name="label">
-                        {{__('forms.KNEDP')}} *
+                        {{ __('forms.KNEDP') }} *
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">
@@ -36,7 +36,7 @@
             <x-forms.form-group class="">
                 <x-slot name="label">
                     <x-forms.label class="default-label" for="keyContainerUpload" name="label">
-                        {{__('forms.keyContainerUpload')}} *
+                        {{ __('forms.keyContainerUpload') }} *
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">
@@ -77,7 +77,7 @@
                 </div>
                 <div class="xl:w-1/4 text-right">
                     <button wire:click="signPerson" type="button" class="btn-primary">
-                        {{ __('Відправити на затвердження') }}
+                        {{ __('forms.send_for_approval') }}
                     </button>
                 </div>
             </div>

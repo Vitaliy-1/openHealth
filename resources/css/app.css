@@ -181,6 +181,10 @@
         @apply button text-gray-900 inline-flex items-center bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700
     }
 
+    .button-sync {
+        @apply focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800;
+    }
+
     /* General */
 
     .default-label {
@@ -228,7 +232,7 @@
     }
 
     .accordion-content {
-        @apply p-5 border border-gray-200 dark:border-gray-700;
+        @apply p-5 border border-gray-200 dark:border-gray-700 dark:bg-gray-900;
     }
 
     .badge-green {
@@ -278,7 +282,7 @@
 
     /* Tables */
     .table-section {
-        @apply bg-white dark:bg-gray-900 p-3 sm:p-5;
+        @apply bg-gray-100 dark:bg-gray-900 p-3 sm:p-5;
     }
 
     .table-container {

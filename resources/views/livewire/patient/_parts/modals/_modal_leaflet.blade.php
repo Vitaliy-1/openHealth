@@ -1,6 +1,6 @@
 <x-dialog-modal maxWidth="3xl" wire:model="showModal">
     <x-slot name="title">
-        {{ __("Пам’ятка") }}
+        {{ __('patients.leaflet') }}
     </x-slot>
 
     <x-slot name="content">
@@ -32,7 +32,6 @@
             }"
         >
             <div class="mb-4.5 flex flex-col gap-6 xl:flex-container">
-
                 @if(!empty($leafletContent))
                     <div id="printable-content">
                         {!! $leafletContent !!}
@@ -40,7 +39,7 @@
                 @endif
 
                 <button @click="printContent" class="mb-6 underline font-medium text-sm">
-                    {{ __("Роздрукувати пам'ятку для ознайомлення пацієнтом") }}
+                    {{ __('patients.print_leaflet_for_patient') }}
                 </button>
 
                 <div class="mb-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center">
@@ -51,7 +50,7 @@
                     </div>
                     <div class="xl:w-1/4 text-right">
                         <button wire:click="informAndCloseModal" type="button" class="default-button">
-                            {{ __('Підписати') }}
+                            {{ __('forms.sign') }}
                         </button>
                     </div>
                 </div>

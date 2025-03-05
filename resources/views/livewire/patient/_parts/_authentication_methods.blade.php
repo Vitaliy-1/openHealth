@@ -2,7 +2,7 @@
 
 <fieldset class="fieldset"
           x-data="{
-              authenticationMethods: $wire.entangle('patientRequest.patient.authenticationMethods'),
+              authenticationMethods: $wire.entangle('form.patient.authenticationMethods'),
               isIncapacitated: $wire.entangle('isIncapacitated'),
 
               get availableAuthMethods() {
@@ -10,18 +10,18 @@
                       return [
                           {
                               value: '{{ AuthenticationMethod::THIRD_PERSON->value }}',
-                              label: '{{ __('forms.authentication') }} {{ AuthenticationMethod::THIRD_PERSON->label() }}'
+                              label: '{{ __('patients.authentication') }} {{ AuthenticationMethod::THIRD_PERSON->label() }}'
                           }
                       ];
                   } else {
                       return [
                           {
                               value: '{{ AuthenticationMethod::OTP->value }}',
-                              label: '{{ __('forms.authentication') }} {{ AuthenticationMethod::OTP->label() }}'
+                              label: '{{ __('patients.authentication') }} {{ AuthenticationMethod::OTP->label() }}'
                           },
                           {
                               value: '{{ AuthenticationMethod::OFFLINE->value }}',
-                              label: '{{ __('forms.authentication') }} {{ AuthenticationMethod::OFFLINE->label() }}'
+                              label: '{{ __('patients.authentication') }} {{ AuthenticationMethod::OFFLINE->label() }}'
                           }
                       ];
                   }
@@ -29,26 +29,32 @@
           }"
 >
     <legend class="legend">
-        {{ __('forms.authentication') }}
+        {{ __('patients.authentication') }}
     </legend>
 
     <div class="form-row-3">
         <div class="form-group group">
             <label for="relationType" class="sr-only">
-                {{ __('forms.authentication') }}
+                {{ __('patients.authentication') }}
             </label>
             <select x-model="authenticationMethods[0].type"
                     id="relationType"
-                    class="input-select peer"
+                    class="input-select peer @error('form.patient.authenticationMethods.*.type') input-error @enderror"
                     required
             >
                 <option selected>
-                    {{ __('forms.select') }} {{ __('forms.authentication') }} *
+                    {{ __('forms.select') }} {{ __('patients.authentication') }} *
                 </option>
                 <template x-for="method in availableAuthMethods" :key="method.value">
                     <option :value="method.value" x-text="method.label"></option>
                 </template>
             </select>
+
+            @error('form.patient.authenticationMethods.*.type')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
         </div>
     </div>
 
@@ -59,7 +65,7 @@
                        type="text"
                        name="phoneNumber"
                        id="phoneNumber"
-                       class="input peer @error('patientRequest.patient.authenticationMethods.*.phoneNumber') input-error @enderror"
+                       class="input peer @error('form.patient.authenticationMethods.*.phoneNumber') input-error @enderror"
                        placeholder=" "
                        required
                        autocomplete="off"
@@ -68,7 +74,7 @@
                     {{ __('forms.phone_number') }}
                 </label>
 
-                @error("patientRequest.patient.authenticationMethods.*.phoneNumber")
+                @error('form.patient.authenticationMethods.*.phoneNumber')
                 <p class="text-error">
                     {{ $message }}
                 </p>
@@ -84,16 +90,16 @@
                        type="text"
                        name="alias"
                        id="alias"
-                       class="input peer @error('patientRequest.patient.authenticationMethods.*.alias') input-error @enderror"
+                       class="input peer @error('form.patient.authenticationMethods.*.alias') input-error @enderror"
                        placeholder=" "
                        required
                        autocomplete="off"
                 />
                 <label for="alias" class="label">
-                    {{ __('forms.alias') }}
+                    {{ __('patients.alias') }}
                 </label>
 
-                @error('patientRequest.patient.authenticationMethods.*.alias')
+                @error('form.patient.authenticationMethods.*.alias')
                 <p class="text-error">
                     {{ $message }}
                 </p>

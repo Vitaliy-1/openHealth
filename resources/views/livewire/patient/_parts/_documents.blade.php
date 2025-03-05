@@ -5,7 +5,8 @@
 
     <x-tables.table align="left">
         <x-slot name="headers"
-                :list="[__('forms.documentType'), __('forms.number'), __('forms.issuedBy'), __('forms.issuedAt'), __('forms.expirationDate'), __('forms.action')]">
+                :list="[__('forms.document_type'), __('forms.number'), __('forms.issued_by'), __('forms.issued_at'), __('forms.expiration_date'), __('forms.action')]"
+        >
         </x-slot>
 
         <x-slot name="tbody">
@@ -53,11 +54,11 @@
         </x-slot>
     </x-tables.table>
 
-    <div class="mb-6 mt-6 flex flex-wrap xl:gap-7.5">
-        <a wire:click.prevent="create('documents')"
+    <div class="mb-6 mt-6 flex flex-wrap xl:gap-8">
+        <button wire:click.prevent="create('documents')"
            class="text-sm inline-flex items-center font-medium text-blue-600 dark:text-blue-500 hover:underline"
-           href="#">
-            {{ __('forms.addDocument') }}
-        </a>
+        >
+            {{ __('forms.add_document') }}
+        </button>
     </div>
 </fieldset>

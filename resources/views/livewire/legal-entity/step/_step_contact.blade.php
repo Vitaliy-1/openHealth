@@ -54,7 +54,7 @@
                             <x-forms.select wire:model.defer="legal_entity_form.phones.{{$key}}.type"
                                             class="default-select">
                                 <x-slot name="option">
-                                    <option>{{__('forms.typeMobile')}}</option>
+                                    <option>{{__('forms.type_mobile')}}</option>
                                     @foreach($this->dictionaries['PHONE_TYPE'] as $k=>$phone_type)
                                         <option
                                             {{ isset ($phone['type']) === $phone_type ? 'selected': ''}} value="{{$k}}">{{$phone_type}}</option>
@@ -83,7 +83,7 @@
                             {{--                            @if($key != 0)--}}
                             {{--                                <a wire:click="removePhone({{$key}},'phones')"--}}
                             {{--                                   class="text-primary m-t-5"--}}
-                            {{--                                   href="#">{{__('forms.removePhone')}}</a>--}}
+                            {{--                                   href="#">{{__('forms.remove_phone')}}</a>--}}
                             {{--                            @endif--}}
 
                         </div>
@@ -99,7 +99,7 @@
                         <x-forms.select wire:model.defer="legal_entity_form.phones.0.type"
                                         class="default-select">
                             <x-slot name="option">
-                                <option>{{__('forms.typeMobile')}}</option>
+                                <option>{{__('forms.type_mobile')}}</option>
                                 @foreach($this->dictionaries['PHONE_TYPE'] as $k=>$phone_type)
                                     <option
                                         {{ isset ($phone['type']) === $phone_type ? 'selected': ''}} value="{{$k}}">{{$phone_type}}</option>

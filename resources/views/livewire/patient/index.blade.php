@@ -1,14 +1,14 @@
 @php
     $svgSprite = file_get_contents(resource_path('images/sprite.svg'));
     $tableHeaders = [
-            __('forms.full_name'),
-            __('forms.phone'),
-            __('Д.Н.'),
-            __('forms.RNOCPP') . '(' . __('forms.ipn') . ')',
-            __('forms.birthCertificate'),
-            __('forms.status'),
-            __('forms.action')
-        ];
+        __('forms.full_name'),
+        __('forms.phone'),
+        __('Д.Н.'),
+        __('forms.rnokpp') . '(' . __('forms.ipn') . ')',
+        __('forms.birth_certificate'),
+        __('forms.status'),
+        __('forms.action')
+    ];
 @endphp
 
 <div>
@@ -28,36 +28,36 @@
                                 {{ __('patients.add_patient') }}
                             </a>
                         </button>
-                        <button type="button"
-                                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                            {{ __('Синхронізувати з ЕСОЗ') }}
+                        <button class="button-sync">
+                            {{ __('forms.synchronise_with_eHealth') }}
                         </button>
                     </div>
                 </div>
 
-                <div class="mb-8 flex items-center gap-1 font-semibold text-gray-900">
-                    <svg width="17" height="17">
+                <div class="mb-8 flex items-center gap-1 font-semibold text-gray-900 dark:text-white">
+                    <svg width="18" height="18">
                         <use xlink:href="#svg-search-outline"></use>
                     </svg>
-                    <p>{{ __('Пошук пацієнта') }}</p>
+                    <p>{{ __('patients.patient_search') }}</p>
                 </div>
 
                 @include('livewire.patient._parts._search_filter')
-                <x-forms.form-group class="py-4">
-                    <x-slot name="label">
-                        <x-forms.button-with-icon wire:click.prevent="searchForPerson('patientsFilter')"
-                                                  class="default-button"
-                                                  label="{{ __('Шукати') }}"
-                                                  svgId="svg-search"
-                        />
-                    </x-slot>
-                </x-forms.form-group>
+                <div class="py-4">
+                    <button wire:click.prevent="searchForPerson('patientsFilter')"
+                            class="flex items-center gap-2 default-button"
+                    >
+                        <svg width="16" height="16">
+                            <use xlink:href="#svg-search"></use>
+                        </svg>
+                        <span>{{ __('patients.search') }}</span>
+                    </button>
+                </div>
             </x-slot>
         </x-section-navigation>
 
         @if($paginatedPatients && count($paginatedPatients) > 0)
-            <section class="table-section"
-                     x-data="{
+            <div class="table-section"
+                 x-data="{
                          activeFilter: 'all',
                          patients: {{ json_encode($paginatedPatients->items()) }},
 
@@ -77,18 +77,21 @@
                          }
                      }"
             >
-                <div class="mb-6 flex items-center gap-7">
+                <div class="mb-6 flex items-center gap-8">
                     <button @click="activeFilter = 'all'"
-                            :class="activeFilter === 'all' ? 'default-button' : 'light-button'">
-                        {{ __('Всі') }}
+                            :class="activeFilter === 'all' ? 'default-button' : 'light-button'"
+                    >
+                        {{ __('patients.all') }}
                     </button>
                     <button @click="activeFilter = 'eHEALTH'"
-                            :class="activeFilter === 'eHEALTH' ? 'default-button' : 'light-button'">
-                        {{ __('Пацієнти') }}
+                            :class="activeFilter === 'eHEALTH' ? 'default-button' : 'light-button'"
+                    >
+                        {{ __('patients.patients') }}
                     </button>
                     <button @click="activeFilter = 'APPLICATION'"
-                            :class="activeFilter === 'APPLICATION' ? 'default-button' : 'light-button'">
-                        {{ __('Заявки') }}
+                            :class="activeFilter === 'APPLICATION' ? 'default-button' : 'light-button'"
+                    >
+                        {{ __('patients.applications') }}
                     </button>
                 </div>
                 <div class="table-container">
@@ -113,7 +116,7 @@
                                             <div class="flex gap-2 mt-2">
                                                 <a :href="`{{ route('patient.form', ['id' => '']) }}/${patient.id}`"
                                                    class="default-button">
-                                                    {{ __('Продовжити реєстрацію') }}
+                                                    {{ __('patients.continue_registration') }}
                                                 </a>
                                             </div>
                                         </template>
@@ -123,10 +126,11 @@
                                                         type="button"
                                                         class="default-button"
                                                 >
-                                                    {{ __('Переглянути карту') }}
+                                                    {{ __('patients.view_record') }}
                                                 </button>
-                                                <button type="button"
-                                                        class="flex items-center gap-2 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                                                <button @click.prevent="$wire.redirectToEncounter(patient)"
+                                                        class="button-sync"
+                                                >
                                                     <svg width="16" height="16">
                                                         <use xlink:href="#svg-plus"></use>
                                                     </svg>
@@ -176,7 +180,7 @@
                                                             <svg width="18" height="19">
                                                                 <use xlink:href="#svg-edit"></use>
                                                             </svg>
-                                                            {{ __('Видалити') }}
+                                                            {{ __('forms.delete') }}
                                                         </a>
                                                     </li>
                                                 </ul>
@@ -204,12 +208,13 @@
                             <li>
                                 <a href="{{ $paginatedPatients->previousPageUrl() }}"
                                    class="pagination-prev-button">
-                                    <span class="sr-only">{{ __('Попередня') }}</span>
+                                    <span class="sr-only">{{ __('forms.previous') }}</span>
                                     <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20"
                                          xmlns="http://www.w3.org/2000/svg">
                                         <path fill-rule="evenodd"
                                               d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                                              clip-rule="evenodd"/>
+                                              clip-rule="evenodd"
+                                        />
                                     </svg>
                                 </a>
                             </li>
@@ -218,7 +223,8 @@
                                 <li>
                                     <a href="{{ 'patient' . $url }}"
                                        {{ $paginatedPatients->currentPage() === $page ? 'aria-current="page"' : '' }}
-                                       class="pagination-number {{ $paginatedPatients->currentPage() === $page ? 'pagination-number-active' : 'pagination-number-inactive' }}">
+                                       class="pagination-number {{ $paginatedPatients->currentPage() === $page ? 'pagination-number-active' : 'pagination-number-inactive' }}"
+                                    >
                                         {{ $page }}
                                     </a>
                                 </li>
@@ -226,33 +232,32 @@
                             <li>
                                 <a href="{{ $paginatedPatients->nextPageUrl() }}"
                                    class="pagination-next-button">
-                                    <span class="sr-only">{{ __('Наступна') }}</span>
+                                    <span class="sr-only">{{ __('forms.next') }}</span>
                                     <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20"
                                          xmlns="http://www.w3.org/2000/svg">
                                         <path fill-rule="evenodd"
                                               d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                              clip-rule="evenodd"/>
+                                              clip-rule="evenodd"
+                                        />
                                     </svg>
                                 </a>
                             </li>
                         </ul>
                     </nav>
                 </div>
-            </section>
+            </div>
         @elseif($searchPerformed && $paginatedPatients->isEmpty())
-            <div class="rounded-lg p-4 bg-gray-100">
+            <div class="rounded-lg p-4 bg-gray-200 dark:bg-gray-900">
                 <div class="flex items-center gap-2">
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M9 6V9M9 12H9.0075M16.5 9C16.5 13.1421 13.1421 16.5 9 16.5C4.85786 16.5 1.5 13.1421 1.5 9C1.5 4.85786 4.85786 1.5 9 1.5C13.1421 1.5 16.5 4.85786 16.5 9Z"
-                            stroke="#1E1E1E" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round"/>
+                    <svg width="20" height="20">
+                        <use xlink:href="#svg-exclamation-circle"></use>
                     </svg>
-                    <p class="font-semibold text-gray-900">{{ __('Нікого не знайдено') }}</p>
+                    <p class="default-p font-semibold">{{ __('patients.nobody_found') }}</p>
                 </div>
-                <span class="text-gray-900">{{ __('Спробуйте змінити параметри пошуку') }}</span>
+                <p class="default-p">{{ __('patients.try_change_search_parameters') }}</p>
             </div>
         @endif
     </section>
+
+    <x-forms.loading/>
 </div>

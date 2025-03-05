@@ -16,7 +16,7 @@
                     {{__('forms.cancel')}}
                 </button>
                 <button wire:click="signedComplete('signedContent')" type="button" class="button-primary">
-                    {{__('Відправити на затвердження')}}
+                    {{ __('forms.send_for_approval') }}
                 </button>
             </div>
         </form>

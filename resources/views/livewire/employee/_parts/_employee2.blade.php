@@ -8,7 +8,7 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="lastName" class="default-label">
-                        {{__('forms.lastName')}} *
+                        {{__('forms.last_name')}} *
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">
@@ -26,7 +26,7 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="firstName" class="default-label">
-                        {{__('forms.firstName')}} *
+                        {{__('forms.first_name')}} *
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">
@@ -44,7 +44,7 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label for="secondName" class="default-label">
-                        {{__('forms.secondName')}} *
+                        {{__('forms.second_name')}} *
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">
@@ -103,7 +103,7 @@
             <x-forms.form-group class="xl:w-1/3">
                 <x-slot name="label">
                     <x-forms.label class="default-label" for="taxId">
-                        {{__('forms.number')}} {{__('forms.RNOCPP')}} *
+                        {{ __('forms.tax_id') }} *
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">

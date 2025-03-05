@@ -1,22 +1,22 @@
 <fieldset class="fieldset">
     <legend class="legend">
-        {{ __('forms.contactData') }}
+        {{ __('patients.contact_data') }}
     </legend>
 
     {{-- Using Alpine to dynamically add and remove phone input fields --}}
-    <div class="mb-4" x-data="{ phones: $wire.entangle('patientRequest.patient.phones') }">
+    <div class="mb-4" x-data="{ phones: $wire.entangle('form.patient.phones') }">
         <template x-for="(phone, index) in phones">
             <div class="form-row-3 md:mb-0">
                 <div class="form-group group">
-                    <label :for="'phoneType-' + index" class="sr-only">{{ __('forms.typeMobile') }}</label>
-                    <select x-model="phone.type" :id="'phoneType-' + index" class="input-select peer" required>
-                        <option selected>{{ __('forms.typeMobile') }} *</option>
+                    <label :for="'phoneType-' + index" class="sr-only">{{ __('forms.type_mobile') }}</label>
+                    <select x-model="phone.type" :id="'phoneType-' + index" class="input-select peer">
+                        <option selected>{{ __('forms.type_mobile') }}</option>
                         @foreach($this->dictionaries['PHONE_TYPE'] as $key => $phoneType)
                             <option value="{{ $key }}">{{ $phoneType }}</option>
                         @endforeach
                     </select>
 
-                    @error('patientRequest.patient.phones.*.type')
+                    @error('form.patient.phones.*.type')
                     <p class="text-error">
                         {{ $message }}
                     </p>
@@ -27,22 +27,20 @@
                     <svg class="svg-input w-5 top-2.5" height="24">
                         <use xlink:href="#svg-phone"></use>
                     </svg>
-
-                    <label :for="'phoneNumber-' + index" class="label">
-                        {{__('forms.phone_number')}}
-                    </label>
                     <input x-model="phone.number"
                            type="tel"
                            name="phoneNumber"
                            :id="'phoneNumber-' + index"
-                           class="input peer @error('patientRequest.patient.phones.*.number') input-error @enderror"
+                           class="input peer @error('form.patient.phones.*.number') input-error @enderror"
                            placeholder=" "
-                           required
                     />
+                    <label :for="'phoneNumber-' + index" class="label">
+                        {{ __('forms.phone_number') }}
+                    </label>
 
-                    @error('patientRequest.patient.phones.*.number')
+                    @error('form.patient.phones.*.number')
                     <p class="text-error">
-                        {{$message}}
+                        {{ $message }}
                     </p>
                     @enderror
                 </div>
@@ -52,7 +50,7 @@
                         <svg>
                             <use xlink:href="#svg-minus"></use>
                         </svg>
-                        {{ __('forms.removePhone') }}
+                        {{ __('forms.remove_phone') }}
                     </button>
                 </template>
                 <template x-if="index == phones.length - 1">
@@ -64,7 +62,7 @@
                         <svg>
                             <use xlink:href="#svg-plus"></use>
                         </svg>
-                        {{ __('forms.addPhone') }}
+                        {{ __('forms.add_phone') }}
                     </button>
                 </template>
             </div>
@@ -73,11 +71,11 @@
 
     <div class="form-row-3">
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.email"
+            <input wire:model="form.patient.email"
                    type="email"
                    name="email"
                    id="email"
-                   class="input peer @error('patientRequest.patient.email') input-error @enderror"
+                   class="input peer @error('form.patient.email') input-error @enderror"
                    placeholder=" "
                    autocomplete="off"
             />
@@ -85,7 +83,7 @@
                 {{ __('forms.email') }}
             </label>
 
-            @error('patientRequest.patient.email')
+            @error('form.patient.email')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -93,20 +91,20 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.secret"
+            <input wire:model="form.patient.secret"
                    type="text"
                    name="secret"
                    id="secret"
-                   class="input peer @error('patientRequest.patient.secret') input-error @enderror"
+                   class="input peer @error('form.patient.secret') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
             />
             <label for="secret" class="label">
-                {{ __('forms.secret') }}
+                {{ __('patients.secret') }}
             </label>
 
-            @error('patientRequest.patient.secret')
+            @error('form.patient.secret')
             <p class="text-error">
                 {{ $message }}
             </p>

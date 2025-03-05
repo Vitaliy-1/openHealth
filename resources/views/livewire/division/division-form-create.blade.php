@@ -127,7 +127,7 @@
                             <x-forms.form-group>
                                 <x-slot name='label'>
                                     <x-forms.label for='phone_type' class='default-label'>
-                                        {{ __('forms.typeMobile') }}
+                                        {{ __('forms.type_mobile') }}
                                     </x-forms.label>
                                 </x-slot>
                                 <x-slot name='input'>
@@ -137,7 +137,7 @@
                                         id="phone_type"
                                     >
                                         <x-slot name='option'>
-                                            <option>{{ __('forms.typeMobile') }} *</option>
+                                            <option>{{ __('forms.type_mobile') }} *</option>
                                             @foreach ($dictionaries['PHONE_TYPE'] as $k => $phone_type)
                                                 <option {{ isset($phone['type']) === $phone_type ? 'selected' : '' }}
                                                     value="{{ $k }}">{{ $phone_type }}

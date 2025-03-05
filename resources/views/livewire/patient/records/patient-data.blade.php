@@ -45,7 +45,7 @@
                 <div class="accordion-content dark:bg-gray-900 border-b-0">
                     <div class="form-row-4 items-baseline">
                         <div class="form-group group">
-                            <p class="default-p">{{ __('forms.lastName') }}</p>
+                            <p class="default-p">{{ __('forms.last_name') }}</p>
                         </div>
                         <div>
                             <input wire:model="lastName"
@@ -62,7 +62,7 @@
 
                     <div class="form-row-4 items-baseline">
                         <div class="form-group group">
-                            <p class="default-p">{{ __('forms.firstName') }}</p>
+                            <p class="default-p">{{ __('forms.first_name') }}</p>
                         </div>
                         <div>
                             <input wire:model="firstName"
