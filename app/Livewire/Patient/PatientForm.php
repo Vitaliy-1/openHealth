@@ -250,7 +250,7 @@ class PatientForm extends Component
      * @param  string|null  $model  The model type to reset the data for (optional).
      * @return void
      */
-    public function closeModalModel(string $model = null): void
+    public function closeModalModel(?string $model = null): void
     {
         if (!empty($model)) {
             $this->form->{$model} = [];
@@ -318,7 +318,7 @@ class PatientForm extends Component
      */
     public function createPerson($model): void
     {
-        if (!auth()->user()->can('createPerson', Person::class)) {
+        if (!Auth::user()?->can('createPerson', Person::class)) {
             $this->dispatch('flashMessage', [
                 'message' => 'У вас немає дозволу на створення пацієнта.',
                 'type' => 'error'
@@ -373,7 +373,7 @@ class PatientForm extends Component
      */
     public function createApplication(string $model): void
     {
-        if (!auth()->user()->can('createApplication', PersonRequest::class)) {
+        if (!Auth::user()?->can('createApplication', PersonRequest::class)) {
             $this->dispatch('flashMessage', [
                 'message' => 'У вас немає дозволу на створення пацієнта.',
                 'type' => 'error'

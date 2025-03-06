@@ -29,7 +29,7 @@ class PatientData extends BasePatientComponent
 
     public function render(): View
     {
-        return view('livewire.patient.patient-data');
+        return view('livewire.patient.records.patient-data');
     }
 
     /**

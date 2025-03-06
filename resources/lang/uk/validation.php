@@ -449,7 +449,23 @@ return [
         'whatLicensed' => 'напрям діяльності, що ліцензовано',
 
         'uploadedDocuments.*' => 'для завантаження файлів',
-        'verificationCode' => 'код підтвердження з СМС'
-    ],
-    'consentText' => 'Я погоджуюсь з умовами',
+        'verificationCode' => 'код підтвердження з СМС',
+        'encounter' => [
+            'division.identifier.value' => 'місце надання послуг',
+            'class.code' => 'клас взаємодії',
+            'type.coding.code' => 'тип взаємодії',
+            'period' => [
+                'date' => 'дата',
+                'start' => 'час початку',
+                'end' => 'час закінчення'
+            ],
+            'priority.coding.code' => 'пріоритет'
+        ],
+        'episode' => [
+            'name' => 'назва епізоду',
+            'type' => [
+                'code' => 'тип епізоду'
+            ]
+        ],
+    ]
 ];

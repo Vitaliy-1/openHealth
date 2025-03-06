@@ -9,16 +9,18 @@
 
     <section class="section-form">
         <x-section-navigation class="breadcrumb-form">
-            <x-slot name="title">{{ __('patients.interaction') }} - {{ $patient['last_name'] }} {{ $patient['first_name'] }} {{ $patient['second_name'] ?? '' }}</x-slot>
+            <x-slot name="title">
+                {{ __('patients.interaction') }} - {{ $firstName }} {{ $lastName }} {{ $secondName ?? '' }}
+            </x-slot>
         </x-section-navigation>
 
-        <form action="#" class="form">
+        <form class="form">
             @include('livewire.encounter._parts._patient_data')
             @include('livewire.encounter._parts._aside_navigation')
             @include('livewire.encounter._parts._diagnoses')
 
             <div class="text-center">
-                <button wire:click.prevent="save('encounter')" type="submit" class="alternative-button">
+                <button wire:click.prevent="save(['encounter', 'episode'])" type="submit" class="alternative-button">
                     {{ __('forms.save') }}
                 </button>
             </div>

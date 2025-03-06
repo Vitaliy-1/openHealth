@@ -72,7 +72,6 @@
             <svg class="svg-input" width="20" height="20">
                 <use xlink:href="#svg-calendar-week"></use>
             </svg>
-
             <input wire:model="form.patient.birthDate"
                    datepicker-max-date="{{ now()->format('Y-m-d') }}"
                    type="text"
@@ -83,7 +82,6 @@
                    required
                    autocomplete="off"
             />
-
             <label for="birthDate" class="label">
                 {{ __('forms.birth_date') }}
             </label>
