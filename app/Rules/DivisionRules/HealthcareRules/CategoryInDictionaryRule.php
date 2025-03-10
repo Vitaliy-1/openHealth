@@ -25,7 +25,7 @@ class CategoryInDictionaryRule extends HealthcareRule
     protected function checkRule($data = null): bool
     {
         $category = $this->healthcareService['category'];
-        $dictionary = array_keys(dictionary()->getDictionary('HEALTHCARE_SERVICE_CATEGORIES', true)['values']);
+        $dictionary = array_keys(dictionary()->getDictionary('HEALTHCARE_SERVICE_CATEGORIES'));
 
         return !in_array($category, $dictionary, true);
     }

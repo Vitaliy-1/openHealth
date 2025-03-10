@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Division;
 
+use App\Traits\FormTrait;
 use Livewire\Component;
 use App\Models\Division;
 use Livewire\Attributes\On;
@@ -12,13 +13,11 @@ use App\Livewire\Division\Api\DivisionRequestApi;
 
 class DivisionIndex extends Component
 {
-    use WithPagination;
+    use WithPagination, FormTrait;
 
     protected ?AddressRepository $addressRepository;
 
     public ?object $legalEntity;
-
-    public ?array $dictionaries;
 
     public ?array $working_hours = [
         'mon' => 'Понеділок',
@@ -32,26 +31,22 @@ class DivisionIndex extends Component
 
     public ?array $tableHeaders = [];
 
-    public bool $showModal = false;
-
     public string $mode = 'default';
+
+    public array $dictionaryNames = [
+        'DIVISION_TYPE'
+    ];
 
     public function boot(AddressRepository $addressRepository)
     {
         $this->addressRepository = $addressRepository;
     }
 
-    public function mount()
+    public function mount(): void
     {
         $this->tableHeaders();
-
         $this->getLegalEntity();
-
-        $this->dictionaries = [
-            'PHONE_TYPE' => dictionary()->getDictionary('PHONE_TYPE')->getValue('values')->toArray(),
-            'SETTLEMENT_TYPE' => dictionary()->getDictionary('SETTLEMENT_TYPE', true)['values'],
-            'DIVISION_TYPE' => dictionary()->getDictionary('DIVISION_TYPE', true)['values'],
-        ];
+        $this->getDictionary();
     }
 
     #[On('refreshPage')]

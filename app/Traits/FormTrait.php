@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Traits;
 
 use Illuminate\Support\Str;
@@ -108,14 +110,9 @@ trait FormTrait
      *
      * @return void
      */
-//    public function getDictionary(): void
-//    {
-//        $this->dictionaries = JsonHelper::searchValue('DICTIONARIES_PATH', $this->dictionaries_field ?? []);
-//    }
-
     public function getDictionary(): void
     {
-        $this->dictionaries = dictionary()->getDictionaries($this->dictionaries_field ?? [], true);
+        $this->dictionaries = dictionary()->getDictionaries($this->dictionaryNames ?? []);
     }
 
     /**
@@ -123,7 +120,7 @@ trait FormTrait
      *
      * @param  array  $keys  The keys to keep in the dictionaries array
      * @param  string  $dictionaries  The name of the dictionaries array to filter
-     * @return void
+     * @return array
      */
     public function getDictionariesFields(array $keys, string $dictionaries): array
     {
@@ -136,6 +133,7 @@ trait FormTrait
         // return an empty array if the dictionaries array does not exist or is not an array
         return [];
     }
+
     /**
      * Closes the modal by setting the showModal property to false.
      */

@@ -2,7 +2,7 @@
 
 use App\Classes\eHealth\Services\SchemaService;
 use App\Services\DictionaryService;
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 
 if (!function_exists("all_day")) {
@@ -138,18 +138,19 @@ if (!function_exists("not_available")) {
         }
         return removeEmptyKeys($not_available);
     }
+}
 
-    if (!function_exists("convertToISO8601")) {
-        function convertToISO8601($dateString): string
-        {
-            if (empty($dateString)) {
-                return '';
-            }
-            $dateTime = Carbon::parse($dateString);
-            return $dateTime->format("Y-m-d\TH:i:s.v\Z"); // Используем .v для миллисекунд
+if (!function_exists('convertToISO8601')) {
+    function convertToISO8601(string $dateString): string
+    {
+        if (empty($dateString)) {
+            return '';
         }
+
+        return CarbonImmutable::parse($dateString)->format('Y-m-d\TH:i:s.v\Z');
     }
 }
+
 if (!function_exists('replacePhone')) {
     function removeSpacePhones($phones): array
     {
@@ -183,7 +184,7 @@ if (!function_exists('schemaService')) {
 }
 
 if (!function_exists('dictionary')) {
-    function dictionary()
+    function dictionary(): DictionaryService
     {
         return app(DictionaryService::class);
     }
