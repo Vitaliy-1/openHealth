@@ -41,7 +41,7 @@ class AddressesSearch extends Component
 
         $this->class = $class;
 
-        $this->dictionaries = dictionary()->getDictionaries(['SETTLEMENT_TYPE', 'STREET_TYPE'], true);
+        $this->dictionaries = dictionary()->getDictionaries(['SETTLEMENT_TYPE', 'STREET_TYPE']);
     }
 
     public static function getAddressRules(array $address): array

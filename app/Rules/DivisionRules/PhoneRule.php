@@ -63,7 +63,7 @@ class PhoneRule implements ValidationRule
     protected function checkPhoneType(): bool
     {
         $phoneType= $this->division['phones']['type'];
-        $dictionary = dictionary()->getDictionary('PHONE_TYPE', true)['values'];
+        $dictionary = dictionary()->getDictionary('PHONE_TYPE');
 
         if (!in_array($phoneType, array_keys($dictionary))) {
             $this->setMessage(__('validation.attributes.healthcareService.error.division.phone.type'));

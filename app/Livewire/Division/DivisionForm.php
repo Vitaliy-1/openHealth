@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Division;
 
 use Livewire\Component;
@@ -7,7 +9,6 @@ use App\Models\Division;
 use App\Traits\AddressSearch;
 use App\Traits\WorkTimeUtilities;
 use App\Livewire\Division\Forms\DivisionFormRequest;
-
 
 // TODO: divide this class onto three ones: Divisions as parent class and Division Create & DivisionUpdate extends Division
 class DivisionForm extends Component
@@ -19,11 +20,10 @@ class DivisionForm extends Component
 
     public string $mode = 'create';
 
-    public ?array $dictionaries;
+    public array $dictionaries;
 
-    protected ?array $division_allowed_phone_type_keys = ['MOBILE','LAND_LINE'];
-
-    protected ?array $division_allowed_type_keys = ['CLINIC', 'AMBULANT_CLINIC', 'FAP'];
+    protected array $divisionAllowedPhoneTypeKeys = ['MOBILE','LAND_LINE'];
+    protected array $divisionAllowedTypeKeys = ['CLINIC', 'AMBULANT_CLINIC', 'FAP'];
 
     public function mount($id = '')
     {
@@ -35,33 +35,14 @@ class DivisionForm extends Component
         $this->formService->initWorkingHours($this->weekdays);
 
         $this->dictionaries = [
-            'PHONE_TYPE' => $this->filterDictionary('PHONE_TYPE', $this->division_allowed_phone_type_keys),
-            'SETTLEMENT_TYPE' => dictionary()->getDictionary('SETTLEMENT_TYPE', true)['values'],
-            'DIVISION_TYPE' => $this->filterDictionary('DIVISION_TYPE', $this->division_allowed_type_keys)
+            'SETTLEMENT_TYPE' => dictionary()->getDictionary('SETTLEMENT_TYPE'),
+            'PHONE_TYPE' => dictionary()->getDictionary('PHONE_TYPE', false)
+                ->allowedKeys($this->divisionAllowedPhoneTypeKeys)
+                ->toArrayRecursive(),
+            'DIVISION_TYPE' => dictionary()->getDictionary('DIVISION_TYPE', false)
+                ->allowedKeys($this->divisionAllowedTypeKeys)
+                ->toArrayRecursive()
         ];
-    }
-
-    /**
-     * Get original dictionary and return key:values pair which key is matched with one of the key stored into #keys array.
-     * If $removeKeys = true this will remove all keys matched with $keys array.
-     *
-     * @param string $dictionaryName
-     * @param array $keys
-     * @param bool $removeKeys
-     *
-     * @return array
-     */
-    public function filterDictionary(string $dictionaryName, array $keys, bool $removeKeys = false): array
-    {
-        $filteredDictionary = array_filter(dictionary()->getDictionary($dictionaryName, true)['values'], function($key) use ($keys, $removeKeys) {
-            if ($removeKeys) {
-                return !in_array($key, $keys);
-            } else {
-                return in_array($key, $keys);
-            }
-        }, ARRAY_FILTER_USE_KEY);
-
-        return $filteredDictionary;
     }
 
     public function getDivision($id)
@@ -99,7 +80,7 @@ class DivisionForm extends Component
         }
     }
 
-    public function update():void
+    public function update(): void
     {
         if ($this->validateDivision()) {
             $division = Division::find($this->formService->getDivisionParam('id'));
@@ -110,7 +91,7 @@ class DivisionForm extends Component
 
     public function updateOrCreate(Division $division)
     {
-         $response = $this->mode === 'edit'
+        $response = $this->mode === 'edit'
             ? $this->formService->updateDivision()
             : $this->formService->createDivision();
 
@@ -127,8 +108,8 @@ class DivisionForm extends Component
      * Proxy method!
      * Proceed data when day is off and hasn't the schedule at all
      *
-     * @param mixed $day
-     * @param mixed $allDayWork
+     * @param  mixed  $day
+     * @param  mixed  $allDayWork
      *
      * @return void
      */
@@ -141,7 +122,7 @@ class DivisionForm extends Component
      * Proxy method!
      * Add shift(s) to the current day's schedule
      *
-     * @param string $day
+     * @param  string  $day
      *
      * @return void
      */
@@ -154,8 +135,8 @@ class DivisionForm extends Component
      * Proxy method!
      * Remove the selected shift from the day's schedule
      *
-     * @param string $day   // key value aka 'mon', 'tue' etc.
-     * @param int $shift    // shift's numeric position in array
+     * @param  string  $day  key value aka 'mon', 'tue' etc.
+     * @param  int  $shift  shift's numeric position in array
      *
      * @return void
      */
@@ -169,8 +150,8 @@ class DivisionForm extends Component
      * Called when no shift should be present in the day's schedule.
      * But one time range must left anyway!
      *
-     * @param mixed $day
-     * @param mixed $isShift    // true if shift schedule is activated
+     * @param  mixed  $day
+     * @param  mixed  $isShift  true if shift schedule is activated
      * @return void
      */
     public function noShift($day, $isShift)
@@ -186,14 +167,14 @@ class DivisionForm extends Component
     public function render()
     {
         $currentDivision = [];
-        $_division = $this->formService->getDivision();
+        $division = $this->formService->getDivision();
 
-        if (!empty($_division)) {
-            $currentDivision['name'] = !empty($_division['name'])
-                ? $_division['name']
+        if (!empty($division)) {
+            $currentDivision['name'] = !empty($division['name'])
+                ? $division['name']
                 : '';
-            $currentDivision['type'] = !empty($_division['type'])
-                ? dictionary()->getDictionary('DIVISION_TYPE', true)['values'][$_division['type']]
+            $currentDivision['type'] = !empty($division['type'])
+                ? dictionary()->getDictionary('DIVISION_TYPE', false)->getValue($division['type'])
                 : '';
         }
 

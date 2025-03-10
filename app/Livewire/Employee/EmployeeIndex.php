@@ -40,8 +40,8 @@ class EmployeeIndex extends Component
     public string $email = '';
     protected ?EmployeeRepository $employeeRepository; // nullable
 
-    public array $dictionaries_field = [
-        'POSITION',
+    public array $dictionaryNames = [
+        'POSITION'
     ];
 
     public string $status = 'APPROVED';
