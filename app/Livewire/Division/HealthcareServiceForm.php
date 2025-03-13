@@ -22,16 +22,16 @@ class HealthcareServiceForm extends Component
 
     public Division $division;
 
-    public  string $mode = 'create';
+    public string $mode = 'create';
 
     public ?array $tableHeaders = [];
 
     /**
      * Values of possible allowed categories
      *
-     * @var ?array $healthcare_categories_keys
+     * @var array $healthcareCategoriesKeys
      */
-    public ?array $healthcare_categories_keys = ['MSP'];
+    protected array $healthcareCategoriesKeys = ['MSP'];
 
     /**
      * Current selected category
@@ -61,7 +61,6 @@ class HealthcareServiceForm extends Component
 
     public bool $divisionStatus = false;
 
-
     public function mount(Division $division)
     {
         $this->dictionaries = [
@@ -73,7 +72,7 @@ class HealthcareServiceForm extends Component
 
         $this->divisionStatus = $this->division->status === 'ACTIVE';
 
-        $this->category = $this->healthcare_categories_keys[0];
+        $this->category = $this->healthcareCategoriesKeys[0];
 
         $this->prepareDictionaries();
 
@@ -94,47 +93,25 @@ class HealthcareServiceForm extends Component
         $this->changeCategory($this->category);
     }
 
-    public function prepareDictionaries()
+    protected function prepareDictionaries(): void
     {
-        // HEALTHCARE_SERVICE_CATEGORIES
-        $HSC = $this->filterDictionary('HEALTHCARE_SERVICE_CATEGORIES', $this->healthcare_categories_keys);
-        // SPECIALITY_TYPE
-        $ST = $this->filterDictionary('SPECIALITY_TYPE', $this->speciality_type_msp_keys, true);
-        // PROVIDING_CONDITION
-        $PC = dictionary()->getDictionary('PROVIDING_CONDITION', true)['values'];
+        $healthcareServiceCategories = dictionary()->getDictionary('HEALTHCARE_SERVICE_CATEGORIES', false)
+            ->allowedKeys($this->healthcareCategoriesKeys)
+            ->toArrayRecursive();
+        $specialityType = dictionary()->getDictionary('SPECIALITY_TYPE', false)
+            ->allowedKeys($this->speciality_type_msp_keys)
+            ->toArrayRecursive();
+        $providingCondition = dictionary()->getDictionary('PROVIDING_CONDITION');
 
         // Using for HealthcareServices main page (in table)
         $this->dictionaries['show'] = [
-            'HEALTHCARE_SERVICE_CATEGORIES' => $HSC,
-            'SPECIALITY_TYPE' => $ST,
-            'PROVIDING_CONDITION' => $PC
+            'HEALTHCARE_SERVICE_CATEGORIES' => $healthcareServiceCategories,
+            'SPECIALITY_TYPE' => $specialityType,
+            'PROVIDING_CONDITION' => $providingCondition
         ];
 
         // Use within modal dialog window
         $this->dictionaries['modal'] = $this->dictionaries['show'];
-    }
-
-    /**
-     * Get original dictionary and return key:values pair which key is matched with one of the key stored into #keys array.
-     * If $removeKeys = true this will remove all keys matched with $keys array.
-     *
-     * @param string $dictionaryName
-     * @param array $keys
-     * @param bool $removeKeys
-     *
-     * @return array
-     */
-    public function filterDictionary(string $dictionaryName, array $keys, bool $removeKeys = false): array
-    {
-        $filteredDictionary = array_filter(dictionary()->getDictionary($dictionaryName, true)['values'], function($key) use ($keys, $removeKeys) {
-            if ($removeKeys) {
-                return !in_array($key, $keys);
-            } else {
-                return in_array($key, $keys);
-            }
-        }, ARRAY_FILTER_USE_KEY);
-
-        return $filteredDictionary;
     }
 
     #[On('refreshPage')]
@@ -143,7 +120,7 @@ class HealthcareServiceForm extends Component
         $this->dispatch('$refresh');
     }
 
-    public function closeModal():void
+    public function closeModal(): void
     {
         $this->showModal = false;
 
@@ -152,7 +129,7 @@ class HealthcareServiceForm extends Component
         $this->dispatch('refreshPage');
     }
 
-    public function create():void
+    public function create(): void
     {
         $this->formService->healthcareServiceClean();
 
@@ -165,7 +142,7 @@ class HealthcareServiceForm extends Component
         $this->openModal();
     }
 
-    public function store():void
+    public function store(): void
     {
         $this->resetErrorBag();
 
@@ -180,7 +157,7 @@ class HealthcareServiceForm extends Component
         $this->closeModal();
     }
 
-    public function edit(HealthcareService $healthcareServiceApi):void
+    public function edit(HealthcareService $healthcareServiceApi): void
     {
         $this->mode = 'edit';
 
@@ -189,17 +166,15 @@ class HealthcareServiceForm extends Component
         $this->openModal();
     }
 
-    public function update(HealthcareService $healthcareService) :void
+    public function update(HealthcareService $healthcareService): void
     {
         $id = $this->formService->getHealthcareServiceParam('id');
-        $healthcareService = $healthcareService::find($id);
-
         $error = $this->formService->doValidation($this->mode);
 
         if ($error) {
             $this->dispatch('flashMessage', ['message' => $error, 'type' => 'error']);
         } else {
-            $this->updateOrCreate($healthcareService);
+            $this->updateOrCreate($healthcareService::find($id));
         }
 
         $this->closeModal();
@@ -220,12 +195,12 @@ class HealthcareServiceForm extends Component
     {
         $uuid = $this->formService->getHealthcareServiceParam('uuid');
 
-        return HealthcareServiceRequestApi::updateHealthcareServiceRequest($uuid,$this->formService->getHealthcareService());
+        return HealthcareServiceRequestApi::updateHealthcareServiceRequest($uuid, $this->formService->getHealthcareService());
     }
 
     private function createHealthcareService(): array
     {
-        return HealthcareServiceRequestApi::createHealthcareServiceRequest($this->division->uuid,$this->formService->getHealthcareService());
+        return HealthcareServiceRequestApi::createHealthcareServiceRequest($this->division->uuid, $this->formService->getHealthcareService());
     }
 
     private function saveHealthcareService(HealthcareService $healthcareService, array $response): void
@@ -263,14 +238,14 @@ class HealthcareServiceForm extends Component
 
         $this->dispatch('flashMessage', ['message' => __('Інформацію успішно оновлено'), 'type' => 'success']);
 
-        $this->synсHealthcareServicesSave($syncHealthcareServices);
+        $this->syncHealthcareServicesSave($syncHealthcareServices);
 
         $this->dispatch('refreshPage');
     }
 
-    public function synсHealthcareServicesSave($responses): void
+    public function syncHealthcareServicesSave($responses): void
     {
-        foreach ($responses as $response){
+        foreach ($responses as $response) {
             $healthcareService = HealthcareService::firstOrNew(['uuid' => $response['id']]);
             $healthcareService->setAttribute('uuid', $response['id']);
             $healthcareService->fill($response);
@@ -280,7 +255,7 @@ class HealthcareServiceForm extends Component
 
     public function tableHeadersHealthcare(): void
     {
-        $this->tableHeaders  = [
+        $this->tableHeaders = [
             __('ID E-health '),
             __('Категорія'),
             __('Умови надання'),
@@ -295,9 +270,10 @@ class HealthcareServiceForm extends Component
         $this->category = $type;
 
         $this->dictionaries['modal']['PROVIDING_CONDITION'] = $type === 'MSP'
-            ? $this->filterDictionary('PROVIDING_CONDITION', ['OUTPATIENT'])
-            : dictionary()->getDictionary('PROVIDING_CONDITION', true)['values'];
-
+            ? dictionary()->getDictionary('PROVIDING_CONDITION', false)
+                ->allowedKeys(['OUTPATIENT'])
+                ->toArrayRecursive()
+            : dictionary()->getDictionary('PROVIDING_CONDITION');
 
         // if ($category === 'PHARMACY_DRUGS') {
         //     $this->speciality_type_msp_keys = ["PHARMACIST", "PROVISOR", "CLINICAL_PROVISOR"];
@@ -308,17 +284,24 @@ class HealthcareServiceForm extends Component
 
     public function specialityType(): void
     {
-        $this->dictionaries['modal']['SPECIALITY_TYPE'] = array_intersect_key( $this->speciality_type, array_flip($this->speciality_type_msp_keys));
+        $this->dictionaries['modal']['SPECIALITY_TYPE'] = array_intersect_key(
+            $this->speciality_type,
+            array_flip($this->speciality_type_msp_keys)
+        );
     }
 
     public function changeProvidingCondition($type): void
     {
         $currentProvidingCondition = $this->formService->getHealthcareServiceParam('providing_condition') ?? '';
 
-        if ($currentProvidingCondition  == 'INPATIENT') {
-            $this->dictionaries['modal']['SPECIALITY_TYPE'] = $this->filterDictionary('SPECIALITY_TYPE', $this->speciality_type_inpatient_keys);
+        if ($currentProvidingCondition === 'INPATIENT') {
+            $this->dictionaries['modal']['SPECIALITY_TYPE'] = dictionary()->getDictionary('SPECIALITY_TYPE', false)
+                ->allowedKeys($this->speciality_type_inpatient_keys)
+                ->toArrayRecursive();
         } else {
-            $this->dictionaries['modal']['SPECIALITY_TYPE'] = $this->filterDictionary('SPECIALITY_TYPE', $this->speciality_type_msp_keys, true);
+            $this->dictionaries['modal']['SPECIALITY_TYPE'] = dictionary()->getDictionary('SPECIALITY_TYPE', false)
+                ->allowedKeys($this->speciality_type_msp_keys)
+                ->toArrayRecursive();
         }
     }
 
@@ -358,13 +341,12 @@ class HealthcareServiceForm extends Component
         $this->formService->removeNotAvailable($k);
     }
 
-
     public function render(): View
     {
         $perPage = config('pagination.per_page');
         $healthcareServices = $this->division->healthcareService()->orderBy('uuid')->paginate($perPage);
         $currentDivision['name'] = $this->division->name;
-        $currentDivision['type'] = dictionary()->getDictionary('DIVISION_TYPE', true)['values'][$this->division->type];
+        $currentDivision['type'] = dictionary()->getDictionary('DIVISION_TYPE', false)->getValue($this->division->type);
 
         return view('livewire.division.healthcare-service-form', compact(['healthcareServices', 'currentDivision']));
     }

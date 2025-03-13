@@ -110,17 +110,7 @@ trait FormTrait
      */
     public function getDictionary(): void
     {
-        $this->dictionaries = dictionary()->getDictionaries($this->dictionaries_field ?? [], true);
-    }
-
-    /**
-     * Get the dictionaries by names.
-     *
-     * @return void
-     */
-    public function getDictionaryV2(): void
-    {
-        $this->dictionaries = dictionaryV2()->getDictionaries($this->dictionaryNames);
+        $this->dictionaries = dictionary()->getDictionaries($this->dictionaryNames ?? []);
     }
 
     /**

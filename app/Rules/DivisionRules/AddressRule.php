@@ -29,10 +29,8 @@ class AddressRule implements ValidationRule
     public function __construct(array $division)
     {
         $this->division = $division;
-
         $this->message = __('validation.attributes.healthcareService.error.division.address.commonError');
-
-        $this->dictionaries = dictionary()->getDictionaries(['ADDRESS_TYPE', 'SETTLEMENT_TYPE', 'STREET_TYPE'], true);
+        $this->dictionaries = dictionary()->getDictionaries(['ADDRESS_TYPE', 'SETTLEMENT_TYPE', 'STREET_TYPE']);
     }
 
     /**

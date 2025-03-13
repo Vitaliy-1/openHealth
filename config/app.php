@@ -174,7 +174,6 @@ return [
         App\Providers\JetstreamServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
         App\Providers\DictionaryServiceProvider::class,
-        App\Providers\DictionaryV2ServiceProvider::class,
         App\Providers\BladeServiceProvider::class,
         App\Classes\eHealth\Providers\SchemaServiceProvider::class,
     ])->toArray(),

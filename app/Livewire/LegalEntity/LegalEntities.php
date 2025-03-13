@@ -143,7 +143,7 @@ class LegalEntities extends Component
     /**
      * @var array|string[] Get dictionaries keys
      */
-    public array $dictionaries_field = [
+    public array $dictionaryNames = [
         'PHONE_TYPE',
         'POSITION',
         'LICENSE_TYPE',

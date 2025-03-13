@@ -121,7 +121,7 @@ class PatientForm extends Component
      */
     public int $resendCooldown = 60;
 
-    public array $dictionaries_field = [
+    public array $dictionaryNames = [
         'DOCUMENT_TYPE',
         'DOCUMENT_RELATIONSHIP_TYPE',
         'GENDER',

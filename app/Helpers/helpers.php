@@ -1,7 +1,6 @@
 <?php
 
 use App\Classes\eHealth\Services\SchemaService;
-use App\Services\Dictionary\v2\Dictionary;
 use App\Services\DictionaryService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
@@ -185,16 +184,9 @@ if (!function_exists('schemaService')) {
 }
 
 if (!function_exists('dictionary')) {
-    function dictionary()
+    function dictionary(): DictionaryService
     {
         return app(DictionaryService::class);
-    }
-}
-
-if (!function_exists('dictionaryV2')) {
-    function dictionaryV2(): Dictionary
-    {
-        return app(Dictionary::class);
     }
 }
 
