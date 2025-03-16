@@ -20,7 +20,7 @@ class ContractIndex extends Component
 
     public ?array $tableHeaders;
 
-    public ?array $dictionaries_field = [
+    public ?array $dictionaryNames = [
         'CONTRACT_TYPE',
     ];
 

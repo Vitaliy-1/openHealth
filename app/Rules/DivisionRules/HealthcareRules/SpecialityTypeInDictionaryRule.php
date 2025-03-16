@@ -25,7 +25,7 @@ class SpecialityTypeInDictionaryRule extends HealthcareRule
     protected function checkRule($data = null): bool
     {
         $specialityType = $this->healthcareService['speciality_type'] ?? '';
-        $dictionary = array_keys(dictionary()->getDictionary('SPECIALITY_TYPE', true)['values']);
+        $dictionary = array_keys(dictionary()->getDictionary('SPECIALITY_TYPE'));
 
         return !in_array($specialityType, $dictionary, true);
     }

@@ -68,7 +68,7 @@ class LegalEntity extends Component
     /**
      * @var array|string[] Get dictionaries keys
      */
-    public array $dictionaries_field = [
+    public array $dictionaryNames = [
         'PHONE_TYPE',
         'LICENSE_TYPE',
         'SETTLEMENT_TYPE',
@@ -111,7 +111,7 @@ class LegalEntity extends Component
 
         // Get dictionaries
         foreach ($fields as $type => $keys) {
-            $this->dictionaries = array_merge($this->dictionaries, dictionary()->getDictionariesFields($keys, $type));
+            $this->dictionaries = array_merge($this->dictionaries, $this->getDictionariesFields($keys, $type));
         }
     }
 
