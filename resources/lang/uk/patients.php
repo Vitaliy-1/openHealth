@@ -20,6 +20,7 @@ return [
     'nobody_found' => 'Нікого не знайдено',
     'try_change_search_parameters' => 'Спробуйте змінити параметри пошуку',
     'contact_data' => 'Контактні дані',
+    'priority' => 'Пріоритет',
 
     'relation_type' => [
         'primary' => 'Основний',
@@ -93,4 +94,42 @@ return [
 
     // Observations record
     'observations' => 'Обстеження',
+
+    // Encounter
+    'interaction' => 'Взаємодія',
+    'basic_data' => 'Основні дані',
+    'reasons_for_visit' => 'Причини звернення',
+    'actions' => 'Дії',
+    'examination' => 'Обстеження',
+    'vaccinations' => 'Вакцинації',
+    'prescriptions' => 'Рецепти',
+    'referrals' => 'Направлення',
+    'medical_reports' => 'Медичні висновки',
+    'procedures' => 'Процедури',
+    'treatment_plans' => 'Плани лікування',
+    'diagnostic_reports' => 'Діагностичні звіти',
+    'clinical_assessments' => 'Клінічні оцінки',
+
+    // Basic data
+    'patient_full_name' => 'ПІБ пацієнта',
+    'employee_full_name' => 'ПІБ працівника(автора)',
+    'division_name' => 'Місце надання послуг',
+    'referral_available' => 'Є направлення',
+    'referral_number' => 'Номер направлення',
+    'search_for_referral' => 'Шукати направлення',
+    'interaction_class' => 'Клас взаємодії',
+    'interaction_type' => 'Тип взаємодії',
+    'data' => 'Дата',
+    'period_start' => 'Час початку',
+    'period_end' => 'Час закінчення',
+    'episode_name' => 'Назва епізоду',
+    'episode_type' => 'Тип епізоду',
+    'existing_episode' => 'Існуючий епізод',
+    'new_episode' => 'Новий епізод',
+    'episode_number' => 'Номер епізоду',
+
+    // Diagnoses
+    'code_and_name' => 'Код та назва',
+    'clinical_status' => 'Клінічний статус',
+    'verification_status' => 'Статус верифікації',
 ];

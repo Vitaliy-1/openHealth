@@ -89,8 +89,6 @@ Route::middleware([
         Route::prefix('declaration')->group(function () {
             Route::get('/', DeclarationIndex::class)->name('declaration.index');
         });
-
-        Route::get('/test-license', [HomeController::class, 'test']);
     });
 
     Route::group(['middleware' => ['role:OWNER|ADMIN|DOCTOR']], function () {
@@ -102,7 +100,7 @@ Route::middleware([
             Route::get('/{id}/episodes', PatientEpisodes::class)->name('patient.episodes');
 
             Route::prefix('encounter')->group(function () {
-                Route::get('/create', EncounterCreate::class)->name('encounter.form');
+                Route::get('/create/{id?}', EncounterCreate::class)->name('encounter.form');
             });
         });
     });
