@@ -23,13 +23,11 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->uuid('inserted_by')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->json('license')->nullable();
             $table->text('nhs_comment')->nullable();
             $table->boolean('nhs_reviewed')->default(false);
             $table->boolean('nhs_verified')->default(false);
             $table->json('phones')->nullable();
             $table->string('receiver_funds_code')->nullable();
-            $table->json('residence_address')->nullable();
             $table->string('status')->nullable();
             $table->string('type')->nullable();
             $table->uuid('updated_by')->nullable();

@@ -17,10 +17,13 @@ use App\Repositories\AddressRepository;
 use App\Livewire\Division\Api\DivisionRequestApi;
 use Illuminate\Support\Facades\DB;
 use App\Models\Division;
+use App\Traits\FormTrait;
 
 // TODO: (after divide DivisionForm onto three classes) rename this one to the DivisionForm
 class DivisionFormRequest extends Form
 {
+    use FormTrait;
+
     protected ?AddressRepository $addressRepository;
 
     #[Validate([
@@ -185,6 +188,7 @@ class DivisionFormRequest extends Form
     {
         $uuid = $this->division['uuid'];
         $division = removeEmptyKeys($this->division);
+        $division['addresses'] = $this->convertArrayKeysToSnakeCase($division['addresses']);
 
         return DivisionRequestApi::updateDivisionRequest($uuid, $division);
     }
@@ -192,6 +196,7 @@ class DivisionFormRequest extends Form
     public function createDivision(): array
     {
         $division = removeEmptyKeys($this->division);
+        $division['addresses'] = $this->convertArrayKeysToSnakeCase($division['addresses']);
 
         return DivisionRequestApi::createDivisionRequest($division);
     }
