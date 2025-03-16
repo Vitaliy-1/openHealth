@@ -49,7 +49,7 @@ class EmployeeForm extends Component
         'status'  => false,
     ];
 
-    public ?array $dictionaries_field = [
+    public ?array $dictionaryNames = [
         'PHONE_TYPE',
         'COUNTRY',
         'SETTLEMENT_TYPE',

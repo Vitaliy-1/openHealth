@@ -25,7 +25,7 @@ class ContractForm extends Component
 
     const CACHE_PREFIX = 'register_contract_form';
 
-    public ?array $dictionaries_field = [
+    public ?array $dictionaryNames = [
         'CONTRACT_TYPE',
         'CAPITATION_CONTRACT_CONSENT_TEXT',
         'SPECIALITY_TYPE'

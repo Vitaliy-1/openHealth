@@ -67,7 +67,7 @@ class TypeRule implements ValidationRule
     protected function checkDivisionType(): bool
     {
         $divisionType= $this->division['type'];
-        $dictionary = dictionary()->getDictionary('DIVISION_TYPE', true)['values'];
+        $dictionary = dictionary()->getDictionary('DIVISION_TYPE');
 
         if (!in_array($divisionType, array_keys($dictionary))) {
             $this->setMessage(__('validation.attributes.healthcareService.error.division.type'));

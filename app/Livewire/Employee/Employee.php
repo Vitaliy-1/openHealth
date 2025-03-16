@@ -15,7 +15,7 @@ class Employee extends Component
     /**
      * @var array|string[] Set dictionaries to load with the component
      */
-    public ?array $dictionaries_field = [
+    public ?array $dictionaryNames = [
         'PHONE_TYPE',
         'COUNTRY',
         'SETTLEMENT_TYPE',
