@@ -17,7 +17,7 @@ class PatientSummary extends BasePatientComponent
 
     public function render(): View
     {
-        return view('livewire.patient.patient-summary');
+        return view('livewire.patient.records.patient-summary');
     }
 
     /**

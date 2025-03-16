@@ -1,21 +1,21 @@
 <?php
 
 return [
-    'api'                                 => [
-        'domain'        => env('EHEALTH_API_URL', 'private-anon-cb2ce4f7fc-uaehealthapi.apiary-mock.com'),
-        'token'         => env('EHEALTH_X_CUSTOM_PSK', 'X-Custom-PSK'),
-        'api_key'       => env('EHEALTH_API_KEY', ''),
+    'api' => [
+        'domain' => env('EHEALTH_API_URL', 'private-anon-cb2ce4f7fc-uaehealthapi.apiary-mock.com'),
+        'token' => env('EHEALTH_X_CUSTOM_PSK', 'X-Custom-PSK'),
+        'api_key' => env('EHEALTH_API_KEY', ''),
         'callback_prod' => env('EHEALTH_CALBACK_PROD', true),
-        'auth_host'     => env('EHEALTH_AUTH_HOST', 'https://auth-preprod.ehealth.gov.ua/sign-in'),
-        'redirect_uri'  => env('EHEALTH_REDIRECT_URI', 'https://openhealths.com/ehealth/oauth'),
-        'url_dev'       => env('EHEALTH_URL_DEV', 'http://localhost'),
-        'timeout'       => 10,
-        'queueTimeout'  => 60,
-        'cooldown'      => 300,
-        'retries'       => 10
+        'auth_host' => env('EHEALTH_AUTH_HOST', 'https://auth-preprod.ehealth.gov.ua/sign-in'),
+        'redirect_uri' => env('EHEALTH_REDIRECT_URI', 'https://openhealths.com/ehealth/oauth'),
+        'url_dev' => env('EHEALTH_URL_DEV', 'http://localhost'),
+        'timeout' => 10,
+        'queueTimeout' => 60,
+        'cooldown' => 300,
+        'retries' => 10
     ],
     'capitation_contract_max_period_days' => 366,
-    'legal_entity_type'                   => [
+    'legal_entity_type' => [
         'PRIMARY_CARE' => [
             'roles' => ['OWNER', 'ADMIN', 'DOCTOR', 'HR', 'ASSISTANT', 'RECEPTIONIST', 'MED_ADMIN', 'LABORANT'],
             //            'positions' => [
@@ -43,27 +43,27 @@ return [
             //            ],
         ],
     ],
-    'rate_limit'                          => [
+    'rate_limit' => [
         'employee_request' => 20
     ],
-    'employee_type'                       => [
-        'OWNER'           => [
+    'employee_type' => [
+        'OWNER' => [
             'position' => [
                 'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P18', 'P19', 'P22', 'P23', 'P24', 'P25', 'P26', 'P32', 'P229',
                 'P230', 'P231', 'P232', 'P233', 'P234', 'P235', 'P236', 'P237', 'P238', 'P239', 'P240', 'P247', 'P249',
                 'P257'
             ]
         ],
-        'ADMIN'           => [
+        'ADMIN' => [
             'position' => [
                 ' P5', 'P6', 'P14', 'P18', 'P19'
             ]
         ],
-        'HR'              => [
+        'HR' => [
             'position' => ['P14']
         ],
-        'ASSISTANT'       => [
-            'position'        => [
+        'ASSISTANT' => [
+            'position' => [
                 'P17', 'P66', 'P169', 'P170', 'P171', 'P173', 'P174', 'P175', 'P176', 'P177', 'P178', 'P179', 'P180',
                 'P181', 'P182', 'P183', 'P184', 'P185', 'P186', 'P187', 'P188', 'P189', 'P190', 'P191', 'P192', 'P193',
                 'P194', 'P195', 'P196', 'P197', 'P198', 'P199', 'P200', 'P201', 'P202', 'P203', 'P204', 'P205', 'P206',
@@ -71,16 +71,16 @@ return [
                 'P253', 'P256',
             ],
             'speciality_type' => [
-                "ORTHOPEDIC_DENTISTRY", "X_RAY_RADIOLOGY", "SANOLOGY", "STOMATOLOGY", "GENERAL_MEDICINE",
-                "MEDICAL_CASE_EMERGENCY_MEDICINE", "PUBLIC_HEALTH_AND_PREVENTIVE_MEDICINE"
+                'ORTHOPEDIC_DENTISTRY', 'X_RAY_RADIOLOGY', 'SANOLOGY', 'STOMATOLOGY', 'GENERAL_MEDICINE',
+                'MEDICAL_CASE_EMERGENCY_MEDICINE', 'PUBLIC_HEALTH_AND_PREVENTIVE_MEDICINE'
             ]
         ],
-        'DOCTOR'          => [
-            'position'        => ['P7', 'P8', 'P9', 'P10', 'P11'],
-            'speciality_type' => ["FAMILY_DOCTOR", "PEDIATRICIAN", "THERAPIST"]
+        'DOCTOR' => [
+            'position' => ['P7', 'P8', 'P9', 'P10', 'P11'],
+            'speciality_type' => ['FAMILY_DOCTOR', 'PEDIATRICIAN', 'THERAPIST']
         ],
-        'LABORANT'        => [
-            'position'        => [
+        'LABORANT' => [
+            'position' => [
                 'P17', 'P170', 'P173', 'P241', 'P242', 'P243', 'P244', 'P251', 'P256', 'P271', 'P272', 'P273', 'P274',
                 'P276', 'P277', 'P278', 'P279', 'P281'
             ],
@@ -92,15 +92,15 @@ return [
         'MED_COORDINATOR' => [
             'position' => ['P280']
         ],
-        'NHS ADMIN'       => [
+        'NHS ADMIN' => [
             'position' => [
                 'P27', 'P28', 'P29', 'P30', 'P31', 'P237', 'P238', 'P239',
             ],
         ],
-        'RECEPTIONIST'    => [
+        'RECEPTIONIST' => [
             'position' => ['P15']
         ],
-        'MED_ADMIN'       => [
+        'MED_ADMIN' => [
             'position' => [
                 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P33', 'P34', 'P35', 'P36', 'P37', 'P38',
                 'P39',
@@ -114,13 +114,45 @@ return [
                 'P139', 'P140', 'P141', 'P142', 'P143', 'P144', 'P145', 'P146', 'P147', 'P148', 'P149', 'P150', 'P151',
                 'P152', 'P153', 'P154', 'P155', 'P156', 'P157', 'P158', 'P159', 'P160', 'P161', 'P162', 'P163', 'P164',
                 'P165', 'P166', 'P167', 'P228', 'P248', 'P245', 'P258', 'P266', 'P267', 'P268', 'P269', 'P270', 'P1',
-                'P2',
-                'P3', 'P4', 'P5', 'P6', 'P23', 'P24', 'P25', 'P26', 'P32', 'P229', 'P230', 'P231', 'P249', 'P257'
+                'P2', 'P3', 'P4', 'P5', 'P6', 'P23', 'P24', 'P25', 'P26', 'P32', 'P229', 'P230', 'P231', 'P249', 'P257'
             ]
         ]
     ],
     'doctors_type' => [
-        'LABORANT','DOCTOR','MED_ADMIN','ASSISTANT','MED_COORDINATOR'
+        'LABORANT', 'DOCTOR', 'MED_ADMIN', 'ASSISTANT', 'MED_COORDINATOR'
+    ],
+    // https://e-health-ua.atlassian.net/wiki/spaces/EH/pages/583402009/Medical+Events+Dictionaries+and+configurations#legal_entity_encounter_classes
+    'legal_entity_encounter_classes' => [
+        'PRIMARY_CARE' => ['PHC'],
+        'MSP' => ['PHC'],
+        'OUTPATIENT' => ['AMB', 'INPATIENT']
+    ],
+    // https://e-health-ua.atlassian.net/wiki/spaces/EH/pages/583402009/Medical+Events+Dictionaries+and+configurations#employee_encounter_classes
+    'employee_encounter_classes' => [
+        'DOCTOR' => ['PHC'],
+        'SPECIALIST' => ['AMB', 'INPATIENT'],
+        'ASSISTANT' => ['PHC', 'AMB', 'INPATIENT'],
+        'MED_COORDINATOR' => ['AMB']
+    ],
+    // https://e-health-ua.atlassian.net/wiki/spaces/EH/pages/583402009/Medical+Events+Dictionaries+and+configurations#encounter_class_encounter_types
+    'encounter_class_encounter_types' => [
+        'AMB' => ['service_delivery_location', 'virtual', 'patient_identity', 'field', 'home', 'intervention'],
+        'INPATIENT' => ['patient_identity', 'discharge', 'service_delivery_location', 'intervention'],
+        'PHC' => ['service_delivery_location', 'virtual', 'home', 'field', 'intervention']
+    ],
+    // https://e-health-ua.atlassian.net/wiki/spaces/EH/pages/583402009/Medical+Events+Dictionaries+and+configurations#legal_entity_%3CLEGAL_ENTITY_TYPE%3E_episode_types
+    'legal_entity_episode_types' => [
+        'OUTPATIENT' => ['TREATMENT', 'PREVENTION', 'PALLIATIVE_CARE', 'DG', 'REHAB', 'CONDITIONING'],
+        'PRIMARY_CARE' => ['TREATMENT', 'PREVENTION', 'PALLIATIVE_CARE', 'PHC'],
+        'MSP' => ['TREATMENT', 'PHC', 'PREVENTION', 'PALLIATIVE_CARE'],
+        'MSP_PHARMACY' => ['TREATMENT', 'PREVENTION', 'PALLIATIVE_CARE']
+    ],
+    // https://e-health-ua.atlassian.net/wiki/spaces/EH/pages/583402009/Medical+Events+Dictionaries+and+configurations#employee_%3CEMPLOYEE_TYPE%3E_episode_types
+    'employee_episode_types' => [
+        'SPECIALIST' => ['TREATMENT', 'PREVENTION', 'PALLIATIVE_CARE', 'DG', 'REHAB', 'CONDITIONING'],
+        'DOCTOR' => ['TREATMENT', 'PREVENTION', 'PALLIATIVE_CARE', 'PHC'],
+        'ASSISTANT' => ['TREATMENT'],
+        'MED_COORDINATOR' => ['TREATMENT', 'DG']
     ],
 
     // Set the test environment
