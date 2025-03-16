@@ -70,8 +70,10 @@ Route::middleware([
 
         Route::prefix('employee')->group(function () {
             Route::get('/', EmployeeIndex::class)->name('employee.index');
-            Route::get('/{id}', EmployeeEdit::class)->name('employee.edit');
-            Route::get('/create', EmployeeCreate::class)->name('employee.create');
+            Route::get('/{id}', EmployeeEdit::class)
+                ->name('employee.edit')
+                ->where('id', '[0-9]+');
+            Route::get('/new', EmployeeCreate::class)->name('employee.create');
         });
 
         Route::prefix('contract')->group(function () {

@@ -80,7 +80,7 @@ trait FormTrait
         }
     }
 
-    public function &handleDynamicProperty(string $property): mixed
+    protected function &handleDynamicProperty(string $property): mixed
     {
         $propertyParts = explode('.', $property);
         $currentProperty = &$this;
@@ -110,7 +110,7 @@ trait FormTrait
      *
      * @return void
      */
-    public function getDictionary(): void
+    protected function getDictionary(): void
     {
         $this->dictionaries = dictionary()->getDictionaries($this->dictionaryNames ?? []);
     }
@@ -122,7 +122,7 @@ trait FormTrait
      * @param  string  $dictionaries  The name of the dictionaries array to filter
      * @return array
      */
-    public function getDictionariesFields(array $keys, string $dictionaries): array
+    protected function getDictionariesFields(array $keys, string $dictionaries): array
     {
         // If the dictionaries array exists and is an array, filter and keep only the specified keys
         if (isset($this->dictionaries[$dictionaries]) && is_array($this->dictionaries[$dictionaries])) {
