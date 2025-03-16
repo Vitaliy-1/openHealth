@@ -6,12 +6,16 @@
 
 /* Ваши стили должны быть написаны после загрузки компонентов Tailwind */
 @layer components {
+    [x-cloak] {
+        display: none !important;
+    }
 
     /*
      * Forms
      */
 
     /* Svg in inputs require specific styling. Assuming svg, input and label are siblings */
+    select[required] ~ label:after,
     input[required] ~ label:after {
         content: "*";
     }
@@ -55,7 +59,7 @@
     }
 
     .legend {
-        @apply text-xl font-bold text-gray-900 dark:text-white
+        @apply px-1 text-xl font-bold text-gray-900 dark:text-white
     }
 
     .fieldset-table .legend {
@@ -83,7 +87,7 @@
     }
 
     .input-select {
-        @apply input text-gray-500 dark:text-gray-400
+        @apply input text-gray-500 dark:text-gray-400 dark:border-gray-700 dark:focus:border-blue-500 dark:bg-gray-800
     }
 
     .input-error {
@@ -95,7 +99,11 @@
     }
 
     .text-error {
-        @apply mt-2 text-sm text-red-600 dark:text-red-500
+        @apply mt-2 text-xs text-red-600 dark:text-red-500
+    }
+
+    .text-note {
+        @apply mt-2 text-xs text-blue-600 dark:text-blue-500
     }
 
     .textarea {
@@ -199,6 +207,10 @@
         @apply rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800;
     }
 
+    .default-datepicker {
+        @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
+    }
+
     .default-input {
         @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
     }
@@ -253,7 +265,7 @@
 
     /* Buttons */
     .default-button {
-        @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800;
+        @apply text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800;
     }
 
     .alternative-button {
@@ -270,6 +282,10 @@
 
     .gray-button {
         @apply text-gray-800 bg-gray-200 border border-gray-300 focus:outline-none hover:bg-gray-300 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700;
+    }
+
+    .disabled-button {
+        @apply cursor-not-allowed text-gray-700 bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-gray-700;
     }
 
     .dropdown-button {
@@ -363,4 +379,99 @@
     .form-row-modal {
         @apply grid gap-4 mb-4 sm:grid-cols-2
     }
+
+    /* Stepping */
+    .steps {
+        @apply p-4 mb-4 bg-white border-t border-gray-200 dark:border-gray-700 sm:p-6 dark:bg-gray-800
+    }
+
+    .steps-header {
+        @apply mb-4 flex flex-wrap gap-2 sm:gap-4 w-full text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base
+    }
+
+    .steps-header_index {
+        @apply hidden sm:inline mx-2.5 flex items-center justify-center w-3.5 h-3.5 sm:w-4 sm:h-4 text-xs font-bold border rounded-full shrink-0 dark:border-blue-500 firefox-fix
+    }
+
+    .steps-header_title {
+        @apply ms-2.5 flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-400 dark:after:text-gray-500
+    }
+
+    .steps-owner_gender_list {
+        @apply justify-start items-center gap-2 w-full mt-1 text-sm font-medium text-gray-900 bg-white sm:flex dark:text-white dark:bg-gray-800
+    }
+
+    .steps-owner_radio {
+        @apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500
+    }
+
+    .steps-owner_radio_label {
+        @apply w-full py-2 ms-2 text-sm font-medium text-gray-600 dark:text-gray-300 dark:bg-gray-800
+    }
+
+    .steps-footer {
+        @apply mt-6 flex flex-col gap-6 xl:flex-row justify-between items-center
+    }
+
+    .steps-agreement_checkbox {
+        @apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600
+    }
+
+    .steps-agreement_label {
+        @apply ms-2 text-sm font-medium text-gray-900 dark:text-gray-300
+    }
+
+    .steps-agreement_button {
+        @apply text-blue-600 dark:text-blue-500 hover:underline
+    }
+
+    .step-completed-color {
+       @apply step-header-completed-blue
+    }
+
+    .step-active-color {
+        @apply text-blue-600 dark:text-blue-500 cursor-default
+    }
+
+    .step-incomplete-color {
+        @apply text-gray-500 border-gray-600
+    }
+}
+
+:root {
+    --header-height: 64px; /* Adjust this value to match your header height */
+}
+
+.fixed {
+    position: fixed !important;
+}
+
+/* Ensure the modal overlay is below the header */
+.main-header {
+    position: relative;
+    z-index: 50;
+}
+
+.step-header-completed-blue {
+    border-color: #4CAF50;
+    color: #4CAF50;
+}
+
+/* Change autocomplete behavior for Google Chrome */
+input:-webkit-autofill {
+    background-color: transparent !important;
+    color: inherit !important;
+    -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+}
+
+/* For numbers in LegalEntity creation header */
+@-moz-document url-prefix() {
+    .firefox-fix {
+        line-height: 1;
+    }
+
+
+    /* .pagination {
+        @apply bottom-0 right-0 items-center w-full py-[35px] px-10 bg-white border-t border-gray-200 dark:bg-gray-800 dark:border-gray-700
+    } */
 }

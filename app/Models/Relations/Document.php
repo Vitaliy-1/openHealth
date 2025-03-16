@@ -12,10 +12,10 @@ class Document extends Model
 {
     protected $hidden = [
         'id',
-        'documentable_type',
-        'documentable_id',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'documentable_id',
+        'documentable_type'
     ];
 
     protected $fillable = [

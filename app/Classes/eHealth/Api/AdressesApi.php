@@ -22,7 +22,7 @@ class AdressesApi
             'page_size' => 50,
         ];
 
-        return (new Request('get', self::URL_REGIONS, $params,false))->sendRequest();
+        return (array) new Request('get', self::URL_REGIONS, $params,false)->sendRequest();
     }
 
     //Search Districts
@@ -35,7 +35,7 @@ class AdressesApi
             'name' => $search,
         ];
 
-        return (new Request('get', self::URL_DISTRICTS, $params,false))->sendRequest();
+        return (array) new Request('get', self::URL_DISTRICTS, $params,false)->sendRequest();
     }
 
     //Search settlements
@@ -48,7 +48,8 @@ class AdressesApi
             'district' => $district,
             'name' => $search,
         ];
-        return (new Request('get', self::URL_SETTLEMENTS, $params,false))->sendRequest();
+
+        return (array) new Request('get', self::URL_SETTLEMENTS, $params,false)->sendRequest();
     }
 
 
@@ -63,6 +64,6 @@ class AdressesApi
             'name' => $search,
         ];
 
-        return (new Request('get', self::URL_STREETS, $params,false))->sendRequest();
+        return (array) new Request('get', self::URL_STREETS, $params,false)->sendRequest();
     }
 }

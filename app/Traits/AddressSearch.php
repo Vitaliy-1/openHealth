@@ -58,7 +58,7 @@ trait AddressSearch
         if ($value === 'М.КИЇВ') {
             $this->address['region'] = '';
             $this->address['settlement'] = 'Київ';
-            $this->address['settlement_type'] = 'CITY';
+            $this->address['settlementType'] = 'CITY';
             $this->address['settlementId'] = 'adaa4abf-f530-461c-bcbf-a0ac210d955b';
         }
     }
@@ -81,9 +81,9 @@ trait AddressSearch
     public function updated($field)
     {
         $fieldsToReset = match (substr($field, strrpos($field, '.') + 1)) {
-            'area' => ['region', 'settlement', 'settlementId', 'settlement_type', 'street_type', 'street', 'building', 'apartment', 'zip'],
-            'region' => ['settlement', 'settlementId', 'settlement_type', 'street_type', 'street', 'building', 'apartment', 'zip'],
-            'settlement' => ['street_type', 'street', 'building', 'apartment', 'zip'],
+            'area' => ['region', 'settlement', 'settlementId', 'settlementType', 'streetType', 'street', 'building', 'apartment', 'zip'],
+            'region' => ['settlement', 'settlementId', 'settlementType', 'streetType', 'street', 'building', 'apartment', 'zip'],
+            'settlement' => ['streetType', 'street', 'building', 'apartment', 'zip'],
             'street' => ['building', 'apartment', 'zip'],
             default => []
         };

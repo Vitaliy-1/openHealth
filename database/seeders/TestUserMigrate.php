@@ -127,23 +127,6 @@ class TestUserMigrate extends Seeder
             'email' => 'vitaliybezsh@gmail.com',
             'inserted_by' => '4261eacf-8008-4e62-899f-de1e2f7065f0',
             'is_active' => true,
-            'license' => json_encode([
-                'active_from_date' => new Carbon('2017-02-28'),
-                'expiry_date' => new Carbon('2027-02-28'),
-                'id' => '869b92a2-5511-45c3-beca-b5c9e3ad099b',
-                'inserted_at' => new Carbon('2024-06-06T15:41:30Z'),
-                'inserted_by' => '4261eacf-8008-4e62-899f-de1e2f7065f0',
-                'is_active' => true,
-                'issued_by' => 'Кваліфікацйна комісія',
-                'issued_date' => new Carbon('2017-02-28'),
-                'issuer_status' => null,
-                'license_number' => 'fd123443',
-                'order_no' => 'ВА43234',
-                'type' => 'MSP',
-                'updated_at' => new Carbon('2024-09-10T13:40:10Z'),
-                'updated_by' => '4261eacf-8008-4e62-899f-de1e2f7065f0',
-                'what_licensed' => 'реалізація наркотичних засобів',
-            ]),
             'nhs_comment' => '',
             'nhs_reviewed' => true,
             'nhs_verified' => true,
@@ -153,20 +136,7 @@ class TestUserMigrate extends Seeder
                     'type' => 'MOBILE',
                 ],
             ]),
-            'receiver_funds_code' => null,
-            'residence_address' => json_encode([
-                'apartment' => '22',
-                'area' => 'М.КИЇВ',
-                'building' => '22',
-                'country' => 'UA',
-                'settlement' => 'Київ',
-                'settlement_id' => 'adaa4abf-f530-461c-bcbf-a0ac210d955b',
-                'settlement_type' => 'CITY',
-                'street' => 'Анни Ахматової',
-                'street_type' => 'STREET',
-                'type' => 'RESIDENCE',
-                'zip' => '02000',
-            ]),
+            'receiver_funds_code' => '777',
             'status' => 'ACTIVE',
             'type' => 'PRIMARY_CARE',
             'updated_by' => '4261eacf-8008-4e62-899f-de1e2f7065f0',
@@ -174,6 +144,41 @@ class TestUserMigrate extends Seeder
             'inserted_at' => new Carbon('2024-06-06T12:41:30.000000Z'),
             'created_at' => new Carbon('2024-10-17T13:29:18.000000Z'),
             'updated_at' => new Carbon('2024-10-17T13:29:24.000000Z'),
+        ]);
+
+        $addressId = DB::table('addresses')->insert([
+            'type' => 'RESIDENCE',
+            'country' => 'UA',
+            'area' => 'М.КИЇВ',
+            'region' => null,
+            'settlement' => 'Київ',
+            'settlement_type' => 'CITY',
+            'settlement_id' => 'adaa4abf-f530-461c-bcbf-a0ac210d955b',
+            'street_type' => 'STREET',
+            'street' => 'Анни Ахматової',
+            'building' => '22',
+            'apartment' => '22',
+            'zip' => '02000',
+            'addressable_type' => 'App\Models\LegalEntity',
+            'addressable_id' => $legalEntityId,
+            'created_at' => new Carbon('2025-03-06T15:41:30Z'),
+            'updated_at' => new Carbon('2025-03-10T13:40:10Z'),
+        ]);
+
+        $licenseId = DB::table('licenses')->insert([
+            'uuid' => '869b92a2-5511-45c3-beca-b5c9e3ad099b',
+            'type' => 'MSP',
+            'legal_entity_id' => $legalEntityId,
+            'issued_by' => 'Кваліфікацйна комісія',
+            'issued_date' => new Carbon('2017-02-28'),
+            'active_from_date' => new Carbon('2017-02-28'),
+            'order_no' => 'ВА43234',
+            'license_number' => 'fd123443',
+            'expiry_date' => new Carbon('2027-02-28'),
+            'what_licensed' => 'реалізація наркотичних засобів',
+            'is_primary' => true,
+            'created_at' => new Carbon('2024-06-06T15:41:30Z'),
+            'updated_at' => new Carbon('2024-09-10T13:40:10Z'),
         ]);
 
         $userId = DB::table('users')->insertGetId([
@@ -214,6 +219,23 @@ class TestUserMigrate extends Seeder
             'no_tax_id' => false,
             'about_myself' => null,
             'working_experience' => null
+        ]);
+
+        $documentId = DB::table('documents')->insertGetId([
+            'type' => 'PASSPORT',
+            'number' => 'РО8927422',
+            'issued_by' => 'Рокитнянський РОВД',
+            'issued_at' => new Carbon('2025-03-27'),
+            'expiration_date' => null,
+            'documentable_type' => 'App\Models\Relations\Party',
+            'documentable_id' => $partyId
+        ]);
+
+        $phoneId = DB::table('phones')->insertGetId([
+            'type' => 'MOBILE',
+            'number' => '+380506491244',
+            'phoneable_type' => 'App\Models\Relations\Party',
+            'phoneable_id' => $partyId
         ]);
 
         DB::table('employees')->insert([

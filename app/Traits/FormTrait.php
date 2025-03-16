@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Str;
+
 trait FormTrait
 {
     /**
@@ -140,5 +142,86 @@ trait FormTrait
     public function closeModalModel(): void
     {
         $this->showModal = false;
+    }
+
+        /**
+     * Convert all keys in address array (course, only of need to) to the snake-case format.
+     * This need to do because DB table store it's attributes in the snake-case
+     *
+     * @return array
+     */
+    public function convertArrayKeysToSnakeCase(array $array): array
+    {
+        return collect($array)
+            ->mapWithKeys(function ($value, $key) {
+                return is_array($value)
+                    ? [Str::snake($key) => $this->convertArrayKeysToSnakeCase($value)]
+                    : [Str::snake($key) => $value];
+            })
+            ->toArray();
+    }
+
+    /**
+     * Convert all keys in address array (course, only of need to) to thecamelCase format.
+     * This need to do because DB table has it's attributes in the snake-case but the form uses camelCase
+     *
+     * @return array
+     */
+    public function convertArrayKeysToCamelCase(array $array ): array
+    {
+        return collect($array)
+            ->mapWithKeys(function ($value, $key) {
+                return is_array($value)
+                    ? [Str::camel($key) => $this->convertArrayKeysToCamelCase($value)]
+                    : [Str::camel($key) => $value];
+            })
+            ->toArray();
+    }
+
+    /**
+     * Retrieves all attributes from a model object (includes relations).
+     *
+     * @param object $model The model object to extract attributes from
+     *
+     * @return array An array containing all attributes of the model
+     */
+    protected function getAllAttributes(object $model): array
+    {
+        $arr = $model->getAttributes();
+        $relations = $model->getRelations();
+
+        foreach ($relations as $key => $relation) {
+            $arr = array_merge($arr, [$key => $relation->getAttributes()]);
+        }
+
+        // return $this->flattenArray($arr);
+        return $arr;
+    }
+
+    /**
+     * Flattens a multi-dimensional array.
+     * All non-firstlevel keys are concatenated with a dot.
+     *
+     * @param array $array The multi-dimensional array to flatten
+     *
+     * @param string $keyPrefix The prefix to add to the keys
+     *
+     * @return array The flattened array
+     */
+    protected function flattenArray(array $array, $keyPrefix = ""): array
+    {
+        $flattenedArray = [];
+
+        foreach ($array as $key => $value) {
+            $key = $keyPrefix ? $keyPrefix . '.' . $key : $key;
+
+            if (is_array($value)) {
+                $flattenedArray = array_merge($flattenedArray, $this->flattenArray($value, $key));
+            } else {
+                $flattenedArray[$key] = $value;
+            }
+        }
+
+        return $flattenedArray;
     }
 }

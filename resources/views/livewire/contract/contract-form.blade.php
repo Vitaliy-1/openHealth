@@ -205,7 +205,7 @@
                                     type='date'
                                 />
                             </x-slot>
-                            @error('legal_entity_form.start_date')
+                            @error('legalEntityForm.start_date')
                             <x-slot name='error'>
                                 <x-forms.error>
                                     {{ $message }}
@@ -227,7 +227,7 @@
                                     type='date'
                                 />
                             </x-slot>
-                            @error('legal_entity_form.end_date')
+                            @error('legalEntityForm.end_date')
                             <x-slot name='error'>
                                 <x-forms.error>
                                     {{ $message }}

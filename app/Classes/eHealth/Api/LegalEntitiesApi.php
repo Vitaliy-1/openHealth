@@ -6,8 +6,6 @@ use App\Classes\eHealth\Request;
 
 class LegalEntitiesApi extends Request
 {
-
-
     public const URL_V2 = '/api/v2/legal_entities';
     public const URL = '/api/legal_entities';
 
@@ -25,7 +23,8 @@ class LegalEntitiesApi extends Request
         return (new Request('GET', self::URL_V2.'/'.$id,$params))->sendRequest();
     }
 
-    public static function _verify(string $id): array{
+    public static function _verify(string $id): array
+    {
         return (new Request('PATCH', self::URL.'/'.$id.'/actions/nhs_verify',[]))->sendRequest();
     }
 
@@ -33,9 +32,4 @@ class LegalEntitiesApi extends Request
     {
         return (new Request('PUT', self::URL_V2, $params,false))->sendRequest();
     }
-
-
-
-
-
 }

@@ -1,129 +1,155 @@
+@php
+    $hasAccreditationCategoryError = $errors->has('legalEntityForm.accreditation.category');
+    $hasAccreditationOrderNumberError = $errors->has('legalEntityForm.accreditation.order_no');
+    $hasAccreditationOrderDateError = $errors->has('legalEntityForm.accreditation.order_date');
+@endphp
 
-<div x-data="{ show_accreditation: false }">
+<fieldset
+    class="fieldset"
+    xmlns="http://www.w3.org/1999/html"
+    x-data="{ title: '{{ __('forms.accreditation') }}', index: 5 }"
+    x-init="typeof addHeader !== 'undefined' && addHeader(title, index)"
+    x-show="activeStep === index || isEdit"
+    x-cloak
+    :key="`step-${index}`"
+>
+    <template x-if="isEdit">
+        <legend x-text="title" class="legend"></legend>
+    </template>
 
-    <x-forms.form-row >
-        <x-forms.form-group class="xl:w-1/2">
-            <x-slot name="label">
-                <x-forms.label class="default-label flex items-center" for="accreditation_show"
+    <div x-data="{ showAccreditation: $wire.entangle('legalEntityForm.accreditationShow') }">
+        <div class='form-row-3'>
+            <div class="form-group group">
+                <input
+                    type="checkbox"
+                    id="accreditationShow"
+                    class="default-checkbox text-blue-500 focus:ring-blue-300"
+                    x-model="showAccreditation"
+                    :checked="showAccreditation"
+                >
 
-                               name="label">
-                        <x-forms.checkbox class="mr-1" x-bind:checked="show_accreditation"
-                                       @change="show_accreditation = !show_accreditation"
-                                       type="checkbox"
-                                       id="accreditation_show"/>
-                    {{__('forms.accreditation_show')}}
-                </x-forms.label>
-            </x-slot>
+                <label for="accreditationShow" class="ms-2 text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('forms.accreditationShow') }}</label>
+            </div>
+        </div>
 
-        </x-forms.form-group>
-    </x-forms.form-row>
+        <div
+            class='form-row-3'
+            x-show="showAccreditation"
+        >
+            <div class="form-group group">
+                <select
+                    required
+                    id="accreditationСategory"
+                    wire:model="legalEntityForm.accreditation.category"
+                    {{-- aria-describedby="{{ $hasAccreditationCategoryError ? 'accreditationCategoryErrorHelp' : '' }}" --}}
+                    class="input-select text-gray-800 {{ $hasAccreditationCategoryError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                >
+                    <option value="_placeholder_" selected hidden>-- {{ __('forms.select') }} --</option>
 
-    <x-forms.form-row class="flex-wrap"  x-show="show_accreditation">
-            <x-forms.form-group class="xl:w-1/4">
-                <x-slot name="label">
-                    <x-forms.label class="default-label" for="accreditation_category"
-                                   name="label">
-                        {{__('forms.accreditation_category')}}
-                    </x-forms.label>
-                </x-slot>
-                <x-slot name="input">
-                    <x-forms.select class="default-input" wire:model="legal_entity_form.accreditation.category"
-                                    type="text" id="accreditation_category">
-                        <x-slot name="option">
-                            <option value="">{{__('forms.select')}}</option>
-                            @isset($dictionaries['ACCREDITATION_CATEGORY'])
-                                @foreach($dictionaries['ACCREDITATION_CATEGORY'] as $k=>$category)
-                                    <option {{isset($legal_entity_form->accreditation['category'] ) == $k ? 'selected': ''}} value="{{$k}}">{{$category}}</option>
-                                @endforeach
-                            @endif
-                        </x-slot>
-                    </x-forms.select>
-                </x-slot>
-                @error('legal_entity_form.accreditation.category')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-            <x-forms.form-group class="xl:w-1/4">
-                <x-slot name="label">
-                    <x-forms.label class="default-label" for="accreditation_order_no"
-                                   name="label">
-                        {{ __('forms.accreditation_order_no')}}
-                    </x-forms.label>
-                </x-slot>
-                <x-slot name="input">
-                    <x-forms.input class="default-input" wire:model="legal_entity_form.accreditation.order_no"
-                                   type="text" id="accreditation_order_no"/>
-                </x-slot>
-                @error('legal_entity_form.accreditation.order_no')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
+                    @isset($dictionaries['ACCREDITATION_CATEGORY'])
+                            @foreach($dictionaries['ACCREDITATION_CATEGORY'] as $k => $category)
+                                <option {{ isset($legalEntityForm->accreditation['category']) == $k ? 'selected': ''}} value="{{ $k }}">
+                                    {{ $category }}
+                                </option>
+                            @endforeach
+                        @endif
+                </select>
 
-            </x-forms.form-group>
-            <x-forms.form-group class="xl:w-1/4">
-                <x-slot name="label">
-                    <x-forms.label class="default-label" for="accreditation_issued_date"
-                                   name="label">
-                        {{__('forms.accreditation_issued_date')}}
-                    </x-forms.label>
-                </x-slot>
-                <x-slot name="input">
-                    <x-forms.input-date   wire:model="legal_entity_form.accreditation.issued_date"
-                                     id="accreditation_issued_date"/>
-                </x-slot>
-                @error('legal_entity_form.accreditation.issued_date')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-            <x-forms.form-group class="xl:w-1/4">
-                <x-slot name="label">
-                    <x-forms.label class="default-label" for="accreditation_expiry_date"
-                                   name="label">
-                        {{__('forms.accreditation_expired_date')}}
-                    </x-forms.label>
-                </x-slot>
-                <x-slot name="input">
-                    <x-forms.input-date wire:model="legal_entity_form.accreditation.expiry_date"
-                                   id="accreditation_expiry_date"/>
-                </x-slot>
-                @error('legal_entity_form.accreditation.expiry_date')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
-            </x-forms.form-group>
-            <x-forms.form-group class="xl:w-1/4">
-                <x-slot name="label">
-                    <x-forms.label class="default-label" for="accreditation_order_date"
-                                   name="label">
-                        {{__('forms.accreditation_order_date')}}
-                    </x-forms.label>
-                </x-slot>
-                <x-slot name="input">
-                    <x-forms.input-date wire:model="legal_entity_form.accreditation.order_date"
-                               id="accreditation_order_date"/>
-                </x-slot>
-                @error('legal_entity_form.accreditation.order_date')
-                <x-slot name="error">
-                    <x-forms.error>
-                        {{$message}}
-                    </x-forms.error>
-                </x-slot>
-                @enderror
+                @if($hasAccreditationCategoryError)
+                    <p id="accreditationCategoryErrorHelp" class="text-error">
+                        {{ $errors->first('legalEntityForm.accreditation.category') }}
+                    </p>
+                @endif
 
-            </x-forms.form-group>
-    </x-forms.form-row >
-</div>
+                <label for="accreditationСategory" class="label z-10">
+                    {{ __('forms.accreditationCategory') }}
+                </label>
+            </div>
+
+            <div class="form-group group">
+
+                <input
+                    required
+                    type="text"
+                    placeholder=" "
+                    id="accreditationOrderNumber"
+                    wire:model="legalEntityForm.accreditation.orderNo"
+                    {{-- aria-describedby="{{ $hasAccreditationOrderNumberError ? 'accreditationOrderNumberErrorHelp' : '' }}" --}}
+                    class="input {{ $hasAccreditationOrderNumberError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                />
+
+                @if($hasAccreditationOrderNumberError)
+                    <p id="accreditationOrderNumberErrorHelp" class="text-error">
+                        {{ $errors->first('legalEntityForm.accreditation.orderNo') }}
+                    </p>
+                @endif
+
+                <label for="accreditationOrderNumber" class="label z-10">
+                    {{ __('forms.accreditationOrderNo') }}
+                </label>
+            </div>
+
+            <div class="form-group group">
+                <svg class="svg-input" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                </svg>
+
+                <input
+                    type="text"
+                    placeholder=" "
+                    id="accreditationIssuedDate"
+                    wire:model="legalEntityForm.accreditation.issuedDate"
+                    class="input datepicker-input peer"
+                />
+
+                <label for="accreditationIssuedDate" class="label z-10">
+                    {{ __('forms.accreditationIssuedDate') }}
+                </label>
+            </div>
+
+            <div class="form-group group">
+                <svg class="svg-input" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                </svg>
+
+                <input
+                    type="text"
+                    placeholder=" "
+                    id="accreditationExpiryDate"
+                    wire:model="legalEntityForm.accreditation.expiryDate"
+                    class="input datepicker-input peer"
+                />
+
+                <label for="accreditationExpiryDate" class="label z-10">
+                    {{ __('forms.accreditationExpiredDate') }}
+                </label>
+            </div>
+
+            <div class="form-group group">
+                <svg class="svg-input" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                </svg>
+
+                <input
+                    required
+                    type="text"
+                    placeholder=" "
+                    id="accreditationOrderDate"
+                    wire:model="legalEntityForm.accreditation.orderDate"
+                    {{-- aria-describedby="{{ $hasAccreditationOrderDateError ? 'accreditationOrderDateErrorHelp' : '' }}" --}}
+                    class="input datepicker-input {{ $hasAccreditationOrderDateError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                />
+
+                @if($hasAccreditationOrderDateError)
+                    <p id="accreditationOrderDateErrorHelp" class="text-error">
+                        {{ $errors->first('legalEntityForm.accreditation.orderDate') }}
+                    </p>
+                @endif
+
+                <label for="accreditationOrderDate" class="label z-10">
+                    {{ __('forms.accreditationOrderDate') }}
+                </label>
+            </div>
+        </div>
+    </div>
+</fieldset>

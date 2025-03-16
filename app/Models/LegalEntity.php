@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use App\Models\Relations\Address;
 
 /**
  * @mixin IdeHelperLegalEntity
@@ -16,7 +18,7 @@ class LegalEntity extends Model
 {
     use HasFactory;
 
-    const TYPE_PRIMARY_CARE = 'PRIMARY_CARE';
+    public const string TYPE_PRIMARY_CARE = 'PRIMARY_CARE';
 
     protected $fillable = [
         'uuid',
@@ -30,7 +32,7 @@ class LegalEntity extends Model
         'inserted_at',
         'inserted_by',
         'is_active',
-        'license',
+        // 'license',
         'nhs_comment',
         'nhs_reviewed',
         'nhs_verified',
@@ -50,7 +52,7 @@ class LegalEntity extends Model
         'accreditation' => 'array',
         'archive' => 'array',
         'edr' => 'array',
-        'license' => 'array',
+        // 'license' => 'array',
         'phones' => 'array',
         'residence_address' => 'array',
         'inserted_at' => 'datetime',
@@ -60,18 +62,23 @@ class LegalEntity extends Model
         'updated_by' => 'string',
     ];
 
+    protected $with = [
+        'licenses',
+        'address'
+    ];
+
     protected $attributes = [
         'is_active' => false,
     ];
 
     public null|object $owner;
 
-    public function employees(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function employees(): HasMany
     {
         return $this->hasMany(Employee::class);
     }
 
-    public function employeesRequest(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function employeesRequest(): HasMany
     {
         return $this->hasMany(EmployeeRequest::class);
     }
@@ -131,5 +138,10 @@ class LegalEntity extends Model
     public function getEdr(): array
     {
         return $this->edr;
+    }
+
+    public function address(): MorphOne
+    {
+        return $this->morphOne(Address::class, 'addressable');
     }
 }
