@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Classes\eHealth\Api\DictionaryApi;
 use App\Services\Dictionary\Dictionary;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 class DictionaryService
 {
-    protected string $dictionariesUrl;
-
     /**
      * Local storage for all founded Dictionaries into incoming array.
      * As 'Dictionary' here should be interpreted as object created from the associative array.
@@ -22,9 +20,8 @@ class DictionaryService
      */
     protected Dictionary $rootDictionary;
 
-    public function __construct(array $config)
+    public function __construct()
     {
-        $this->dictionariesUrl = $config['dictionaries_api_v2_url'];
         $this->rootDictionary = new Dictionary();
         $this->update();
     }
@@ -35,9 +32,9 @@ class DictionaryService
      *
      * @return void
      */
-    public function update(): void
+    protected function update(): void
     {
-        $dictionaries = $this->getSourceDictionaries($this->dictionariesUrl);
+        $dictionaries = $this->getSourceDictionaries();
 
         foreach ($dictionaries as $entity) {
             if (empty($entity['name'])) {
@@ -54,17 +51,14 @@ class DictionaryService
     /**
      * Get all dictionaries data from external resource via API and put it into the cache.
      *
-     * @param  string  $dictionariesUrl  API URL to the resource
      * @return array
      * @throws RuntimeException
      */
-    protected function getSourceDictionaries(string $dictionariesUrl): array
+    protected function getSourceDictionaries(): array
     {
-        return Cache::remember('dictionaries', now()->addDays(7), static function () use ($dictionariesUrl): array {
+        return Cache::remember('dictionaries', now()->addDays(7), static function (): array {
             try {
-                $response = Http::get($dictionariesUrl);
-                $response->throw();
-                return $response->json('data');
+                return DictionaryApi::getDictionaries();
             } catch (\Exception $e) {
                 throw new \RuntimeException('Failed to fetch dictionaries data: ' . $e->getMessage());
             }
@@ -110,5 +104,33 @@ class DictionaryService
         }
 
         return $toArray ? collect($items)->toArray() : new Dictionary($items);
+    }
+
+    /**
+     * In order to get values that belong to a large reference dictionary, we must pass the name of the dictionary in the name parameter.
+     *
+     * @param  array  $params
+     * @param  bool  $toArray
+     * @return Dictionary|array
+     */
+    public function getLargeDictionary(array $params, bool $toArray = true): Dictionary|array
+    {
+        $cacheKey = "large_dictionary_" . $params['name'];
+
+        return Cache::remember($cacheKey, now()->addDays(7), static function () use ($params, $toArray) {
+            $items = DictionaryApi::getDictionaries($params);
+
+            $formatted = collect($items)
+                ->filter(static fn($item) => isset($item['name'], $item['values']))
+                ->mapWithKeys(static fn($item) => [
+                    $item['name'] => collect($item['values'])
+                        ->filter(static fn($value) => isset($value['code'], $value['description']))
+                        ->mapWithKeys(static fn($value) => [$value['code'] => $value['description']])
+                        ->toArray()
+                ])
+                ->toArray();
+
+            return $toArray ? $formatted : new Dictionary($formatted);
+        });
     }
 }
