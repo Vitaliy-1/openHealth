@@ -9,7 +9,7 @@
             <div class='items-center border-stroke px-7 py-4 dark:border-strokedark'>
                 <div class='mb-4'>
                     <p>
-                        <strong>{{ __('Тип') }}:</strong> {{ $license->type_value }}
+                        <strong>{{ __('forms.type') }}:</strong> {{ $license->type_value }}
                     </p>
                 </div>
                 <div class='mb-4'>

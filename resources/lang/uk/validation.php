@@ -459,7 +459,9 @@ return [
                 'start' => 'час початку',
                 'end' => 'час закінчення'
             ],
-            'priority.coding.code' => 'пріоритет'
+            'priority.coding.code' => 'пріоритет',
+            'diagnoses.role.coding.*.code' => 'тип',
+            'diagnoses.rank' => 'пріоритет'
         ],
         'episode' => [
             'name' => 'назва епізоду',
