@@ -18,7 +18,7 @@ class DictionaryServiceProvider extends ServiceProvider implements DeferrablePro
      */
     public function register(): void
     {
-        $this->app->singleton(DictionaryService::class, fn (Application $app) => new DictionaryService($app['config']['dictionary']));
+        $this->app->singleton(DictionaryService::class, fn(Application $app) => new DictionaryService());
     }
 
     /**

@@ -6,6 +6,7 @@ namespace App\Livewire\Encounter\Forms;
 
 use App\Models\Employee\Employee;
 use App\Rules\Cyrillic;
+use App\Rules\TimeInPast;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
@@ -16,29 +17,25 @@ class Encounter extends Form
     #[Validate([
         'encounter.division.identifier.value' => ['nullable', 'string'],
         'encounter.period.date' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
-        'encounter.period.start' => ['required', 'date_format:H:i'],
+        'encounter.period.start' => ['required', 'date_format:H:i', new TimeInPast()],
         'encounter.period.end' => ['required', 'date_format:H:i', 'after:encounter.period.start'],
         'encounter.class.code' => ['required', 'string'],
         'encounter.type.coding.code' => ['required', 'string'],
         'encounter.priority.coding.code' => ['required_if:encounter.class.code,INPATIENT', 'string'],
-        'encounter.diagnoses.role.coding.code' => ['required', 'string'],
-        'encounter.diagnoses.rank' => ['nullable', 'integer', 'min:1', 'max:10'],
         'encounter.episode.identifier.type.coding.code' => ['nullable', 'string'],
+        'encounter.diagnoses.role.coding.*.code' => ['required', 'string'],
+        'encounter.diagnoses.rank' => ['nullable', 'integer', 'min:1', 'max:10']
     ])]
     public array $encounter = [
         'status' => 'finished',
         'visit' => [
             'identifier' => [
-                'type' => [
-                    'coding' => [['system' => 'eHealth/resources', 'code' => 'visit']]
-                ]
+                'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'visit']]]
             ]
         ],
         'episode' => [
             'identifier' => [
-                'type' => [
-                    'coding' => [['system' => 'eHealth/resources', 'code' => 'episode']]
-                ]
+                'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'episode']]]
             ]
         ],
         'class' => [
@@ -52,22 +49,24 @@ class Encounter extends Form
         ],
         'performer' => [
             'identifier' => [
-                'type' => [
-                    'coding' => [['system' => 'eHealth/resources', 'code' => 'employee']]
-                ]
+                'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'employee']]]
             ]
         ],
         'division' => [
             'identifier' => [
-                'type' => [
-                    'coding' => [['system' => 'eHealth/resources', 'code' => 'division']]
-                ]
+                'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'division']]]
             ]
         ],
-        'diagnoses.condition.identifier.type.coding.system' => 'eHealth/resources',
-        'diagnoses.condition.identifier.type.coding.code' => 'condition',
-        'diagnoses.role.coding.system' => 'eHealth/diagnosis_roles',
-        'encounter.reasons.coding.system' => 'eHealth/ICPC2/reasons',
+        'diagnoses' => [
+            'condition' => [
+                'identifier' => [
+                    'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'condition']]]
+                ]
+            ],
+            'role' => [
+                'coding' => [['system' => 'eHealth/resources']]
+            ]
+        ]
     ];
 
     #[Validate([
@@ -96,11 +95,44 @@ class Encounter extends Form
     ];
 
     #[Validate([
-        'condition.coding.code' => ['required', 'string'],
+        'conditions.coding.code' => ['required', 'string'],
+        'conditions.onsetDate' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
+        'conditions.onsetTime' => ['required', 'date_format:H:i', new TimeInPast()],
+        'conditions.assertedDate' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
+        'conditions.assertedTime' => ['required', 'date_format:H:i', new TimeInPast()],
     ])]
-    public array $condition = [
-        'code.coding.system' => 'eHealth/ICD10/condition_codes',
-    ];
+    public array $conditions = [];
+
+    public function getDefaultCondition(): array
+    {
+        return [
+            'context' => [
+                'identifier' => [
+                    'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'encounter']]]
+                ]
+            ],
+            'code' => [
+                'coding' => [
+                    0 => ['system' => 'eHealth/ICPC2/condition_codes'],
+                    1 => ['system' => 'eHealth/ICD10_AM/condition_codes']
+                ]
+            ],
+            'severity' => [
+                'coding' => [['system' => 'eHealth/condition_severities']]
+            ],
+            // TODO: add evidences when observations isset
+//        'evidences' => [
+//            'codes' => [
+//                'coding' => [['system' => 'eHealth/ICPC2/reasons']],
+//            ],
+//            'details' => [
+//                'identifier' => [
+//                    'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'observation']]]
+//                ]
+//            ]
+//        ]
+        ];
+    }
 
     /**
      * Validate provided models by corresponding rules.
