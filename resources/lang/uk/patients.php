@@ -129,7 +129,13 @@ return [
     'episode_number' => 'Номер епізоду',
 
     // Diagnoses
+    'add_diagnose' => 'Додати діагноз',
+    'icpc-2_status_code' => 'Код стану за ICPC-2',
+    'icd-10' => 'МКХ-10',
     'code_and_name' => 'Код та назва',
     'clinical_status' => 'Клінічний статус',
     'verification_status' => 'Статус верифікації',
+    'severity_of_the_condition' => 'Ступінь тяжкості стану',
+    'create_diagnose' => 'Створити діагноз',
+    'save_changes' => 'Зберегти зміни'
 ];

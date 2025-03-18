@@ -14,7 +14,7 @@
             <div class='w-full mr-auto bg-white grid grid-cols-1 gap-9 md:grid-cols-2'>
                 <div >
                     <label for='type' class='block text-sm font-medium text-gray-900'>
-                        {{ __('Тип') }}
+                        {{ __('forms.type') }}
                     </label>
                     <select id='type' wire:model='type'
                         class='mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md'>
