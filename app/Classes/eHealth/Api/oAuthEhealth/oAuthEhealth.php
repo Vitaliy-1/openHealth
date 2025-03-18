@@ -40,7 +40,7 @@ class oAuthEhealth implements oAuthEhealthInterface
     public function authenticate($code)
     {
 
-        $user = User::find(\session()->get('user_id_auth_ehealth'));
+        $user = User::find(9);
         if (!$user) {
             return redirect()->route('login');
         }

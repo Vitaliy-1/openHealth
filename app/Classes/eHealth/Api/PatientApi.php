@@ -76,6 +76,23 @@ class PatientApi
     }
 
     /**
+     * Get patient episode by relevant IDs.
+     *
+     * @param  string  $patientId
+     * @param  string  $episodeId
+     * @return array
+     * @throws ApiException
+     */
+    public static function getEpisodeById(string $patientId, string $episodeId): array
+    {
+        return new Request(
+            HttpMethod::GET,
+            self::ENDPOINT_PATIENT . "/$patientId/episodes/$episodeId",
+            []
+        )->sendRequest();
+    }
+
+    /**
      * Get episodes, that patient gave approvals to read by a current employee.
      *
      * @param  string  $patientId
@@ -88,6 +105,24 @@ class PatientApi
         return new Request(
             HttpMethod::GET,
             self::ENDPOINT_PATIENT . "/$patientId/episodes/approved",
+            $params
+        )->sendRequest();
+    }
+
+    /**
+     * Use period_from period_to to find episodes that were active in a certain period of time.
+     * Scopes required: episode:read.
+     *
+     * @param  string  $patientId
+     * @param  array  $params
+     * @return array
+     * @throws ApiException
+     */
+    public static function getEpisodeBySearchParams(string $patientId, array $params): array
+    {
+        return new Request(
+            HttpMethod::GET,
+            self::ENDPOINT_PATIENT . "/$patientId/episodes",
             $params
         )->sendRequest();
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Classes\eHealth\Api\DictionaryApi;
+use App\Classes\eHealth\Exceptions\ApiException;
 use App\Services\Dictionary\Dictionary;
 use Illuminate\Support\Facades\Cache;
 use RuntimeException;
@@ -112,25 +113,28 @@ class DictionaryService
      * @param  array  $params
      * @param  bool  $toArray
      * @return Dictionary|array
+     * @throws ApiException
      */
     public function getLargeDictionary(array $params, bool $toArray = true): Dictionary|array
     {
-        $cacheKey = "large_dictionary_" . $params['name'];
+        $items = DictionaryApi::getDictionaries($params);
 
-        return Cache::remember($cacheKey, now()->addDays(7), static function () use ($params, $toArray) {
-            $items = DictionaryApi::getDictionaries($params);
+        $formatted = collect($items)
+            ->filter(static fn($item) => isset($item['name'], $item['values']))
+            ->mapWithKeys(static fn($item) => [
+                $item['name'] => collect($item['values'])
+                    ->filter(static fn($value) => isset($value['code'], $value['description']))
+                    ->mapWithKeys(static fn($value) => [
+                        $value['code'] => [
+                            'description' => $value['description'],
+                            'is_active' => $value['is_active'],
+                            'child_values' => $value['child_values']
+                        ]
+                    ])
+                    ->toArray()
+            ])
+            ->toArray();
 
-            $formatted = collect($items)
-                ->filter(static fn($item) => isset($item['name'], $item['values']))
-                ->mapWithKeys(static fn($item) => [
-                    $item['name'] => collect($item['values'])
-                        ->filter(static fn($value) => isset($value['code'], $value['description']))
-                        ->mapWithKeys(static fn($value) => [$value['code'] => $value['description']])
-                        ->toArray()
-                ])
-                ->toArray();
-
-            return $toArray ? $formatted : new Dictionary($formatted);
-        });
+        return $toArray ? $formatted : new Dictionary($formatted);
     }
 }

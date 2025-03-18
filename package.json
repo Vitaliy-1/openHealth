@@ -1,4 +1,5 @@
 {
+    "name": "mis",
     "private": true,
     "type": "module",
     "scripts": {
@@ -34,10 +35,10 @@
         "webpack-dev-server": "^4.7.3"
     },
     "dependencies": {
-        "@alpinejs/focus": "^3.14.8",
-        "@alpinejs/mask": "^3.13.3",
-        "@alpinejs/persist": "^3.12.0",
-        "alpinejs": "^3.10.3",
+        "@alpinejs/focus": "^3.14.9",
+        "@alpinejs/mask": "^3.14.9",
+        "@alpinejs/ui": "^3.14.9",
+        "alpinejs": "^3.14.9",
         "apexcharts": "^3.36.3",
         "flatpickr": "^4.6.13",
         "flowbite": "^2.5.2",

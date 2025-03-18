@@ -16,7 +16,6 @@ use App\Livewire\Employee\EmployeeIndex;
 use App\Livewire\Encounter\EncounterCreate;
 use App\Livewire\LegalEntity\CreateLegalEntity;
 use App\Livewire\LegalEntity\EditLegalEntity;
-use App\Livewire\LegalEntity\LegalEntities;
 use App\Livewire\License\Forms\CreateNewLicense;
 use App\Livewire\License\Forms\LicenseForms;
 use App\Livewire\License\LicenseIndex;
@@ -102,7 +101,7 @@ Route::middleware([
             Route::get('/{id}/episodes', PatientEpisodes::class)->name('patient.episodes');
 
             Route::prefix('encounter')->group(function () {
-                Route::get('/create/{id?}', EncounterCreate::class)->name('encounter.form');
+                Route::get('/create/{id}', EncounterCreate::class)->name('encounter.form');
             });
         });
     });
