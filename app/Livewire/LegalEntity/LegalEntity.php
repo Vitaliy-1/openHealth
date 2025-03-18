@@ -11,8 +11,11 @@ use App\Models\LegalEntity as LegalEntityModel;
 use App\Models\License;
 use App\Models\User;
 use App\Classes\Cipher\Traits\Cipher;
+use App\Classes\eHealth\Api\EmployeeApi;
 use App\Models\Employee\Employee;
+use App\Models\Employee\EmployeeRequest;
 use App\Models\Relations\Address;
+use App\Models\Relations\Party;
 use App\Traits\AddressSearch;
 use App\Traits\FormTrait;
 use Illuminate\Support\Facades\Auth;
@@ -24,9 +27,11 @@ use Illuminate\Support\Facades\Cache;
 use Livewire\WithFileUploads;
 use App\Repositories\AddressRepository;
 use App\Repositories\EmployeeRepository;
+use Carbon\Carbon;
 use Livewire\Attributes\Computed;
 use Illuminate\Validation\ValidationException;
 use Exception;
+use Log;
 
 /**
  *
@@ -74,8 +79,12 @@ class LegalEntity extends Component
         'SETTLEMENT_TYPE',
         'GENDER',
         'SPECIALITY_LEVEL',
-        'ACCREDITATION_CATEGORY'
+        'ACCREDITATION_CATEGORY',
+        'POSITION',
+        'DOCUMENT_TYPE'
     ];
+
+    protected array $employeeData = [];
 
     /**
      * @return void set cache keys
@@ -111,7 +120,7 @@ class LegalEntity extends Component
 
         // Get dictionaries
         foreach ($fields as $type => $keys) {
-            $this->dictionaries = array_merge($this->dictionaries, $this->getDictionariesFields($keys, $type));
+            $this->dictionaries[$type] = $this->getDictionariesFields($keys, $type);
         }
     }
 
@@ -212,6 +221,19 @@ class LegalEntity extends Component
         }
     }
 
+    public function saveEmployeeResponse($response, $legalEntity): Employee|EmployeeRequest
+    {
+        dump('response', $response);
+        $employeeResponse = schemaService()->setDataSchema($response, app(EmployeeApi::class))
+            ->responseSchemaNormalize()
+            ->replaceIdsKeysToUuid(['id', 'legalEntityId', 'divisionId', 'partyId'])
+            ->getNormalizedData();
+
+        dump('$employeeResponse', $employeeResponse);
+
+        return app(EmployeeRepository::class)->saveEmployeeData($employeeResponse, $legalEntity,new EmployeeRequest());
+    }
+
     /**
      * Step 8 for handling sign legal entity  submission.
      *
@@ -239,15 +261,16 @@ class LegalEntity extends Component
         $data = $this->prepareDataForRequest($this->legalEntityForm->toArray());
 
         $taxId = $this->legalEntityForm->owner['taxId'];
-        dd($data);
+        // dd($data);
         // Sending encrypted data
-        $base64Data = $this->sendEncryptedData($data, $taxId, CipherApi::SIGNATORY_INITIATOR_BUSINESS);
+        $base64Data = ''; // TODO: remove it after testing and uncomment lines below
+        // $base64Data = $this->sendEncryptedData($data, $taxId, CipherApi::SIGNATORY_INITIATOR_BUSINESS);
 
         // Handle errors from encrypted data
-        if (isset($base64Data['errors'])) {
-            $this->dispatchErrorMessage($base64Data['errors']);
-            return;
-        }
+        // if (isset($base64Data['errors'])) {
+        //     $this->dispatchErrorMessage($base64Data['errors']);
+        //     return;
+        // }
 
         // Prepare data for API request
         $request = LegalEntitiesRequestApi::_createOrUpdate([
@@ -263,7 +286,13 @@ class LegalEntity extends Component
 
         // Handle successful API request
         if (!empty($request['data'])) {
-            $this->handleSuccessResponse($request);
+            try {
+                $this->handleSuccessResponse($request, $data);
+            } catch (\Exception $err) {
+                Log::error('Data creation error: ' . $err->getMessage());
+
+                $this->dispatchErrorMessage(__('Помилка збереження отриманих даних'));
+            }
         }
 
         // Dispatch error message for unknown errors
@@ -334,6 +363,37 @@ class LegalEntity extends Component
         return removeEmptyKeys($data);
     }
 
+    protected function prepareEmployeeData(string $legalEntityId, array $requestData): array
+    {
+        $arr = [
+            'employee_request' => [
+                'legal_entity_id' => $legalEntityId,
+                'position' => $requestData['owner']['position'],
+                'start_date' => Carbon::now()->format('Y-m-d'),
+                'end_date' => null,
+                'status' => 'NEW',
+                'employee_type' => "OWNER",
+                'doctor' => null,
+                'division_id' => null,
+                'party' => [
+                    'first_name' => $requestData['owner']['first_name'],
+                    'last_name' => $requestData['owner']['last_name'],
+                    'birth_date' => $requestData['owner']['birth_date'],
+                    'gender' => $requestData['owner']['gender'],
+                    'tax_id' => $requestData['owner']['tax_id'],
+                    'email' => $requestData['owner']['email'],
+                    'documents' => $requestData['owner']['documents'],
+                    'phones' => $requestData['owner']['phones']
+                ],
+                'id' => "b075f148-7f93-4fc2-b2ec-2d81b19a9b7b",
+                'inserted_at' => "2017-05-05T14:09:59.232112",
+                'updated_at' => "2017-05-05T14:09:59.232112"
+            ]
+        ];
+
+        return $arr;
+    }
+
     /**
      * Dispatches an error message with optional errors array.
      *
@@ -353,24 +413,40 @@ class LegalEntity extends Component
     /**
      * Handle success response from API request.
      *
-     * @param array $request The response from the API request
+     * @param array $response The response from the API request
      * @return void
      */
-    private function handleSuccessResponse(array $request): void
+    private function handleSuccessResponse(array $response, array $requestData = []): void
     {
         try {
-            $this->createOrUpdateLegalEntity($request);
+            $legalEntity = $this->createOrUpdateLegalEntity($response);
+
 
             if (!\auth()->user()?->legalEntity?->getOwner()?->exists()) {
                 $this->createUser();
             }
 
-            if (isset($request['data']['license'])) {
-                $this->createLicense($request['data']['license']);
-            } else {
-                $this->dispatchErrorMessage(__('Ліцензійні дані відсутні'));
+            if (empty($legalEntity->uuid)) {
+                $this->dispatchErrorMessage(__('LegalEntity Create: LegalEntity не має UUID'));
+
                 return;
             }
+
+            $this->employeeData = $this->prepareEmployeeData($legalEntity->uuid, $requestData);
+
+            $employeeResponse = $this->getEmployeeResponse($this->employeeData['employee_request'], $legalEntity->uuid, $response['urgent']['employee_request_id']);
+
+            $employee = $this->saveEmployeeResponse($employeeResponse, $legalEntity);
+
+            if (isset($response['data']['license'])) {
+                $this->createLicense($response['data']['license']);
+            } else {
+                $this->dispatchErrorMessage(__('Дані по ліцензії відсутні'));
+
+                return;
+            }
+
+            dd('FIN');
 
             if (Cache::has($this->entityCacheKey)) {
                 Cache::forget($this->entityCacheKey);
@@ -384,19 +460,52 @@ class LegalEntity extends Component
                 Cache::forget($this->stepCacheKey);
             }
 
-            if (session()->has('savedAddress')) {
-                session()->forget('savedAddress');
-            }
+            // if (session()->has('savedAddress')) {
+            //     session()->forget('savedAddress');
+            // }
 
-            if (session()->has('savedLegalEntityForm')) {
-                session()->forget('savedLegalEntityForm');
-            }
+            // if (session()->has('savedLegalEntityForm')) {
+            //     session()->forget('savedLegalEntityForm');
+            // }
 
             $this->redirect('/legal-entities/edit');
         } catch (Exception $e) {
             $this->dispatchErrorMessage(__('Сталася помилка під час обробки запиту'), ['error' => $e->getMessage()]);
             return;
         }
+    }
+
+    protected function getEmployeeResponse(array $employeeData, string $legalEntityUUID, string $employeeRequestId): array
+    {
+        $party = $employeeData['party'];
+
+        $arr = [
+
+            //   "division_id" => "b075f148-7f93-4fc2-b2ec-2d81b19a9b7b",
+              "legal_entity_id" => $legalEntityUUID,
+              "position" => $employeeData['position'],
+              "start_date" => $employeeData['start_date'],
+            //   "end_date" => "2018-03-02T10:45:16.000Z",
+              "status" => $employeeData['status'],
+              "employee_type" => $employeeData['employee_type'],
+              "party" => [
+                "first_name" => $party['first_name'],
+                "last_name" => $party['last_name'],
+                "second_name" => $party['second_name'] ?? '',
+                "birth_date" => $party['birth_date'],
+                "gender" => $party['gender'],
+                "no_tax_id" => false,
+                "tax_id" => $party['tax_id'], // (string, required) - if no_tax_id=true then passport number, otherwise tax_id": "",
+                "email" => $party['email'],
+                "documents" => $party['documents'],
+                "phones" => $party['phones']
+              ],
+              "id" => $employeeRequestId,
+              "inserted_at" => Carbon::now()->format('Y-m-d'),
+              "updated_at" => Carbon::now()->format('Y-m-d')
+        ];
+
+        return $arr;
     }
 
     /**
@@ -406,7 +515,7 @@ class LegalEntity extends Component
      *
      * @return void
      */
-    public function createOrUpdateLegalEntity(array $data): void
+    public function createOrUpdateLegalEntity(array $data): LegalEntityModel|null
     {
         // Get the UUID from the data, if it exists
         $uuid = $data['data']['id'] ?? '';
@@ -416,7 +525,7 @@ class LegalEntity extends Component
 
         if (empty($uuid)) {
             $this->dispatchErrorMessage(__('Не вдалось створити Юридичну особу'), ['errors' => 'No UUID found in data']);
-            return;
+            return null;
         }
 
         // Find or create a new LegalEntity object by UUID
@@ -431,7 +540,7 @@ class LegalEntity extends Component
         $this->legalEntity->uuid = $data['data']['id'] ?? '';
 
         // Set client secret from data or default to empty string
-        $this->legalEntity->client_secret = $data['urgent']['security']['client_secret'] ?? '';
+        $this->legalEntity->client_secret = $data['urgent']['security']['secret_key'] ?? '';
 
         // Set client id from data or default to null
         $this->legalEntity->client_id = $data['urgent']['security']['client_id'] ?? null;
@@ -440,5 +549,7 @@ class LegalEntity extends Component
         $this->legalEntity->save();
 
         $this->addressRepository->addAddresses($this->legalEntity, $addressData);
+
+        return $this->legalEntity;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models\Relations;
 
 use Illuminate\Database\Eloquent\Model;
+use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
@@ -10,10 +11,12 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class Document extends Model
 {
+    use HasCamelCasing;
+
     protected $hidden = [
         'id',
-        'created_at',
-        'updated_at',
+        'createdAt',
+        'updatedAt',
         'documentable_id',
         'documentable_type'
     ];
@@ -23,9 +26,9 @@ class Document extends Model
         'documentable_id',
         'type',
         'number',
-        'issued_by',
-        'issued_at',
-        'expiration_date'
+        'issuedBy',
+        'issuedAt',
+        'expirationDate'
     ];
 
     public function documentable(): MorphTo
