@@ -129,7 +129,7 @@
                                                     {{ __('patients.view_record') }}
                                                 </button>
                                                 <button @click.prevent="$wire.redirectToEncounter(patient)"
-                                                        class="button-sync"
+                                                        class="button-sync flex items-center gap-2"
                                                 >
                                                     <svg width="16" height="16">
                                                         <use xlink:href="#svg-plus"></use>

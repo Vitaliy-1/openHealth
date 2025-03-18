@@ -97,10 +97,10 @@ class PatientRequestApi extends PersonApi
     public static function buildGetShortEpisodes(
         int $page = 1,
         int $pageSize = 50,
-        string $periodStartFrom = null,
-        string $periodStartTo = null,
-        string $periodEndFrom = null,
-        string $periodEndTo = null
+        ?string $periodStartFrom = null,
+        ?string $periodStartTo = null,
+        ?string $periodEndFrom = null,
+        ?string $periodEndTo = null
     ): array {
         return [
             'page' => $page,

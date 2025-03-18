@@ -2,8 +2,15 @@
 
 namespace App\Livewire\Employee;
 
-class EmployeeCreate extends Employee
+use App\Models\Employee\Employee as Employee;
+
+class EmployeeCreate extends EmployeeComponent
 {
+    public function mount(): void
+    {
+        parent::mount();
+    }
+
     public function save()
     {
         $this->form->validate();
