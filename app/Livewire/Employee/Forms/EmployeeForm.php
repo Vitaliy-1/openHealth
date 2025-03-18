@@ -4,6 +4,10 @@ namespace App\Livewire\Employee\Forms;
 
 use App\Rules\AgeCheck;
 use App\Rules\Cyrillic;
+use App\Rules\InDictionary;
+use App\Rules\InDictionaryCheck;
+use App\Rules\Name;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -15,21 +19,12 @@ class EmployeeForm extends Form
 
     public string $status = 'NEW';
 
-    #[Validate([
-        'party.lastName'        => ['required', 'min:3', new Cyrillic()],
-        'party.firstName'       => ['required', 'min:3', new Cyrillic()],
-        'party.gender'          => 'required|string',
-        'party.birthDate'       => ['required', 'date', new AgeCheck()],
-        'party.phones.*.number' => 'required|string:digits:13',
-        'party.phones.*.type'   => 'required|string',
-        'party.email'           => 'required|email',
-        'party.taxId'           => 'required|min:8|max:10',
-        'party.employeeType'    => 'required|string',
-        'party.position'        => 'required|string',
-        'party.startDate'       => 'date',
-    ])]
+    /**
+     * Default values are transferred to the Alpine on the frontend
+     */
     public ?array $party = [
         'position' => '',
+        'employeeType' => '',
         'phones' => [
             [
                 'type' => '',
@@ -38,57 +33,71 @@ class EmployeeForm extends Form
         ]
     ];
 
-    #[Validate([
-        'document.type'   => 'required|string|min:3',
-        'document.number' => 'required|string|min:3',
-    ])]
-    public ?array $document = [];
-    public ?array $documents = [];
-
-    #[Validate([
-        'education.country'         => 'required|string',
-        'education.city'            => 'required|string|min:3',
-        'education.institutionName' => 'required|string|min:3',
-        'education.diplomaNumber'   => 'required|string|min:3',
-        'education.degree'          => 'required|string|min:3',
-        'education.speciality'      => 'required|string|min:3',
-    ])]
+    public array $documents = [];
     public ?array $education = [
         'country' => '',
     ];
     public ?array $educations = [];
-
-    #[Validate([
-        'speciality.speciality'        => 'required|string|min:3',
-        'speciality.level'             => 'required|string|min:3',
-        'speciality.qualificationType' => 'required|string|min:3',
-        'speciality.attestationName'   => 'required|string|min:3',
-        'speciality.attestationDate'   => 'required|date',
-        'speciality.certificateNumber' => 'required|string|min:3',
-
-    ])]
     public ?array $speciality = [];
     public ?array $specialities = [];
-
-    #[Validate([
-        'scienceDegree.country'         => 'required|string',
-        'scienceDegree.city'            => 'required|string',
-        'scienceDegree.degree'          => 'required|string',
-        'scienceDegree.institutionName' => 'required|string',
-        'scienceDegree.diplomaNumber'   => 'required|string',
-        'scienceDegree.speciality'      => 'required|string',
-
-    ])]
     public ?array $scienceDegree = [];
-    #[Validate([
-        'qualification.type'              => 'required|string',
-        'qualification.institutionName'   => 'required|string',
-        'qualification.speciality'        => 'required|string',
-        'qualification.issuedDate'        => 'required|date',
-        'qualification.certificateNumber' => 'required|string',
-    ])]
     public ?array $qualification = [];
     public ?array $qualifications = [];
+
+    protected function rules()
+    {
+        return [
+            // Party
+            'party.lastName' => ['required', new Name()],
+            'party.firstName' => ['required', new Name()],
+            'party.secondName' => [new Name()],
+            'party.gender' => ['required', new InDictionaryCheck('GENDER')],
+            'party.birthDate' => ['required', 'date', new AgeCheck()],
+            'party.phones.*.number' => 'required|string:digits:13',
+            'party.phones.*.type' => 'required|string',
+            'party.email' => 'required|email',
+            'party.taxId' => 'required|min:8|max:10',
+            'party.employeeType' => 'required|string',
+            'party.position' => 'required|string',
+            'party.startDate' => 'date',
+
+            // Documents
+            'documents' => 'required',
+            'documents.*.type' => 'required|string|min:3',
+            'documents.*.number' => 'required|string|min:3',
+
+            // Education
+            'education.country'         => 'string',
+            'education.city'            => 'string|min:3',
+            'education.institutionName' => 'string|min:3',
+            'education.diplomaNumber'   => 'string|min:3',
+            'education.degree'          => 'string|min:3',
+            'education.speciality'      => 'string|min:3',
+
+            // Speciality
+            'speciality.speciality'        => 'string|min:3',
+            'speciality.level'             => 'string|min:3',
+            'speciality.qualificationType' => 'string|min:3',
+            'speciality.attestationName'   => 'string|min:3',
+            'speciality.attestationDate'   => 'date',
+            'speciality.certificateNumber' => 'string|min:3',
+
+            // Science degree
+            'scienceDegree.country'         => 'string',
+            'scienceDegree.city'            => 'string',
+            'scienceDegree.degree'          => 'string',
+            'scienceDegree.institutionName' => 'string',
+            'scienceDegree.diplomaNumber'   => 'string',
+            'scienceDegree.speciality'      => 'string',
+
+            // Qualification
+            'qualification.type'              => 'string',
+            'qualification.institutionName'   => 'string',
+            'qualification.speciality'        => 'string',
+            'qualification.issuedDate'        => 'date',
+            'qualification.certificateNumber' => 'string',
+        ];
+    }
 
     /**
      * @throws ValidationException

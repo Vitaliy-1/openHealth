@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -20,9 +21,10 @@ class DatabaseSeeder extends Seeder
             RolesPermissionsSeeder::class,
             /*
              * populates following tables legal_entities, users and model has roles with test data
-             * TODO shouldn't ne used in production
+             * TODO: shouldn't be used in production
              */
             TestUserMigrate::class,
+            ICD10Seeder::class
         ]);
     }
 }
