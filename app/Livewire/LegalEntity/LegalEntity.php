@@ -223,7 +223,7 @@ class LegalEntity extends Component
 
     public function saveEmployeeResponse($response, $legalEntity): Employee|EmployeeRequest
     {
-        dump('response', $response);
+        // dump('response', $response);
         $employeeResponse = schemaService()->setDataSchema($response, app(EmployeeApi::class))
             ->responseSchemaNormalize()
             ->replaceIdsKeysToUuid(['id', 'legalEntityId', 'divisionId', 'partyId'])
@@ -378,6 +378,7 @@ class LegalEntity extends Component
                 'party' => [
                     'first_name' => $requestData['owner']['first_name'],
                     'last_name' => $requestData['owner']['last_name'],
+                    'second_name' => $requestData['owner']['second_name'] ?? '',
                     'birth_date' => $requestData['owner']['birth_date'],
                     'gender' => $requestData['owner']['gender'],
                     'tax_id' => $requestData['owner']['tax_id'],
@@ -419,7 +420,11 @@ class LegalEntity extends Component
     private function handleSuccessResponse(array $response, array $requestData = []): void
     {
         try {
-            $legalEntity = $this->createOrUpdateLegalEntity($response);
+            try {
+            $this->createOrUpdateLegalEntity($response);
+            } catch (Exception $e) {
+                dd('LE Error', $e->getMessage());
+            }
 
 
             if (!\auth()->user()?->legalEntity?->getOwner()?->exists()) {
@@ -432,11 +437,25 @@ class LegalEntity extends Component
                 return;
             }
 
-            $this->employeeData = $this->prepareEmployeeData($legalEntity->uuid, $requestData);
+            try {
+                $this->employeeData = $this->prepareEmployeeData($this->legalEntity->uuid, $requestData);
+            } catch (Exception $e) {
+                dd('Empl-0 Error', $e->getMessage());
+            }
+            dump('$this->employeeData', $this->employeeData);
+            try{
+                $employeeResponse = $this->getEmployeeResponse($this->employeeData['employee_request'], $this->legalEntity->uuid, $response['urgent']['employee_request_id']);
+            } catch (Exception $e) {
+                dd('Empl-1 Error', $e->getMessage());
+            }
 
-            $employeeResponse = $this->getEmployeeResponse($this->employeeData['employee_request'], $legalEntity->uuid, $response['urgent']['employee_request_id']);
+            try{
+                $employee = $this->saveEmployeeResponse($employeeResponse, $this->legalEntity);
+            } catch (Exception $e) {
+                dd('Empl-2 Error', $e->getMessage());
+            }
 
-            $employee = $this->saveEmployeeResponse($employeeResponse, $legalEntity);
+            dump($response['data'] ?? 'KKK');
 
             if (isset($response['data']['license'])) {
                 $this->createLicense($response['data']['license']);

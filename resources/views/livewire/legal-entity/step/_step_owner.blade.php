@@ -321,6 +321,7 @@
     <div class='form-row-3'>
         <div class="form-group group relative z-0">
             <input
+                required
                 type="text"
                 id="taxId"
                 name="taxId"
