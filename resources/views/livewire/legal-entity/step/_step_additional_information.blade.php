@@ -24,15 +24,14 @@
             placeholder=" "
             id="additionalInformationReceiverFundsCode"
             wire:model="legalEntityForm.receiverFundsCode"
-            {{-- aria-describedby="{{ $hasAccreditationOrderNumberError ? 'licenseNumberErrorHelp' : '' }}" --}}
             class="input peer"
         />
             <p id="additionalInformationReceiverFundsCoderHelp" class="text-note">
-                {{ __('forms.receiverFundsCode') }}
+                {{ __('forms.receiver_funds_code') }}
             </p>
 
             <label for="additionalInformationReceiverFundsCode" class="label z-10">
-                {{ __('forms.treasuryRegistrationCode') }}
+                {{ __('forms.treasury_registration_code') }}
             </label>
         </div>
 
@@ -42,12 +41,11 @@
                 placeholder=" "
                 id="additionalInformationBeneficiary"
                 wire:model="legalEntityForm.beneficiary"
-                {{-- aria-describedby="{{ $hasAccreditationOrderNumberError ? 'licenseNumberErrorHelp' : '' }}" --}}
                 class="input peer"
             />
 
             <p id="additionalInformationBeneficiaryHelp" class="text-note">
-                {{ __('forms.beneficiaryInfo') }}
+                {{ __('forms.beneficiary_info') }}
             </p>
 
             <label for="additionalInformationBeneficiary" class="label z-10">
@@ -83,7 +81,7 @@
                         placeholder=" "
                         id="additionalInformationArchiveDate"
                         wire:model="legalEntityForm.archive.date"
-                        {{-- aria-describedby="{{ $hasAdditionalInformationArchiveDateError ? 'additionalInformationArchiveDateErrorHelp' : '' }}" --}}
+                        aria-describedby="{{ $hasAdditionalInformationArchiveDateError ? 'additionalInformationArchiveDateErrorHelp' : '' }}"
                         class="input datepicker-input {{ $hasAdditionalInformationArchiveDateError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
                     />
 
@@ -94,7 +92,7 @@
                     @endif
 
                     <label for="additionalInformationArchiveDate" class="label z-10">
-                        {{ __("forms.archiveDate") }}
+                        {{ __("forms.archive_date") }}
                     </label>
                 </div>
 
@@ -105,7 +103,7 @@
                         placeholder=" "
                         id="additionalInformationArchivePlace"
                         wire:model="legalEntityForm.archive.place"
-                        {{-- aria-describedby="{{ $hasAdditionalInformationArchivePlaceError ? 'additionalInformationArchivePlaceErrorHelp' : '' }}" --}}
+                        aria-describedby="{{ $hasAdditionalInformationArchivePlaceError ? 'additionalInformationArchivePlaceErrorHelp' : '' }}"
                         class="input {{ $hasAdditionalInformationArchivePlaceError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
                     />
 
@@ -115,7 +113,7 @@
                         </p>
                     @else
                         <p id="additionalInformationArchivePlaceHelp" class="text-note">
-                            {{ __('forms.archivePlace') }}
+                            {{ __('forms.archive_place') }}
                         </p>
                     @endif
 

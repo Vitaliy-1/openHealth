@@ -25,6 +25,11 @@ class SchemaService
         return $this;
     }
 
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
     /**
      * Return schema from class.
      *
@@ -68,10 +73,12 @@ class SchemaService
                 throw new \InvalidArgumentException('Переданий об\'єкт повинен мати метод schemaResponse');
             }
         }
-        return $this->setSchema($this->class->schemaResponse())
+
+       return $this->setSchema($this->class->schemaResponse())
             ->arrayToCollection()
             ->mappingSchemaNormalize()
             ->camelCaseKeys();
+
     }
 
 
@@ -95,6 +102,7 @@ class SchemaService
             collect($this->data),
             $this->schema);
 
+            // dd('responseSchemaNormalize',  $this->normalizedData);
         return $this;
     }
 
@@ -135,6 +143,7 @@ class SchemaService
     public function mapDataBySchema(Collection $data, Collection $schema, mixed $definitions = []): Collection
     {
         $definitions = $definitions ?: $this->schema->get('definitions');
+        // dd('definitions', $definitions);
         $schema = collect($schema->get('properties'));
         return collect($schema)->map(function ($property, $key) use (
             $data,
@@ -411,9 +420,10 @@ class SchemaService
     /**
      * Replace IDs keys to UUID in the normalized data.
      */
-    public function replaceIdsKeysToUuid($replace = []): self
+    public function replaceIdsKeysToUuid(array $replace = []): self
     {
         $this->normalizedData = $this->replaceNestedKeys($this->normalizedData, $replace);
+
         return $this;
     }
 

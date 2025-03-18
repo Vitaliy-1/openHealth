@@ -344,7 +344,8 @@ class CreateLegalEntity extends LegalEntity
     // Step #5 Create/Update Accreditation
     public function stepAccreditation(): void
     {
-        if (!empty(removeEmptyKeys($this->legalEntityForm->accreditation)) && $this->legalEntityForm->accreditationShow) {
+        // if (!empty(removeEmptyKeys($this->legalEntityForm->accreditation)) && $this->legalEntityForm->accreditationShow) {
+        if ($this->legalEntityForm->accreditationShow) {
             $this->legalEntityForm->rulesForAccreditation();
         }
 
@@ -411,7 +412,7 @@ class CreateLegalEntity extends LegalEntity
         // $employee = $this->employeeRepository->saveEmployeeData($this->getEmployeeRequest(), $this->legalEntity, new Employee());
 
         // Send an email with the owner credentials to the user
-        Mail::to($user->email)->send(new OwnerCredentialsMail($user->email));
+        //Mail::to($user->email)->send(new OwnerCredentialsMail($user->email));
 
         return $user;
     }

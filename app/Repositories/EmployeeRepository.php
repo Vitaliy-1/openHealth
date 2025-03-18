@@ -85,15 +85,23 @@ class EmployeeRepository
             if (isset($request['party']['email']) && !empty($request['party']['email'])) {
                 $this->userRepository->createIfNotExist($request['party'], $request['employeeType'], $legalEntity);
             }
+            // dump($request);
             // Create or update Employee
-            $employee = $this->createOrUpdate($request,$employeeModel,$legalEntity);
-
+            try {
+                $employee = $this->createOrUpdate($request,$employeeModel,$legalEntity);
+            } catch (Exception $e) {
+                dd($e->getMessage());
+            }
+            // dd($employee);
             // Create or update Party
             $party = $this->partyRepository->createOrUpdate($request['party']);
 
+            try{
             // Add documents for Party
-            $this->documentRepository->addDocuments($party, $request['party']['documents'] ?? []);
-
+                $this->documentRepository->addDocuments($party, $request['party']['documents'] ?? []);
+            } catch (Exception $e) {
+                dd($e->getMessage());
+            }
             // Add phones for Party
             $this->phoneRepository->addPhones($party, $request['party']['phones'] ?? []);
 

@@ -161,6 +161,12 @@ class LegalEntitiesForms extends Form
                 $errors = array_merge($e->errors(), $errors);
             }
 
+            // try {
+            //     $this->rulesForLicense();
+            // } catch(ValidationException $e) {
+            //     $errors = array_merge($e->errors(), $errors);
+            // }
+
             $this->validate();
 
             if (!empty($errors)) {
@@ -240,6 +246,7 @@ class LegalEntitiesForms extends Form
      */
     public function rulesForLicense()
     {
+        // dd('In license');
         // Validate license array rules
         $this->validate($this->rulesForModel('license')->toArray());
     }

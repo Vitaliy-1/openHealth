@@ -165,7 +165,7 @@
                 autocomplete="off"
                 x-ref="settlementField"
                 wire:model.live.debounce.400ms="address.settlement"
-                {{-- aria-describedby="{{ $hasSettlementError? 'addressSettlementErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasSettlementError? 'addressSettlementErrorHelp' : '' }}"
                 class="input {{ $hasSettlementError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
                 :disabled="{{ empty($address['settlementType']) || (isset($address['area']) && $address['area']) === 'М.КИЇВ' ? 'true' : 'false' }}"
             />
@@ -215,7 +215,7 @@
             required
             id="addressStreetType"
             wire:model.live="address.streetType"
-            {{-- aria-describedby="{{ $hasStreetTypeError ? 'addressStreetTypeErrorHelp' : '' }}" --}}
+            aria-describedby="{{ $hasStreetTypeError ? 'addressStreetTypeErrorHelp' : '' }}"
             class="input-select text-gray-800 {{ $hasStreetTypeError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             :disabled="{{ empty($address['settlement']) ? 'true' : 'false' }}"
         >
@@ -250,7 +250,7 @@
             autocomplete="off"
             x-ref="streetField"
             wire:model.live.debounce.400ms="address.street"
-            {{-- aria-describedby="{{ $hasStreetError ? 'addressStreetErrorHelp' : '' }}" --}}
+            aria-describedby="{{ $hasStreetError ? 'addressStreetErrorHelp' : '' }}"
             class="input {{ $hasStreetError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             :disabled="{{ empty($address['settlementType']) ? 'true' : 'false' }}"
         />
@@ -313,7 +313,7 @@
             placeholder=" "
             id="addressBuilding"
             wire:model="address.building"
-            {{-- aria-describedby="{{ $hasBuildingError ? 'addressBuildingErrorHelp' : '' }}" --}}
+            aria-describedby="{{ $hasBuildingError ? 'addressBuildingErrorHelp' : '' }}"
             class="input {{ $hasBuildingError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             :disabled="{{ empty($address['settlement']) ? 'true' : 'false' }}"
         />
@@ -336,7 +336,7 @@
             placeholder=" "
             id="addressApartment"
             wire:model="address.apartment"
-            {{-- aria-describedby="{{ $hasApartmentError ? 'addressApartmentErrorHelp' : '' }}" --}}
+            aria-describedby="{{ $hasApartmentError ? 'addressApartmentErrorHelp' : '' }}"
             class="input {{ $hasApartmentError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             :disabled="{{ empty($address['settlement']) ? 'true' : 'false' }}"
         />
@@ -360,13 +360,13 @@
             placeholder=" "
             id="addressZip"
             wire:model="address.zip"
-            {{-- aria-describedby="{{ $hasZipError ? 'address_zip_error_help' : '' }}" --}}
+            aria-describedby="{{ $hasZipError ? 'addressZipErrorHelp' : '' }}"
             class="input {{ $hasZipError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             :disabled="{{ empty($address['settlement']) ? 'true' : 'false' }}"
         />
 
         @if($hasZipError)
-            <p id="address_zip_error_help" class="text-error">
+            <p id="addressZipErrorHelp" class="text-error">
                 {{ $errors->first('address.zip') }}
             </p>
         @endif

@@ -46,9 +46,9 @@ class InDictionaryCheck implements ValidationRule
     protected function getDictionaryData(string $field): array
     {
         return match($field) {
-            'phone_type' => array_keys(dictionary()->getDictionary('PHONE_TYPE', true)['values']),
-            'position' => array_keys(dictionary()->getDictionary('POSITION', true)['values']),
-            'document_type' => array_keys(dictionary()->getDictionary('DOCUMENT_TYPE', true)['values']),
+            'phone_type' => array_keys(dictionary()->getDictionary('PHONE_TYPE', true)),
+            'position' => array_keys(dictionary()->getDictionary('POSITION', true)),
+            'document_type' => array_keys(dictionary()->getDictionary('DOCUMENT_TYPE', true)),
             default => []
         };
     }
