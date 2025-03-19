@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -8,13 +10,8 @@ use Spatie\Permission\Models\Role;
 
 class RolesPermissionsSeeder extends Seeder
 {
-
-
-    /**
-     * Run the database seeds.
-     */
-    public array $roles = [
-        'OWNER'           => [
+    private array $roles = [
+        'OWNER' => [
             'capitation_report:read',
             'client:read',
             'connection:delete',
@@ -65,7 +62,7 @@ class RolesPermissionsSeeder extends Seeder
             'party_verification:details',
             'party_verification:write',
         ],
-        'ADMIN'           => [
+        'ADMIN' => [
             'declaration:read',
             'declaration_request:approve',
             'declaration_request:reject',
@@ -104,7 +101,7 @@ class RolesPermissionsSeeder extends Seeder
             'person_verification:details',
             'person_verification:write'
         ],
-        'DOCTOR'          => [
+        'DOCTOR' => [
             'declaration:read',
             'declaration_request:approve',
             'declaration_request:read',
@@ -195,7 +192,7 @@ class RolesPermissionsSeeder extends Seeder
             'device_request:resend',
             'device_request:revoke',
         ],
-        'HR'              => [
+        'HR' => [
             'division:activate',
             'division:deactivate',
             'division:details',
@@ -217,7 +214,7 @@ class RolesPermissionsSeeder extends Seeder
             'party_verification:details',
             'party_verification:write'
         ],
-        'SPECIALIST'      => [
+        'SPECIALIST' => [
             'division:read',
             'employee:read',
             'employee_request:approve',
@@ -308,7 +305,7 @@ class RolesPermissionsSeeder extends Seeder
             'device_request:resend',
             'device_request:revoke',
         ],
-        'ASSISTANT'       => [
+        'ASSISTANT' => [
             'division:read',
             'employee:read',
             'employee_request:approve',
@@ -375,7 +372,7 @@ class RolesPermissionsSeeder extends Seeder
             'device_request:read',
             'device_request:resend',
         ],
-        'LABORANT'        => [
+        'LABORANT' => [
             'employee_request:read',
             'employee_request:approve',
             'employee_request:reject',
@@ -394,7 +391,7 @@ class RolesPermissionsSeeder extends Seeder
             'observation:read',
             'observation:write',
         ],
-        'RECEPTIONIST'    => [
+        'RECEPTIONIST' => [
             'declaration:read',
             'declaration_request:approve',
             'declaration_request:reject',
@@ -432,7 +429,7 @@ class RolesPermissionsSeeder extends Seeder
             'medical_event_context:read',
             'person_verification:details',
         ],
-        'MED_ADMIN'       => [
+        'MED_ADMIN' => [
             'diagnostic_report:read',
             'diagnostic_report:cancel',
             'encounter:read',
@@ -519,6 +516,11 @@ class RolesPermissionsSeeder extends Seeder
         ]
     ];
 
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run(): void
     {
         foreach ($this->roles as $role => $permissions) {

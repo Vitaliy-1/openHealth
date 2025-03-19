@@ -23,8 +23,7 @@ class DatabaseSeeder extends Seeder
              * populates following tables legal_entities, users and model has roles with test data
              * TODO: shouldn't be used in production
              */
-            TestUserMigrate::class,
-            ICD10Seeder::class
+            TestUserMigrate::class
         ]);
     }
 }
