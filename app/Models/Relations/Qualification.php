@@ -2,10 +2,10 @@
 
 namespace App\Models\Relations;
 
-use Eloquence\Behaviours\HasCamelCasing;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @mixin IdeHelperQualification
@@ -17,12 +17,12 @@ class Qualification extends Model
 
     protected $fillable = [
         'type',
-        'institutionName',
+        'institution_name',
         'speciality',
-        'issuedDate',
-        'certificateNumber',
-        'validTo',
-        'additionalInfo',
+        'issued_date',
+        'certificate_number',
+        'valid_to',
+        'additional_info',
     ];
 
     public function qualificationable(): MorphTo

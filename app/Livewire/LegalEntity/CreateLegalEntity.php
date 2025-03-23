@@ -5,6 +5,7 @@ namespace App\Livewire\LegalEntity;
 use App\Mail\OwnerCredentialsMail;
 use App\Models\LegalEntity as LegalEntityModel;
 use App\Models\License;
+use App\Models\Relations\Phone;
 use App\Models\User;
 use App\Models\Employee\Employee;
 use App\Models\Relations\Address;
@@ -13,8 +14,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
+use App\Repositories\PhoneRepository;
 use App\Repositories\AddressRepository;
-use App\Repositories\EmployeeRepository;
 use Illuminate\Validation\ValidationException;
 
 class CreateLegalEntity extends LegalEntity
@@ -25,13 +26,6 @@ class CreateLegalEntity extends LegalEntity
      * @var string
      */
     protected const string CACHE_PREFIX = 'register_legal_entity_form';
-
-    protected EmployeeRepository $employeeRepository;
-
-    /**
-     * @var Employee
-     */
-    public Employee $employee; // TODO: try to find out where this is used
 
     /**
      * @var int The current step of the process
@@ -60,9 +54,11 @@ class CreateLegalEntity extends LegalEntity
     /**
      * @return void set cache keys
      */
-    public function boot(AddressRepository $addressRepository): void
-    {
-        parent::boot($addressRepository);
+    public function boot(
+        AddressRepository $addressRepository,
+        PhoneRepository $phoneRepository
+    ): void {
+        parent::boot($addressRepository, $phoneRepository);
 
         $this->entityCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . LegalEntityModel::class;
         $this->ownerCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . Employee::class;
@@ -239,6 +235,18 @@ class CreateLegalEntity extends LegalEntity
         // Attach the newly created License model to the current LegalEntity model
         $this->legalEntity->setRelation('licenses', $license);
 
+        // Associate the legal entity with the phones
+        if (!empty($formData['phones'])) {
+            $phoneCollection = collect($formData['phones'])->map(function($phone) {
+                $instance = new Phone();
+                $instance->fill($phone);
+
+                return $instance;
+            });
+
+            $this->legalEntity->setRelation('phones', $phoneCollection);
+        }
+
         // Check if the entity is not in the cache or if changes are detected
         if (!Cache::has($this->entityCacheKey) || $this->checkChanges()) {
             // Put the legal entity in the cache with a 90-day expiration
@@ -323,10 +331,6 @@ class CreateLegalEntity extends LegalEntity
         if ($this->checkOwnerChanges()) {
             Cache::put($this->ownerCacheKey, $personData, now()->days(90));
         }
-
-        if (isset($this->legalEntity->phones) && !empty($this->legalEntity->phones)) {
-            $this->phones = $this->legalEntity->phones;
-        }
     }
 
     // Step #3 Create/Update Contact[Phones, Email,beneficiary,receiver_funds_code]
@@ -344,7 +348,7 @@ class CreateLegalEntity extends LegalEntity
     // Step #5 Create/Update Accreditation
     public function stepAccreditation(): void
     {
-        if (!empty(removeEmptyKeys($this->legalEntityForm->accreditation)) && $this->legalEntityForm->accreditationShow) {
+        if ($this->legalEntityForm->accreditationShow) {
             $this->legalEntityForm->rulesForAccreditation();
         }
 
@@ -375,7 +379,7 @@ class CreateLegalEntity extends LegalEntity
         $this->legalEntityForm->rulesForSignificancy();
     }
 
-    public function createUser(): User
+    public function createUser(): ?User
     {
         // Get the currently authenticated user
         $authenticatedUser = Auth::user();
@@ -403,12 +407,17 @@ class CreateLegalEntity extends LegalEntity
 
         // Associate the legal entity with the user
         $user->legalEntity()->associate($this->legalEntity);
-        $user->save();
+
+        try{
+            $user->save();
+        } catch (\Exception $e) {
+            $this->dispatchErrorMessage(__('Сталася помилка під час обробки запиту'), ['error' => $e->getMessage()]);
+
+            return null;
+        }
 
         // Assign the 'OWNER' role to the user
         $user->assignRole('OWNER');
-
-        // $employee = $this->employeeRepository->saveEmployeeData($this->getEmployeeRequest(), $this->legalEntity, new Employee());
 
         // Send an email with the owner credentials to the user
         Mail::to($user->email)->send(new OwnerCredentialsMail($user->email));
@@ -431,6 +440,13 @@ class CreateLegalEntity extends LegalEntity
         if (isset($this->legalEntity)) {
             $this->legalEntity->licenses()->save($license);
         }
+    }
+
+    public function createLegalEntity(): void
+    {
+        $this->stepSignificancy();
+
+        $this->signLegalEntity();
     }
 
     public function render()

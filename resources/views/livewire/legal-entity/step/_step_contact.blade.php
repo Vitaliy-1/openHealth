@@ -31,12 +31,12 @@
                 id="contact_email"
                 wire:model="legalEntityForm.email"
                 value="{{ $legalEntityForm->email ?? '' }}"
-                {{-- aria-describedby="{{ $hasContactEmailError ? 'contact_email_error_help' : '' }}" --}}
+                aria-describedby="{{ $hasContactEmailError ? 'contactEmailErrorHelp' : '' }}"
                 class="input {{ $hasContactEmailError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
             @if($hasContactEmailError)
-                <p id="contact_email_error_help" class="text-error">
+                <p id="contactEmailErrorHelp" class="text-error">
                     {{ $errors->first('legalEntityForm.email') }}
                 </p>
             @endif
@@ -54,12 +54,12 @@
                 id="website"
                 value="{{ $legalEntityForm->website ?? '' }}"
                 wire:model="legalEntityForm.website"
-                {{-- aria-describedby="{{ $hasWebsiteError ? 'website_name_error_help' : '' }}" --}}
+                aria-describedby="{{ $hasWebsiteError ? 'websiteErrorHelp' : '' }}"
                 class="input {{ $hasWebsiteError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
             @if($hasWebsiteError)
-                <p id="website_error_help" class="text-error">
+                <p id="websiteErrorHelp" class="text-error">
                     {{ $errors->first('legalEntityForm.website') }}
                 </p>
             @endif
@@ -74,7 +74,7 @@
     <div
         class='form-row mt-6'
         x-data="{ phones: $wire.entangle('legalEntityForm.phones') }"
-        x-init="phones = phones.length > 0 ? phones : [{ type: '', number: '' }]"
+        x-init="console.log('len', phones); phones = phones.length > 0 ? phones : [{ type: '', number: '' }]; console.log('phones', phones); "
         x-id="['phone']"
     >
         <template x-for="(phone, index) in phones" :key="index">
@@ -104,7 +104,7 @@
                     </template>
 
                     <label :for="$id('phone', '_type' + index)" class="label z-10">
-                        {{ __('forms.phoneType') }}
+                        {{ __('forms.phone_type') }}
                     </label>
                 </div>
 
@@ -157,8 +157,5 @@
 
             {{__('forms.add_phone')}}
         </button>
-</div>
-
-    
-
+    </div>
 </fieldset>

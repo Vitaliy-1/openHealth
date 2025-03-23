@@ -130,12 +130,6 @@ class TestUserMigrate extends Seeder
             'nhs_comment' => '',
             'nhs_reviewed' => true,
             'nhs_verified' => true,
-            'phones' => json_encode([
-                [
-                    'number' => '+380506491244',
-                    'type' => 'MOBILE',
-                ],
-            ]),
             'receiver_funds_code' => '777',
             'status' => 'ACTIVE',
             'type' => 'PRIMARY_CARE',
@@ -231,7 +225,14 @@ class TestUserMigrate extends Seeder
             'documentable_id' => $partyId
         ]);
 
-        $phoneId = DB::table('phones')->insertGetId([
+        $legalEntityPhoneId = DB::table('phones')->insertGetId([
+            'type' => 'MOBILE',
+            'number' => '+380506491244',
+            'phoneable_type' => 'App\Models\LegalEntity',
+            'phoneable_id' => $legalEntityId
+        ]);
+
+        $partyPhoneId = DB::table('phones')->insertGetId([
             'type' => 'MOBILE',
             'number' => '+380506491244',
             'phoneable_type' => 'App\Models\Relations\Party',
@@ -250,6 +251,7 @@ class TestUserMigrate extends Seeder
             'status' => 'APPROVED',
             'legal_entity_id' => $legalEntityId,
             'division_id' => null,
+            'user_id' => $userId,
             'party_id' => $partyId,
             'created_at' => new Carbon('2024-11-14T10:37:35.000000Z'),
             'updated_at' => new Carbon('2024-11-14T10:37:35.000000Z'),
