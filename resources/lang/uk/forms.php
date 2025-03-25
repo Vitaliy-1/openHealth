@@ -189,7 +189,7 @@ return [
     'issued_by' => 'Ким видано',
     'issued_at' => 'Коли видано',
     'serialAndNumber' => 'Серія та номер',
-    'documents' => 'Документ',
+    'documents' => 'Документи',
     'contractType' => 'Тип договору',
     'contract' => 'Договір',
     'initializationContract' => 'Ініціалізація договору',

@@ -3,8 +3,8 @@
 namespace App\Livewire\Employee\Forms;
 
 use App\Rules\AgeCheck;
+use App\Rules\BirthDate;
 use App\Rules\Cyrillic;
-use App\Rules\InDictionary;
 use App\Rules\InDictionaryCheck;
 use App\Rules\Name;
 use Illuminate\Validation\Rule;
@@ -51,8 +51,8 @@ class EmployeeForm extends Form
             'party.lastName' => ['required', new Name()],
             'party.firstName' => ['required', new Name()],
             'party.secondName' => [new Name()],
-            'party.gender' => ['required', new InDictionaryCheck('GENDER')],
-            'party.birthDate' => ['required', 'date', new AgeCheck()],
+            'party.gender' => ['required'],
+            'party.birthDate' => ['required', 'date', new BirthDate()],
             'party.phones.*.number' => 'required|string:digits:13',
             'party.phones.*.type' => 'required|string',
             'party.email' => 'required|email',

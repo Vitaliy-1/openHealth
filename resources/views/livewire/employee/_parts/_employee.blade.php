@@ -70,7 +70,11 @@
     <div class="form-row-4">
         <div class="form-group group">
             <label for="employeeGender" class="sr-only">{{__('forms.select')}} {{__('forms.gender')}}</label>
-            <select wire:model="form.party.gender" id="employeeGender" class="input-select peer" required>
+            <select wire:model="form.party.gender"
+                    id="employeeGender"
+                    class="input-select peer @error('form.party.gender') input-error @enderror"
+                    required
+            >
                 <option selected>{{__('forms.gender')}} *</option>
                 @foreach($this->dictionaries['GENDER'] as $k=>$gender )
                     <option value="{{$k}}">{{$gender}}</option>
@@ -90,17 +94,17 @@
             </svg>
 
             <input wire:model="form.party.birthDate"
-                   datepicker
+                   datepicker-max-date="{{ now()->format('Y-m-d') }}"
                    type="text"
                    name="birthDate"
                    id="birthDate"
-                   class="input default-datepicker peer @error('form.party.birthDate') input-error @enderror"
+                   class="input datepicker-input peer @error('form.party.birthDate') input-error @enderror"
                    placeholder=" "
                    required
             />
 
             <label for="birthDate" class="label">
-                {{__('forms.birthDate')}}
+                {{__('forms.birth_date')}}
             </label>
 
             @error('form.party.birthDate')
@@ -112,7 +116,7 @@
 
 
         <div class="form-group group">
-            <svg class="svg-input w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="svg-input w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M2.038 5.61A2.01 2.01 0 0 0 2 6v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6c0-.12-.01-.238-.03-.352l-.866.65-7.89 6.032a2 2 0 0 1-2.429 0L2.884 6.288l-.846-.677Z"/>
                 <path d="M20.677 4.117A1.996 1.996 0 0 0 20 4H4c-.225 0-.44.037-.642.105l.758.607L12 10.742 19.9 4.7l.777-.583Z"/>
             </svg>
@@ -207,11 +211,11 @@
             </svg>
 
             <input wire:model="form.party.startDate"
-                   datepicker
+                   datepicker-max-date="{{ now()->format('Y-m-d') }}"
                    type="text"
                    name="startDate"
                    id="startDate"
-                   class="input default-datepicker peer @error('form.party.startDate') input-error @enderror"
+                   class="input datepicker-input peer @error('form.party.startDate') input-error @enderror"
                    placeholder=" "
                    required
             />
