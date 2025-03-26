@@ -2,13 +2,9 @@
 
 namespace App\Livewire\Employee\Forms;
 
-use App\Rules\AgeCheck;
 use App\Rules\BirthDate;
-use App\Rules\Cyrillic;
-use App\Rules\InDictionary;
 use App\Rules\Name;
 use Illuminate\Validation\ValidationException;
-use Livewire\Attributes\Validate;
 use Livewire\Form;
 
 use function Livewire\of;
