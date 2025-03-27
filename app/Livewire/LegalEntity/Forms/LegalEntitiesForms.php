@@ -2,17 +2,18 @@
 
 namespace App\Livewire\LegalEntity\Forms;
 
-
-use App\Rules\DocumentType;
+use App\Rules\ExpiryDate;
 use Livewire\Form;
+use App\Rules\Name;
 use App\Models\User;
 use App\Rules\Email;
-use App\Rules\AgeCheck;
+use App\Rules\TaxId;
 use App\Rules\Cyrillic;
+use App\Rules\BirthDate;
+use App\Rules\DocumentType;
 use App\Rules\InDictionary;
 use App\Rules\UniqueEdrpou;
 use App\Exceptions\CustomValidationException;
-use App\Rules\Name;
 use Illuminate\Validation\ValidationException;
 
 class LegalEntitiesForms extends Form
@@ -61,11 +62,11 @@ class LegalEntitiesForms extends Form
             'owner.firstName' => ['required', 'min:3', new Name()],
             'owner.secondName' => ['nullable', new Name()],
             'owner.gender' => 'required|string',
-            'owner.birthDate' => ['required', 'date', new AgeCheck()],
+            'owner.birthDate' => ['required', 'date', new BirthDate()],
             'owner.noTaxId' => 'boolean|nullable',
-            'owner.taxId' => 'required|integer|digits:10',
+            'owner.taxId' => ['required', new TaxId($this->owner['noTaxId'])],
             'owner.documents.type' => ['required','string', new InDictionary('DOCUMENT_TYPE')],
-            'owner.documents.number' => ['required', 'string', new DocumentType($this->owner['documents']['type'])],
+            'owner.documents.number' => ['required', 'string', new DocumentType($this->owner['documents']['type'] ?? '')],
             'owner.phones' => 'required|array',
             'owner.phones.*.number' => 'required|string|regex:/^\+?\d{12}$/',
             'owner.phones.*.type' => ['required', 'string', new InDictionary('PHONE_TYPE')],
@@ -80,11 +81,12 @@ class LegalEntitiesForms extends Form
             'accreditation.orderNo' => ['required', 'string', 'min:2'],
             'accreditation.orderDate' => ['required', 'date'],
             'accreditation.issuedDate' => ['nullable', 'date'],
-            'accreditation.expiryDate' => ['nullable', 'date'],
+            'accreditation.expiryDate' => ['nullable', 'date', new ExpiryDate($this->accreditation['issuedDate'] ?? '')],
             'license.type' => 'required|string',
             'license.issuedBy' => ['required', 'string','min:3',new Cyrillic()],
             'license.issuedDate' => 'required|date|min:3',
             'license.activeFromDate' => 'required|date|min:3',
+            'license.expiryDate' => ['nullable', 'date', new ExpiryDate($this->license['activeFromDate'] ?? '')],
             'license.orderNo' => 'required|string',
             'license.licenseNumber' => ['nullable', 'string', 'regex:/^(?!.*[ЫЪЭЁыъэё@$^#])[a-zA-ZА-ЯҐЇІЄа-яґїіє0-9№\"!\^\*)\]\[(&._-].*$/'],
             'receiverFundsCode' => 'nullable|string|regex:/^[0-9]+$/',
@@ -108,8 +110,7 @@ class LegalEntitiesForms extends Form
             'owner.age_check' => 'Вік власника має бути не менше 18 років',
             'owner.gender' => __('Це поле є обов\'язковим до заповнення'),
             'owner.phones' => __('Контактний телефон є обов\'язковим до заповнення'),
-            'owner.taxId' => __('Номер ІПН чи РНОКПП є обов\'язковим до заповнення'),
-            'owner.taxId.digits' => __('Номер ІПН чи РНОКПП повинен містити 10 цифр'),
+            'owner.taxId.required' => __('Номер ІПН чи РНОКПП є обов\'язковим до заповнення'),
             'owner.documents.type.required' => __('Тип документа є обов\'язковим до заповнення'),
             'owner.position.required' => __('Посада є обов\'язковою до заповнення'),
             'owner.email.unique' => 'Поле :attribute вже зареєстровано в системі',

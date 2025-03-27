@@ -2,6 +2,7 @@
     $hasAccreditationCategoryError = $errors->has('legalEntityForm.accreditation.category');
     $hasAccreditationOrderNumberError = $errors->has('legalEntityForm.accreditation.orderNo');
     $hasAccreditationOrderDateError = $errors->has('legalEntityForm.accreditation.orderDate');
+    $hasAccreditationExpiryDateError = $errors->has('legalEntityForm.accreditation.expiryDate');
 @endphp
 
 <fieldset
@@ -118,7 +119,14 @@
                     id="accreditationExpiryDate"
                     wire:model="legalEntityForm.accreditation.expiryDate"
                     class="input datepicker-input peer"
+                    aria-describedby="{{ $hasAccreditationExpiryDateError ? 'accreditationExpiryDateErrorHelp' : '' }}"
                 />
+
+                @if($hasAccreditationExpiryDateError)
+                    <p id="accreditationExpiryDateErrorHelp" class="text-error">
+                        {{ $errors->first('legalEntityForm.accreditation.expiryDate') }}
+                    </p>
+                @endif
 
                 <label for="accreditationExpiryDate" class="label z-10">
                     {{ __('forms.accreditation_expired_date') }}

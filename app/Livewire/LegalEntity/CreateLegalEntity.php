@@ -75,9 +75,9 @@ class CreateLegalEntity extends LegalEntity
 
         $this->getOwnerFields();
 
-        if (empty($this->legalEntityForm->owner['phones'])) {
-            $this->legalEntityForm->owner['phones'] = [];
-        }
+        $this->legalEntityForm->owner['phones'] = $this->legalEntityForm->owner['phones'] ?? [];
+
+        $this->legalEntityForm->owner['noTaxId'] = $this->legalEntityForm->owner['noTaxId'] ?? false;
 
         $this->setOwnerFromCache();
     }

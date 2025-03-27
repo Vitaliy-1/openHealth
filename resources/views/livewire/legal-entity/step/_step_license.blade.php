@@ -3,6 +3,7 @@
     $hasLicenseIssuedByError = $errors->has('legalEntityForm.license.issuedBy');
     $hasLicenseIssuedDateError = $errors->has('legalEntityForm.license.issuedDate');
     $hasLicenseActiveFromDateError = $errors->has('legalEntityForm.license.activeFromDate');
+    $hasLicenseExpirationDateError = $errors->has('legalEntityForm.license.expiryDate');
     $hasLicenseOrderNumberError = $errors->has('legalEntityForm.license.orderNo');
 @endphp
 
@@ -147,7 +148,14 @@
                 id="licenseExpiryDate"
                 wire:model="legalEntityForm.license.expiryDate"
                 class="input datepicker-input peer"
+                aria-describedby="{{ $hasLicenseExpirationDateError ? 'licenseExpirationDateErrorHelp' : '' }}"
             />
+
+            @if($hasLicenseExpirationDateError)
+                <p id="licenseExpirationDateErrorHelp" class="text-error">
+                    {{ $errors->first('legalEntityForm.license.expiryDate') }}
+                </p>
+            @endif
 
             <label for="licenseExpiryDate" class="label z-10">
                 {{ __('forms.license_expiry_date') }}

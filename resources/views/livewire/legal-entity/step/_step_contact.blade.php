@@ -74,7 +74,7 @@
     <div
         class='form-row mt-6'
         x-data="{ phones: $wire.entangle('legalEntityForm.phones') }"
-        x-init="console.log('len', phones); phones = phones.length > 0 ? phones : [{ type: '', number: '' }]; console.log('phones', phones); "
+        x-init="phones = phones.length > 0 ? phones : [{ type: '', number: '' }];"
         x-id="['phone']"
     >
         <template x-for="(phone, index) in phones" :key="index">

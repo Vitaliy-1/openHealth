@@ -20,7 +20,7 @@ class DocumentType implements ValidationRule
      *
      * @return void
      */
-    public function __construct(string $documentType)
+    public function __construct(string $documentType = '')
     {
         $this->documentType = $documentType;
 
@@ -41,7 +41,7 @@ class DocumentType implements ValidationRule
         };
 
         if (!(bool)preg_match($regex, $value)) {
-            $fail(__('validation.attributes.errors.wrong_number_format'));
+            $fail(__('validation.attributes.errors.wrongNumberFormat'));
         }
     }
 }

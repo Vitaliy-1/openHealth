@@ -318,7 +318,10 @@
     </div>
 
     {{-- Owner IPN --}}
-    <div class='form-row-3'>
+    <div
+        class='form-row-3'
+        x-data="{ showNoTaxId: $wire.entangle('legalEntityForm.owner.noTaxId') }"
+    >
         <div class="form-group group relative z-0">
             <input
                 required
@@ -338,11 +341,27 @@
                 </p>
             @endif
 
-            <label for="taxId" class="label z-10">
-                {{ __('forms.number') }} {{ __('forms.ipn') }} / {{ __('forms.rnokpp') }}
-            </label>
+            <label
+                for="taxId"
+                class="label z-10"
+                x-text="showNoTaxId ? '{{ __('forms.document_no_tax_id') }}' : '{{ __('forms.number') . ' ' . __('forms.ipn') . ' / ' . __('forms.rnokpp') }}'"
+            ></label>
         </div>
 
+        <div class="form-group group">
+            <div class="mt-3">
+                <input
+                    type="checkbox"
+                    id="noTaxId"
+                    class="default-checkbox text-blue-500 focus:ring-blue-300"
+                    {{-- wire:model="legalEntityForm.owner.noTaxId" --}}
+                    x-model="showNoTaxId"
+                    :checked="showNoTaxId"
+                >
+
+                <label for="noTaxId" class="ms-2 text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('forms.no_tax_id') }}</label>
+            </div>
+        </div>
     </div>
 
     <div class='form-row-3'>

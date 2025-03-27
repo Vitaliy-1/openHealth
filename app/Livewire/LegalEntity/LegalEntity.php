@@ -353,7 +353,7 @@ class LegalEntity extends Component
             'data.accreditation.issued_date' => 'sometimes|string',
             'data.accreditation.expiry_date' => 'sometimes|string',
             'data.accreditation.order_no' => 'required|string',
-            'data.accreditation.order_date' => 'required|string',
+            'data.accreditation.order_date' => 'required_unless:data.accreditation.category,NO_ACCREDITATION|string',
             'data.license' => 'sometimes|array',
             'data.license.id' => 'sometimes|string',
             'data.license.type' => 'required|string',
@@ -365,8 +365,8 @@ class LegalEntity extends Component
             'data.license.what_licensed' => 'required|string',
             'data.license.order_no' => 'required|string',
             'data.archive' => 'sometimes|array',
-            'data.archive.*.date' => 'required|string',
-            'data.archive.*.place' => 'required|string',
+            'data.archive.*.date' => 'required_with:data.archive|string',
+            'data.archive.*.place' => 'required_with:data.archive|string',
             'data.inserted_by' => 'nullable|string',
             'data.inserted_at' => 'nullable|string',
             'data.updated_by' => 'nullable|string',
@@ -432,18 +432,20 @@ class LegalEntity extends Component
 
         $data['residence_address'] = $this->convertArrayKeysToSnakeCase($this->address);
 
-        // Converting tax_id to no_tax_id
-        $data['owner']['no_tax_id'] = empty($data['owner']['tax_id']);
-
         // Converting accreditation to array
-        $data['accreditation'] = $data['accreditation_show']
-            ? $data['accreditation'] ?? []
-            : [];
+        $data['accreditation'] = $data['accreditation_show'] ? $data['accreditation'] : [];
+
+        // Check if 'category' === 'NO_ACCREDITATION' and only required fields are filled, also update following fields: 'issued_date', 'expiry_date', 'order_date'
+         if(isset($data['accreditation']['category']) && $data['accreditation']['category'] === 'NO_ACCREDITATION') {
+            if (!isset($data['accreditation']['issued_date']) && !isset($data['accreditation']['expiry_date'])) {
+                $data['accreditation']['issued_date'] = null;
+                $data['accreditation']['expiry_date'] = null;
+                $data['accreditation']['order_date'] = null;
+            }
+        }
 
         // Converting archive to array
-        $data['archive'] = $data['archivation_show']
-            ? [$data['archive'] ?? []]
-            : [];
+        $data['archive'] = $data['archivation_show'] ? [$data['archive']] : [];
 
         unset($data['archivation_show']);
         unset($data['accreditation_show']);
@@ -467,6 +469,7 @@ class LegalEntity extends Component
                     'birth_date' => $requestData['owner']['birth_date'],
                     'gender' => $requestData['owner']['gender'],
                     'tax_id' => $requestData['owner']['tax_id'],
+                    'no_tax_id' => $requestData['owner']['no_tax_id'],
                     'email' => $requestData['owner']['email'],
                     'documents' => $requestData['owner']['documents'],
                     'phones' => $requestData['owner']['phones']
@@ -592,7 +595,7 @@ class LegalEntity extends Component
                 "second_name" => $party['second_name'],
                 "birth_date" => $party['birth_date'],
                 "gender" => $party['gender'],
-                "no_tax_id" => empty($party['tax_id']),
+                "no_tax_id" => $party['no_tax_id'],
                 "tax_id" => $party['tax_id'] ?? null,
                 "email" => $party['email'],
                 "documents" => $party['documents'],
