@@ -48,7 +48,7 @@
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
             <x-forms.label for="specialityCountry" class="default-label">
-                {{__('forms.levelSpeciality')}}*
+                {{__('forms.speciality_level')}}*
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -165,7 +165,7 @@
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
             <x-forms.label for="certificateNumber" class="default-label">
-                {{__('forms.validToDate')}}
+                {{__('forms.valid_until')}}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">

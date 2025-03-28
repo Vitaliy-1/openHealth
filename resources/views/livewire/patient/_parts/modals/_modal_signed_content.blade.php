@@ -76,7 +76,7 @@
                     </x-secondary-button>
                 </div>
                 <div class="xl:w-1/4 text-right">
-                    <button wire:click="signPerson" type="button" class="btn-primary">
+                    <button wire:click="signPerson" type="button" class="button-primary">
                         {{ __('forms.send_for_approval') }}
                     </button>
                 </div>

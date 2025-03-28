@@ -110,7 +110,7 @@
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
             <x-forms.label for="validTo" class="default-label">
-                {{__('forms.validTo')}} *
+                {{__('forms.valid_until')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">

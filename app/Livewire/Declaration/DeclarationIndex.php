@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Declaration;
 
 use App\Models\Declaration;
@@ -11,7 +13,6 @@ use Livewire\WithPagination;
 
 class DeclarationIndex extends Component
 {
-
     use WithPagination;
 
     public array $tableHeaders = [];
@@ -21,8 +22,8 @@ class DeclarationIndex extends Component
      * @var array|string[]
      */
     public array $employee_filter = [
-        'full_name'     => '',
-        'status'        => '',
+        'full_name' => '',
+        'status' => '',
         'employee_uuid' => '',
     ];
 
@@ -30,7 +31,7 @@ class DeclarationIndex extends Component
      * @var array|int[]
      */
     public ?array $request_declaration = [
-        'page'      => 1,
+        'page' => 1,
         'page_size' => 10,
     ];
 
@@ -45,19 +46,18 @@ class DeclarationIndex extends Component
 
     public ?array $declarations_filter = [
         'number_declaration' => '',
-        'first_name'         => '',
-        'last_name'          => '',
-        'second_name'        => '',
-        'gender'             => '',
-        'birthday_day'       => '',
-        'phone'              => '',
+        'first_name' => '',
+        'last_name' => '',
+        'second_name' => '',
+        'gender' => '',
+        'birthday_day' => '',
+        'phone' => '',
     ];
 
     /**
      * @var object|null
      */
     public ?object $declaration_show = null;
-
 
     protected $listeners = ['searchUpdated'];
 
@@ -76,10 +76,9 @@ class DeclarationIndex extends Component
             __('Статус'),
             __('Дата декларації'),
             __('Лікар'),
-            __('Дії'),
+            __('forms.actions'),
         ];
     }
-
 
     //Livewire functions
     public function showDeclaration($declaration): void
@@ -95,7 +94,7 @@ class DeclarationIndex extends Component
     public function updated($field): void
     {
 
-        if (in_array($field, $this->declarations_filter) ) {
+        if (in_array($field, $this->declarations_filter)) {
             $this->resetPage();
         }
     }
@@ -113,12 +112,10 @@ class DeclarationIndex extends Component
 
     }
 
-
     public function searchUpdated($searchData): void
     {
         $this->declarations_filter = $searchData;
     }
-
 
     public function getDeclarations(): ?object
     {
@@ -205,7 +202,6 @@ class DeclarationIndex extends Component
 
         return null; // Return null if the employee is not found or doesn't havE
     }
-
 
     public function render()
     {

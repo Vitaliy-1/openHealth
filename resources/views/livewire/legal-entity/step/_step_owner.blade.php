@@ -207,7 +207,7 @@
                 {{-- aria-describedby="{{ $hasOwnerPosition ? 'ownerPositionErrorHelp' : '' }}" --}}
                 class="input-select text-gray-800 {{ $hasOwnerPosition ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             >
-                <option value="_placeholder_" selected hidden>-- {{ __('forms.selectPosition') }} --</option>
+                <option value="_placeholder_" selected hidden>-- {{ __('forms.select_position') }} --</option>
 
                 @foreach($dictionaries['POSITION'] as $k => $position)
                     <option value="{{ $k }}">{{ $position }}</option>
@@ -391,7 +391,7 @@
             @endif
 
             <label for="documentNumber" class="label z-10">
-                {{ __('forms.documentNumber') }}
+                {{ __('forms.document_number') }}
             </label>
         </div>
 
@@ -413,7 +413,7 @@
             @endif
 
             <label for="documentsIssuedBy" class="label z-10">
-                {{__('forms.documentIssuedBy')}}
+                {{__('forms.document_issued_by')}}
             </label>
         </div>
 
@@ -439,7 +439,7 @@
             @endif
 
             <label for="documentsIssuedAt" class="label z-10">
-                {{ __('forms.documentIssuedAt') }}
+                {{ __('forms.document_issued_at') }}
             </label>
         </div>
     </div>

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\Relations;
 
 use Illuminate\Support\Str;
@@ -18,6 +20,8 @@ class Address extends Model
         'settlement_type',
         'settlement_id',
         'street_type',
+        'created_at',
+        'updated_at'
     ];
 
     protected $fillable = [

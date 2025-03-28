@@ -72,8 +72,14 @@
         <template x-for="(phone, index) in emergencyContactPhones">
             <div class="form-row-3 md:mb-0">
                 <div class="form-group group">
-                    <label :for="'emergencyContactPhoneType-' + index" class="sr-only">{{ __('forms.type_mobile') }}</label>
-                    <select x-model="phone.type" :id="'emergencyContactPhoneType-' + index" class="input-select peer" required>
+                    <label :for="'emergencyContactPhoneType-' + index" class="sr-only">
+                        {{ __('forms.type_mobile') }}
+                    </label>
+                    <select x-model="phone.type"
+                            :id="'emergencyContactPhoneType-' + index"
+                            class="input-select peer"
+                            required
+                    >
                         <option selected>{{ __('forms.type_mobile') }} *</option>
                         @foreach($this->dictionaries['PHONE_TYPE'] as $key => $phoneType)
                             <option value="{{ $key }}">{{ $phoneType }}</option>
@@ -133,7 +139,4 @@
             </div>
         </template>
     </div>
-
-    @include('livewire.patient._parts._addresses')
-
 </fieldset>

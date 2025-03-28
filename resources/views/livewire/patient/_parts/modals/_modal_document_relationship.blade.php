@@ -1,6 +1,6 @@
 <x-dialog-modal maxWidth="3xl" wire:model="showModal">
     <x-slot name="title">
-        {{ __('forms.documents') }}
+        {{ __('patients.identity_document') }}
     </x-slot>
 
     <x-slot name="content">
@@ -40,8 +40,8 @@
 
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
-                            <x-forms.label for="documents_number" class="default-label">
-                                {{ __('forms.documentNumber') }} *
+                            <x-forms.label for="documentsNumber" class="default-label">
+                                {{ __('forms.document_number') }} *
                             </x-forms.label>
                         </x-slot>
 
@@ -49,7 +49,7 @@
                             <x-forms.input class="default-input"
                                            wire:model="form.documentsRelationship.number"
                                            type="text"
-                                           id="documents_number"
+                                           id="documentsNumber"
                             />
                         </x-slot>
 
@@ -67,7 +67,7 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="documents_issued_by" class="default-label">
-                                {{ __('forms.documentIssuedBy') }} *
+                                {{ __('forms.document_issued_by') }} *
                             </x-forms.label>
                         </x-slot>
 
@@ -76,7 +76,7 @@
                                            wire:model="form.documentsRelationship.issuedBy"
                                            type="text"
                                            id="documents_issued_by"
-                                           placeholder="{{ __('forms.documentIssuedBy') }}"
+                                           placeholder="{{ __('forms.document_issued_by') }}"
                             />
                         </x-slot>
 
@@ -92,7 +92,7 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="confidant_person_documents_issued_at" class="default-label">
-                                {{ __('forms.documentIssuedAt') }} *
+                                {{ __('forms.document_issued_at') }} *
                             </x-forms.label>
                         </x-slot>
 

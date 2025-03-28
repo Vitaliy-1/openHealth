@@ -16,7 +16,7 @@
 >
 
     <legend class="legend">
-        {{ __('patients.patient_identity_documents') }}
+        {{ __('forms.rnokpp') }}/{{ __('forms.ipn') }}
     </legend>
 
     <div class="flex items-center gap-2 mb-4">

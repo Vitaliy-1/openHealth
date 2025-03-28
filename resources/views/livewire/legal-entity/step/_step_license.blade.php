@@ -81,7 +81,7 @@
             @endif
 
             <label for="licenseIssuedBy" class="label z-10">
-                {{ __('forms.licenseIssuedBy') }}
+                {{ __('forms.document_issued_by') }}
             </label>
         </div>
 
@@ -107,7 +107,7 @@
             @endif
 
             <label for="licenseIssuedDate" class="label z-10">
-                {{ __('forms.licenseIssuedDate') }}
+                {{ __('forms.document_issued_at') }}
             </label>
         </div>
 
@@ -152,7 +152,7 @@
             />
 
             <label for="licenseExpiryDate" class="label z-10">
-                {{ __('forms.licenseExpiryDate') }}
+                {{ __('forms.end_date') }}
             </label>
         </div>
 

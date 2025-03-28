@@ -15,16 +15,31 @@ use Livewire\Form;
 class Encounter extends Form
 {
     #[Validate([
-        'encounter.division.identifier.value' => ['nullable', 'string'],
         'encounter.period.date' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
         'encounter.period.start' => ['required', 'date_format:H:i', new TimeInPast()],
-        'encounter.period.end' => ['required', 'date_format:H:i', 'after:encounter.period.start'],
-        'encounter.class.code' => ['required', 'string'],
-        'encounter.type.coding.code' => ['required', 'string'],
-        'encounter.priority.coding.code' => ['required_if:encounter.class.code,INPATIENT', 'string'],
-        'encounter.episode.identifier.type.coding.code' => ['nullable', 'string'],
+        'encounter.period.end' => ['required', 'date_format:H:i', 'after:encounter.period.start', new TimeInPast()],
+        'encounter.class.code' => ['required', 'string'], // TODO: add in dictionary check (eHealth/encounter_classes)
+        // TODO: add in dictionary check (eHealth/encounter_types)
+        'encounter.type.coding.*.code' => ['required', 'string'],
+        'encounter.priority' => ['required_if:encounter.class.code,INPATIENT', 'array'],
+        // TODO: add in dictionary check (eHealth/encounter_priority)
+        'encounter.priority.coding.*.code' => ['required', 'string'],
+        'encounter.reasons' => ['required_if:encounter.class.code,PHC', 'array'],
+        // TODO: add in dictionary check (eHealth/ICPC2/reasons)
+        'encounter.reasons.*.coding.*.code' => ['required', 'string'],
+        'encounter.reasons.*.text' => ['nullable', 'string', new Cyrillic()],
+        // TODO: Encounter must have exactly one primary diagnosis
+        'encounter.diagnoses' => ['required_unless:encounter.type.coding.0.code,intervention', 'array'],
+        // TODO: add in dictionary check (eHealth/diagnosis_roles)
         'encounter.diagnoses.role.coding.*.code' => ['required', 'string'],
-        'encounter.diagnoses.rank' => ['nullable', 'integer', 'min:1', 'max:10']
+        'encounter.diagnoses.rank' => ['nullable', 'integer', 'min:1', 'max:10'],
+        'encounter.actions' => [
+            'required_if:encounter.class.code,PHC', 'prohibited_unless:encounter.class.code,PHC', 'array'
+        ],
+        // TODO: add in dictionary check (eHealth/ICPC2/actions)
+        'encounter.actions.*.coding.*.code' => ['required', 'string'],
+        'encounter.actions.*.text' => ['nullable', 'string', new Cyrillic()],
+        'encounter.division.identifier.value' => ['required', 'uuid'],
     ])]
     public array $encounter = [
         'status' => 'finished',
@@ -44,48 +59,35 @@ class Encounter extends Form
         'type' => [
             'coding' => [['system' => 'eHealth/encounter_types']]
         ],
-        'priority' => [
-            'coding' => [['system' => 'eHealth/encounter_priority']]
-        ],
         'performer' => [
             'identifier' => [
                 'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'employee']]]
             ]
         ],
-        'division' => [
-            'identifier' => [
-                'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'division']]]
-            ]
-        ],
-        'diagnoses' => [
-            'condition' => [
-                'identifier' => [
-                    'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'condition']]]
-                ]
-            ],
-            'role' => [
-                'coding' => [['system' => 'eHealth/resources']]
-            ]
-        ]
+        'reasons' => [],
+        'diagnoses' => [],
+        'actions' => []
     ];
 
     #[Validate([
-        'episode.name' => ['required', 'string', new Cyrillic()],
-        'episode.type.code' => ['required']
+        'episode' => ['required', 'array'],
+        // TODO: add in dictionary check (eHealth/episode_types)
+        'episode.type.code' => ['required', 'string'],
+        'episode.name' => ['required', 'string', new Cyrillic()]
     ])]
     public array $episode = [
         'type' => [
             'system' => 'eHealth/episode_types'
         ],
         'status' => 'active',
-        'managing_organization' => [
+        'managingOrganization' => [
             'identifier' => [
                 'type' => [
                     'coding' => [['system' => 'eHealth/resources', 'code' => 'legal_entity']]
                 ]
             ]
         ],
-        'care_manager' => [
+        'careManager' => [
             'identifier' => [
                 'type' => [
                     'coding' => [['system' => 'eHealth/resources', 'code' => 'employee']]
@@ -95,44 +97,24 @@ class Encounter extends Form
     ];
 
     #[Validate([
-        'conditions.coding.code' => ['required', 'string'],
-        'conditions.onsetDate' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
-        'conditions.onsetTime' => ['required', 'date_format:H:i', new TimeInPast()],
-        'conditions.assertedDate' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
-        'conditions.assertedTime' => ['required', 'date_format:H:i', new TimeInPast()],
+        'conditions' => ['required', 'array'],
+        'conditions.*.primarySource' => ['required', 'boolean'],
+        'conditions.*.asserter' => ['required_if:conditions.*.primarySource,true', 'array'],
+        'conditions.*.reportOrigin' => ['required_if:conditions.*.primarySource,false', 'array'],
+        'conditions.*.code.coding.0.code' => ['required', 'string'],
+        'conditions.*.code.coding.1.code' => ['required_if:encounter.class.code,AMB, INPATIENT', 'string'],
+        'conditions.*.clinicalStatus' => ['required', 'string'],
+        'conditions.*.verificationStatus' => ['required', 'string'],
+        // TODO: add in dictionary check (eHealth/condition_severities)
+        'conditions.*.severity.coding.*.code' => ['nullable', 'string'],
+        'conditions.*.onsetDate' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
+        'conditions.*.onsetTime' => ['required', 'date_format:H:i', new TimeInPast()],
+        'conditions.*.assertedDate' => ['nullable', 'before:tomorrow', 'date_format:Y-m-d'],
+        'conditions.*.assertedTime' => ['nullable', 'date_format:H:i', new TimeInPast()],
     ])]
-    public array $conditions = [];
+    public array $conditions;
 
-    public function getDefaultCondition(): array
-    {
-        return [
-            'context' => [
-                'identifier' => [
-                    'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'encounter']]]
-                ]
-            ],
-            'code' => [
-                'coding' => [
-                    0 => ['system' => 'eHealth/ICPC2/condition_codes'],
-                    1 => ['system' => 'eHealth/ICD10_AM/condition_codes']
-                ]
-            ],
-            'severity' => [
-                'coding' => [['system' => 'eHealth/condition_severities']]
-            ],
-            // TODO: add evidences when observations isset
-//        'evidences' => [
-//            'codes' => [
-//                'coding' => [['system' => 'eHealth/ICPC2/reasons']],
-//            ],
-//            'details' => [
-//                'identifier' => [
-//                    'type' => ['coding' => [['system' => 'eHealth/resources', 'code' => 'observation']]]
-//                ]
-//            ]
-//        ]
-        ];
-    }
+    public array $evidences;
 
     /**
      * Validate provided models by corresponding rules.
@@ -211,8 +193,10 @@ class Encounter extends Form
 
         if ($additionalConfigKey) {
             $additionalValues = config($additionalConfigKey);
-            $allowedValues = array_intersect($allowedValues[Auth::user()->legalEntity->type],
-                $additionalValues[Employee::find(1)->employee_type]);
+            $allowedValues = array_intersect(
+                $allowedValues[Auth::user()->legalEntity->type],
+                $additionalValues[Employee::find(1)->employee_type]
+            );
         }
 
         return $allowedValues;
