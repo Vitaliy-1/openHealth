@@ -90,7 +90,7 @@
                             </li>
                         @empty
                             <li class="cursor-default px-4 py-2">
-                                {{ __('Нічого не знайдено') }}
+                                {{ __('forms.nothing_found') }}
                             </li>
                         @endforelse
                     </ul>
@@ -122,9 +122,9 @@
             <option value="_placeholder_" selected hidden>-- {{ __('forms.select') }} --</option>
 
             @isset($dictionaries['SETTLEMENT_TYPE'])
-                @foreach($dictionaries['SETTLEMENT_TYPE'] as $k => $type)
+                @foreach($dictionaries['SETTLEMENT_TYPE'] as $key => $type)
                     <option class="normal-case"
-                        {{ isset($address['settlementType']) && $address['settlementType'] == $k ? 'selected': ''}} value="{{ $k }}">{{ $type }}
+                        {{ isset($address['settlementType']) && $address['settlementType'] === $key ? 'selected': ''}} value="{{ $key }}">{{ $type }}
                     </option>
                 @endforeach
             @endif
@@ -190,7 +190,7 @@
                             </li>
                         @empty
                             <li class="cursor-default px-4 py-2">
-                                {{ __('Нічого не знайдено') }}
+                                {{ __('forms.nothing_found') }}
                             </li>
                         @endforelse
                     </ul>
@@ -222,9 +222,9 @@
             <option value="_placeholder_" selected hidden>-- {{ __('forms.select') }} --</option>
 
             @if($dictionaries['STREET_TYPE'])
-                @foreach($dictionaries['STREET_TYPE'] as $k => $type)
+                @foreach($dictionaries['STREET_TYPE'] as $key => $type)
                     <option class="normal-case"
-                        {{ isset($address['streetType']) && $address['streetType'] == $k ? 'selected': ''}} value="{{ $k }}">{{ $type }}</option>
+                        {{ isset($address['streetType']) && $address['streetType'] === $key ? 'selected': ''}} value="{{ $key }}">{{ $type }}</option>
                 @endforeach
             @endif
         </select>
@@ -288,7 +288,7 @@
                         </li>
                     @empty
                         <li class="cursor-default px-4 py-2">
-                            {{ __('Нічого не знайдено') }}
+                            {{ __('forms.nothing_found') }}
                         </li>
                     @endforelse
                 </ul>

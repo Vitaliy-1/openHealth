@@ -15,31 +15,41 @@
         </x-section-navigation>
 
         <form class="form">
-            @include('livewire.encounter._parts._patient_data')
             @include('livewire.encounter._parts._aside_navigation')
+            @include('livewire.encounter._parts._main_data')
+            @include('livewire.encounter._parts._reasons')
             @include('livewire.encounter._parts._diagnoses')
+            @include('livewire.encounter._parts._actions')
+            @include('livewire.encounter._parts._additional_data')
 
-            <div class="text-center">
-                <button wire:click.prevent="save(['encounter', 'episode'])" type="submit" class="alternative-button">
+            <div class="flex gap-8">
+                <button wire:click.prevent="" type="submit" class="button-minor">
+                    {{ __('forms.delete') }}
+                </button>
+
+                <button wire:click.prevent="save" type="submit" class="button-primary">
                     {{ __('forms.save') }}
                 </button>
+
+                <button wire:click.prevent="create('signedContent')"
+                        type="button"
+                        class="button-sync flex items-center gap-2"
+                >
+                    <svg width="16" height="17">
+                        <use xlink:href="#svg-key"></use>
+                    </svg>
+                    {{ __('forms.complete_the_interaction_and_sign') }}
+                    <svg width="16" height="17">
+                        <use xlink:href="#svg-arrow-right"></use>
+                    </svg>
+                </button>
             </div>
-            <button wire:click="create('signedContent')"
-                    type="button"
-                    class="default-button flex items-center gap-2"
-            >
-                <svg width="16" height="17">
-                    <use xlink:href="#svg-key"></use>
-                </svg>
-                {{ __('Підписати КЕПом') }}
-                <svg width="16" height="17">
-                    <use xlink:href="#svg-arrow-right"></use>
-                </svg>
-            </button>
+
             @if($showModal === 'signedContent')
                 @include('livewire.patient._parts.modals._modal_signed_content')
             @endif
         </form>
+
         <x-forms.loading/>
     </section>
 </div>

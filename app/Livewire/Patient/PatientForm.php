@@ -15,6 +15,7 @@ use App\Models\Person\PersonRequest;
 use App\Repositories\PersonRepository;
 use App\Traits\AddressSearch;
 use App\Traits\FormTrait;
+use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -25,14 +26,18 @@ use Throwable;
 
 class PatientForm extends Component
 {
-    use FormTrait, WithFileUploads, Cipher, AddressSearch;
+    use FormTrait;
+    use WithFileUploads;
+    use Cipher;
+    use AddressSearch;
 
     /**
      * Allowed model modals name.
      */
     private const array ALLOWED_MODAL_MODELS = [
         'documents',
-        'documentsRelationship'
+        'documentsRelationship',
+        'signedContent'
     ];
 
     #[Locked]
@@ -473,7 +478,7 @@ class PatientForm extends Component
 
                     $this->uploadedFiles[$key] = false;
                 }
-            } catch (\Exception) {
+            } catch (Exception) {
                 $this->dispatch('flashMessage', [
                     'message' => 'Виникла помилка, зверніться до адміністратора',
                     'type' => 'error',

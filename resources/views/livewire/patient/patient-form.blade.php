@@ -1,4 +1,5 @@
 @php
+    $user = Auth::user();
     $svgSprite = file_get_contents(resource_path('images/sprite.svg'));
 @endphp
 
@@ -18,6 +19,7 @@
                 @include('livewire.patient._parts._documents')
                 @include('livewire.patient._parts._identity')
                 @include('livewire.patient._parts._contact_data')
+                @include('livewire.patient._parts._addresses')
                 @include('livewire.patient._parts._emergency_contact')
                 @include('livewire.patient._parts._incapacitated')
                 @include('livewire.patient._parts._authentication_methods')
@@ -26,12 +28,12 @@
                     <a href="{{ route('patient.index') }}" class="button-minor">
                         {{ __('forms.back') }}
                     </a>
-                    @if(auth()->user()->hasRole('DOCTOR'))
+                    @if($user->hasRole('DOCTOR'))
                         <button wire:click.prevent="createPerson('patient')" class="button-primary">
                             {{ __('forms.send_for_approval') }}
                         </button>
                     @endif
-                    @if(auth()->user()->hasRole(['DOCTOR', 'RECEPTIONIST']))
+                    @if($user->hasAnyRole(['DOCTOR', 'RECEPTIONIST']))
                         <button wire:click.prevent="createApplication('patient')" class="button-primary">
                             {{ __('patients.save_to_application') }}
                         </button>

@@ -50,7 +50,7 @@ class PersonRepository
                 Repository::authenticationMethod()->addAuthenticationMethod($personRequest, $authenticationMethods);
             }
 
-            if (isset($response['confidant_person'])) {
+            if (!empty($response['confidant_person'])) {
                 $confidantData = [
                     'documents_relationship' => $response['documents_relationship'],
                     'confidantPersonInfo' => $response['confidant_person'][0]
@@ -59,9 +59,11 @@ class PersonRepository
                 Repository::confidantPerson()->addConfidantPerson($personRequest, $confidantData);
             }
 
-            if (isset($response['person']['confidant_person'])) {
-                Repository::confidantPerson()->addConfidantPerson($personRequest,
-                    $response['person']['confidant_person']);
+            if (!empty($response['person']['confidant_person'])) {
+                Repository::confidantPerson()->addConfidantPerson(
+                    $personRequest,
+                    $response['person']['confidant_person']
+                );
             }
 
             DB::commit();

@@ -121,7 +121,7 @@
                 />
 
                 <label for="accreditationExpiryDate" class="label z-10">
-                    {{ __('forms.accreditationExpiredDate') }}
+                    {{ __('forms.end_date') }}
                 </label>
             </div>
 

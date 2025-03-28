@@ -1,6 +1,6 @@
 <x-dialog-modal maxWidth="3xl" wire:model="showModal">
     <x-slot name="title">
-        {{ __('forms.documents') }}
+        {{ __('patients.identity_document') }}
     </x-slot>
 
     <x-slot name="content">
@@ -10,7 +10,7 @@
                 <x-forms.form-row class="flex-col">
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
-                            <x-forms.label for="documents_type" class="default-label">
+                            <x-forms.label for="documentsType" class="default-label">
                                 {{ __('forms.document_type') }} *
                             </x-forms.label>
                         </x-slot>
@@ -18,7 +18,7 @@
                         <x-slot name="input">
                             <x-forms.select class="default-select"
                                             wire:model="form.documents.type"
-                                            id="documents_type"
+                                            id="documentsType"
                             >
                                 <x-slot name="option">
                                     <option>{{ __('forms.select') }} {{ __('forms.type') }}</option>
@@ -41,8 +41,8 @@
 
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
-                            <x-forms.label for="documents_number" class="default-label">
-                                {{ __('forms.documentNumber') }} *
+                            <x-forms.label for="documentsNumber" class="default-label">
+                                {{ __('forms.document_number') }} *
                             </x-forms.label>
                         </x-slot>
 
@@ -50,7 +50,7 @@
                             <x-forms.input class="default-input"
                                            wire:model="form.documents.number"
                                            type="text"
-                                           id="documents_number"
+                                           id="documentsNumber"
                             />
                         </x-slot>
 
@@ -67,8 +67,8 @@
                 <x-forms.form-row class="flex-col">
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
-                            <x-forms.label for="documents_issued_by" class="default-label">
-                                {{ __('forms.documentIssuedBy') }} *
+                            <x-forms.label for="documentsIssuedBy" class="default-label">
+                                {{ __('forms.document_issued_by') }} *
                             </x-forms.label>
                         </x-slot>
 
@@ -76,8 +76,8 @@
                             <x-forms.input class="default-input"
                                            wire:model="form.documents.issuedBy"
                                            type="text"
-                                           id="documents_issued_by"
-                                           placeholder="{{ __('forms.documentIssuedBy') }}"
+                                           id="documentsIssuedBy"
+                                           placeholder="{{ __('forms.document_issued_by') }}"
                             />
                         </x-slot>
 
@@ -92,15 +92,15 @@
 
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
-                            <x-forms.label for="documents_issued_at" class="default-label">
-                                {{ __('forms.documentIssuedAt') }} *
+                            <x-forms.label for="documentsIssuedAt" class="default-label">
+                                {{ __('forms.document_issued_at') }} *
                             </x-forms.label>
                         </x-slot>
 
                         <x-slot name="input">
                             <x-forms.input-date :maxDate="now()->format('Y-m-d')"
                                                 wire:model="form.documents.issuedAt"
-                                                id="documents_issued_at"
+                                                id="documentsIssuedAt"
                             />
                         </x-slot>
 
@@ -118,14 +118,14 @@
                     <x-forms.form-group class="xl:w-1/2">
                         <x-slot name="label">
                             <x-forms.label for="expiration_date" class="default-label">
-                                {{ __('forms.expirationDate') }}
+                                {{ __('forms.valid_until') }}
                             </x-forms.label>
                         </x-slot>
 
                         <x-slot name="input">
                             <x-forms.input-date :minDate="now()->format('Y-m-d')"
                                                 wire:model="form.documents.expirationDate"
-                                                id="expiration_date"
+                                                id="expirationDate"
                             />
                         </x-slot>
 

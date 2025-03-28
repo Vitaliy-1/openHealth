@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\Employee;
 
 use App\Enums\Status;
@@ -12,7 +14,6 @@ use App\Models\Relations\Qualification;
 use App\Models\Relations\ScienceDegree;
 use App\Models\Relations\Speciality;
 use App\Traits\HasPersonalAttributes;
-use Carbon\Carbon;
 use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,15 +22,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
- * @property string $uuid
- * @property string $legal_entity_uuid
- * @property string $division_uuid
- * @property int $person_id
- * @property Status $status
- * @property string $position
- * @property Carbon $start_date
- * @property Carbon $end_date
- * @property string $employee_type
  * @mixin IdeHelperBaseEmployee
  */
 class BaseEmployee extends Model
@@ -52,9 +44,9 @@ class BaseEmployee extends Model
     ];
 
     protected $casts = [
-        'status'    => Status::class,
+        'status' => Status::class,
         'startDate' => 'datetime',
-        'endDate'   => 'datetime',
+        'endDate' => 'datetime',
     ];
 
     protected array $prettyAttributes = [
@@ -74,7 +66,6 @@ class BaseEmployee extends Model
         'specialities',
         'scienceDegrees'
     ];
-
 
     public function legalEntity(): BelongsTo
     {
@@ -128,6 +119,7 @@ class BaseEmployee extends Model
             $employeeData->party->{$attribute} = $employeeData->{$attribute} ?? '';
         }
         $employeeData->documents = $employeeData->party->documents()->get()->toArray() ?? [];
+
         return $employeeData->toArray();
     }
 }

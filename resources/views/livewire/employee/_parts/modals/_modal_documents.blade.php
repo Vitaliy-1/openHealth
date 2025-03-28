@@ -28,7 +28,7 @@
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
             <x-forms.label for="documentNumber" class="default-label">
-                {{__('forms.documentNumber')}} *
+                {{__('forms.document_number')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -50,7 +50,7 @@
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
             <x-forms.label for="documentIssuedBy" class="default-label">
-                {{__('forms.documentIssuedBy')}}
+                {{__('forms.document_issued_by')}}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
@@ -70,7 +70,7 @@
     <x-forms.form-group class="xl:w-1/2">
         <x-slot name="label">
             <x-forms.label for="documentIssuedAt" class="default-label">
-                {{__('forms.documentIssuedAt')}}
+                {{__('forms.document_issued_at')}}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">

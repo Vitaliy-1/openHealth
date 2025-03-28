@@ -58,6 +58,15 @@ class PatientApi
         )->sendRequest();
     }
 
+    public static function getShortEncounterBySearchParams(string $patientId): array
+    {
+        return new Request(
+            HttpMethod::GET,
+            self::ENDPOINT_PATIENT . "/$patientId/summary/encounters",
+            []
+        )->sendRequest();
+    }
+
     /**
      * Get brief information about episodes, in order not to disclose confidential and sensitive data.
      *

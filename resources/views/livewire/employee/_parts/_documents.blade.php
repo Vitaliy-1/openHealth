@@ -14,7 +14,7 @@
               }"
     >
         <legend class="legend">
-            <h2>{{__('forms.documents')}}</h2>
+            <h2>{{__('forms.document')}}</h2>
         </legend>
 
         <table class="table-input w-inherit">
@@ -34,7 +34,7 @@
                         <td class="td-input" x-text="document.number"></td>
                         <td class="td-input" x-text="document.issuedBy"></td>
                         <td class="td-input" x-text="document.issuedAt"></td>
-                        <td class="td-input" t-text="index">
+                        <td class="td-input">
                             {{-- That all that is needed for the dropdown --}}
                             <div
                                 x-data="{
@@ -175,19 +175,19 @@
                                             @endforeach
                                         </select>
                                         {{-- Check if the picked value is the one from the dictionary --}}
-                                        <p class="text-error text-xs" x-show="!Object.keys(dictionary).includes(modalDocument.type)">{{__('forms.fieldEmpty')}}</p>
+                                        <p class="text-error text-xs" x-show="!Object.keys(dictionary).includes(modalDocument.type)">{{__('forms.field_empty')}}</p>
                                     </div>
                                     <div>
-                                        <label for="documentNumber" class="label-modal">{{__('forms.documentNumber')}}</label>
+                                        <label for="documentNumber" class="label-modal">{{__('forms.document_number')}}</label>
                                         <input x-model="modalDocument.number" type="text" name="documentNumber" id="documentNumber" class="input-modal" required>
-                                        <p class="text-error text-xs" x-show="!modalDocument.number.trim().length > 0">{{__('forms.fieldEmpty')}}</p>
+                                        <p class="text-error text-xs" x-show="!modalDocument.number.trim().length > 0">{{__('forms.field_empty')}}</p>
                                     </div>
                                     <div>
-                                        <label for="documentIssuedBy" class="label-modal">{{__('forms.documentIssuedBy')}}</label>
+                                        <label for="documentIssuedBy" class="label-modal">{{__('forms.document_issued_by')}}</label>
                                         <input x-model="modalDocument.issuedBy" type="text" name="documentIssuedBy" id="documentIssuedBy" class="input-modal">
                                     </div>
                                     <div>
-                                        <label for="documentIssuedAt" class="label-modal">{{__('forms.documentIssuedAt')}}</label>
+                                        <label for="documentIssuedAt" class="label-modal">{{__('forms.document_issued_at')}}</label>
                                         <input x-model="modalDocument.issuedAt" type="text" name="documentIssuedAt" id="documentIssuedAt" class="input-modal datepicker-input" autocomplete="off">
                                     </div>
                                 </div>

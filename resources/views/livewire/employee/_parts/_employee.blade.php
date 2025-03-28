@@ -190,13 +190,13 @@
         </div>
 
         <div class="form-group group">
-            <label for="position" class="sr-only">{{__('forms.positionChoose')}}</label>
+            <label for="position" class="sr-only">{{__('forms.select_position')}}</label>
             <select x-model="employeePosition"
                     id="position"
                     class="input-select peer @error('form.party.position') input-error @enderror"
                     required
             >
-                <option selected>{{__('forms.positionChoose')}} *</option>
+                <option selected>{{__('forms.select_position')}} *</option>
                 {{-- Only show positions associated with certain employee types --}}
                 <template x-for="(position, index) in employeeTypePosition[employeeType]">
                     <option :value="index" x-text="position"></option>

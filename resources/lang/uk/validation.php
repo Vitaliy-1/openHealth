@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -22,7 +24,6 @@ return [
     'alphaNum' => 'Поле :attribute має містити лише літери та цифри.',
     'array' => 'Поле :attribute має бути масивом.',
     'before' => 'Поле :attribute має містити дату не пізніше :date.',
-    'beforeOrEqual' => 'Поле :attribute має містити дату не пізніше або дорівнюватися :date.',
     'between' => [
         'numeric' => 'Поле :attribute має бути між :min та :max.',
         'file' => 'Розмір файлу в полі :attribute має бути не менше :min та не більше :max кілобайт.',
@@ -35,7 +36,6 @@ return [
     'dateFormat' => 'Поле :attribute не відповідає формату :format.',
     'different' => 'Поля :attribute та :other повинні бути різними.',
     'digits' => 'Довжина цифрового поля :attribute повинна дорівнювати :digits.',
-    'digitsBetween' => 'Довжина цифрового поля :attribute повинна бути від :min до :max.',
     'dimensions' => 'Поле :attribute містить неприпустимі розміри зображення.',
     'distinct' => 'Поле :attribute містить значення, яке дублюється.',
     'email' => 'Поле :attribute повинне містити коректну електронну адресу.',
@@ -88,19 +88,13 @@ return [
         'string' => 'Текст в полі :attribute повинен містити не менше :min символів.',
         'array' => 'Поле :attribute повинне містити не менше :min елементів.',
     ],
-    'notIn' => 'Вибране для :attribute значення не коректне.',
-    'notRegex' => 'The :attribute format is invalid.',
     'numeric' => 'Поле :attribute повинно містити число.',
     'phone' => 'Поле :attribute має бути дійсним номером телефону з мінімум :min цифрами, без пробілів та крапок.',
     'present' => 'Поле :attribute повинне бути присутнє.',
     'regex' => 'Поле :attribute має хибний формат.',
     'required' => "Поле :attribute є обов'язковим для заповнення.",
     'required_if' => "Поле :attribute є обов'язковим для заповнення, коли :other є рівним :value.",
-    'requiredUnless' => "Поле :attribute є обов'язковим для заповнення, коли :other відрізняється від :values",
-    'requiredWith' => "Поле :attribute є обов'язковим для заповнення, коли :values вказано.",
-    'requiredWithAll' => "Поле :attribute є обов'язковим для заповнення, коли :values вказано.",
-    'requiredWithout' => "Поле :attribute є обов'язковим для заповнення, коли :values не вказано.",
-    'requiredWithoutAll' => "Поле :attribute є обов'язковим для заповнення, коли :values не вказано.",
+    'prohibited_unless' => "Поле :attribute заборонено, якщо :other не є одним із значень: :values.",
     'same' => 'Поля :attribute та :other мають співпадати.',
     'size' => [
         'numeric' => 'Поле :attribute має бути довжини :size.',
@@ -113,6 +107,7 @@ return [
     'unique' => 'Таке значення поля :attribute вже існує.',
     'uploaded' => 'Завантаження поля :attribute не вдалося.',
     'url' => 'Формат поля :attribute неправильний.',
+    'uuid' => 'Поле :attribute повинно містити коректний UUID.',
 
     /*
     |--------------------------------------------------------------------------
@@ -466,9 +461,20 @@ return [
                 'end' => 'час закінчення'
             ],
             'priority.coding.code' => 'пріоритет',
+            'reasons' => 'причини звернення',
             'diagnoses.role.coding.*.code' => 'тип',
             'diagnoses.rank' => 'пріоритет'
         ],
+        'conditions' => 'діагнози',
+        'conditions.*.code.coding.0.code' => 'код стану за ICPC-2',
+        'conditions.*.code.coding.1.code' => 'код стану за МКХ-10',
+        'conditions.*.onsetDate' => 'дата початку',
+        'conditions.*.onsetTime' => 'час початку',
+        'conditions.*.assertedDate' => 'дата внесення',
+        'conditions.*.assertedTime' => 'час внесення',
+        'conditions.*.clinicalStatus' => 'клінічний статус',
+        'conditions.*.verificationStatus' => 'статус верифікації',
+        'conditions.*.severity.coding.*.code' => 'ступінь тяжкості стану',
         'episode' => [
             'name' => 'назва епізоду',
             'type' => [

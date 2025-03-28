@@ -8,7 +8,7 @@
                     <svg width="24" height="24" class="text-gray-400 dark:text-white">
                         <use xlink:href="#svg-chart-pie"></use>
                     </svg>
-                    <p class="default-p">{{ __('patients.basic_data') }}</p>
+                    <p class="default-p">{{ __('patients.main_data') }}</p>
                 </a>
             </li>
             <li>
@@ -20,7 +20,7 @@
                 </a>
             </li>
             <li>
-                <a href="#" class="encounter-nav-item">
+                <a href="#reasons-section" class="encounter-nav-item">
                     <svg width="24" height="24" class="dark:text-white">
                         <use xlink:href="#svg-person"></use>
                     </svg>
@@ -28,11 +28,11 @@
                 </a>
             </li>
             <li>
-                <a href="#" class="encounter-nav-item">
+                <a href="#actions-section" class="encounter-nav-item">
                     <svg width="24" height="24" class="dark:text-white">
                         <use xlink:href="#svg-check-box"></use>
                     </svg>
-                    <p class="default-p">{{ __('patients.actions') }}</p>
+                    <p class="default-p">{{ __('forms.actions') }}</p>
                 </a>
             </li>
             <li>

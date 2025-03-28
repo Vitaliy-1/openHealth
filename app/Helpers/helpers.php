@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Classes\eHealth\Services\SchemaService;
 use App\Services\DictionaryService;
 use Carbon\CarbonImmutable;
@@ -147,7 +149,7 @@ if (!function_exists('convertToISO8601')) {
             return '';
         }
 
-        return CarbonImmutable::parse($dateString)->format('Y-m-d\TH:i:s.v\Z');
+        return CarbonImmutable::parse($dateString)->toIso8601String();
     }
 }
 

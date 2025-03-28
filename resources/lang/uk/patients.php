@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -21,6 +23,10 @@ return [
     'try_change_search_parameters' => 'Спробуйте змінити параметри пошуку',
     'contact_data' => 'Контактні дані',
     'priority' => 'Пріоритет',
+    'icpc-2_status_code' => 'Код стану за ICPC-2',
+    'code_and_name' => 'Код та назва',
+    'write_comment_here' => 'Напишіть коментар тут',
+    'diagnoses' => 'Діагнози',
 
     'relation_type' => [
         'primary' => 'Основний',
@@ -53,7 +59,7 @@ return [
     // Create patient
     'patient_information' => 'Інформація про пацієнта',
     'unzr' => 'УНЗР',
-    'patient_identity_documents' => 'Документи пацієнта, що підтверджують особу',
+    'identity_document' => 'Документ, що засвідчує особу',
     'rnokpp_not_found' => 'РНОКПП/ІПН відсутній',
     'secret' => 'Кодове слово',
     'emergency_contact' => 'Контакт для екстреного зв’язку',
@@ -90,16 +96,14 @@ return [
     'episodes' => 'Епізоди',
 
     // Diagnoses record
-    'diagnoses' => 'Діагнози',
 
     // Observations record
     'observations' => 'Обстеження',
 
     // Encounter
     'interaction' => 'Взаємодія',
-    'basic_data' => 'Основні дані',
+    'main_data' => 'Основні дані',
     'reasons_for_visit' => 'Причини звернення',
-    'actions' => 'Дії',
     'examination' => 'Обстеження',
     'vaccinations' => 'Вакцинації',
     'prescriptions' => 'Рецепти',
@@ -110,32 +114,41 @@ return [
     'diagnostic_reports' => 'Діагностичні звіти',
     'clinical_assessments' => 'Клінічні оцінки',
 
-    // Basic data
-    'patient_full_name' => 'ПІБ пацієнта',
-    'employee_full_name' => 'ПІБ працівника(автора)',
-    'division_name' => 'Місце надання послуг',
+    // Main data
     'referral_available' => 'Є направлення',
     'referral_number' => 'Номер направлення',
     'search_for_referral' => 'Шукати направлення',
     'interaction_class' => 'Клас взаємодії',
     'interaction_type' => 'Тип взаємодії',
+    'existing_episode' => 'Існуючий епізод',
+    'new_episode' => 'Новий епізод',
+    'episode_name' => 'Назва епізоду',
+    'episode_type' => 'Тип епізоду',
+    'episode_number' => 'Номер епізоду',
+
+    // Reasons
+    'reason_for_visit' => 'Причина звернення',
+
+    // Diagnoses
+    'icd-10' => 'МКХ-10',
+    'clinical_status' => 'Клінічний статус',
+    'verification_status' => 'Статус верифікації',
+    'entry_date' => 'Дата внесення',
+    'entry_time' => 'Час внесення',
+    'severity_of_the_condition' => 'Ступінь тяжкості стану',
+    'primary_source' => 'Первинне джерело',
+    'performer' => 'Виконавець',
+    'other_source' => 'Інше джерело',
+    'information_source' => 'Джерело інформації',
+
+    // Evidences
+    'evidence_conditions' => 'Докази - стани',
+    'condition' => 'Стан',
+
+    // Додаткові дані
+    'additional_data' => 'Додаткові дані',
     'data' => 'Дата',
     'period_start' => 'Час початку',
     'period_end' => 'Час закінчення',
-    'episode_name' => 'Назва епізоду',
-    'episode_type' => 'Тип епізоду',
-    'existing_episode' => 'Існуючий епізод',
-    'new_episode' => 'Новий епізод',
-    'episode_number' => 'Номер епізоду',
-
-    // Diagnoses
-    'add_diagnose' => 'Додати діагноз',
-    'icpc-2_status_code' => 'Код стану за ICPC-2',
-    'icd-10' => 'МКХ-10',
-    'code_and_name' => 'Код та назва',
-    'clinical_status' => 'Клінічний статус',
-    'verification_status' => 'Статус верифікації',
-    'severity_of_the_condition' => 'Ступінь тяжкості стану',
-    'create_diagnose' => 'Створити діагноз',
-    'save_changes' => 'Зберегти зміни'
+    'division_name' => 'Місце надання послуг'
 ];

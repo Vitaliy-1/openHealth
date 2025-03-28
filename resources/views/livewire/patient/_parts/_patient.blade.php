@@ -115,11 +115,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.birthSettlement"
+            <input wire:model="form.patient.birthSettlement"
                    type="text"
                    name="birthSettlement"
                    id="birthSettlement"
-                   class="input peer @error('patientRequest.patient.birthSettlement') input-error @enderror"
+                   class="input peer @error('form.patient.birthSettlement') input-error @enderror"
                    placeholder=" "
                    required
                    autocomplete="off"
@@ -128,7 +128,7 @@
                 {{ __('forms.birth_settlement') }}
             </label>
 
-            @error('patientRequest.patient.birthSettlement')
+            @error('form.patient.birthSettlement')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -138,10 +138,10 @@
 
     <div class="form-row-3">
         <div class="form-group group">
-            <select wire:model="patientRequest.patient.gender"
+            <select wire:model="form.patient.gender"
                     id="patientGender"
                     name="patientGender"
-                    class="input-select peer @error('patientRequest.patient.gender') input-error @enderror"
+                    class="input-select peer @error('form.patient.gender') input-error @enderror"
                     required
             >
                 <option selected>{{ __('forms.gender') }} *</option>
@@ -150,7 +150,7 @@
                 @endforeach
             </select>
 
-            @error('patientRequest.patient.gender')
+            @error('form.patient.gender')
             <p class="text-error">
                 {{ $message }}
             </p>
@@ -158,11 +158,11 @@
         </div>
 
         <div class="form-group group">
-            <input wire:model="patientRequest.patient.unzr"
+            <input wire:model="form.patient.unzr"
                    type="text"
                    name="unzr"
                    id="unzr"
-                   class="input peer @error('patientRequest.patient.unzr') input-error @enderror"
+                   class="input peer @error('form.patient.unzr') input-error @enderror"
                    placeholder=" "
                    maxlength="14"
                    autocomplete="off"
@@ -171,7 +171,7 @@
                 {{ __('patients.unzr') }}
             </label>
 
-            @error('patientRequest.patient.unzr')
+            @error('form.patient.unzr')
             <p class="text-error">
                 {{ $message }}
             </p>
