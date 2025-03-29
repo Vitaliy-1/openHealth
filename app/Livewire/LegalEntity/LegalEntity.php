@@ -23,6 +23,9 @@ use Illuminate\Validation\ValidationException;
 use App\Models\LegalEntity as LegalEntityModel;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesForms;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesRequestApi;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class LegalEntity extends Component
 {
@@ -568,15 +571,31 @@ class LegalEntity extends Component
                     Cache::forget($this->stepCacheKey);
                 }
 
-                $this->redirect('/legal-entities/dashboard');
-                // TODO: refactor this after complex testing
-                // return redirect()->route('logout');
+                $this->logout();
             });
         } catch (Exception $err) {
             Log::error(__('Сталася помилка під час обробки запиту'), ['error' => $err->getMessage()]);
 
             throw new Exception(__('Сталася помилка під час обробки запиту.' . ' Код помилки: ' . $err->getCode()));
         }
+    }
+
+
+    protected function logout()
+    {
+        $user = Auth::user();
+
+        if ($user) {
+            $user->tokens()->delete();
+        }
+
+        Auth::guard('web')->logout();
+        Session::flush();
+
+        session()->invalidate();
+        session()->regenerateToken();
+
+        return redirect()->route('login');
     }
 
     protected function getEmployeeResponse(array $employeeData, string $legalEntityUUID, string $employeeRequestId): array
