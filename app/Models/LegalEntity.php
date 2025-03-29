@@ -8,15 +8,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Relations\Address;
+use App\Models\Relations\Phone;
 
 /**
  * @mixin IdeHelperLegalEntity
  */
 class LegalEntity extends Model
 {
-    use HasFactory;
+    use HasCamelCasing,
+        HasFactory;
 
     public const string TYPE_PRIMARY_CARE = 'PRIMARY_CARE';
 
@@ -32,11 +36,9 @@ class LegalEntity extends Model
         'inserted_at',
         'inserted_by',
         'is_active',
-        // 'license',
         'nhs_comment',
         'nhs_reviewed',
         'nhs_verified',
-        'phones',
         'receiver_funds_code',
         'residence_address',
         'status',
@@ -52,8 +54,6 @@ class LegalEntity extends Model
         'accreditation' => 'array',
         'archive' => 'array',
         'edr' => 'array',
-        // 'license' => 'array',
-        'phones' => 'array',
         'residence_address' => 'array',
         'inserted_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -64,7 +64,8 @@ class LegalEntity extends Model
 
     protected $with = [
         'licenses',
-        'address'
+        'address',
+        'phones'
     ];
 
     protected $attributes = [
@@ -143,5 +144,10 @@ class LegalEntity extends Model
     public function address(): MorphOne
     {
         return $this->morphOne(Address::class, 'addressable');
+    }
+
+    public function phones(): MorphMany
+    {
+        return $this->morphMany(Phone::class, 'phoneable');
     }
 }

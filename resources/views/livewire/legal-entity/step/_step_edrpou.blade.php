@@ -29,20 +29,20 @@
                 placeholder=" "
                 value="{{ $edrpou ?? '' }}"
                 wire:model="legalEntityForm.edrpou"
-                {{-- aria-describedby="{{ $hasEdrpouError ? 'edrpou_error_help' : '' }}" --}}
+                aria-describedby="{{ $hasEdrpouError ? 'edrpouErrorHelp' : '' }}"
                 class="input {{ $hasEdrpouError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
                 :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
                 :disabled="isDisabled"
             />
 
             @if($hasEdrpouError)
-                <p id="edrpou_error_help" class="text-error">
+                <p id="edrpouErrorHelp" class="text-error">
                     {{ $errors->first('legalEntityForm.edrpou') }}
                 </p>
             @endif
 
             <label :for="$id('edrpou')" class="label z-10">
-                {{__('forms.edrpouRnokpp')}}
+                {{__('forms.edrpou_rnokpp')}}
             </label>
         </div>
     </div>

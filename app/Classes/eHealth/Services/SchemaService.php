@@ -68,6 +68,7 @@ class SchemaService
                 throw new \InvalidArgumentException('Переданий об\'єкт повинен мати метод schemaResponse');
             }
         }
+
         return $this->setSchema($this->class->schemaResponse())
             ->arrayToCollection()
             ->mappingSchemaNormalize()
@@ -79,6 +80,7 @@ class SchemaService
     private function setSchema($schema): self
     {
         $this->schema = collect($schema);
+
         return $this;
     }
 
@@ -344,9 +346,14 @@ class SchemaService
      *
      * @return self
      */
-    public function snakeCaseKeys(): self
+    public function snakeCaseKeys(bool $isFromNormalizedData = false): self
     {
-        $this->data = $this->convertKeysToSnakeCase($this->data);
+        if ($isFromNormalizedData){
+            $this->normalizedData = collect($this->convertKeysToSnakeCase($this->normalizedData->toArray()));
+        } else {
+            $this->data = $this->convertKeysToSnakeCase($this->data);
+        }
+
         return $this;
     }
 

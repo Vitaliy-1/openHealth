@@ -2,11 +2,12 @@
 
 namespace App\Repositories;
 
+use Log;
+use Exception;
 use App\Models\Employee\BaseEmployee;
 use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeRequest;
 use App\Models\LegalEntity;
-use Exception;
 use Illuminate\Support\Facades\DB;
 
 class EmployeeRepository
@@ -77,13 +78,12 @@ class EmployeeRepository
 
     }
 
-    public function saveEmployeeData($request, LegalEntity $legalEntity ,  Employee|EmployeeRequest $employeeModel): Employee|EmployeeRequest //TODO: Global LegalEntity model
+    public function saveEmployeeData($request, LegalEntity $legalEntity,  Employee|EmployeeRequest $employeeModel): Employee|EmployeeRequest|null
     {
-//        DB::beginTransaction();
-//        try {
+       try {
             // Create or update User
             if (isset($request['party']['email']) && !empty($request['party']['email'])) {
-                $this->userRepository->createIfNotExist($request['party'], $request['employeeType'], $legalEntity);
+                $this->userRepository->createIfNotExist($request['party'], $request['employee_type'], $legalEntity);
             }
             // Create or update Employee
             $employee = $this->createOrUpdate($request,$employeeModel,$legalEntity);
@@ -112,16 +112,9 @@ class EmployeeRepository
             // Bind employee to Party
             $party->employees()->save($employee);
 
-            // Commit the transaction
-//            DB::commit();
-
             return $employee;
-//        } catch (Exception $e) {
-//            // Rollback the transaction on error
-//            DB::rollBack();
-//
-//            return null;
-//        }
+       } catch (Exception $err) {
+            throw new Exception(__('Create Employee Error') . ' : ' . $err->getMessage());
+       }
     }
-
 }

@@ -18,12 +18,12 @@ class ScienceDegree extends Model
     protected $fillable = [
         'country',
         'city',
-        'institutionName',
-        'issuedDate',
+        'institution_name',
+        'issued_date',
         'degree',
-        'diplomaNumber',
+        'diploma_number',
         'speciality',
-        'issuedDate'
+        'issued_date'
     ];
 
     public function science_degreeable(): MorphTo

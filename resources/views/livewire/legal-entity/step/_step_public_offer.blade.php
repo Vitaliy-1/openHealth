@@ -23,7 +23,7 @@
                 required
                 id="publicOfferKnedp"
                 wire:model="knedp"
-                {{-- aria-describedby="{{ $hasPublicOfferKnedpError ? 'publicOfferKnedpErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasPublicOfferKnedpError ? 'publicOfferKnedpErrorHelp' : '' }}"
                 class="input-select text-gray-800 {{ $hasPublicOfferKnedpError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             >
                 <option value="_placeholder_" selected hidden>-- {{ __('forms.select') }} --</option>
@@ -49,6 +49,7 @@
                 required
                 wire:model="keyContainerUpload"
                 file="{{ $keyContainerUpload?->getClientOriginalName() }}"
+                aria-describedby="{{ $hasPublicOfferFileError ? 'publicOfferFileErrorHelp' : '' }}"
                 :id="'keyContainerUpload'"
             />
 
@@ -59,7 +60,7 @@
             @endif
 
             <label for="keyContainerUpload" class="label z-10">
-                {{ __('forms.keyContainerUpload') }} *
+                {{ __('forms.key_container_upload') }} *
             </label>
         </div>
 
@@ -70,7 +71,7 @@
                 placeholder=" "
                 id="publicOfferPassword"
                 wire:model="password"
-                {{-- aria-describedby="{{ $hasPublicOfferPasswordError ? 'publicOfferPasswordErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasPublicOfferPasswordError ? 'publicOfferPasswordErrorHelp' : '' }}"
                 class="input {{ $hasPublicOfferPasswordError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 

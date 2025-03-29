@@ -18,9 +18,9 @@ class Education extends Model
     protected $fillable = [
         'country',
         'city',
-        'institutionName',
-        'issuedDate',
-        'diplomaNumber',
+        'institution_name',
+        'issued_date',
+        'diploma_number',
         'degree',
         'speciality',
     ];

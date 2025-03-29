@@ -8,16 +8,18 @@
     $hasSettlementError = $errors->has('address.settlement');
     $hasStreetTypeError = $errors->has('address.streetType');
     $hasStreetError = $errors->has('address.street');
+
+    natcasesort($dictionaries['STREET_TYPE']);
 @endphp
 
 <div class="{{ $class }}">
     {{--  AREA --}}
-    <div class="form-group group z-[18]">
+    <div class="form-group group !z-[18]">
         <select
             required
             id="addressArea"
             wire:model.live="address.area"
-            {{-- aria-describedby="{{ $hasAreaError ? 'addressAreaErrorHelp' : '' }}" --}}
+            aria-describedby="{{ $hasAreaError ? 'addressAreaErrorHelp' : '' }}"
             class="input-select text-gray-800 {{ $hasAreaError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
         >
             <option value="_placeholder_" hidden>-- {{ __('forms.select') }} --</option>
@@ -42,7 +44,7 @@
     </div>
 
     {{-- REGION  --}}
-    <div class="form-group group z-[17]">
+    <div class="form-group group !z-[17]">
         <div
             x-data="{
                 showTo: false,
@@ -65,7 +67,7 @@
                 autocomplete="off"
                 x-ref="regionField"
                 wire:model.live.debounce.400ms="address.region"
-                {{-- aria-describedby="{{ $hasRegionError ? 'addressRegionErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasRegionError ? 'addressRegionErrorHelp' : '' }}"
                 class="input {{ $hasRegionError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
                 :disabled="{{ empty($address['area']) || (isset($address['area']) && $address['area']) === 'М.КИЇВ' ? 'true' : 'false' }}"
             />
@@ -110,12 +112,12 @@
     </div>
 
     {{-- TYPE --}}
-    <div class="form-group group z-[16]">
+    <div class="form-group group !z-[16]">
         <select
             required
             id="addressSettlementType"
             wire:model.live="address.settlementType"
-            {{-- aria-describedby="{{ $hasSettlementTypeError ? 'addressSettlementTypeErrorHelp' : '' }}" --}}
+            aria-describedby="{{ $hasSettlementTypeError ? 'addressSettlementTypeErrorHelp' : '' }}"
             class="input-select text-gray-800 {{ $hasSettlementTypeError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             :disabled="{{ empty($address['region']) ? 'true' : 'false' }}"
         >
@@ -142,7 +144,7 @@
     </div>
 
     {{-- SETTLEMENT --}}
-    <div class="form-group group z-[15]">
+    <div class="form-group group !z-[15]">
         <div
             x-data="{
                 showTo: false,
@@ -165,7 +167,7 @@
                 autocomplete="off"
                 x-ref="settlementField"
                 wire:model.live.debounce.400ms="address.settlement"
-                {{-- aria-describedby="{{ $hasSettlementError? 'addressSettlementErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasSettlementError? 'addressSettlementErrorHelp' : '' }}"
                 class="input {{ $hasSettlementError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
                 :disabled="{{ empty($address['settlementType']) || (isset($address['area']) && $address['area']) === 'М.КИЇВ' ? 'true' : 'false' }}"
             />
@@ -210,12 +212,12 @@
     </div>
 
     {{-- STREET_TYPE --}}
-    <div class="form-group group z-[14]">
+    <div class="form-group group !z-[14]">
         <select
             required
             id="addressStreetType"
             wire:model.live="address.streetType"
-            {{-- aria-describedby="{{ $hasStreetTypeError ? 'addressStreetTypeErrorHelp' : '' }}" --}}
+            aria-describedby="{{ $hasStreetTypeError ? 'addressStreetTypeErrorHelp' : '' }}"
             class="input-select text-gray-800 {{ $hasStreetTypeError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             :disabled="{{ empty($address['settlement']) ? 'true' : 'false' }}"
         >
@@ -241,7 +243,7 @@
     </div>
 
     {{-- STREET --}}
-    <div class="form-group group z-[13]">
+    <div class="form-group group !z-[13]">
         <input
             required
             type="text"
@@ -250,7 +252,7 @@
             autocomplete="off"
             x-ref="streetField"
             wire:model.live.debounce.400ms="address.street"
-            {{-- aria-describedby="{{ $hasStreetError ? 'addressStreetErrorHelp' : '' }}" --}}
+            aria-describedby="{{ $hasStreetError ? 'addressStreetErrorHelp' : '' }}"
             class="input {{ $hasStreetError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             :disabled="{{ empty($address['settlementType']) ? 'true' : 'false' }}"
         />
@@ -307,13 +309,13 @@
     </div>
 
     {{-- BUILDING --}}
-    <div class="form-group group z-[12]">
+    <div class="form-group group !z-[12]">
         <input
             type="text"
             placeholder=" "
             id="addressBuilding"
             wire:model="address.building"
-            {{-- aria-describedby="{{ $hasBuildingError ? 'addressBuildingErrorHelp' : '' }}" --}}
+            aria-describedby="{{ $hasBuildingError ? 'addressBuildingErrorHelp' : '' }}"
             class="input {{ $hasBuildingError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             :disabled="{{ empty($address['settlement']) ? 'true' : 'false' }}"
         />
@@ -330,13 +332,13 @@
     </div>
 
     {{-- APARTMENT --}}
-    <div class="form-group group z-[11]">
+    <div class="form-group group !z-[11]">
         <input
             type="text"
             placeholder=" "
             id="addressApartment"
             wire:model="address.apartment"
-            {{-- aria-describedby="{{ $hasApartmentError ? 'addressApartmentErrorHelp' : '' }}" --}}
+            aria-describedby="{{ $hasApartmentError ? 'addressApartmentErrorHelp' : '' }}"
             class="input {{ $hasApartmentError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             :disabled="{{ empty($address['settlement']) ? 'true' : 'false' }}"
         />
@@ -360,13 +362,13 @@
             placeholder=" "
             id="addressZip"
             wire:model="address.zip"
-            {{-- aria-describedby="{{ $hasZipError ? 'address_zip_error_help' : '' }}" --}}
+            aria-describedby="{{ $hasZipError ? 'addressZipErrorHelp' : '' }}"
             class="input {{ $hasZipError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             :disabled="{{ empty($address['settlement']) ? 'true' : 'false' }}"
         />
 
         @if($hasZipError)
-            <p id="address_zip_error_help" class="text-error">
+            <p id="addressZipErrorHelp" class="text-error">
                 {{ $errors->first('address.zip') }}
             </p>
         @endif

@@ -106,7 +106,6 @@ class Request
 
         if ($response->failed()) {
             $errors = json_decode($response->body(), true);
-            dd($errors);
 
             Log::channel('api_errors')->error('API request failed', [
                 'url' => $this->makeApiUrl(),
@@ -114,6 +113,7 @@ class Request
                 'errors' => $errors
             ]);
 
+            dd($errors);
             return (new ErrorHandler())->handleError($errors);
         }
     }

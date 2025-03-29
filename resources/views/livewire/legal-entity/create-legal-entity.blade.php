@@ -124,13 +124,14 @@
                                     {{ __('forms.agree') }}
                                     <button
                                         type="button"
-                                        class="steps-agreement_button"
-                                        @click="openModal = !openModal;console.log('Is clicked', openModal);"
+                                        class="steps-agreement_button cursor-pointer"
+                                        @click="openModal = !openModal"
                                     >
                                         {{ __('forms.withTerms') }}
                                     </button>
                                 </label>
                             </div>
+
                             @error('legalEntityForm.public_offer.consent')
                                 <div class='validation-error'>
                                     {{ $message }}
@@ -143,8 +144,8 @@
                                 <button
                                     type="button"
                                     id="submit_button"
-                                    class="button-primary"
-                                    wire:click="signLegalEntity"
+                                    class="button-primary cursor-pointer"
+                                    wire:click="createLegalEntity"
                                     :disabled="isSendDisabled"
                                 >
                                     {{ __('forms.sendRequest') }}
@@ -155,7 +156,7 @@
                                 <button
                                     type="button"
                                     id="next_button"
-                                    class="default-button"
+                                    class="default-button cursor-pointer"
                                     @click="$wire.nextStep(activeStep).then(result => result ? activeStep={{ $currentStep }} : activeStep)"
                                 >
                                     {{ __('forms.next') }}
@@ -181,14 +182,14 @@
                     <div
                         x-show="openModal"
                         @click="openModal = false"
-                        class="fixed z-22 inset-0 bg-black/25"
+                        class="fixed z-20 inset-0 bg-black/25"
                     ></div>
 
                     <!-- Modal content -->
                     <div
                         x-on:click.stop
                         x-trap.noscroll.inert="openModal"
-                        class="relative w-[70%] h-[75vh] rounded-xl bg-white shadow-lg mx-auto mt-[15vh] flex flex-col dark:bg-gray-800"
+                        class="relative w-[70%] h-[75vh] rounded-xl bg-white shadow-lg mx-auto mt-[15vh] flex flex-col dark:bg-gray-800 z-22"
                     >
                         <!-- Modal header -->
                         <div class="p-6 border-b mb-2">
@@ -200,7 +201,7 @@
                             <button
                                 type="button"
                                 @click="openModal = false"
-                                class="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
+                                class="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center cursor-pointer"
                             >
                                 <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
@@ -218,7 +219,7 @@
                         <div class="flex gap-4 flex-wrap justify-center p-4 border-t mt-2 mx-auto">
                             <button
                                 type="button"
-                                class="default-button"
+                                class="default-button cursor-pointer"
                                 @click="isTermDisabled = false; isSendDisabled = false; openModal = false;"
                             >
                                 {{ __('forms.agree') }}
@@ -226,7 +227,7 @@
 
                             <button
                                 type="button"
-                                class="alternative-button"
+                                class="alternative-button cursor-pointer"
                                 @click="isTermDisabled = true; isSendDisabled = true; openModal = false;"
                             >
                                 {{ __('forms.decline') }}
