@@ -19,16 +19,16 @@ class Party extends Model
 
     protected $fillable = [
         'uuid',
-        'lastName',
-        'firstName',
-        'secondName',
+        'last_name',
+        'first_name',
+        'second_name',
         'email',
-        'birthDate',
+        'birth_date',
         'gender',
-        'taxId',
-        'noTaxId',
-        'aboutMyself',
-        'workingExperience',
+        'tax_id',
+        'no_tax_id',
+        'about_myself',
+        'working_experience',
     ];
 
     public $timestamps = false;

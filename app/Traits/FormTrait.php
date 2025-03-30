@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 
 trait FormTrait
 {
@@ -189,7 +190,17 @@ trait FormTrait
         $relations = $model->getRelations();
 
         foreach ($relations as $key => $relation) {
-            $arr = array_merge($arr, [$key => $relation->getAttributes()]);
+            if ($relation instanceof Collection) {
+                $relationData = [];
+
+                foreach ($relation as $index => $relationModel) {
+                    $relationData[] = [$index => $relationModel->getAttributes()];
+                }
+            } else {
+                $relationData = $relation->getAttributes();
+            }
+
+            $arr = array_merge($arr, [$key => $relationData]);
         }
 
         // return $this->flattenArray($arr);

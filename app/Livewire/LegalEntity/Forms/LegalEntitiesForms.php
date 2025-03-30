@@ -2,16 +2,19 @@
 
 namespace App\Livewire\LegalEntity\Forms;
 
-use App\Models\User;
-use App\Rules\AgeCheck;
-use App\Rules\Cyrillic;
-use App\Rules\InDictionaryCheck;
-use App\Rules\UniqueEdrpou;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Validation\Rule;
-use Livewire\Attributes\Validate;
+use App\Rules\ExpiryDate;
 use Livewire\Form;
+use App\Rules\Name;
+use App\Models\User;
+use App\Rules\Email;
+use App\Rules\TaxId;
+use App\Rules\Cyrillic;
+use App\Rules\BirthDate;
+use App\Rules\DocumentType;
+use App\Rules\InDictionary;
+use App\Rules\UniqueEdrpou;
 use App\Exceptions\CustomValidationException;
+use Illuminate\Validation\ValidationException;
 
 class LegalEntitiesForms extends Form
 {
@@ -19,61 +22,14 @@ class LegalEntitiesForms extends Form
 
     protected string $positionKeys;
 
-    #[Validate(['required', 'regex:/^(\d{8,10}|[А-ЯЁЇІЄҐ]{2}\d{6})$/', new UniqueEdrpou()])]
     public string $edrpou = '';
 
-    #[Validate(
-        [
-            'owner.lastName'        => ['required', 'min:3', new Cyrillic()],
-            'owner.firstName'       => ['required', 'min:3', new Cyrillic()],
-            'owner.secondName'      => ['nullable', new Cyrillic()],
-            'owner.gender'           => 'required|string',
-            'owner.birthDate'       => ['required', 'date', new AgeCheck()],
-            'owner.noTaxId'        => 'boolean|nullable',
-            'owner.taxId'           => 'required|integer|digits:10',
-            'owner.documents.type'   => ['required','string', new InDictionaryCheck('document_type')],
-            'owner.documents.number' => 'required|string',
-            'owner.phones'           => 'required|array',
-            'owner.phones.*.number'  => 'required|string|regex:/^\+?\d{12}$/',
-            'owner.phones.*.type'    => ['required', 'string', new InDictionaryCheck('phone_type')],
-            'owner.email'            => 'required|email|regex:/^([a-z0-9+-]+)(\.[a-z0-9+-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/ix',
-            'owner.position'         => ['required','string', new InDictionaryCheck('position')]
-        ],
-        message: [
-            'owner.email.unique'           => 'Поле :attribute вже зареєстровано в системі',
-            'owner.phones.required'          => 'Поле з номерами телефонів є обов\'язковим',
-            'owner.phones.array'             => 'Поле з номерами телефонів повинно бути масивом',
-            'owner.age_check'                => 'Вік власника має бути не менше 18 років',
-            'owner.phones.*.number.required' => 'Номер телефону є обов\'язковим',
-            'owner.phones.*.number.regex'    => 'Номер телефону повинен містити 12 цифр',
-            'owner.phones.*.type.required'   => 'Тип телефону є обов\'язковим',
-            'owner.phones.*.type'         => 'Тип телефону повинен бути "МОБІЛЬНИЙ" або "СТАЦІОНАРНИЙ"'
-        ]
-    )]
     public ?array $owner = [];
 
-    #[Validate([
-        'phones'          => 'required|array',
-        'phones.*.number' => 'required|string|regex:/^\+?\d{12}$/',
-        'phones.*.type'   => ['required', 'string', new InDictionaryCheck('phone_type')]
-    ],
-        message: [
-            'phones.required'          => 'Поле з номерами телефонів є обов\'язковим',
-            'phones.array'             => 'Поле з номерами телефонів повинно бути масивом',
-            'phones.*.number.required' => 'Номер телефону є обов\'язковим',
-            'phones.*.number.regex'    => 'Номер телефону повинен містити 12 цифр',
-            'phones.*.type.required'   => 'Тип телефону є обов\'язковим',
-            'phones.*.type'         => 'Тип телефону повинен бути "МОБІЛЬНИЙ" або "СТАЦІОНАРНИЙ"',
-        ]
-    )]
     public ?array $phones = [];
 
-    #[Validate([
-        'website' => ['required', 'regex:/^(https?:\/\/)?(www\.)?([a-z0-9\-]+\.)+[a-z]{2,}$/i']
-    ])]
     public string $website = '';
 
-    #[Validate('required|email|regex:/^([a-z0-9+-]+)(.[a-z0-9+-]+)*@([a-z0-9-]+.)+[a-z]{2,6}$/ix')]
     public string $email = '';
 
     public ?array $residenceAddress = [];
@@ -82,42 +38,14 @@ class LegalEntitiesForms extends Form
 
     public bool $accreditationShow = false;
 
-    #[Validate([
-        'accreditation.category' => ['required', 'string'],
-        'accreditation.orderNo' => ['required', 'string', 'min:2'],
-        'accreditation.orderDate' => ['required', 'date'],
-        'accreditation.issuedDate' => ['nullable', 'date'],
-        'accreditation.expiryDate' => ['nullable', 'date'],
-    ])]
     public ?array $accreditation = [];
 
-    #[Validate([
-        'license.type'             => 'required|string',
-        'license.issuedBy'        => ['required', 'string','min:3',new Cyrillic()],
-        'license.issuedDate'      => 'required|date|min:3',
-        'license.activeFromDate' => 'required|date|min:3',
-        'license.orderNo'         => 'required|string',
-        'license.licenseNumber'   => [
-            'nullable',
-            'string',
-            'regex:/^(?!.*[ЫЪЭЁыъэё@$^#])[a-zA-ZА-ЯҐЇІЄа-яґїіє0-9№\"!\^\*)\]\[(&._-].*$/'
-        ],
-    ])]
     public array|null $license = [];
 
-    #[Validate([
-        'archive.date'  => 'required|date',
-        'archive.place' => 'required|string',
-    ])]
     public ?array $archive = [];
 
-    #[Validate([
-        'receiverFundsCode' => 'nullable|string|regex:/^[0-9]+$/'
-    ])]
     public ?string $receiverFundsCode = '';
 
-
-    #[Validate(['min:3', new Cyrillic()])]
     public ?string $beneficiary = '';
 
     public ?array $publicOffer = [];
@@ -126,25 +54,96 @@ class LegalEntitiesForms extends Form
         'redirect_uri' => 'https://openhealths.com/ehealth/oauth',
     ];
 
+    public function rules(): array
+    {
+        return [
+            'edrpou' => ['required', 'regex:/^(\d{8,10}|[А-ЯЁЇІЄҐ]{2}\d{6})$/', new UniqueEdrpou()],
+            'owner.lastName' => ['required', 'min:3', new Name()],
+            'owner.firstName' => ['required', 'min:3', new Name()],
+            'owner.secondName' => ['nullable', new Name()],
+            'owner.gender' => 'required|string',
+            'owner.birthDate' => ['required', 'date', new BirthDate()],
+            'owner.noTaxId' => 'boolean|nullable',
+            'owner.taxId' => ['required', new TaxId($this->owner['noTaxId'])],
+            'owner.documents.type' => ['required','string', new InDictionary('DOCUMENT_TYPE')],
+            'owner.documents.number' => ['required', 'string', new DocumentType($this->owner['documents']['type'] ?? '')],
+            'owner.phones' => 'required|array',
+            'owner.phones.*.number' => 'required|string|regex:/^\+?\d{12}$/',
+            'owner.phones.*.type' => ['required', 'string', new InDictionary('PHONE_TYPE')],
+            'owner.email' => ['required','email',new Email()],
+            'owner.position' => ['required','string', new InDictionary('POSITION')],
+            'email' => ['required','email',new Email()],
+            'website' => ['required', 'regex:/^(https?:\/\/)?(www\.)?([a-z0-9\-]+\.)+[a-z]{2,}$/i'],
+            'phones' => 'required|array',
+            'phones.*.number' => 'required|string|regex:/^\+?\d{12}$/',
+            'phones.*.type' => ['required', 'string', new InDictionary('PHONE_TYPE')],
+            'accreditation.category' => ['required', 'string'],
+            'accreditation.orderNo' => ['required', 'string', 'min:2'],
+            'accreditation.orderDate' => ['required', 'date'],
+            'accreditation.issuedDate' => ['nullable', 'date'],
+            'accreditation.expiryDate' => ['nullable', 'date', new ExpiryDate($this->accreditation['issuedDate'] ?? '')],
+            'license.type' => 'required|string',
+            'license.issuedBy' => ['required', 'string','min:3',new Cyrillic()],
+            'license.issuedDate' => 'required|date|min:3',
+            'license.activeFromDate' => 'required|date|min:3',
+            'license.expiryDate' => ['nullable', 'date', new ExpiryDate($this->license['activeFromDate'] ?? '')],
+            'license.orderNo' => 'required|string',
+            'license.licenseNumber' => ['nullable', 'string', 'regex:/^(?!.*[ЫЪЭЁыъэё@$^#])[a-zA-ZА-ЯҐЇІЄа-яґїіє0-9№\"!\^\*)\]\[(&._-].*$/'],
+            'receiverFundsCode' => 'nullable|string|regex:/^[0-9]+$/',
+            'beneficiary' => ['min:3', new Cyrillic()],
+            'archive.date'  => 'required|date',
+            'archive.place' => 'required|string'
+        ];
+    }
+
     public function messages(): array
     {
         return [
-            'owner.firstName' => __('Iм\'я є обов\'язковим до заповнення'),
-            'owner.lastName' => __('Прізвище є обов\'язковим до заповнення'),
-            // 'owner.secondName' => __('Це поле є обов\'язковим до заповнення'),
+            'edrpou.required' => __('Це поле є обов\'язковим до заповнення'),
+            'edrpou' => __('Поле має хибний формат'),
+            'owner.firstName.required' => __('Iм\'я є обов\'язковим до заповнення'),
+            'owner.lastName.required' => __('Прізвище є обов\'язковим до заповнення'),
+            'owner.firstName' => __('Поле має хибний формат. (Дозволено лише кирилічні символи)'),
+            'owner.lastName' => __('Поле має хибний формат. (Дозволено лише кирилічні символи)'),
+            'owner.secondName' => __('Поле має хибний формат. (Дозволено лише кирилічні символи)'),
             'owner.birthDate.required' => __('Дата народження є обов\'язковою до заповнення'),
+            'owner.age_check' => 'Вік власника має бути не менше 18 років',
             'owner.gender' => __('Це поле є обов\'язковим до заповнення'),
             'owner.phones' => __('Контактний телефон є обов\'язковим до заповнення'),
-            'owner.taxId' => __('Номер ІПН чи РНОКПП є обов\'язковим до заповнення'),
+            'owner.taxId.required' => __('Номер ІПН чи РНОКПП є обов\'язковим до заповнення'),
             'owner.documents.type.required' => __('Тип документа є обов\'язковим до заповнення'),
             'owner.position.required' => __('Посада є обов\'язковою до заповнення'),
-            'accreditation.category' => __('Категорія є обов\'язковою до заповнення'),
-            'accreditation.orderNo' => __('Номер наказу є обов\'язковим до заповнення'),
-            'accreditation.orderDate' => __('Дата наказу є обов\'язковою до заповнення'),
+            'owner.email.unique' => 'Поле :attribute вже зареєстровано в системі',
+            'owner.phones.required' => 'Поле з номерами телефонів є обов\'язковим',
+            'owner.phones.array' => 'Поле з номерами телефонів повинно бути масивом',
+            'owner.phones.*.number.required' => 'Номер телефону є обов\'язковим',
+            'owner.phones.*.number.regex' => 'Номер телефону повинен містити 12 цифр',
+            'owner.phones.*.type.required' => 'Тип телефону є обов\'язковим',
+            'owner.phones.*.type' => 'Тип телефону повинен бути "МОБІЛЬНИЙ" або "СТАЦІОНАРНИЙ"',
+            'website.required' => __('Це поле є обов\'язковим до заповнення'),
+            'website' => __('Поле має хибний формат'),
+            'phones.required' => 'Поле з номерами телефонів є обов\'язковим',
+            'phones.array' => 'Поле з номерами телефонів повинно бути масивом',
+            'phones.*.number.required' => 'Номер телефону є обов\'язковим',
+            'phones.*.number.regex' => 'Номер телефону повинен містити 12 цифр',
+            'phones.*.type.required' => 'Тип телефону є обов\'язковим',
+            'phones.*.type' => 'Тип телефону повинен бути "МОБІЛЬНИЙ" або "СТАЦІОНАРНИЙ"',
+            'accreditation.category.required' => __('Категорія є обов\'язковою до заповнення'),
+            'accreditation.orderNo.required' => __('Номер наказу є обов\'язковим до заповнення'),
+            'accreditation.orderDate.required' => __('Дата наказу є обов\'язковою до заповнення'),
+            'accreditation.orderNo.min' => __('Поле має хибний формат. (Мінімальна довжина - 2 символи)'),
+            'accreditation.category' => __('Поле має хибний формат'),
+            'accreditation.orderNo' => __('Поле має хибний формат'),
             'license.issuedDate' => __('Дата видачі є обов\'язковою до заповнення'),
             'license.activeFromDate' => __('Дата початку дії є обов\'язковою до заповнення'),
+            'license.issuedBy.min' => __('Поле має хибний формат. (Мінімальна довжина - 3 символи)'),
             'license.issuedBy' => __('Потрібно вказати орган, який видав документ'),
-            'license.orderNo' => __('Номер наказу є обов\'язковим до заповнення')
+            'license.orderNo' => __('Номер наказу є обов\'язковим до заповнення'),
+            'receiverFundsCode' => __('Поле має хибний формат. (Дозволено лише цифри)'),
+            'beneficiary.min' => __('Поле має хибний формат. (Мінімальна довжина - 3 символи)'),
+            'beneficiary' => __('Поле має хибний формат. (Дозволено лише кирилічні символи)'),
+            'archive.date' => __('Це поле є обов\'язковим до заповнення'),
+            'archive.place' => __('Це поле є обов\'язковим до заповнення'),
         ];
     }
 
@@ -172,8 +171,6 @@ class LegalEntitiesForms extends Form
             // Throw an validation error from Division's side
             throw ValidationException::withMessages($errors);
         }
-
-        // $this->customRulesValidation(); // TODO: Uncomment this after adding custom rules
     }
 
     public function rulesForAddresses()
@@ -217,13 +214,17 @@ class LegalEntitiesForms extends Form
     public function rulesForContact(): void
     {
         // Validate email
-        $this->validate($this->rulesForModel('email')->toArray());
+        $emailRules = $this->rulesForModel('email')->toArray();
 
         // Validate website
-        $this->validate($this->rulesForModel('website')->toArray());
+        $websiteRules = $this->rulesForModel('website')->toArray();
 
         // Validate phones array rules
-        $this->validate($this->rulesForModel('phones')->toArray());
+        $phonesRules = $this->rulesForModel('phones')->toArray();
+
+        $modelRules = array_merge($emailRules, $websiteRules, $phonesRules);
+
+        $this->validate($modelRules);
     }
 
     /**
@@ -250,14 +251,17 @@ class LegalEntitiesForms extends Form
     public function rulesForAdditionalInformation(): void
     {
         // Validate archive array rules
-        $this->validate($this->rulesForModel('archive')->toArray());
+        $archiveRules = $this->rulesForModel('archive')->toArray();
 
         // Validate beneficiary
-        $this->validate($this->rulesForModel('beneficiary')->toArray());
+        $beneficiaryRules = $this->rulesForModel('beneficiary')->toArray();
 
         // Validate receiver_funds_code
-        $this->validate($this->rulesForModel('receiverFundsCode')->toArray());
+        $fundsCodeRules = $this->rulesForModel('receiverFundsCode')->toArray();
 
+        $modelRules = array_merge($archiveRules, $beneficiaryRules, $fundsCodeRules);
+
+        $this->validate($modelRules);
     }
 
     public function rulesForSignificancy()

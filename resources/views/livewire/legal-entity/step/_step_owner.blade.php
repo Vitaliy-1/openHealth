@@ -35,7 +35,7 @@
                 placeholder=" "
                 id="ownerLastName"
                 wire:model="legalEntityForm.owner.lastName"
-                {{-- aria-describedby="{{ $hasOwnerLastName ? 'ownerLastNameErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasOwnerLastName ? 'ownerLastNameErrorHelp' : '' }}"
                 class="input {{ $hasOwnerLastName ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -58,7 +58,7 @@
                 placeholder=" "
                 id="ownerFirstName"
                 wire:model="legalEntityForm.owner.firstName"
-                {{-- aria-describedby="{{ $hasOwnerFirstName ? 'ownerFirstNameErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasOwnerFirstName ? 'ownerFirstNameErrorHelp' : '' }}"
                 class="input {{ $hasOwnerFirstName ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -80,7 +80,7 @@
                 placeholder=" "
                 id="ownerSecondName"
                 wire:model="legalEntityForm.owner.secondName"
-                {{-- aria-describedby="{{ $hasOwnerSecondName ? 'ownerSecondNameErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasOwnerSecondName ? 'ownerSecondNameErrorHelp' : '' }}"
                 class="input {{ $hasOwnerSecondName ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -107,7 +107,7 @@
                 placeholder=" "
                 id="ownerBirthDate"
                 wire:model="legalEntityForm.owner.birthDate"
-                {{-- aria-describedby="{{ $hasOwnerBirthDate ? 'ownerBirthDateErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasOwnerBirthDate ? 'ownerBirthDateErrorHelp' : '' }}"
                 class="input datepicker-input {{ $hasOwnerBirthDate ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -183,7 +183,7 @@
                 placeholder=" "
                 id="ownerEmail"
                 wire:model="legalEntityForm.owner.email"
-                {{-- aria-describedby="{{ $hasOwnerEmail ? 'ownerEmailErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasOwnerEmail ? 'ownerEmailErrorHelp' : '' }}"
                 class="input {{ $hasOwnerEmail ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -204,10 +204,10 @@
                 required
                 id="ownerPosition"
                 wire:model="legalEntityForm.owner.position"
-                {{-- aria-describedby="{{ $hasOwnerPosition ? 'ownerPositionErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasOwnerPosition ? 'ownerPositionErrorHelp' : '' }}"
                 class="input-select text-gray-800 {{ $hasOwnerPosition ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             >
-                <option value="_placeholder_" selected hidden>-- {{ __('forms.selectPosition') }} --</option>
+                <option value="_placeholder_" selected hidden>-- {{ __('forms.select_position') }} --</option>
 
                 @foreach($dictionaries['POSITION'] as $k => $position)
                     <option value="{{ $k }}">{{ $position }}</option>
@@ -221,7 +221,7 @@
             @endif
 
             <label for="ownerPosition" class="label z-10">
-                {{ __('forms.ownerPosition') }}
+                {{ __('forms.owner_position') }}
             </label>
         </div>
     </div>
@@ -233,7 +233,7 @@
         x-init="phones = phones.length > 0 ? phones : [{ type: '', number: '' }]"
         x-id="['phone']"
      >
-        <h3 class="legend text-sm text-gray-600 mb-6">{{ __('forms.phonesOwner') }} *</h3>
+        <h3 class="font-bold text-sm text-gray-600 mb-6">{{ __('forms.phones_owner') }} *</h3>
 
         <template x-for="(phone, index) in phones" :key="index">
             <div
@@ -262,7 +262,7 @@
                     </template>
 
                     <label :for="$id('phone', '_type' + index)" class="label z-10">
-                        {{ __('forms.phoneType') }}
+                        {{ __('forms.phone_type') }}
                     </label>
                 </div>
 
@@ -318,16 +318,20 @@
     </div>
 
     {{-- Owner IPN --}}
-    <div class='form-row-3'>
+    <div
+        class='form-row-3'
+        x-data="{ showNoTaxId: $wire.entangle('legalEntityForm.owner.noTaxId') }"
+    >
         <div class="form-group group relative z-0">
             <input
-                type="text"
+                required
                 id="taxId"
+                type="text"
                 name="taxId"
                 maxlength="10"
                 placeholder=" "
                 wire:model="legalEntityForm.owner.taxId"
-                {{-- aria-describedby="{{ $hasOwnerTaxId ? 'ownerTaxIdErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasOwnerTaxId ? 'ownerTaxIdErrorHelp' : '' }}"
                 class="input {{ $hasOwnerTaxId ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -337,11 +341,27 @@
                 </p>
             @endif
 
-            <label for="taxId" class="label z-10">
-                {{ __('forms.number') }} {{ __('forms.ipn') }} / {{ __('forms.rnokpp') }}
-            </label>
+            <label
+                for="taxId"
+                class="label z-10"
+                x-text="showNoTaxId ? '{{ __('forms.document_no_tax_id') }}' : '{{ __('forms.number') . ' ' . __('forms.ipn') . ' / ' . __('forms.rnokpp') }}'"
+            ></label>
         </div>
 
+        <div class="form-group group">
+            <div class="mt-3">
+                <input
+                    type="checkbox"
+                    id="noTaxId"
+                    class="default-checkbox text-blue-500 focus:ring-blue-300"
+                    {{-- wire:model="legalEntityForm.owner.noTaxId" --}}
+                    x-model="showNoTaxId"
+                    :checked="showNoTaxId"
+                >
+
+                <label for="noTaxId" class="ms-2 text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('forms.no_tax_id') }}</label>
+            </div>
+        </div>
     </div>
 
     <div class='form-row-3'>
@@ -351,7 +371,7 @@
                 required
                 id="documentType"
                 wire:model.defer="legalEntityForm.owner.documents.type"
-                {{-- aria-describedby="{{ $hasOwnerDocumentType ? 'ownerDocumentTypeErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasOwnerDocumentType ? 'ownerDocumentTypeErrorHelp' : '' }}"
                 class="input-select text-gray-800 {{ $hasOwnerDocumentType ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             >
                 <option value="_placeholder_" selected hidden>-- {{ __('Обрати тип') }} --</option>
@@ -380,7 +400,7 @@
                 placeholder=" "
                 id="documentNumber"
                 wire:model="legalEntityForm.owner.documents.number"
-                {{-- aria-describedby="{{ $hasOwnerDocumentNumber ? 'ownerDocumentNumberErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasOwnerDocumentNumber ? 'ownerDocumentNumberErrorHelp' : '' }}"
                 class="input {{ $hasOwnerDocumentNumber ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -391,7 +411,7 @@
             @endif
 
             <label for="documentNumber" class="label z-10">
-                {{ __('forms.documentNumber') }}
+                {{ __('forms.document_number') }}
             </label>
         </div>
 
@@ -402,7 +422,7 @@
                 placeholder=" "
                 id="documentsIssuedBy"
                 wire:model="legalEntityForm.owner.documents.issuedBy"
-                {{-- aria-describedby="{{ $hasOwnerDocumentIssuedBy ? 'ownerDocumentIssuedByErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasOwnerDocumentIssuedBy ? 'ownerDocumentIssuedByErrorHelp' : '' }}"
                 class="input {{ $hasOwnerDocumentIssuedBy ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -413,7 +433,7 @@
             @endif
 
             <label for="documentsIssuedBy" class="label z-10">
-                {{__('forms.documentIssuedBy')}}
+                {{__('forms.document_issued_by')}}
             </label>
         </div>
 
@@ -428,7 +448,7 @@
                 placeholder=" "
                 id="documentsIssuedAt"
                 wire:model="legalEntityForm.owner.documents.issuedAt"
-                {{-- aria-describedby="{{ $hasOwnerDocumentIssuedAt ? 'ownerDocumentIssuedByErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasOwnerDocumentIssuedAt ? 'ownerDocumentIssuedAtErrorHelp' : '' }}"
                 class="input datepicker-input {{ $hasOwnerDocumentIssuedAt ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -439,7 +459,7 @@
             @endif
 
             <label for="documentsIssuedAt" class="label z-10">
-                {{ __('forms.documentIssuedAt') }}
+                {{ __('forms.document_issued_at') }}
             </label>
         </div>
     </div>

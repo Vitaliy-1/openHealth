@@ -1,9 +1,10 @@
 @php
     $hasLicenseTypeError = $errors->has('legalEntityForm.license.type');
-    $hasLicenseIssuedByError = $errors->has('legalEntityForm.license.issued_by');
-    $hasLicenseIssuedDateError = $errors->has('legalEntityForm.license.issued_date');
-    $hasLicenseActiveFromDateError = $errors->has('legalEntityForm.license.active_from_date');
-    $hasLicenseOrderNumberError = $errors->has('legalEntityForm.license.order_no');
+    $hasLicenseIssuedByError = $errors->has('legalEntityForm.license.issuedBy');
+    $hasLicenseIssuedDateError = $errors->has('legalEntityForm.license.issuedDate');
+    $hasLicenseActiveFromDateError = $errors->has('legalEntityForm.license.activeFromDate');
+    $hasLicenseExpirationDateError = $errors->has('legalEntityForm.license.expiryDate');
+    $hasLicenseOrderNumberError = $errors->has('legalEntityForm.license.orderNo');
 @endphp
 
 <fieldset
@@ -25,7 +26,7 @@
                 required
                 id="licenseType"
                 wire:model.defer="legalEntityForm.license.type"
-                {{-- aria-describedby="{{ $hasLicenseTypeError ? 'licenseTypeErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasLicenseTypeError ? 'licenseTypeErrorHelp' : '' }}"
                 class="input-select text-gray-800 {{ $hasLicenseTypeError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             >
                 <option value="_placeholder_" selected hidden>-- {{ __('forms.select') }} --</option>
@@ -44,7 +45,7 @@
             @endif
 
             <label for="licenseType" class="label z-10">
-                {{ __('forms.licenseType') }}
+                {{ __('forms.license_type') }}
             </label>
         </div>
 
@@ -54,12 +55,11 @@
                 placeholder=" "
                 id="licenseNumber"
                 wire:model="legalEntityForm.license.licenseNumber"
-                {{-- aria-describedby="{{ $hasAccreditationOrderNumberError ? 'licenseNumberErrorHelp' : '' }}" --}}
                 class="input peer"
             />
 
             <label for="licenseNumber" class="label z-10">
-                {{ __('forms.licenseNumber') }}
+                {{ __('forms.license_number') }}
             </label>
         </div>
 
@@ -70,7 +70,7 @@
                 placeholder=" "
                 id="licenseIssuedBy"
                 wire:model="legalEntityForm.license.issuedBy"
-                {{-- aria-describedby="{{ $hasLicenseIssuedByError ? 'licenseIssuedByErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasLicenseIssuedByError ? 'licenseIssuedByErrorHelp' : '' }}"
                 class="input {{ $hasLicenseIssuedByError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -81,7 +81,7 @@
             @endif
 
             <label for="licenseIssuedBy" class="label z-10">
-                {{ __('forms.licenseIssuedBy') }}
+                {{ __('forms.license_issued_by') }}
             </label>
         </div>
 
@@ -96,7 +96,7 @@
                 placeholder=" "
                 id="licenseIssuedDate"
                 wire:model="legalEntityForm.license.issuedDate"
-                {{-- aria-describedby="{{ $hasLicenseIssuedDateError ? 'licenseIssuedDateErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasLicenseIssuedDateError ? 'licenseIssuedDateErrorHelp' : '' }}"
                 class="input datepicker-input {{ $hasLicenseIssuedDateError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -107,7 +107,7 @@
             @endif
 
             <label for="licenseIssuedDate" class="label z-10">
-                {{ __('forms.licenseIssuedDate') }}
+                {{ __('forms.license_issued_date') }}
             </label>
         </div>
 
@@ -122,7 +122,7 @@
                 placeholder=" "
                 id="licenseActiveFromDate"
                 wire:model="legalEntityForm.license.activeFromDate"
-                {{-- aria-describedby="{{ $hasLicenseActiveFromDateError ? 'licenseActiveFromDateErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasLicenseActiveFromDateError ? 'licenseActiveFromDateErrorHelp' : '' }}"
                 class="input datepicker-input {{ $hasLicenseActiveFromDateError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -133,7 +133,7 @@
             @endif
 
             <label for="licenseActiveFromDate" class="label z-10">
-                {{ __('forms.licenseActiveFromDate') }}
+                {{ __('forms.license_active_from_date') }}
             </label>
         </div>
 
@@ -147,12 +147,18 @@
                 placeholder=" "
                 id="licenseExpiryDate"
                 wire:model="legalEntityForm.license.expiryDate"
-                {{-- aria-describedby="{{ $hasLicenseActiveFromDateError ? 'licenseActiveFromDateErrorHelp' : '' }}" --}}
                 class="input datepicker-input peer"
+                aria-describedby="{{ $hasLicenseExpirationDateError ? 'licenseExpirationDateErrorHelp' : '' }}"
             />
 
+            @if($hasLicenseExpirationDateError)
+                <p id="licenseExpirationDateErrorHelp" class="text-error">
+                    {{ $errors->first('legalEntityForm.license.expiryDate') }}
+                </p>
+            @endif
+
             <label for="licenseExpiryDate" class="label z-10">
-                {{ __('forms.licenseExpiryDate') }}
+                {{ __('forms.license_expiry_date') }}
             </label>
         </div>
 
@@ -162,12 +168,11 @@
                 placeholder=" "
                 id="licenseWhatLicensed"
                 wire:model="legalEntityForm.license.whatLicensed"
-                {{-- aria-describedby="{{ $hasAccreditationOrderNumberError ? 'licenseNumberErrorHelp' : '' }}" --}}
                 class="input peer"
             />
 
             <label for="licenseWhatLicensed" class="label z-10">
-                {{ __('forms.licenseWhatLicensed') }}
+                {{ __('forms.license_what_licensed') }}
             </label>
         </div>
 
@@ -178,7 +183,7 @@
                 placeholder=" "
                 id="licenseOrderNumber"
                 wire:model="legalEntityForm.license.orderNo"
-                {{-- aria-describedby="{{ $hasLicenseOrderNumberError ? 'licenseOrderNumberErrorHelp' : '' }}" --}}
+                aria-describedby="{{ $hasLicenseOrderNumberError ? 'licenseOrderNumberErrorHelp' : '' }}"
                 class="input {{ $hasLicenseOrderNumberError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
             />
 
@@ -189,7 +194,7 @@
             @endif
 
             <label for="licenseOrderNumber" class="label z-10">
-                {{ __('forms.licenseOrderNo') }}
+                {{ __('forms.license_order_no') }}
             </label>
         </div>
     </div>

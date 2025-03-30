@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Models\Employee\EmployeeRequest;
 use App\Models\Person\Person;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -104,6 +106,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function licenses(): HasMany
     {
         return $this->hasMany(License::class, 'legal_entity_id', 'legal_entity_id');
+    }
+
+    public function employeeRequests(): HasMany
+    {
+        return $this->hasMany(EmployeeRequest::class);
     }
 
     /**
