@@ -1,7 +1,8 @@
 @php
     $hasAccreditationCategoryError = $errors->has('legalEntityForm.accreditation.category');
-    $hasAccreditationOrderNumberError = $errors->has('legalEntityForm.accreditation.order_no');
-    $hasAccreditationOrderDateError = $errors->has('legalEntityForm.accreditation.order_date');
+    $hasAccreditationOrderNumberError = $errors->has('legalEntityForm.accreditation.orderNo');
+    $hasAccreditationOrderDateError = $errors->has('legalEntityForm.accreditation.orderDate');
+    $hasAccreditationExpiryDateError = $errors->has('legalEntityForm.accreditation.expiryDate');
 @endphp
 
 <fieldset
@@ -41,7 +42,7 @@
                     required
                     id="accreditationСategory"
                     wire:model="legalEntityForm.accreditation.category"
-                    {{-- aria-describedby="{{ $hasAccreditationCategoryError ? 'accreditationCategoryErrorHelp' : '' }}" --}}
+                    aria-describedby="{{ $hasAccreditationCategoryError ? 'accreditationCategoryErrorHelp' : '' }}"
                     class="input-select text-gray-800 {{ $hasAccreditationCategoryError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
                 >
                     <option value="_placeholder_" selected hidden>-- {{ __('forms.select') }} --</option>
@@ -62,7 +63,7 @@
                 @endif
 
                 <label for="accreditationСategory" class="label z-10">
-                    {{ __('forms.accreditationCategory') }}
+                    {{ __('forms.accreditation_category') }}
                 </label>
             </div>
 
@@ -74,7 +75,7 @@
                     placeholder=" "
                     id="accreditationOrderNumber"
                     wire:model="legalEntityForm.accreditation.orderNo"
-                    {{-- aria-describedby="{{ $hasAccreditationOrderNumberError ? 'accreditationOrderNumberErrorHelp' : '' }}" --}}
+                    aria-describedby="{{ $hasAccreditationOrderNumberError ? 'accreditationOrderNumberErrorHelp' : '' }}"
                     class="input {{ $hasAccreditationOrderNumberError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
                 />
 
@@ -85,7 +86,7 @@
                 @endif
 
                 <label for="accreditationOrderNumber" class="label z-10">
-                    {{ __('forms.accreditationOrderNo') }}
+                    {{ __('forms.accreditation_order_no') }}
                 </label>
             </div>
 
@@ -118,7 +119,14 @@
                     id="accreditationExpiryDate"
                     wire:model="legalEntityForm.accreditation.expiryDate"
                     class="input datepicker-input peer"
+                    aria-describedby="{{ $hasAccreditationExpiryDateError ? 'accreditationExpiryDateErrorHelp' : '' }}"
                 />
+
+                @if($hasAccreditationExpiryDateError)
+                    <p id="accreditationExpiryDateErrorHelp" class="text-error">
+                        {{ $errors->first('legalEntityForm.accreditation.expiryDate') }}
+                    </p>
+                @endif
 
                 <label for="accreditationExpiryDate" class="label z-10">
                     {{ __('forms.end_date') }}
@@ -136,7 +144,7 @@
                     placeholder=" "
                     id="accreditationOrderDate"
                     wire:model="legalEntityForm.accreditation.orderDate"
-                    {{-- aria-describedby="{{ $hasAccreditationOrderDateError ? 'accreditationOrderDateErrorHelp' : '' }}" --}}
+                    aria-describedby="{{ $hasAccreditationOrderDateError ? 'accreditationOrderDateErrorHelp' : '' }}"
                     class="input datepicker-input {{ $hasAccreditationOrderDateError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
                 />
 
@@ -147,7 +155,7 @@
                 @endif
 
                 <label for="accreditationOrderDate" class="label z-10">
-                    {{ __('forms.accreditationOrderDate') }}
+                    {{ __('forms.accreditation_order_date') }}
                 </label>
             </div>
         </div>

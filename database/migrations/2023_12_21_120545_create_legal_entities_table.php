@@ -26,7 +26,6 @@ return new class extends Migration
             $table->text('nhs_comment')->nullable();
             $table->boolean('nhs_reviewed')->default(false);
             $table->boolean('nhs_verified')->default(false);
-            $table->json('phones')->nullable();
             $table->string('receiver_funds_code')->nullable();
             $table->string('status')->nullable();
             $table->string('type')->nullable();

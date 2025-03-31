@@ -8,7 +8,7 @@ use Livewire\Features\SupportFormObjects\Form;
 use App\Rules\DivisionRules\WorkingHoursRule;
 use App\Exceptions\CustomValidationException;
 use App\Rules\DivisionRules\LocationRule;
-use App\Rules\DivisionRules\EmailRule;
+use App\Rules\Email;
 use App\Rules\DivisionRules\PhoneRule;
 use App\Rules\DivisionRules\TypeRule;
 use Livewire\Attributes\Validate;
@@ -29,7 +29,7 @@ class DivisionFormRequest extends Form
     #[Validate([
         'division.name' => 'required|min:6|max:255',
         'division.type' => 'required',
-        'division.email' => 'required|email',
+        'division.email' => ['required', 'email', new Email()],
         'division.phones.number' => 'required|string',
         'division.phones.type' => 'required',
         'division.addresses' => 'required',
@@ -85,8 +85,6 @@ class DivisionFormRequest extends Form
             new WorkingHoursRule($this->division),
             // Check that phone type exists in dictionaries and valid accordingly to international rules
             new PhoneRule($this->division),
-            // Check that Email has a valid format and specified correctly
-            new EmailRule($this->division),
             // Check that Division type exists in dictionaries
             new TypeRule($this->division)
         ];

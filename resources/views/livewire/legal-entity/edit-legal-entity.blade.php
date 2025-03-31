@@ -61,8 +61,8 @@
                                 {{__('forms.agree')}}
                                 <button
                                     type="button"
-                                    class="steps-agreement_button"
-                                    @click="openModal = !openModal;console.log('Is clicked', openModal);"
+                                    class="steps-agreement_button cursor-pointer"
+                                    @click="openModal = !openModal"
                                 >
                                     {{ __('forms.withTerms') }}
                                 </button>
@@ -74,7 +74,7 @@
                     <div class="xl:w-1/4 flex justify-end">
                         <button
                             type="button"
-                            class="button-primary"
+                            class="button-primary cursor-pointer"
                             wire:click="updateLegalEntity"
                             :disabled="isSendDisabled"
                         >
@@ -100,14 +100,14 @@
                 <div
                     x-show="openModal"
                     @click="openModal = false"
-                    class="fixed z-22 inset-0 bg-black/25"
+                    class="fixed z-20 inset-0 bg-black/25"
                 ></div>
 
                 <!-- Modal content -->
                 <div
                     x-on:click.stop
                     x-trap.noscroll.inert="openModal"
-                    class="relative w-[70%] h-[75vh] rounded-xl bg-white shadow-lg mx-auto mt-[15vh] flex flex-col dark:bg-gray-800"
+                    class="relative w-[70%] h-[75vh] rounded-xl bg-white shadow-lg mx-auto mt-[15vh] flex flex-col dark:bg-gray-800 z-22"
                 >
                     <!-- Modal header -->
                     <div class="p-6 border-b mb-2">
@@ -137,7 +137,7 @@
                     <div class="flex gap-4 flex-wrap justify-center p-4 border-t mt-2 mx-auto">
                         <button
                             type="button"
-                            class="default-button"
+                            class="default-button cursor-pointer"
                             @click="isTermDisabled = false; isSendDisabled = false; openModal = false;"
                         >
                             {{ __('forms.agree') }}
@@ -145,7 +145,7 @@
 
                         <button
                             type="button"
-                            class="alternative-button"
+                            class="alternative-button cursor-pointer"
                             @click="isTermDisabled = true; isSendDisabled = true; openModal = false;"
                         >
                             {{ __('forms.decline') }}

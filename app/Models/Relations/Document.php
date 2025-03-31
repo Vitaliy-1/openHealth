@@ -3,6 +3,7 @@
 namespace App\Models\Relations;
 
 use Illuminate\Database\Eloquent\Model;
+use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class Document extends Model
 {
+    use HasCamelCasing;
+
     protected $hidden = [
         'id',
         'created_at',

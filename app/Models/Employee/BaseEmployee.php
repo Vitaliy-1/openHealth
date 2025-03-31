@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Employee;
 
+use App\Models\User;
 use App\Enums\Status;
 use App\Models\Declaration;
 use App\Models\Division;
@@ -13,10 +14,9 @@ use App\Models\Relations\Party;
 use App\Models\Relations\Qualification;
 use App\Models\Relations\ScienceDegree;
 use App\Models\Relations\Speciality;
-use App\Traits\HasPersonalAttributes;
+use Illuminate\Database\Eloquent\Model;
 use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -27,37 +27,38 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class BaseEmployee extends Model
 {
     use HasFactory;
-    use HasPersonalAttributes;
     use HasCamelCasing;
 
     protected $fillable = [
         'uuid',
-        'legalEntityUuid',
-        'divisionUuid',
-        'legalEntityId',
+        'legal_entity_uuid',
+        'division_uuid',
+        'legal_entity_id',
         'status',
         'position',
-        'startDate',
-        'endDate',
-        'partyId',
-        'employeeType',
+        'start_date',
+        'end_date',
+        'party_id',
+        'employee_type',
+        'user_id'
     ];
 
     protected $casts = [
         'status' => Status::class,
-        'startDate' => 'datetime',
-        'endDate' => 'datetime',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime'
     ];
 
     protected array $prettyAttributes = [
-        'startDate',
-        'endDate',
+        'start_date',
+        'end_date',
         'status',
         'position',
-        'employeeType',
+        'employee_type'
     ];
 
     protected $with = [
+        'user',
         'party',
         'party.phones',
         'party.documents',
@@ -66,6 +67,30 @@ class BaseEmployee extends Model
         'specialities',
         'scienceDegrees'
     ];
+
+    public function getFullNameAttribute(): string
+    {
+        return implode(' ', array_filter([
+            optional($this->party)->first_name ?? '',
+            optional($this->party)->last_name ?? '',
+            optional($this->party)->second_name?? '',
+        ]));
+    }
+
+    public function getPhoneAttribute(): string
+    {
+        return optional(optional($this->party)->phones)->first()->number ?? '';
+    }
+
+    public function getBirthDateAttribute(): string
+    {
+        return humanFormatDate(optional($this->party)->birth_date ?? '');
+    }
+
+    public function getEmailAttribute(): string
+    {
+        return optional($this->party)->email ?? '';
+    }
 
     public function legalEntity(): BelongsTo
     {
@@ -80,6 +105,11 @@ class BaseEmployee extends Model
     public function party(): BelongsTo
     {
         return $this->belongsTo(Party::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function declarations(): HasMany
