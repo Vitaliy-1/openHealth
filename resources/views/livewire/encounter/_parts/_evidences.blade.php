@@ -96,8 +96,7 @@
                                         {{ __('forms.edit') }}
                                     </button>
 
-                                    <button @click="evidences.splice(index, 1); close($refs.button)"
-                                            @click.prevent
+                                    <button @click.prevent="evidences.splice(index, 1); close($refs.button)"
                                             class="dropdown-button dropdown-delete"
                                     >
                                         {{ __('forms.delete') }}
@@ -105,6 +104,7 @@
                                 </div>
                             </div>
                         </div>
+                    </td>
                 </tr>
             </template>
             </tbody>
@@ -115,7 +115,7 @@
             <button @click.prevent="
                         openModal = true; {{-- Open the Modal --}}
                         newEvidenceCode = true; {{-- We are adding a new evidence --}}
-                        modalEvidenceCode = new ConditionEvidence() {{-- Replace the data of the previous evidence with a new one--}}
+                        modalEvidenceCode = new ConditionEvidence(); {{-- Replace the data of the previous evidence with a new one--}}
                     "
                     class="item-add my-5"
             >
@@ -169,7 +169,7 @@
                                                 type="text"
                                                 required
                                         >
-                                            <option selected>{{ __('patients.icpc-2_status_code') }}</option>
+                                            <option selected>{{ __('forms.select') }}</option>
                                             @foreach($this->dictionaries['eHealth/ICPC2/condition_codes'] as $key => $conditionCode)
                                                 <option value="{{ $key }}">{{ $key }} - {{ $conditionCode }}</option>
                                             @endforeach
@@ -192,7 +192,6 @@
                                     </button>
 
                                     <button @click.prevent="
-                                                console.log(evidences);
                                                 newEvidenceCode !== false
                                                 ? evidences.push(modalEvidenceCode)
                                                 : evidences[item] = modalEvidenceCode;
@@ -200,7 +199,7 @@
                                                 openModal = false;
                                             "
                                             class="button-primary"
-                                        {{--                                            :disabled="!(modalEvidenceCode.evidences[0].codes[0].coding[0].code.trim().length > 0)"--}}
+                                            :disabled="!(modalEvidenceCode.evidences[0].codes[0].coding[0].code.trim().length > 0)"
                                     >
                                         {{ __('forms.save') }}
                                     </button>
@@ -224,7 +223,7 @@
                 codes: [
                     {
                         coding: [
-                            {system: 'eHealth/ICPC2/reasons', code: ''},
+                            { system: 'eHealth/ICPC2/reasons', code: '' }
                         ]
                     }
                 ]
@@ -233,7 +232,7 @@
 
         constructor(obj = null) {
             if (obj) {
-                Object.assign(this, obj);
+                JSON.parse(JSON.stringify(this, obj));
             }
         }
     }

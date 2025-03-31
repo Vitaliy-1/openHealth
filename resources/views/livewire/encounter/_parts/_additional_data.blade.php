@@ -20,7 +20,7 @@
                        required
                 >
                 <label for="date" class="label">
-                    {{ __('patients.data') }}
+                    {{ __('patients.date') }}
                 </label>
 
                 @error('form.encounter.period.date')

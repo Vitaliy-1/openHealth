@@ -1,7 +1,7 @@
 <fieldset class="fieldset">
     @if(!empty($uploadedDocuments))
         <legend class="legend">
-            {{ __('Завантаження документів') }}
+            {{ __('patients.uploading_documents') }}
         </legend>
 
         @foreach($uploadedDocuments as $key => $document)
@@ -56,7 +56,7 @@
         @if(!$isUploaded)
             <x-forms.form-group>
                 <x-slot name="label">
-                    <x-forms.button-with-icon wire:click.prevent="sendFiles('uploadedDocuments')"
+                    <x-forms.button-with-icon wire:click.prevent="sendFiles"
                                               class="default-button flex-row-reverse mt-8"
                                               label="{{ __('Відправити файли') }}"
                                               svgId="svg-arrow-right"
@@ -96,7 +96,7 @@
 
             @if(!$isApproved)
                 <div>
-                    <button wire:click="approvePerson('verificationCode')"
+                    <button wire:click="approvePerson"
                             type="button"
                             class="default-button w-full"
                     >

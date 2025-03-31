@@ -6,6 +6,7 @@ namespace App\Livewire\Patient\Forms;
 
 use App\Rules\AlphaNumericWithSymbols;
 use App\Rules\Cyrillic;
+use App\Rules\InDictionary;
 use App\Rules\TwoLettersFourToSixDigitsOrComplex;
 use App\Rules\TwoLettersSixDigits;
 use App\Rules\EightDigitsHyphenFiveDigits;
@@ -29,7 +30,7 @@ class PatientFormRequest extends Form
         'patient.birthDate' => ['required', 'date'],
         'patient.birthCountry' => ['required', 'string'],
         'patient.birthSettlement' => ['required', 'string'],
-        'patient.gender' => ['required', 'string'],
+        'patient.gender' => ['required', 'string', new InDictionary('GENDER')],
         'patient.unzr' => ['nullable', new EightDigitsHyphenFiveDigits()],
         'patient.noTaxId' => ['nullable', 'boolean'],
         'patient.taxId' => ['required_if:patient.noTaxId,false', 'numeric', 'digits:10'],
@@ -45,10 +46,16 @@ class PatientFormRequest extends Form
         'patient.emergencyContact.phones.*.type' => ['required', 'string'],
         'patient.emergencyContact.phones.*.number' => ['required', 'string', 'regex:/^\+38[0-9]{10}$/'],
 
-        'patient.authenticationMethods.*.type' => ['required', 'string', 'nullable' => false],
-        'patient.authenticationMethods.*.phoneNumber' => ['required_if:patient.authenticationMethods.*.type,OTP', 'regex:/^\+38[0-9]{10}$/'],
-        'patient.authenticationMethods.*.value' => ['required_if:patient.authenticationMethods.*.type,THIRD_PERSON', 'string'],
-        'patient.authenticationMethods.*.alias' => ['required_if:patient.authenticationMethods.*.type,THIRD_PERSON', 'string']
+        'patient.authenticationMethods.*.type' => ['required', 'string', new InDictionary('AUTHENTICATION_METHOD')],
+        'patient.authenticationMethods.*.phoneNumber' => [
+            'required_if:patient.authenticationMethods.*.type,OTP', 'regex:/^\+38[0-9]{10}$/'
+        ],
+        'patient.authenticationMethods.*.value' => [
+            'nullable', 'required_if:patient.authenticationMethods.*.type,THIRD_PERSON', 'string'
+        ],
+        'patient.authenticationMethods.*.alias' => [
+            'nullable', 'required_if:patient.authenticationMethods.*.type,THIRD_PERSON', 'string'
+        ]
     ])]
     public array $patient = [
         'phones' => [
@@ -76,22 +83,23 @@ class PatientFormRequest extends Form
     public array $patientsFilter = [];
 
     #[Validate([
-        'documents.type' => ['required', 'string'],
-        'documents.number' => ['required', 'string', 'max:255'],
-        'documents.issuedBy' => ['required', 'string'],
-        'documents.issuedAt' => ['required', 'date', 'before:today', 'after:patient.birthDate'],
-        'documents.expirationDate' => ['nullable', 'date', 'after:today']
+        'documents' => ['required', 'array'],
+        'documents.*.type' => ['required', 'string', new InDictionary('DOCUMENT_TYPE')],
+        'documents.*.number' => ['required', 'string', 'max:255'],
+        'documents.*.issuedBy' => ['required', 'string', 'max:255'],
+        'documents.*.issuedAt' => ['required', 'date', 'before:today', 'after:patient.birthDate'],
+        'documents.*.expirationDate' => ['nullable', 'date', 'after:today']
     ])]
     public array $documents = [];
 
     public array $addresses = [];
 
     #[Validate([
-        'documentsRelationship.type' => ['required', 'string'],
-        'documentsRelationship.number' => ['required', 'string', 'max:255'],
-        'documentsRelationship.issuedBy' => ['required', 'string'],
-        'documentsRelationship.issuedAt' => ['required', 'date', 'before:today', 'after:patient.birthDate'],
-        'documentsRelationship.activeTo' => ['nullable', 'date', 'after:tomorrow']
+        'documentsRelationship.*.type' => ['required', 'string', new InDictionary('DOCUMENT_RELATIONSHIP_TYPE')],
+        'documentsRelationship.*.number' => ['required', 'string', 'max:255'],
+        'documentsRelationship.*.issuedBy' => ['required', 'string', 'max:255'],
+        'documentsRelationship.*.issuedAt' => ['required', 'date', 'before:today', 'after:patient.birthDate'],
+        'documentsRelationship.*.activeTo' => ['nullable', 'date', 'after:tomorrow']
     ])]
     public array $documentsRelationship = [];
 
@@ -110,27 +118,35 @@ class PatientFormRequest extends Form
     /**
      * Validate data for chosen model.
      *
-     * @param  string  $model
+     * @param  string|array  $fields
      * @return array
      * @throws ValidationException
      */
-    public function rulesForModelValidate(string $model): array
+    public function rulesForModelValidate(string|array $fields): array
     {
-        $rules = $this->rulesForModel($model)->toArray();
+        if (is_string($fields)) {
+            $rules = $this->rulesForModel($fields)->toArray();
+        } else {
+            $rules = [];
 
-        if ($model === 'documents' && !empty($this->documents)) {
-            $this->addExpirationDateRuleIfRequired($rules);
-            $this->addNumberDocumentsValidation($rules);
-        }
+            foreach ($fields as $model) {
+                $rules += $this->rulesForModel($model)->toArray();
+            }
 
-        if ($model === 'documentsRelationship' && !empty($this->documentsRelationship)) {
-            $this->addNumberDocumentsRelationshipValidation($rules);
-        }
+            if (in_array('patient', $fields, true)) {
+                $this->addNoTaxIdValidation($rules);
+                $this->addUnzrRuleIfRequired($rules);
+                $this->validateAddressees();
+            }
 
-        if ($model === 'patient') {
-            $this->addNoTaxIdValidation($rules);
-            $this->addUnzrRuleIfRequired($rules);
-            $this->validateAddressees();
+            if (!empty($this->documents) && in_array('documents', $fields, true)) {
+                $this->addExpirationDateRuleIfRequired($rules);
+                $this->addNumberDocumentsValidation($rules);
+            }
+
+            if (!empty($this->documentsRelationship) && in_array('documentsRelationship', $fields, true)) {
+                $this->addNumberDocumentsRelationshipValidation($rules);
+            }
         }
 
         return $this->validate($rules);
@@ -180,13 +196,12 @@ class PatientFormRequest extends Form
      */
     private function addExpirationDateRuleIfRequired(array &$rules): void
     {
-        $requiredTypes = [
-            'NATIONAL_ID', 'PERMANENT_RESIDENCE_PERMIT', 'REFUGEE_CERTIFICATE', 'TEMPORARY_CERTIFICATE',
-            'TEMPORARY_PASSPORT'
-        ];
+        $requiredTypes = config('ehealth.expiration_date_exists');
 
-        if (empty($this->documents['expirationDate']) && in_array($this->documents['type'], $requiredTypes, true)) {
-            $rules['documents.expirationDate'][] = 'required';
+        foreach ($this->documents as $document) {
+            if (empty($document['expirationDate']) && in_array($document['type'], $requiredTypes, true)) {
+                $rules['documents.expirationDate'][] = 'required';
+            }
         }
     }
 
@@ -198,13 +213,16 @@ class PatientFormRequest extends Form
      */
     private function addNumberDocumentsValidation(array &$rules): void
     {
-        $rules['documents.number'][] = match ($this->documents['type']) {
-            'PASSPORT', 'REFUGEE_CERTIFICATE' => new TwoLettersSixDigits(),
-            'NATIONAL_ID' => 'digits:9',
-            'BIRTH_CERTIFICATE', 'TEMPORARY_PASSPORT', 'CHILD_BIRTH_CERTIFICATE', 'MARRIAGE_CERTIFICATE', 'DIVORCE_CERTIFICATE' => new AlphaNumericWithSymbols(),
-            'TEMPORARY_CERTIFICATE' => new TwoLettersFourToSixDigitsOrComplex(),
-            'BIRTH_CERTIFICATE_FOREIGN', 'PERMANENT_RESIDENCE_PERMIT' => 'string'
-        };
+        foreach ($this->documents as $key => $document) {
+            $rules["documents.$key.number"][] = match ($document['type']) {
+                'PASSPORT', 'REFUGEE_CERTIFICATE' => new TwoLettersSixDigits(),
+                'NATIONAL_ID' => 'digits:9',
+                'BIRTH_CERTIFICATE', 'TEMPORARY_PASSPORT', 'CHILD_BIRTH_CERTIFICATE', 'MARRIAGE_CERTIFICATE', 'DIVORCE_CERTIFICATE' => new AlphaNumericWithSymbols(),
+                'TEMPORARY_CERTIFICATE' => new TwoLettersFourToSixDigitsOrComplex(),
+                'BIRTH_CERTIFICATE_FOREIGN', 'PERMANENT_RESIDENCE_PERMIT' => 'string',
+                default => null
+            };
+        }
     }
 
     /**
@@ -215,8 +233,10 @@ class PatientFormRequest extends Form
      */
     private function addNumberDocumentsRelationshipValidation(array &$rules): void
     {
-        if ($this->documentsRelationship['type'] === 'BIRTH_CERTIFICATE') {
-            $rules['documentsRelationship.number'][] = new AlphaNumericWithSymbols();
+        foreach ($this->documentsRelationship as $key => $document) {
+            if ($document['type'] === 'BIRTH_CERTIFICATE') {
+                $rules["documentsRelationship.$key.number"][] = new AlphaNumericWithSymbols();
+            }
         }
     }
 

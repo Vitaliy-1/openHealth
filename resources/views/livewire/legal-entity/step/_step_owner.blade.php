@@ -376,8 +376,8 @@
             >
                 <option value="_placeholder_" selected hidden>-- {{ __('Обрати тип') }} --</option>
 
-                @foreach($dictionaries['DOCUMENT_TYPE'] as $k_d => $document_type)
-                    <option value="{{ $k_d }}">{{ $document_type }}</option>
+                @foreach($dictionaries['DOCUMENT_TYPE'] as $k_d => $documentType)
+                    <option value="{{ $k_d }}">{{ $documentType }}</option>
                 @endforeach
             </select>
 
