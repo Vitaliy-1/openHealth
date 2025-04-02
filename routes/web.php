@@ -2,6 +2,7 @@
 
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\HomeController;
 use App\Livewire\Contract\ContractForm;
@@ -44,6 +45,7 @@ Route::post('/send-email', [EmailController::class, 'sendEmail'])->name('send.em
 Route::get('/ehealth/oauth/', [oAuthEhealth::class, 'callback'])->name('ehealth.oauth.callback');
 //Route::get('/login', [LoginController::class, 'index'])->middleware('guest')->name('index.login');
 Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login');
+Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::middleware([
     'auth:sanctum',

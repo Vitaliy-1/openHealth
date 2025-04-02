@@ -133,4 +133,16 @@ class User extends Authenticatable implements MustVerifyEmail
             !Str::startsWith($permission->name, $exclude)
         );
     }
+
+    /**
+     * Retrieves the scopes assigned to a specific user.
+     *
+     * @param User $user The user instance for which to retrieve scopes
+     *
+     * @return string The concatenated string of user's scopes
+     */
+    public function getScopes(): string
+    {
+        return $this->getAllPermissions()->unique()->pluck('name')->join(' ');
+    }
 }

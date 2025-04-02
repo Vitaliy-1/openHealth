@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\PotentiallyTranslatedString;
 
 
-class DocumentType implements ValidationRule
+class DocumentNumber implements ValidationRule
 {
     protected array $dictionary;
 
@@ -40,8 +40,8 @@ class DocumentType implements ValidationRule
             default => ''
         };
 
-        if (!(bool)preg_match($regex, $value)) {
-            $fail(__('validation.attributes.errors.wrongNumberFormat'));
+        if (!$regex || !(bool)preg_match($regex, $value)) {
+            $fail(__('forms.document') . ' : ' . __('validation.attributes.errors.wrongNumberFormat'));
         }
     }
 }
