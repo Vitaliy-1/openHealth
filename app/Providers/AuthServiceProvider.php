@@ -7,6 +7,7 @@ use App\Models\Person\Person;
 use App\Models\Person\PersonRequest;
 use App\Policies\PatientPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Laravel\Jetstream\Jetstream;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Disable the default Jetsream's logout route
+        Jetstream::ignoreRoutes(['logout']);
     }
 }

@@ -11,7 +11,12 @@
                 <x-slot name="status">{{ session('status') }}</x-slot>
             </x-message.successes>
         @endif
-        <form x-data="{is_ehealth_auth: true}" method="POST" action="{{ route('login') }}">
+        <form
+            x-data="{ is_ehealth_auth: true }"
+            autocomplete="off"
+            method="POST"
+            action="{{ route('login') }}"
+        >
             @csrf
             <div>
                 <x-label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="email" value="{{ __('Email') }}"/>
@@ -22,7 +27,7 @@
                 </div>
             </div>
 
-            <div class="mt-4" x-show="is_ehealth_auth">
+            <div class="mt-4" x-show="!is_ehealth_auth" x-cloak>
                 <x-label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="password" value="{{ __('Пароль') }}" />
                 <div class="relative @error('password') input-danger @enderror" >
                     <x-input id="password" class="default-input" type="password" name="password"  autocomplete="current-password" />
@@ -32,18 +37,18 @@
             </div>
 
             <div class="block mt-4">
-                <div x-data="{ checkboxToggle: false }">
-                    <label for="is_ehealth_auth" class="flex cursor-pointer select-none items-center">
+                <div>
+                    <label for="is_local_auth" class="flex cursor-pointer select-none items-center">
                         <div class="relative">
-                            <input type="checkbox" name="is_ehealth_auth" id="is_ehealth_auth" class="w-4 h-4 border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
-                                   @change="checkboxToggle = !checkboxToggle; is_ehealth_auth = !is_ehealth_auth" />
-
+                            <input type="checkbox" name="is_local_auth" id="is_local_auth" class="w-4 h-4 border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                                @change="is_ehealth_auth = !$event.target.checked"
+                                :checked="!is_ehealth_auth"
+                            />
                         </div>
-                        <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Авторизація на eHealth') }}</span>
+                        <span class="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('Без авторизації у eHealth') }}</span>
                     </label>
                 </div>
             </div>
-
 
             <div class="flex items-center justify-end mt-4">
                 <x-button class="default-button w-full">

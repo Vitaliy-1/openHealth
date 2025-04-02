@@ -198,17 +198,17 @@
                     </ul>
                 </div>
             </template>
+
+            @if($hasSettlementError)
+                <p id="addressSettlementErrorHelp" class="text-error">
+                    {{ $errors->first('address.settlement') }}
+                </p>
+            @endif
+
+            <label for="addressSettlement" class="label z-10">
+                {{ __('forms.settlement') }}
+            </label>
         </div>
-
-        @if($hasSettlementError)
-            <p id="addressSettlementErrorHelp" class="text-error">
-                {{ $errors->first('address.settlement') }}
-            </p>
-        @endif
-
-        <label for="addressSettlement" class="label z-10">
-            {{ __('forms.settlement') }}
-        </label>
     </div>
 
     {{-- STREET_TYPE --}}

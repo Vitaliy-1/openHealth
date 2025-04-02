@@ -10,7 +10,7 @@ class PhoneNumber implements ValidationRule
 {
     protected $minDigits;
 
-    public function __construct($minDigits = 8)
+    public function __construct($minDigits = 9)
     {
         $this->minDigits = $minDigits;
     }
@@ -22,9 +22,8 @@ class PhoneNumber implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!preg_match('/^\+?[0-9]{'.$this->minDigits.',}$/', $value)) {
+        if (!preg_match('/^\+380[0-9]{'.$this->minDigits.',}$/', $value)) {
             $fail(__('validation.phone', ['min' => $this->minDigits]));
         }
     }
 }
-

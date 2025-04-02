@@ -14,9 +14,10 @@ class LoginController extends Controller
     {
         $user = User::where('email', $request->email)->first();
 
-        if ($user && $request->has('is_ehealth_auth') && $user->isClientId() ) {
-          $url = oAuthEhealth::loginUrl($user);
-          return redirect()->to($url);
+        if ($user && $request->missing('is_local_auth') && $user->isClientId() ) {
+            $url = oAuthEhealth::loginUrl($user);
+
+            return redirect()->to($url);
         }
 
         $credentials = $request->only('email', 'password');
