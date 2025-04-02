@@ -160,7 +160,7 @@
                 <svg width="16" height="17">
                     <use xlink:href="#svg-key"></use>
                 </svg>
-                {{ __('Підписати КЕПом') }}
+                {{ __('forms.sign_with_KEP') }}
                 <svg width="16" height="17">
                     <use xlink:href="#svg-arrow-right"></use>
                 </svg>

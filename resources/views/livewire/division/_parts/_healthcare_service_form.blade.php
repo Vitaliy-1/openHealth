@@ -216,7 +216,7 @@
                                 <x-forms.form-group>
                                     <x-slot name='label'>
                                         <x-forms.label for="start_time-{{ $k }}" class="default-label" x-bind:disabled="disabled">
-                                                {{ __('forms.availableStartTime') }} <span x-show="!disabled">*</span>
+                                                {{ __('forms.start_time') }} <span x-show="!disabled">*</span>
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name='input'>
@@ -237,7 +237,7 @@
                                 <x-forms.form-group>
                                     <x-slot name='label'>
                                         <x-forms.label for="end_time-{{ $k }}" class='default-label' x-bind:disabled="disabled">
-                                            {{ __('forms.availableEndTime') }} <span x-show="!disabled">*</span>
+                                            {{ __('forms.end_time') }} <span x-show="!disabled">*</span>
                                         </x-forms.label>
                                     </x-slot>
                                     <x-slot name='input'>

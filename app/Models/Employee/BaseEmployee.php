@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\Employee;
 
-use Carbon\Carbon;
 use App\Models\User;
 use App\Enums\Status;
 use App\Models\Declaration;
@@ -21,15 +22,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
- * @property string $uuid
- * @property string $legal_entity_uuid
- * @property string $division_uuid
- * @property int $person_id
- * @property Status $status
- * @property string $position
- * @property Carbon $start_date
- * @property Carbon $end_date
- * @property string $employee_type
  * @mixin IdeHelperBaseEmployee
  */
 class BaseEmployee extends Model
@@ -52,9 +44,9 @@ class BaseEmployee extends Model
     ];
 
     protected $casts = [
-        'status'    => Status::class,
+        'status' => Status::class,
         'start_date' => 'datetime',
-        'end_date'   => 'datetime',
+        'end_date' => 'datetime'
     ];
 
     protected array $prettyAttributes = [
@@ -62,7 +54,7 @@ class BaseEmployee extends Model
         'end_date',
         'status',
         'position',
-        'employee_type',
+        'employee_type'
     ];
 
     protected $with = [
@@ -94,7 +86,6 @@ class BaseEmployee extends Model
     {
         return humanFormatDate(optional($this->party)->birth_date ?? '');
     }
-
 
     public function getEmailAttribute(): string
     {
@@ -158,6 +149,7 @@ class BaseEmployee extends Model
             $employeeData->party->{$attribute} = $employeeData->{$attribute} ?? '';
         }
         $employeeData->documents = $employeeData->party->documents()->get()->toArray() ?? [];
+
         return $employeeData->toArray();
     }
 }
