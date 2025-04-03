@@ -1,7 +1,7 @@
 {{-- Component to input values to the table through the Modal, built with Alpine --}}
 <div class="overflow-x-auto relative" id="reasons-section"> {{-- This required for table overflow scrolling --}}
     <fieldset class="fieldset"
-              {{-- Binding evidenceCodes to Alpine, it will be re-used in the modal.
+              {{-- Binding Reason to Alpine, it will be re-used in the modal.
                 Note that it's necessary for modal to work properly --}}
               x-data="{
                   reasons: $wire.entangle('form.encounter.reasons'),
@@ -110,6 +110,7 @@
                                 </div>
                             </div>
                         </div>
+                    </td>
                 </tr>
             </template>
             </tbody>
@@ -120,7 +121,7 @@
             <button @click.prevent="
                         openModal = true; {{-- Open the Modal --}}
                         newReason = true; {{-- We are adding a new reason --}}
-                        modalReason = new Reason() {{-- Replace the data of the previous reason with a new one--}}
+                        modalReason = new Reason(); {{-- Replace the data of the previous reason with a new one--}}
                     "
                     class="item-add my-5"
             >
@@ -241,7 +242,7 @@
 
         constructor(obj = null) {
             if (obj) {
-                Object.assign(this, obj);
+                JSON.parse(JSON.stringify(this, obj));
             }
         }
     }

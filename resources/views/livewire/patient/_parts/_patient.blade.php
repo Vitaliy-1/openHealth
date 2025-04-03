@@ -144,7 +144,7 @@
                     class="input-select peer @error('form.patient.gender') input-error @enderror"
                     required
             >
-                <option selected>{{ __('forms.gender') }} *</option>
+                <option selected>{{ __('forms.select') }} *</option>
                 @foreach($this->dictionaries['GENDER'] as $key => $gender)
                     <option value="{{ $key }}" wire:key="{{ $key }}">{{ $gender }}</option>
                 @endforeach

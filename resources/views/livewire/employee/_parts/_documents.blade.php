@@ -6,7 +6,7 @@
                 Note that it's necessary for modal to work properly --}}
               x-data="{
                   documents: $wire.entangle('form.documents'),
-                  openModal:false,
+                  openModal: false,
                   modalDocument: new Doc(),
                   newDocument: false,
                   item: 0,

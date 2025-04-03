@@ -52,13 +52,12 @@ class PatientIndex extends Component
     /**
      * Search for person with provided filters.
      *
-     * @param  string  $model
      * @return void
      * @throws ApiException|ValidationException
      */
-    public function searchForPerson(string $model): void
+    public function searchForPerson(): void
     {
-        $this->form->rulesForModelValidate($model);
+        $this->form->rulesForModelValidate('patientsFilter');
 
         // Search in eHealth
         $buildSearchRequest = PatientRequestApi::buildSearchForPerson($this->form->patientsFilter);

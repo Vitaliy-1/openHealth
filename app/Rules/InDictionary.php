@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Rules;
 
 use Closure;
@@ -28,10 +30,10 @@ class InDictionary implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $dictionary = array_keys(dictionary()->getDictionary($this->dictionaryName, true)) ?? [];
+        $dictionary = array_keys(dictionary()->getDictionary($this->dictionaryName)) ?? [];
 
         // Check if the field value belongs to appropriate dictionary
-        if (!in_array($value, $dictionary)) {
+        if (!in_array($value, $dictionary, true)) {
             $fail(__('Недопустиме значення'));
         }
     }

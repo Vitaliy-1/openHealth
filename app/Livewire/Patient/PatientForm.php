@@ -35,16 +35,12 @@ class PatientForm extends Component
      * Allowed model modals name.
      */
     private const array ALLOWED_MODAL_MODELS = [
-        'documents',
-        'documentsRelationship',
         'signedContent'
     ];
 
     #[Locked]
     public int $patientId;
 
-    public array $documents = [];
-    public array $documentsRelationship = [];
     public string $mode = 'create';
     public PatientFormRequest $form;
 
@@ -75,7 +71,6 @@ class PatientForm extends Component
      */
     public ?string $selectedConfidantPatientId = null;
 
-    public int $keyProperty;
     public string $viewState = 'default';
 
     /**
@@ -89,12 +84,6 @@ class PatientForm extends Component
      * @var bool
      */
     public bool $isUploaded = false;
-
-    /**
-     * Check is store patient was successful.
-     * @var bool
-     */
-    public bool $isPatientStored = false;
 
     /**
      * Mark 'information from the leaflet was communicated to the patient'.
@@ -146,7 +135,7 @@ class PatientForm extends Component
             $fromDatabase = PersonRequest::find($id);
 
             // Make sure the ID in the URL matches the patient's ID.
-            if ($fromDatabase->id !== $id) {
+            if ($fromDatabase?->id !== $id) {
                 abort(403);
             }
 
@@ -178,90 +167,6 @@ class PatientForm extends Component
         $this->mode = 'create';
         $this->form->{$model} = [];
         $this->openModal($model);
-    }
-
-    /**
-     * Store valid data for a specific model.
-     *
-     * @param  string  $model  The model type to store data for.
-     * @return void
-     * @throws ValidationException|Throwable
-     */
-    public function store(string $model): void
-    {
-        $this->validateModel($model);
-        $this->form->rulesForModelValidate($model);
-
-        $this->{$model}[] = $this->form->{$model};
-        $this->closeModal();
-    }
-
-    /**
-     * Initialize the edit mode for a specific model.
-     *
-     * @param  string  $model  The model type to initialize for editing.
-     * @param  int  $keyProperty  The key property used to identify the specific item to edit.
-     * @return void
-     * @throws ValidationException
-     */
-    public function edit(string $model, int $keyProperty): void
-    {
-        $this->validateModel($model);
-
-        $this->keyProperty = $keyProperty;
-        $this->mode = 'edit';
-        $this->openModal($model);
-
-        // show data in form
-        $this->form->{$model} = $this->{$model}[$keyProperty];
-    }
-
-    /**
-     * Update the data for a specific model and key property.
-     *
-     * @param  string  $model  The model type to update the data for.
-     * @param  int  $keyProperty  The key property used to identify the specific item to update.
-     * @return void
-     * @throws ValidationException
-     */
-    public function update(string $model, int $keyProperty): void
-    {
-        $this->validateModel($model);
-        $this->form->rulesForModelValidate($model);
-
-        $this->{$model}[$keyProperty] = $this->form->{$model};
-        $this->closeModalModel($model);
-    }
-
-    /**
-     * Remove an item from the model by key in the cache.
-     *
-     * @param  string  $model
-     * @param  int  $keyProperty
-     * @return void
-     * @throws ValidationException
-     */
-    public function remove(string $model, int $keyProperty): void
-    {
-        $this->validateModel($model);
-
-        $this->keyProperty = $keyProperty;
-        unset($this->{$model}[$keyProperty]);
-    }
-
-    /**
-     * Close the modal and optionally reset the data for a specific model.
-     *
-     * @param  string|null  $model  The model type to reset the data for (optional).
-     * @return void
-     */
-    public function closeModalModel(?string $model = null): void
-    {
-        if (!empty($model)) {
-            $this->form->{$model} = [];
-        }
-
-        $this->closeModal();
     }
 
     /**
@@ -300,13 +205,12 @@ class PatientForm extends Component
     /**
      * Search for person with provided filters.
      *
-     * @param  string  $model
      * @return void
      * @throws ApiException|ValidationException
      */
-    public function searchForPerson(string $model): void
+    public function searchForPerson(): void
     {
-        $this->form->rulesForModelValidate($model);
+        $this->form->rulesForModelValidate('patientsFilter');
 
         $buildSearchRequest = PatientRequestApi::buildSearchForPerson($this->form->patientsFilter);
 
@@ -317,11 +221,10 @@ class PatientForm extends Component
     /**
      * Send API request 'Create Person v2' and show the next page if data is validated.
      *
-     * @param $model
      * @return void
      * @throws ApiException|Throwable
      */
-    public function createPerson($model): void
+    public function createPerson(): void
     {
         if (!Auth::user()?->can('createPerson', Person::class)) {
             $this->dispatch('flashMessage', [
@@ -333,7 +236,7 @@ class PatientForm extends Component
         }
 
         $this->preparePersonRequest();
-        $this->validatePersonRequest($model);
+        $this->validatePersonRequest(['patient', 'documents', 'documentsRelationship']);
 
         $response = $this->sendPersonRequest(removeEmptyKeys($this->form->toArray()));
 
@@ -372,11 +275,10 @@ class PatientForm extends Component
     /**
      * Create data about person request in DB.
      *
-     * @param  string  $model
      * @return void
      * @throws Throwable
      */
-    public function createApplication(string $model): void
+    public function createApplication(): void
     {
         if (!Auth::user()?->can('createApplication', PersonRequest::class)) {
             $this->dispatch('flashMessage', [
@@ -388,7 +290,7 @@ class PatientForm extends Component
         }
 
         $this->preparePersonRequest();
-        $this->validatePersonRequest($model);
+        $this->validatePersonRequest(['patient', 'documents', 'documentsRelationship']);
 
         $response = PersonRepository::savePersonResponseData(
             arrayKeysToSnake($this->form->toArray()),
@@ -438,13 +340,12 @@ class PatientForm extends Component
     /**
      * Upload patient files to the appropriate URL.
      *
-     * @param  string  $model
      * @return void
      * @throws ValidationException
      */
-    public function sendFiles(string $model): void
+    public function sendFiles(): void
     {
-        $this->form->rulesForModelValidate($model);
+        $this->form->rulesForModelValidate('uploadedDocuments');
 
         $totalFiles = count($this->form->uploadedDocuments);
         // Check that all provided files were uploaded
@@ -526,14 +427,13 @@ class PatientForm extends Component
     /**
      * Build and send API request 'Approve Person v2' and show the next page if data is validated.
      *
-     * @param  string  $model
      * @return void
      * @throws Throwable
      */
-    public function approvePerson(string $model): void
+    public function approvePerson(): void
     {
         try {
-            $this->form->rulesForModelValidate($model);
+            $this->form->rulesForModelValidate('verificationCode');
         } catch (ValidationException $e) {
             $this->dispatch('flashMessage', [
                 'message' => 'Помилка валідації.',
@@ -677,8 +577,6 @@ class PatientForm extends Component
         if (isset($this->patientId)) {
             $patientData = PersonRequest::showPersonRequest($this->patientId);
             $this->form->fill($patientData);
-            $this->documents = $patientData['documents'] ?? [];
-            $this->documentsRelationship = $patientData['confidantPerson'][0]['documentsRelationship'] ?? [];
             $this->address = $patientData['address'];
             $this->confidantPerson = $patientData['confidantPerson'] ?? [];
         }
@@ -735,21 +633,19 @@ class PatientForm extends Component
     private function preparePersonRequest(): void
     {
         $this->form->addresses = $this->address;
-        $this->form->documents = $this->documents;
-        $this->form->documentsRelationship = $this->documentsRelationship;
         $this->form->confidantPerson = $this->confidantPerson;
     }
 
     /**
      * Validate person request data.
      *
-     * @param  string  $model
+     * @param  array  $models
      * @throws ValidationException
      */
-    private function validatePersonRequest(string $model): void
+    private function validatePersonRequest(array $models): void
     {
         try {
-            $this->form->rulesForModelValidate($model);
+            $this->form->rulesForModelValidate($models);
             $this->form->validateBeforeSendApi();
         } catch (ValidationException $e) {
             $this->dispatch('flashMessage', [

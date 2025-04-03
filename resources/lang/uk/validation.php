@@ -237,10 +237,12 @@ return [
         'patient.phones.*.number' => 'номер телефону',
         'patient.emergencyContact.phones.*.type' => 'тип телефону',
         'patient.emergencyContact.phones.*.number' => 'номер телефону',
-        'patient.authenticationMethods.*.type' => 'метод автентифікації',
-        'patient.authenticationMethods.*.phoneNumber' => 'номер телефону',
-        'patient.authenticationMethods.*.value' => 'законний представник пацієнта',
-        'patient.authenticationMethods.*.alias' => 'роль',
+        'patient.authenticationMethods.*' => [
+            'type' => 'метод автентифікації',
+            'phoneNumber' => 'номер телефону',
+            'value' => 'законний представник пацієнта',
+            'alias' => 'роль'
+        ],
 
         'addresses' => [
             'area' => 'область',
@@ -251,18 +253,19 @@ return [
             'apartment' => 'квартира',
             'zip' => 'поштовий індекс'
         ],
-        'documentsRelationship' => [
+        'documentsRelationship.*' => [
             'type' => 'тип документа',
             'number' => 'серія/номер документа',
             'issuedBy' => 'орган яким виданий документ',
             'issuedAt' => 'дата видачі документа',
             'activeTo' => 'дійсний до'
         ],
-        'documents' => [
-            'type' => 'Тип документа',
-            'number' => 'Серія/номер документа',
-            'issuedBy' => 'Орган яким виданий документ',
-            'issuedAt' => 'Дата видачі документа',
+        'documents' => 'документ, що засвідчує особу',
+        'documents.*' => [
+            'type' => 'тип документа',
+            'number' => 'серія/номер документа',
+            'issuedBy' => 'орган яким виданий документ',
+            'issuedAt' => 'дата видачі документа',
             'expirationDate' => 'дійсний до'
         ],
         'patientsFilter' => [

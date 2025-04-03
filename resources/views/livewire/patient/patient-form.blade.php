@@ -29,12 +29,12 @@
                         {{ __('forms.back') }}
                     </a>
                     @if($user->hasRole('DOCTOR'))
-                        <button wire:click.prevent="createPerson('patient')" class="button-primary">
+                        <button wire:click.prevent="createPerson" class="button-primary">
                             {{ __('forms.send_for_approval') }}
                         </button>
                     @endif
                     @if($user->hasAnyRole(['DOCTOR', 'RECEPTIONIST']))
-                        <button wire:click.prevent="createApplication('patient')" class="button-primary">
+                        <button wire:click.prevent="createApplication" class="button-primary">
                             {{ __('patients.save_to_application') }}
                         </button>
                     @endif
@@ -48,12 +48,6 @@
                 @include('livewire.patient._parts._signature')
             </form>
         </section>
-    @endif
-
-    @if($showModal === 'documents')
-        @include('livewire.patient._parts.modals._modal_document')
-    @elseif($showModal === 'documentsRelationship')
-        @include('livewire.patient._parts.modals._modal_document_relationship')
     @endif
 
     <x-forms.loading/>

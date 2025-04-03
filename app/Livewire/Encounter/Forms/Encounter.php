@@ -6,6 +6,7 @@ namespace App\Livewire\Encounter\Forms;
 
 use App\Models\Employee\Employee;
 use App\Rules\Cyrillic;
+use App\Rules\InDictionary;
 use App\Rules\TimeInPast;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -18,28 +19,23 @@ class Encounter extends Form
         'encounter.period.date' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
         'encounter.period.start' => ['required', 'date_format:H:i', new TimeInPast()],
         'encounter.period.end' => ['required', 'date_format:H:i', 'after:encounter.period.start', new TimeInPast()],
-        'encounter.class.code' => ['required', 'string'], // TODO: add in dictionary check (eHealth/encounter_classes)
-        // TODO: add in dictionary check (eHealth/encounter_types)
-        'encounter.type.coding.*.code' => ['required', 'string'],
+        'encounter.class.code' => ['required', 'string', new InDictionary('eHealth/encounter_classes')],
+        'encounter.type.coding.*.code' => ['required', 'string', new InDictionary('eHealth/encounter_types')],
         'encounter.priority' => ['required_if:encounter.class.code,INPATIENT', 'array'],
-        // TODO: add in dictionary check (eHealth/encounter_priority)
-        'encounter.priority.coding.*.code' => ['required', 'string'],
+        'encounter.priority.coding.*.code' => ['required', 'string', new InDictionary('eHealth/encounter_priority')],
         'encounter.reasons' => ['required_if:encounter.class.code,PHC', 'array'],
-        // TODO: add in dictionary check (eHealth/ICPC2/reasons)
-        'encounter.reasons.*.coding.*.code' => ['required', 'string'],
+        'encounter.reasons.*.coding.*.code' => ['required', 'string', new InDictionary('eHealth/ICPC2/reasons')],
         'encounter.reasons.*.text' => ['nullable', 'string', new Cyrillic()],
         // TODO: Encounter must have exactly one primary diagnosis
         'encounter.diagnoses' => ['required_unless:encounter.type.coding.0.code,intervention', 'array'],
-        // TODO: add in dictionary check (eHealth/diagnosis_roles)
-        'encounter.diagnoses.role.coding.*.code' => ['required', 'string'],
+        'encounter.diagnoses.role.coding.*.code' => ['required', 'string', new InDictionary('eHealth/diagnosis_roles')],
         'encounter.diagnoses.rank' => ['nullable', 'integer', 'min:1', 'max:10'],
         'encounter.actions' => [
             'required_if:encounter.class.code,PHC', 'prohibited_unless:encounter.class.code,PHC', 'array'
         ],
-        // TODO: add in dictionary check (eHealth/ICPC2/actions)
-        'encounter.actions.*.coding.*.code' => ['required', 'string'],
+        'encounter.actions.*.coding.*.code' => ['required', 'string', new InDictionary('eHealth/ICPC2/actions')],
         'encounter.actions.*.text' => ['nullable', 'string', new Cyrillic()],
-        'encounter.division.identifier.value' => ['required', 'uuid'],
+        'encounter.division.identifier.value' => ['required', 'uuid']
     ])]
     public array $encounter = [
         'status' => 'finished',
@@ -71,8 +67,7 @@ class Encounter extends Form
 
     #[Validate([
         'episode' => ['required', 'array'],
-        // TODO: add in dictionary check (eHealth/episode_types)
-        'episode.type.code' => ['required', 'string'],
+        'episode.type.code' => ['required', 'string', new InDictionary('eHealth/episode_types')],
         'episode.name' => ['required', 'string', new Cyrillic()]
     ])]
     public array $episode = [
@@ -105,12 +100,11 @@ class Encounter extends Form
         'conditions.*.code.coding.1.code' => ['required_if:encounter.class.code,AMB, INPATIENT', 'string'],
         'conditions.*.clinicalStatus' => ['required', 'string'],
         'conditions.*.verificationStatus' => ['required', 'string'],
-        // TODO: add in dictionary check (eHealth/condition_severities)
-        'conditions.*.severity.coding.*.code' => ['nullable', 'string'],
+        'conditions.*.severity.coding.*.code' => ['nullable', 'string', new InDictionary('eHealth/condition_severities')],
         'conditions.*.onsetDate' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
         'conditions.*.onsetTime' => ['required', 'date_format:H:i', new TimeInPast()],
         'conditions.*.assertedDate' => ['nullable', 'before:tomorrow', 'date_format:Y-m-d'],
-        'conditions.*.assertedTime' => ['nullable', 'date_format:H:i', new TimeInPast()],
+        'conditions.*.assertedTime' => ['nullable', 'date_format:H:i', new TimeInPast()]
     ])]
     public array $conditions;
 

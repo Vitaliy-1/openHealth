@@ -15,7 +15,8 @@
                 <x-slot name="input">
                     <x-forms.select class="default-input"
                                     wire:model="knedp"
-                                    id="knedp">
+                                    id="knedp"
+                    >
                         <x-slot name="option">
                             @foreach($getCertificateAuthority as $certificateType)
                                 <option value="{{ $certificateType['id'] }}" wire:key="{{ $certificateType['id'] }}">
@@ -71,7 +72,7 @@
 
             <div class="mb-4.5 flex flex-col gap-6 xl:flex-row justify-between items-center">
                 <div class="xl:w-1/4 text-left">
-                    <x-secondary-button wire:click="closeModalModel">
+                    <x-secondary-button wire:click="closeModal">
                         {{ __('forms.back') }}
                     </x-secondary-button>
                 </div>
