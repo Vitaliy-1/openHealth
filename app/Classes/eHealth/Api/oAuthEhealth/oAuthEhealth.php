@@ -8,7 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-
+use Illuminate\Http\RedirectResponse;
 
 class oAuthEhealth implements oAuthEhealthInterface
 {
@@ -17,12 +17,13 @@ class oAuthEhealth implements oAuthEhealthInterface
     const OAUTH_APPROVAL = '/oauth/apps/authorize';
     const OAUTH_NONCE = '/oauth/nonce';
 
-    public function callback(): \Illuminate\Http\RedirectResponse
+    public function callback(): RedirectResponse
     {
         // exchange code to token
         if (config('ehealth.api.callback_prod') === false) {
             $code = request()->input('code');
             $url =  'http://localhost/ehealth/oauth?code=' . $code;
+
             return redirect($url);
         }
 
@@ -39,11 +40,12 @@ class oAuthEhealth implements oAuthEhealthInterface
 
     public function authenticate($code)
     {
-
         $user = User::find(\session()->get('user_id_auth_ehealth'));
+
         if (!$user) {
             return redirect()->route('login');
         }
+
         $data = [
             'token' => [
                 'client_id'     => $user->legalEntity->client_id ?? '',
@@ -51,10 +53,12 @@ class oAuthEhealth implements oAuthEhealthInterface
                 'grant_type'    => 'authorization_code',
                 'code'          => $code,
                 'redirect_uri'  => config('ehealth.api.redirect_uri'),
-                'scope'         => $user->getAllPermissions()->unique()->pluck('name')->join(' ')
+                'scope'         => $user->getScopes()
             ]
         ];
-        $request = (new Request('POST', self::OAUTH_TOKENS, $data, false))->sendRequest();
+
+        $request = new Request('POST', self::OAUTH_TOKENS, $data, false)->sendRequest();
+
         self::setToken($request);
 
         $this->login($user);
@@ -70,13 +74,11 @@ class oAuthEhealth implements oAuthEhealthInterface
             'app'=> [
                 'client_id'     => $user->legalEntity->client_id ?? '',
                 'redirect_uri'  => config('ehealth.api.redirect_uri'),
-                'scope'         => $user->getAllPermissions()->unique()->pluck('name')->join(' ')
+                'scope'         => $user->getScopes()
             ]
         ];
 
-
-         (new Request('POST', self::OAUTH_APPROVAL, $queryParams))->sendRequest();
-
+        new Request('POST', self::OAUTH_APPROVAL, $queryParams)->sendRequest();
     }
 
     //TODO: Check if it works
@@ -86,8 +88,8 @@ class oAuthEhealth implements oAuthEhealthInterface
             'client_id'     => $user->legalEntity->client_id ?? '',
             'client_secret' => $user->legalEntity->client_secret ?? '',
         ];
-         (new Request('POST', self::OAUTH_NONCE, $queryParams))->sendRequest();
 
+        new Request('POST', self::OAUTH_NONCE, $queryParams)->sendRequest();
     }
 
     public function login($user): void
@@ -105,18 +107,18 @@ class oAuthEhealth implements oAuthEhealthInterface
         // Base URL and client ID
         $baseUrl = config('ehealth.api.auth_host');
         $redirectUri = config('ehealth.api.redirect_uri');
+
         // Base query parameters
         $queryParams = [
             'client_id'     => $user->legalEntity->client_id ?? '',
             'redirect_uri'  => $redirectUri,
             'response_type' => 'code'
         ];
-        // Additional query parameters if email is provided
 
+        // Additional query parameters if email is provided
         if (!empty($user->email)) {
-            $scope = $user->getAllPermissions()->unique()->pluck('name')->join(' ');
             $queryParams['email'] = $user->email;
-            $queryParams['scope'] = $scope;
+            $queryParams['scope'] = $user->getScopes();
         }
 
         \session()->put('user_id_auth_ehealth', $user->id);
@@ -142,7 +144,7 @@ class oAuthEhealth implements oAuthEhealthInterface
      */
     public static function getUser(): array
     {
-        return (new Request('GET', self::OAUTH_USER, []))->sendRequest();
+        return new Request('GET', self::OAUTH_USER, [])->sendRequest();
     }
 
     public static function forgetToken()
@@ -153,6 +155,7 @@ class oAuthEhealth implements oAuthEhealthInterface
             Session::forget('refresh_token');
             Session::forget('refresh_token_expires_at');
         }
+
         return redirect()->route('login');
     }
 
@@ -164,6 +167,7 @@ class oAuthEhealth implements oAuthEhealthInterface
     public function refreshAuthToken(): array
     {
         $user = Auth::user();
+
         $data = [
             'token' => [
                 'client_id'     => $user->legalEntity->client_id ?? '',
@@ -172,17 +176,16 @@ class oAuthEhealth implements oAuthEhealthInterface
                 'refresh_token' => Session::get('refresh_token'),
             ]
         ];
-        $request = (new Request('POST', self::OAUTH_TOKENS, $data, false))->sendRequest();
+
+        $request = new Request('POST', self::OAUTH_TOKENS, $data, false)->sendRequest();
+
         self::setToken($request);
+
         return $request;
     }
-
 
     public function isLoggedIn(): bool
     {
         return Session::has('auth_token') && Session::has('auth_token_expires_at');
     }
-
 }
-
-

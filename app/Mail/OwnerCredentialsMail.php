@@ -11,18 +11,38 @@ use Illuminate\Queue\SerializesModels;
 
 class OwnerCredentialsMail extends Mailable
 {
-    use Queueable, SerializesModels;
-
-
+    use Queueable,
+        SerializesModels;
 
     public string $email;
+
     public string $password;
+
+    public string $text;
+
+    /**
+     * The array of subjects for different recipients.
+     *
+     * @var array<string, \Illuminate\Mail\Mailables\Envelope>
+     */
+    protected $subjects = [];
+
+    protected $contents = [];
+
     /**
      * Create a new message instance.
      */
-    public function __construct(string $email)
+    public function __construct(string $email, string $password, $text = '')
     {
         $this->email = $email;
+        $this->password = $password;
+        $this->text = $text;
+
+        $this->subjects['owner'] = new Envelope(subject: 'Ви зареєструвались у системі');
+        $this->subjects['anotherUser'] = new Envelope(subject: 'Реєстрація нового користувача');
+
+        $this->contents['owner'] = new Content(view: 'emails.legalEntity.owner-credentials');
+        $this->contents['anotherUser'] = new Content(view: 'emails.legalEntity.creator-notification');
     }
 
     /**
@@ -30,9 +50,7 @@ class OwnerCredentialsMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: 'Ви зареєструвались у системі',
-        );
+        return $this->text ? $this->subjects['anotherUser'] : $this->subjects['owner'];
     }
 
     /**
@@ -40,9 +58,7 @@ class OwnerCredentialsMail extends Mailable
      */
     public function content(): Content
     {
-        return new Content(
-            view: 'emails.legalEntity.owner-credentials', // Вказати правильний шлях до шаблону
-        );
+        return $this->text ? $this->contents['anotherUser'] : $this->contents['owner'];
     }
 
     /**

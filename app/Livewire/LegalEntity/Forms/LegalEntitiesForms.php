@@ -10,10 +10,12 @@ use App\Rules\Email;
 use App\Rules\TaxId;
 use App\Rules\Cyrillic;
 use App\Rules\BirthDate;
-use App\Rules\DocumentType;
+use App\Rules\DocumentNumber;
 use App\Rules\InDictionary;
 use App\Rules\UniqueEdrpou;
 use App\Exceptions\CustomValidationException;
+use App\Rules\AgeCheck;
+use App\Rules\PhoneNumber;
 use Illuminate\Validation\ValidationException;
 
 class LegalEntitiesForms extends Form
@@ -62,20 +64,20 @@ class LegalEntitiesForms extends Form
             'owner.firstName' => ['required', 'min:3', new Name()],
             'owner.secondName' => ['nullable', new Name()],
             'owner.gender' => 'required|string',
-            'owner.birthDate' => ['required', 'date', new BirthDate()],
+            'owner.birthDate' => ['required', 'date', new BirthDate(), new AgeCheck()],
             'owner.noTaxId' => 'boolean|nullable',
             'owner.taxId' => ['required', new TaxId($this->owner['noTaxId'])],
             'owner.documents.type' => ['required','string', new InDictionary('DOCUMENT_TYPE')],
-            'owner.documents.number' => ['required', 'string', new DocumentType($this->owner['documents']['type'] ?? '')],
+            'owner.documents.number' => ['required', 'string', new DocumentNumber($this->owner['documents']['type'] ?? '')],
             'owner.phones' => 'required|array',
-            'owner.phones.*.number' => 'required|string|regex:/^\+?\d{12}$/',
+            'owner.phones.*.number' => ['required', 'string', new PhoneNumber()],
             'owner.phones.*.type' => ['required', 'string', new InDictionary('PHONE_TYPE')],
             'owner.email' => ['required','email',new Email()],
             'owner.position' => ['required','string', new InDictionary('POSITION')],
             'email' => ['required','email',new Email()],
             'website' => ['required', 'regex:/^(https?:\/\/)?(www\.)?([a-z0-9\-]+\.)+[a-z]{2,}$/i'],
             'phones' => 'required|array',
-            'phones.*.number' => 'required|string|regex:/^\+?\d{12}$/',
+            'phones.*.number' => ['required', 'string', new PhoneNumber()],
             'phones.*.type' => ['required', 'string', new InDictionary('PHONE_TYPE')],
             'accreditation.category' => ['required', 'string'],
             'accreditation.orderNo' => ['required', 'string', 'min:2'],

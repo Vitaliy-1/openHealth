@@ -51,6 +51,8 @@ class CreateLegalEntity extends LegalEntity
      */
     protected string $stepCacheKey;
 
+    public string $validationErrorStep = '';
+
     /**
      * @return void set cache keys
      */
@@ -158,7 +160,7 @@ class CreateLegalEntity extends LegalEntity
     /**
      * @throws ValidationException
      */
-    public function validateData($activeStep = null): void
+    protected function validateData($activeStep = null): void
     {
         $stepNumber = $activeStep ?? $this->steps['index'];
 
@@ -176,7 +178,7 @@ class CreateLegalEntity extends LegalEntity
     }
 
     // TODO: implement in the future release when EDRPOU will validate from outside also
-    public function saveLegalEntityFromExistingData($data): void
+    protected function saveLegalEntityFromExistingData($data): void
     {
         $normalizedData = [];
 
@@ -213,7 +215,7 @@ class CreateLegalEntity extends LegalEntity
     /**
      * Update the legal entity in the cache if changes are detected or it doesn't exist already.
      */
-    public function putLegalEntityInCache(): void
+    private function putLegalEntityInCache(): void
     {
         // Convert all camelCase keys to snake_case because the Legal Entity model uses snake_case
         $formData = $this->convertArrayKeysToSnakeCase($this->legalEntityForm->toArray());
@@ -259,7 +261,7 @@ class CreateLegalEntity extends LegalEntity
      *
      * @return bool Returns true if Legal Entity attributes have changed, false otherwise.
      */
-    public function checkChanges(): bool
+    private function checkChanges(): bool
     {
         // Check if entity cache exists
         if (Cache::has($this->entityCacheKey)) {
@@ -287,7 +289,7 @@ class CreateLegalEntity extends LegalEntity
      *
      * @return bool Returns true if the Legal Entity owner has changed, false otherwise.
      */
-    public function checkOwnerChanges(): bool
+    private function checkOwnerChanges(): bool
     {
         // Check if the owner information is cached
         if (Cache::has($this->ownerCacheKey)) {
@@ -307,7 +309,7 @@ class CreateLegalEntity extends LegalEntity
     /* - STEPS - */
 
     // Step #1 set EDRPOU number
-    public function stepEdrpou(): void
+    private function stepEdrpou(): void
     {
         $this->legalEntityForm->rulesForEdrpou();
 
@@ -320,7 +322,7 @@ class CreateLegalEntity extends LegalEntity
     }
 
     // Step #2 Create Owner
-    public function stepOwner(): void
+    private function stepOwner(): void
     {
         $this->legalEntityForm->rulesForOwner();
 
@@ -334,19 +336,19 @@ class CreateLegalEntity extends LegalEntity
     }
 
     // Step #3 Create/Update Contact[Phones, Email,beneficiary,receiver_funds_code]
-    public function stepContact(): void
+    private function stepContact(): void
     {
         $this->legalEntityForm->rulesForContact();
     }
 
     // Step #4 Create/Update Address
-    public function stepAddress(): void
+    private function stepAddress(): void
     {
         $this->legalEntityForm->rulesForAddresses();
     }
 
     // Step #5 Create/Update Accreditation
-    public function stepAccreditation(): void
+    private function stepAccreditation(): void
     {
         if ($this->legalEntityForm->accreditationShow) {
             $this->legalEntityForm->rulesForAccreditation();
@@ -356,7 +358,7 @@ class CreateLegalEntity extends LegalEntity
     }
 
     // Step #6 Create/Update License
-    public function stepLicense(): void
+    private function stepLicense(): void
     {
         $this->legalEntityForm->license['type'] = 'MSP';
 
@@ -364,7 +366,7 @@ class CreateLegalEntity extends LegalEntity
     }
 
     // Step #7 Create/Update Additional Information
-    public function stepAdditionalInformation(): void
+    private function stepAdditionalInformation(): void
     {
         if($this->legalEntityForm->archivationShow) {
             $this->legalEntityForm->rulesForAdditionalInformation();
@@ -374,12 +376,12 @@ class CreateLegalEntity extends LegalEntity
     }
 
     // Step #8 KEP Significancy (called on creating new Legal Entity only)
-    public function stepSignificancy(): void
+    private function stepSignificancy(): void
     {
         $this->legalEntityForm->rulesForSignificancy();
     }
 
-    public function createUser(): ?User
+    protected function createUser(): ?User
     {
         // Get the currently authenticated user
         $authenticatedUser = Auth::user();
@@ -393,12 +395,14 @@ class CreateLegalEntity extends LegalEntity
         // Check if a user with the provided email already exists
         $user = User::where('email', $email)->first();
 
-        // If the authenticated user is the owner, use them as the user
-        if (isset($authenticatedUser->email) && strtolower($authenticatedUser->email) === $email) {
-            // If the authenticated user is the owner, use them as the user
+        // If the authenticated user claim self as the owner of the Legal Entity, use them as the user
+        $isOwner = isset($authenticatedUser->email) && strtolower($authenticatedUser->email) === $email;
+
+        if ($isOwner) {
+            // If the authenticated user is the LegalEntity owner, use them as the user
             $user = $authenticatedUser;
         } elseif (!$user) {
-            // If no user exists with that email, create a new user
+            // If no user exists with that email, create a new user (new owner)
             $user = User::create([
                 'email'    => $email,
                 'password' => Hash::make($password),
@@ -419,8 +423,11 @@ class CreateLegalEntity extends LegalEntity
         // Assign the 'OWNER' role to the user
         $user->assignRole('OWNER');
 
-        // Send an email with the owner credentials to the user
-        Mail::to($user->email)->send(new OwnerCredentialsMail($user->email));
+        if (!$isOwner) {
+            // Send an email with the owner credentials to the user
+            Mail::to($user->email)->send(new OwnerCredentialsMail($user->email, $password));
+            Mail::to($authenticatedUser->email)->send(new OwnerCredentialsMail( '', '', __('Нового користувача зареєстровано в системі. На вказану адресу ' . $user->email . ' надіслано дані для входу в систему')));
+        }
 
         return $user;
     }
@@ -430,7 +437,7 @@ class CreateLegalEntity extends LegalEntity
      *
      * @param array $data The data to fill the license with.
      */
-    public function createLicense(array $data): void
+    protected function createLicense(array $data): void
     {
         $license = License::firstOrNew(['uuid' => $data['id']]);
         $license->fill($data);
@@ -442,11 +449,77 @@ class CreateLegalEntity extends LegalEntity
         }
     }
 
+    /**
+     * Summary of validationRequest
+     *
+     * @return bool
+     */
+    protected function validationRequest(): bool
+    {
+        $step = '';
+        $field = '';
+
+        $stepNames = [
+            'edrpou' => __('forms.edrpou'),
+            'owner' => __('forms.owner'),
+            'contact' => __('forms.contacts'),
+            'address' => __('forms.address'),
+            'accreditation' => __('forms.accreditation'),
+            'license' => __('forms.licenses'),
+            'archivation' => __('forms.information'),
+            'information' => __('forms.information'),
+            'significancy' => __('forms.complete'),
+        ];
+
+        try {
+            $this->legalEntityForm->onEditValidate();
+        } catch (ValidationException $err) {
+            $key= array_key_first($err->errors());
+            $error = $err->errors()[$key][0];
+
+            if (str_contains($key, 'legalEntityForm.')) {
+                $stepGroup = explode('.', str_replace('legalEntityForm.', '', $key));
+                $_step = $stepGroup[0];
+                $field = $stepGroup[count($stepGroup) - 1];
+
+                $step = match($_step) {
+                    'owner', 'accreditation', 'license' => $_step,
+                    'significancy' => 'significancy',
+                    'edrpou' => 'edrpou',
+                    'email' => 'contact',
+                    'website' => 'contact',
+                    'phones' => 'contact',
+                    'archive' => 'archivation',
+                    'receiverFundsCode' => 'information',
+                    'beneficiary' => 'information',
+                    default => 'undefined'
+                };
+            } else if (str_contains($key, 'address.')) {
+                $step = 'address';
+            }
+
+            if (!$step) {
+                $step = 'undefined';
+            }
+
+            $this->validationErrorStep = $stepNames[$step];
+
+            $this->dispatchErrorMessage("[$step : $field] $error");
+
+            return false;
+        }
+
+        return true;
+    }
+
     public function createLegalEntity(): void
     {
         $this->stepSignificancy();
 
-        $this->signLegalEntity();
+        // Validate All the data from the form
+        if ($this->validationRequest()) {
+            $this->signLegalEntity();
+        }
     }
 
     public function render()

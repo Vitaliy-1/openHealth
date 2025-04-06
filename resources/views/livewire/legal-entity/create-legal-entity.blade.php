@@ -20,7 +20,7 @@
                     const stepData = {
                         title,
                         index,
-                        complete: index < this.activeStep
+                        complete: index < this.activeStep,
                     };
 
                     this.headers.push(stepData);
@@ -32,16 +32,25 @@
                     return stepNum ? this.headers.length === stepNum : this.headers.length === this.activeStep;
                 }
             }"
-            x-init="cleanHeaders();"
+            x-init="cleanHeaders()"
             wire:key="active-{{ $activeStep }}"
             class="steps"
         >
-            <div>
+            <div >
+                {{-- Steps Header --}}
                 <ol class="steps-header">
                     <template x-for="header in headers" :key="`step-header-${header.index}-${activeStep}`">
                         <li
-                            x-data="{ isActive: activeStep === header.index }"
+                            x-data="{
+                                isActive: activeStep === header.index,
+                                isValidationError: false
+                            }"
                             @click="if (header.index <= {{ $currentStep }}) { activeStep = header.index; }"
+                            x-init="
+                                $watch('$wire.validationErrorStep', value => {
+                                    isValidationError = value === header.title;
+                                });
+                            "
                             class="flex md:w-max-content items-center"
                             :class="{ 'cursor-pointer': header.index <= {{ $currentStep }} }"
                         >
@@ -50,8 +59,9 @@
                                 <span x-text="header.index"
                                     class="steps-header_index"
                                     :class="{
-                                        'step-completed-color': header.complete && !isActive,
-                                        'step-incomplete-color': !isActive && !header.complete
+                                        'step-completed-color': header.complete && !isActive && !isValidationError,
+                                        'step-incomplete-color': !isActive && !header.complete && !isValidationError,
+                                        'text-red-500': isValidationError
                                     }"></span>
                             </template>
 
@@ -70,8 +80,9 @@
                                 x-text="header.title"
                                 class="steps-header_title"
                                 :class="{
-                                    'step-completed-color': header.complete && !isActive,
-                                    'step-active-color': isActive,
+                                    'step-completed-color': header.complete && !isActive && !isValidationError,
+                                    'step-active-color': isActive && !isValidationError,
+                                    'text-red-500': isValidationError,
                                     'after:content-[\'/\']': !isLastStep(header.index)
                                 }"
                             ></span>
