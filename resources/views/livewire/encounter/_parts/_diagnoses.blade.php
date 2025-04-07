@@ -132,6 +132,7 @@
                             </div>
                         </div>
                     </div>
+                </td>
             </tr>
         </template>
         </tbody>
@@ -142,7 +143,7 @@
         <button @click.prevent="
                         openModal = true; {{-- Open the Modal --}}
                         newCondition = true; {{-- We are adding a new condition --}}
-                        modalCondition = new Condition() {{-- Replace the data of the previous condition with a new one--}}
+                        modalCondition = new Condition(); {{-- Replace the data of the previous condition with a new one--}}
                     "
                 class="item-add my-5"
         >

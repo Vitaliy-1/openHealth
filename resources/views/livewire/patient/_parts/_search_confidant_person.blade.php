@@ -9,7 +9,7 @@
 
             @if(empty($selectedConfidantPatientId))
                 <div class="py-4">
-                    <button wire:click.prevent="searchForPerson('patientsFilter')"
+                    <button wire:click.prevent="searchForPerson"
                             class="flex items-center gap-2 default-button"
                     >
                         <svg width="16" height="16">

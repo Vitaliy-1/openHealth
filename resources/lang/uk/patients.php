@@ -70,6 +70,7 @@ return [
     'alias' => 'Роль',
     'leaflet' => "Пам’ятка",
     'print_leaflet_for_patient' => "Роздрукувати пам’ятку для ознайомлення пацієнтом",
+    'uploading_documents' => 'Завантаження документів',
 
     // PERSON_VERIFICATION_STATUSES
     'CHANGES_NEEDED' => 'Неуспішно верифіковано (потребує змін)',
