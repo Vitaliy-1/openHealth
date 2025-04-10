@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\Person;
 
 use App\Models\Employee\Employee;
+use App\Models\Encounter\Encounter;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
@@ -17,6 +21,11 @@ class Person extends BasePerson
     }
 
     protected $table = 'persons';
+
+    public function encounters(): HasMany
+    {
+        return $this->hasMany(Encounter::class);
+    }
 
     public function employee(): HasOne
     {

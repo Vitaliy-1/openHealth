@@ -2,8 +2,8 @@
     $conditionCodes = $this->dictionaries['eHealth/ICPC2/condition_codes'];
     ksort($conditionCodes);
 @endphp
-{{-- Component to input values to the table through the Modal, built with Alpine --}}
 
+{{-- Component to input values to the table through the Modal, built with Alpine --}}
 <fieldset class="fieldset"
           {{-- Binding conditions to Alpine, it will be re-used in the modal.
             Note that it's necessary for modal to work properly --}}
@@ -36,24 +36,23 @@
         </tr>
         </thead>
         <tbody>
-        <template x-for="(condition, index) in conditions">
+        <template x-for="(condition, index) in conditions" :key="index">
             <tr>
                 <td class="td-input"
                     x-text="`${ condition.code.coding[0]['code'] } - ${ conditionCodesDictionary[condition.code.coding[0]['code']] }`"
                 ></td>
                 <td class="td-input"
-                    x-text="`${ diagnosisRolesDictionary[condition.diagnoses.role.coding[0].code] }`"
+                    x-text="diagnosisRolesDictionary[diagnoses[index].role.coding[0].code]"
                 ></td>
                 <td class="td-input"
-                    x-text="`${ conditionClinicalStatusesRolesDictionary[condition.clinicalStatus] }`"
+                    x-text="conditionClinicalStatusesRolesDictionary[condition.clinicalStatus]"
                 ></td>
                 <td class="td-input"
-                    x-text="`${ conditionVerificationStatusesDictionary[condition.verificationStatus] }`"
+                    x-text="conditionVerificationStatusesDictionary[condition.verificationStatus]"
                 ></td>
                 <td class="td-input"
-                    x-text="`${ condition.asserter.identifier.type.text }`"
-                >
-                </td>
+                    x-text="condition.asserter?.type?.[0]?.text"
+                ></td>
                 <td class="td-input">
                     {{-- That all that is needed for the dropdown --}}
                     <div x-data="{
@@ -115,7 +114,6 @@
                                             openModal = true; {{-- Open the modal --}}
                                             item = index; {{-- Identify the item we are corrently editing --}}
                                             {{-- Replace the previous condition with the current, don't assign object directly (modalCondition = condition) to avoid reactiveness --}}
-{{--                                            modalCondition = new Condition(condition);--}}
                                             modalCondition = new Condition(condition);
                                             newCondition = false; {{-- This condition is already created --}}
                                         "
@@ -636,7 +634,28 @@
 
         constructor(obj = null) {
             if (obj) {
-                this.conditions = JSON.parse(JSON.stringify(obj.conditions || obj));
+                this.conditions = {
+                    ...this.conditions,
+                    ...obj.conditions ?? obj,
+
+                    asserter: {
+                        ...this.conditions.asserter,
+                        ...((obj.conditions ?? obj).asserter ?? {})
+                    },
+                    reportOrigin: {
+                        coding: [...((obj.conditions ?? obj).reportOrigin?.coding ?? this.conditions.reportOrigin.coding)]
+                    },
+                    code: {
+                        coding: [...((obj.conditions ?? obj).code?.coding ?? this.conditions.code.coding)]
+                    },
+                    severity: {
+                        coding: [...((obj.conditions ?? obj).severity?.coding ?? this.conditions.severity.coding)]
+                    },
+                    diagnoses: {
+                        ...this.conditions.diagnoses,
+                        ...((obj.conditions ?? obj).diagnoses ?? {})
+                    }
+                };
             }
         }
     }
