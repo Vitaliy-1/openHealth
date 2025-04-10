@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Relations\Phone;
+use App\Models\Relations\Address;
 use App\Models\Employee\Employee;
-use App\Models\Employee\EmployeeRequest;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Employee\EmployeeRequest;
 use Eloquence\Behaviours\HasCamelCasing;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use App\Models\Relations\Address;
-use App\Models\Relations\Phone;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @mixin IdeHelperLegalEntity
@@ -120,7 +121,7 @@ class LegalEntity extends Model
         return $this->uuid;
     }
 
-    public function getClientId(): string
+    public function getClientId(): ?string
     {
         return $this->client_id;
     }
@@ -149,5 +150,13 @@ class LegalEntity extends Model
     public function phones(): MorphMany
     {
         return $this->morphMany(Phone::class, 'phoneable');
+    }
+
+    /**
+     * Scope a query to get an Legal Entity depends on it's UUID
+     */
+    public function scopeByUuid(Builder $query, string $legalEntityUUID): void
+    {
+        $query->where('uuid', $legalEntityUUID);
     }
 }

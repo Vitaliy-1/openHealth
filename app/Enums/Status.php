@@ -10,6 +10,7 @@ enum Status: string
     case APPROVED = 'APPROVED';
     case REJECTED = 'REJECTED';
     case SIGNED = 'SIGNED';
+    case DISMISSED = 'DISMISSED';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum Status: string
             self::APPROVED => 'Підтверджено',
             self::REJECTED => 'Відхилено',
             self::SIGNED => 'Підписано',
+            self::DISMISSED => 'Звільнено',
         };
     }
 }

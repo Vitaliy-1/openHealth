@@ -240,6 +240,10 @@ button.item-remove svg, button.item-add svg {
     @apply bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300;
 }
 
+.dismissed {
+    @apply bg-black text-gray-300 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-black dark:text-gray-300;
+}
+
 .dropdown-menu {
     @apply z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600;
 }

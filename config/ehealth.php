@@ -11,11 +11,19 @@ return [
         'auth_host' => env('EHEALTH_AUTH_HOST', 'https://auth-preprod.ehealth.gov.ua/sign-in'),
         'redirect_uri' => env('EHEALTH_REDIRECT_URI', 'https://openhealths.com/ehealth/oauth'),
         'url_dev' => env('EHEALTH_URL_DEV', 'http://localhost'),
+        'auth_ehealth' => env('EHEALTH_CODE_TOKEN', 'user_id_auth_ehealth'),
+        'oauth' => [
+            'bearer_token' => env('EHEALTH_OAUTH_TOKEN', 'auth_token'),
+            'tokens' => env('EHEALTH_OAUTH_TOKENS', '/oauth/tokens'),
+            'user' => env('EHEALTH_OAUTH_USER', '/oauth/user'),
+            'logout' => env('EHEALTH_OAUTH_LOGOUT', '/auth/logout')
+        ],
         'timeout' => 10,
         'queueTimeout' => 60,
         'cooldown' => 300,
         'retries' => 10
     ],
+    
     'capitation_contract_max_period_days' => 366,
     'legal_entity_type' => [
         'PRIMARY_CARE' => [

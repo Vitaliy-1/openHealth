@@ -1,4 +1,6 @@
 <x-guest-layout>
+    <x-messages />
+
     <x-authentication-card>
         <x-slot name="logo">
             <x-authentication-card-logo/>
@@ -11,11 +13,7 @@
         <div class="text-base font-normal text-gray-500 dark:text-gray-400">
             {{ __('Забули свій пароль? Без проблем. Просто повідомте нам свою електронну адресу, і ми надішлемо вам електронною поштою посилання для скидання пароля, за яким ви зможете вибрати новий.') }}
         </div>
-        @if (session('status'))
-            <x-message.successes>
-                <x-slot name="status">{{ session('status') }}</x-slot>
-            </x-message.successes>
-        @endif
+
         <form method="POST" action="{{ route('password.email') }}">
             @csrf
 

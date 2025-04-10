@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\HomeController;
 use App\Livewire\Contract\ContractForm;
@@ -44,11 +42,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 Route::post('/send-email', [EmailController::class, 'sendEmail'])->name('send.email');
 
-Route::get('/ehealth/oauth/', [oAuthEhealth::class, 'callback'])->name('ehealth.oauth.callback');
-Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login');
-Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+Route::get('/ehealth/oauth/', [LoginController::class, 'callback'])->name('ehealth.oauth.callback');
+Route::post('/login', [LoginController::class, 'login'])->name('login');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth:web,ehealth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
@@ -57,7 +55,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::group(['middleware' => ['role:OWNER|ADMIN'], 'prefix' => 'dashboard'], function () {
         Route::prefix('legal-entities')->group(function () {
-            Route::get('/edit/{id?}', EditLegalEntity::class)->name('edit.legalEntities');
+            Route::get('/edit', EditLegalEntity::class)->name('edit.legalEntities');
         });
 
         Route::prefix('division')->group(function () {

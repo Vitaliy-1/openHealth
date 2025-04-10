@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'ehealth' => [
+            'driver' => 'ehealth',
+            'provider' => 'ehealth_users'
+        ]
     ],
 
     /*
@@ -64,6 +68,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
+        'ehealth_users' => [
+            'driver' => 'ehealth_user_provider',
+            'model' => App\Models\User::class
+        ]
     ],
 
     /*

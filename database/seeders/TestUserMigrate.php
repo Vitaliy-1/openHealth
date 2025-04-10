@@ -177,6 +177,7 @@ class TestUserMigrate extends Seeder
 
         $userId = DB::table('users')->insertGetId([
             'id' => 1,
+            'uuid' => '82d1f518-23c9-4c6c-868b-6f7ab26c6da8',
             'email' => 'vitaliybezsh@gmail.com',
             'password' => Hash::make(Str::random()),
             'email_verified_at' => null,
