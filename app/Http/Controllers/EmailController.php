@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SendEmailRequest;
 use App\Services\EmailService;
-use App\DTO\EmailDTO;
+use App\Dto\EmailDTO;
 use Illuminate\Http\JsonResponse;
 
 class EmailController extends Controller

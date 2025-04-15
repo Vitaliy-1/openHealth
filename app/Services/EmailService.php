@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendEmail;
-use App\DTO\EmailDTO;
+use App\Dto\EmailDTO;
 
 class EmailService
 {
