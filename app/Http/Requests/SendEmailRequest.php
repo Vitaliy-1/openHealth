@@ -25,7 +25,7 @@ class SendEmailRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'phone' => ['required', new PhoneNumber(8)],
+            'phone' => ['required', new PhoneNumber()],
             '_token' => 'required|csrf_token',
         ];
     }

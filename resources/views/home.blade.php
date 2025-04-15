@@ -274,8 +274,8 @@
                     <input type="text" name="name" placeholder="{{ trans('Your Name*') }}" class="w-full bg-gray px-4 py-2 border border-transparent rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500" title="{{ trans('Введіть ваше ім\'я') }}">
                 </div>
                 <div class="mb-10">
-                    <input type="text" name="phone" placeholder="{{ trans('Phone number*') }}" class="w-full bg-gray px-4 py-2 border border-transparent rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500" pattern="^\+?[0-9]{1,}$"
-                    title="{{ trans('Введіть дійсний номер телефону щонайменше з 8 цифр') }}">
+                    <input type="text" name="phone" placeholder="{{ trans('Phone number*') }}" class="w-full bg-gray px-4 py-2 border border-transparent rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    title="{{ trans('Введіть дійсний номер телефону щонайменше з 10 цифр') }}">
                 </div>
                 <button type="submit" class="w-full bg-orange text-white font-semibold py-3 rounded-lg hover:bg-blue focus:outline-none focus:ring-2 focus:ring-orange">
                     {{ trans('Request a Callback') }}

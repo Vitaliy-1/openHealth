@@ -22,7 +22,7 @@ class PhoneNumber implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!preg_match('/^\+380[0-9]{'.$this->minDigits.',}$/', $value)) {
+        if (!preg_match('/^\+380[0-9]{'.$this->minDigits.'}$/', $value)) {
             $fail(__('validation.phone', ['min' => $this->minDigits]));
         }
     }
