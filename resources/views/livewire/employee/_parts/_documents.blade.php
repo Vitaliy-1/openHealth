@@ -56,15 +56,15 @@
                                         focusAfter && focusAfter.focus()
                                     }
                                 }"
-                                x-on:keydown.escape.prevent.stop="close($refs.button)"
-                                x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
+                                @keydown.escape.prevent.stop="close($refs.button)"
+                                @focusin.window="! $refs.panel.contains($event.target) && close()"
                                 x-id="['dropdown-button']"
                                 class="relative"
                             >
                                 {{-- Dropdown Button --}}
                                 <button
                                     x-ref="button"
-                                    x-on:click="toggle()"
+                                    @click="toggle()"
                                     :aria-expanded="openDropdown"
                                     :aria-controls="$id('dropdown-button')"
                                     type="button"
@@ -82,7 +82,7 @@
                                         x-ref="panel"
                                         x-show="openDropdown"
                                         x-transition.origin.top.left
-                                        x-on:click.outside="close($refs.button)"
+                                        @click.outside="close($refs.button)"
                                         :id="$id('dropdown-button')"
                                         x-cloak
                                         class="dropdown-panel relative"
@@ -139,7 +139,7 @@
             <template x-teleport="body"> {{-- This moves the modal at the end of the body tag --}}
                 <div x-show="openModal"
                      style="display: none"
-                     x-on:keydown.escape.prevent.stop="openModal = false"
+                     @keydown.escape.prevent.stop="openModal = false"
                      role="dialog"
                      aria-modal="true"
                      x-id="['modal-title']"
@@ -153,10 +153,10 @@
                     {{-- Panel --}}
                     <div x-show="openModal"
                          x-transition
-                         x-on:click="openModal = false"
+                         @click="openModal = false"
                          class="relative flex min-h-screen items-center justify-center p-4"
                     >
-                        <div x-on:click.stop
+                        <div @click.stop
                              x-trap.noscroll.inert="openModal"
                              class="modal-content h-fit"
                         >

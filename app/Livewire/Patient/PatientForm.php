@@ -132,7 +132,7 @@ class PatientForm extends Component
     public function mount(?int $id = null): void
     {
         if ($id !== null) {
-            $fromDatabase = PersonRequest::find($id);
+            $fromDatabase = PersonRequest::find($id, ['id']);
 
             // Make sure the ID in the URL matches the patient's ID.
             if ($fromDatabase?->id !== $id) {

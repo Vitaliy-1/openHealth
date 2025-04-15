@@ -78,7 +78,10 @@ class EncounterCreate extends Component
         'eHealth/condition_clinical_statuses',
         'eHealth/condition_verification_statuses',
         'eHealth/condition_severities',
-        'eHealth/report_origins'
+        'eHealth/report_origins',
+        'eHealth/reason_explanations',
+        'eHealth/reason_not_given_explanations',
+        'eHealth/immunization_report_origins'
     ];
 
     public string $encounterUuid;
@@ -208,6 +211,7 @@ class EncounterCreate extends Component
             $encounter = $this->formatEncounterRequest();
             $episode = $this->formatEpisodeRequest();
             $condition = $this->formatConditionRequest();
+            $immunizations = $this->formatImmunizationsRequest();
             $createdEncounterId = EncounterRepository::storeEncounterRequest(
                 $encounter['encounter'],
                 $episode,
@@ -622,6 +626,45 @@ class EncounterCreate extends Component
         return schemaService()
             ->setDataSchema($this->form->episode, app(PatientApi::class))
             ->requestSchemaNormalize('schemaEpisodeRequest')
+            ->getNormalizedData();
+    }
+
+    /**
+     * /**
+     *  Validate and format immunizations data requests.
+     *
+     * @return array
+     */
+    protected function formatImmunizationsRequest(): array
+    {
+        $immunizations = array_map(static function ($immunization) {
+            $immunization['id'] = Str::uuid()->toString();
+
+            if ($immunization['primarySource']) {
+                unset($immunization['reportOrigin']);
+
+                // TODO: потім взяти employee авторизованого
+                $employee = Employee::findOrFail(1);
+                $immunization['performer']['identifier']['value'] = $employee->uuid;
+            } else {
+                unset($immunization['performer']);
+            }
+
+            if ($immunization['notGiven']) {
+                unset($immunization['explanation']['reasons']);
+            } else {
+                unset($immunization['explanation']['reasonsNotGiven']);
+            }
+
+            $immunization['date'] = convertToISO8601($immunization['date'] . $immunization['time']);
+            unset($immunization['time']);
+
+            return $immunization;
+        }, $this->form->immunizations);
+
+        return schemaService()
+            ->setDataSchema(['immunizations' => $immunizations], app(PatientApi::class))
+            ->requestSchemaNormalize()
             ->getNormalizedData();
     }
 }

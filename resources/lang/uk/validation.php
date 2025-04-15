@@ -34,6 +34,7 @@ return [
     'confirmed' => 'Поле :attribute не збігається з підтвердженням.',
     'date' => 'Поле :attribute не є датою.',
     'dateFormat' => 'Поле :attribute не відповідає формату :format.',
+    "declined_if" => "Це значення має бути відхилено, якщо :other є :value.",
     'different' => 'Поля :attribute та :other повинні бути різними.',
     'digits' => 'Довжина цифрового поля :attribute повинна дорівнювати :digits.',
     'dimensions' => 'Поле :attribute містить неприпустимі розміри зображення.',
@@ -94,6 +95,7 @@ return [
     'regex' => 'Поле :attribute має хибний формат.',
     'required' => "Поле :attribute є обов'язковим для заповнення.",
     'required_if' => "Поле :attribute є обов'язковим для заповнення, коли :other є рівним :value.",
+    'prohibited_if' => 'Поле :attribute заборонено, якщо :other дорівнює :value.',
     'prohibited_unless' => "Поле :attribute заборонено, якщо :other не є одним із значень: :values.",
     'same' => 'Поля :attribute та :other мають співпадати.',
     'size' => [
@@ -483,6 +485,28 @@ return [
             'type' => [
                 'code' => 'тип епізоду'
             ]
+        ],
+        'immunizations.*' => [
+            'primarySource' => 'джерело інформації',
+            'performer' => 'виконавець',
+            'reportOrigin' => 'пацієнт',
+            'notGiven' => 'чи була проведена',
+            'explanation.reasons' => 'причини',
+            'manufacturer' => '',
+            'lotNumber' => '',
+            'expirationDate' => '',
+            'doseQuantity.value' => '',
+            'doseQuantity.unit' => '',
+            'site' => '',
+            'route' => '',
+            'vaccinationProtocols.doseSequence' => '',
+            'vaccinationProtocols.authority' => '',
+            'vaccinationProtocols.series' => '',
+            'vaccinationProtocols.seriesDoses' => '',
+            'vaccinationProtocols.targetDiseases' => '',
+            'explanation.reasonsNotGiven' => '',
+            'date' => 'дата вакцинації',
+            'time' => 'час вакцинації',
         ],
         'errors' => [
             'email' => 'Неправильний формат електронної адреси',
