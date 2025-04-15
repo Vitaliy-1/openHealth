@@ -130,7 +130,7 @@
     <x-forms.form-group class="w-full">
         <x-slot name="label">
             <x-forms.label for="additionalInfo" class="default-label">
-                {{__('forms.additionalInfo')}}
+                {{__('forms.additional_info')}}
             </x-forms.label>
         </x-slot>
         <x-slot name="input">

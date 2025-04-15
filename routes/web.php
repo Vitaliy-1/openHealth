@@ -96,7 +96,7 @@ Route::middleware([
         });
     });
 
-    Route::group(['middleware' => ['role:OWNER|ADMIN|DOCTOR']], static function () {
+    Route::group(['middleware' => ['role:OWNER|ADMIN|DOCTOR']], function () {
         Route::prefix('patient')->group(function () {
             Route::get('/', PatientIndex::class)->name('patient.index');
             Route::get('/create/{id?}', PatientForm::class)->name('patient.form');
