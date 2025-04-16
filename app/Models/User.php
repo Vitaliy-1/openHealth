@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Models\Employee\Employee;
 use App\Models\Employee\EmployeeRequest;
 use App\Models\Person\Person;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -113,6 +114,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(EmployeeRequest::class);
     }
 
+    public function employees(): HasMany
+    {
+        return $this->hasMany(Employee::class);
+    }
+
     /**
      * Overides trait's method to exclude unused scopes
      * @return Collection<Permission> a list of scopes associated with the user and entity type
@@ -144,5 +150,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getScopes(): string
     {
         return $this->getAllPermissions()->unique()->pluck('name')->join(' ');
+    }
+
+    /**
+     * Get email verified at timestamp in camelCase
+     *
+     * @return mixed
+     */
+    public function getEmailVerifiedAtAttribute()
+    {
+        return $this->attributes['email_verified_at'];
     }
 }

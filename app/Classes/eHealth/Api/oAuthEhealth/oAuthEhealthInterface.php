@@ -8,8 +8,6 @@ interface oAuthEhealthInterface
 
     public static function getUser(): array;
 
-    public function login($user): void;
-
     public function getApikey(): string;
 
     public function refreshAuthToken(): array;
