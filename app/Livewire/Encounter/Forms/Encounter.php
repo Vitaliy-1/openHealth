@@ -100,7 +100,9 @@ class Encounter extends Form
         'conditions.*.code.coding.1.code' => ['required_if:encounter.class.code,AMB, INPATIENT', 'string'],
         'conditions.*.clinicalStatus' => ['required', 'string'],
         'conditions.*.verificationStatus' => ['required', 'string'],
-        'conditions.*.severity.coding.*.code' => ['nullable', 'string', new InDictionary('eHealth/condition_severities')],
+        'conditions.*.severity.coding.*.code' => [
+            'nullable', 'string', new InDictionary('eHealth/condition_severities')
+        ],
         'conditions.*.onsetDate' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
         'conditions.*.onsetTime' => ['required', 'date_format:H:i', new TimeInPast()],
         'conditions.*.assertedDate' => ['nullable', 'before:tomorrow', 'date_format:Y-m-d'],
@@ -109,6 +111,61 @@ class Encounter extends Form
     public array $conditions;
 
     public array $evidences;
+
+    #[Validate([
+        'immunizations.*.primarySource' => ['required', 'boolean'],
+        'immunizations.*.performer' => [
+            'required_if:immunizations.*.primarySource,true', 'prohibited_if:immunizations.*.primarySource,false',
+            'array'
+        ],
+        'immunizations.*.reportOrigin' => [
+            'required_if:immunizations.*.primarySource,false', 'prohibited_if:immunizations.*.primarySource,true'
+        ],
+        'immunizations.*.reportOrigin.coding.*.code' => [
+            'string', new InDictionary('eHealth/immunization_report_origins')
+        ],
+        'immunizations.*.notGiven' => ['declined_if:immunizations.*.primarySource,false', 'boolean'],
+        'immunizations.*.explanation.reasons' => [
+            'required_if:immunizations.*.notGiven,false', 'prohibited_if:immunizations.*.notGiven,true', 'array'
+        ],
+        'immunizations.*.explanation.reasons.*.coding.*.code' => [
+            'string', new InDictionary('eHealth/reason_explanations')
+        ],
+        'immunizations.*.manufacturer' => [
+            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'string'
+        ],
+        'immunizations.*.lotNumber' => [
+            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'string'
+        ],
+        'immunizations.*.expirationDate' => [
+            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'string'
+        ],
+        'immunizations.*.doseQuantity.value' => ['required_if:immunizations.*.notGiven,false', 'integer'],
+        'immunizations.*.doseQuantity.unit' => ['required_if:immunizations.*.notGiven,false', 'string'],
+        'immunizations.*.doseQuantity.code' => [
+            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'string'
+        ],
+        'immunizations.*.site' => [
+            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'array'
+        ],
+        'immunizations.*.route' => [
+            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'array'
+        ],
+        'immunizations.*.vaccinationProtocols.doseSequence' => ['required', 'integer'],
+        'immunizations.*.vaccinationProtocols.authority' => ['required', 'array'],
+        'immunizations.*.vaccinationProtocols.series' => ['required', 'string'],
+        'immunizations.*.vaccinationProtocols.seriesDoses' => ['required', 'integer'],
+        'immunizations.*.vaccinationProtocols.targetDiseases' => ['required', 'array'],
+        'immunizations.*.explanation.reasonsNotGiven' => [
+            'required_if:immunizations.*.notGiven,true', 'prohibited_if:immunizations.*.notGiven,false', 'array'
+        ],
+        'immunizations.*.explanation.reasonsNotGiven.coding.*.code' => [
+            'string', new InDictionary('eHealth/reason_not_given_explanations')
+        ],
+        'immunizations.*.date' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
+        'immunizations.*.time' => ['required', 'date_format:H:i', new TimeInPast()]
+    ])]
+    public array $immunizations;
 
     /**
      * Validate provided models by corresponding rules.

@@ -1,11 +1,14 @@
-<div class="overflow-x-auto relative" id="immunization-section">
+<div class="relative" id="immunization-section">
     <fieldset class="fieldset"
               x-data="{
-                  actions: $wire.entangle('form.encounter.actions'),
+                  immunizations: $wire.entangle('form.immunizations'),
                   openModal: false,
-                  newAction: false,
+                  modalImmunization: new Immunization(),
+                  newImmunization: false,
                   item: 0,
-                  dictionary: $wire.dictionaries['eHealth/ICPC2/actions']
+                  dictionary: $wire.dictionaries['eHealth/ICPC2/actions'],
+                  reasonExplanationsDictionary: $wire.dictionaries['eHealth/reason_explanations'],
+                  reasonNotGivenExplanationsDictionary: $wire.dictionaries['eHealth/reason_not_given_explanations'],
               }"
     >
         <legend class="legend">
@@ -24,14 +27,22 @@
             </tr>
             </thead>
             <tbody>
-            <template x-for="(action, index) in actions">
+            <template x-for="(immunization, index) in immunizations">
                 <tr>
                     <td class="td-input"
-                        x-text="`${ action.coding[0].code } - ${ dictionary[action.coding[0].code] }`"
                     ></td>
                     <td class="td-input"
-                        x-text="`${ action.text }`"
                     ></td>
+                    <td class="td-input"
+                    ></td>
+                    <td class="td-input"
+                        x-text="
+                            immunization.explanation.reasons[0].coding[0].code !== ''
+                            ? `${ reasonExplanationsDictionary[immunization.explanation.reasons[0].coding[0].code] }`
+                            : `${ reasonNotGivenExplanationsDictionary[immunization.explanation.reasonsNotGiven.coding[0].code] }`
+                        "
+                    ></td>
+                    <td class="td-input" x-text="immunization.date"></td>
                     <td class="td-input">
                         {{-- That all that is needed for the dropdown --}}
                         <div x-data="{
@@ -92,16 +103,16 @@
                                     <button @click.prevent="
                                                 openModal = true; {{-- Open the modal --}}
                                                 item = index; {{-- Identify the item we are corrently editing --}}
-                                                {{-- Replace the previous action with the current, don't assign object directly (modalAction = action) to avoid reactiveness --}}
-                                                modalAction = new Action(action);
-                                                newAction = false; {{-- This action is already created --}}
+                                                {{-- Replace the previous immunization with the current, don't assign object directly (modalImmunization = immunization) to avoid reactiveness --}}
+                                                modalImmunization = JSON.parse(JSON.stringify(immunizations[index]));
+                                                newImmunization = false; {{-- This immunization is already created --}}
                                             "
                                             class="dropdown-button"
                                     >
                                         {{ __('forms.edit') }}
                                     </button>
 
-                                    <button @click.prevent="actions.splice(index, 1); close($refs.button)"
+                                    <button @click.prevent="immunizations.splice(index, 1); close($refs.button)"
                                             class="dropdown-button dropdown-delete"
                                     >
                                         {{ __('forms.delete') }}
@@ -115,15 +126,131 @@
             </tbody>
         </table>
 
-        <a href="{{ route('immunization.create', ['id' => $id]) }}" class="button-primary">
-            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                 viewBox="0 0 24 24"
+        <div>
+            {{-- Button to trigger the modal --}}
+            <button @click.prevent="
+                        openModal = true; {{-- Open the Modal --}}
+                        newImmunization = true; {{-- We are adding a new evidence --}}
+                        modalImmunization = new Immunization(); {{-- Replace the data of the previous evidence with a new one--}}
+                    "
+                    class="item-add my-5"
             >
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M5 12h14m-7 7V5"
-                />
-            </svg>
-            {{ __('forms.add') }}
-        </a>
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                     viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M5 12h14m-7 7V5"
+                    />
+                </svg>
+                {{ __('forms.add') }}
+            </button>
+
+            {{-- Modal --}}
+            <template x-teleport="body"> {{-- This moves the modal at the end of the body tag --}}
+                <div x-show="openModal"
+                     style="display: none"
+                     @keydown.escape.prevent.stop="openModal = false"
+                     role="dialog"
+                     aria-modal="true"
+                     x-id="['modal-title']"
+                     :aria-labelledby="$id('modal-title')" {{-- This associates the modal with unique ID --}}
+                     class="modal"
+                >
+
+                    {{-- Overlay --}}
+                    <div x-show="openModal" x-transition.opacity class="fixed inset-0 bg-black/25"></div>
+
+                    {{-- Panel --}}
+                    <div x-show="openModal"
+                         x-transition
+                         @click="openModal = false"
+                         class="relative flex min-h-screen items-center justify-center p-4"
+                    >
+                        <div @click.stop
+                             x-trap.noscroll.inert="openModal"
+                             class="modal-content h-fit w-full lg:max-w-7xl"
+                        >
+                            {{-- Title --}}
+                            <h3 class="modal-header" :id="$id('modal-title')">{{ __('patients.immunization') }}</h3>
+
+                            {{-- Content --}}
+                            <form>
+                                @include('livewire.encounter.immunization_parts.data')
+
+                                <div class="mt-6 flex justify-between space-x-2">
+                                    <button type="button"
+                                            @click="openModal = false"
+                                            class="button-minor"
+                                    >
+                                        {{ __('forms.cancel') }}
+                                    </button>
+
+                                    <button @click.prevent="
+                                                newImmunization !== false
+                                                ? immunizations.push(modalImmunization)
+                                                : immunizations[item] = modalImmunization;
+
+                                                openModal = false;
+                                            "
+                                            class="button-primary"
+                                            x-data="console.log(modalImmunization)"
+                                            :disabled="!(modalImmunization.date.trim().length > 0 &&
+                                                modalImmunization.time.trim().length > 0
+                                                && (modalImmunization.explanation.reasons[0].coding[0].code.trim().length > 0 || modalImmunization.explanation.reasonsNotGiven.coding[0].code.trim().length > 0))
+                                            "
+                                    >
+                                        {{ __('forms.save') }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
     </fieldset>
 </div>
+
+<script>
+    /**
+     * Representation of the user's personal immunization
+     */
+    class Immunization {
+        date = new Date().toISOString().split('T')[0];
+        time = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', hour12: false });
+        notGiven = false;
+        explanation = {
+            reasons: [
+                {
+                    coding: [{ system: 'eHealth/reason_explanations', code: '' }]
+                }
+            ],
+            reasonsNotGiven: {
+                coding: [{ system: 'eHealth/reason_not_given_explanations', code: '' }]
+            }
+        };
+
+        primarySource = true;
+        performer = {
+            identifier: {
+                type: {
+                    coding: [
+                        { system: 'eHealth/resources', code: 'employee' }
+                    ],
+                    text: ''
+                }
+            }
+        };
+        reportOrigin = {
+            coding: [
+                { system: 'eHealth/immunization_report_origins', code: '' }
+            ],
+            text: ''
+        };
+
+        constructor(obj = null) {
+            if (obj) {
+                this.immunizations = JSON.parse(JSON.stringify(obj.immunizations || obj));
+            }
+        }
+    }
+</script>

@@ -260,7 +260,7 @@
                                         class='mb-1'
                                         wire:click="removeAvailableTime({{ $k }})"
                                     >
-                                        {{ __('Видалити') }}
+                                        {{ __('forms.delete') }}
                                     </x-danger-button>
                                 </div>
                             </div>
@@ -340,7 +340,7 @@
                                         class='mb-1'
                                         wire:click="removeNotAvailable({{ $k }})"
                                     >
-                                        {{ __('Видалити ') }}
+                                        {{ __('forms.delete ') }}
                                     </x-danger-button>
                                 </div>
 

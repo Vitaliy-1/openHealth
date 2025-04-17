@@ -51,7 +51,7 @@
                 </div>
                 <div class='mb-4'>
                     <p>
-                        <strong>{{ __('Основна ліцензія') }}:</strong> {{ $license->is_primary === 1 ? __('Так') : __('Ні') }}
+                        <strong>{{ __('Основна ліцензія') }}:</strong> {{ $license->is_primary === 1 ? __('forms.yes') : __('forms.no') }}
                     </p>
                 </div>
             </div>

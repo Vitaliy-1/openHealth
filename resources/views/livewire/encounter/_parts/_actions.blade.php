@@ -242,7 +242,10 @@
 
         constructor(obj = null) {
             if (obj) {
-                JSON.parse(JSON.stringify(this, obj));
+                this.text = obj.text || '';
+                this.coding = Array.isArray(obj.coding)
+                    ? obj.coding.map(c => ({ ...c }))
+                    : this.coding;
             }
         }
     }

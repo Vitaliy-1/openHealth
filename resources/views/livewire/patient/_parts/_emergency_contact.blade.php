@@ -117,7 +117,7 @@
                 </div>
                 <template x-if="index == emergencyContactPhones.length - 1 & index != 0">
                     {{-- Remove a phone if button is clicked --}}
-                    <button x-on:click="emergencyContactPhones.pop(), index--" class="item-remove">
+                    <button @click="emergencyContactPhones.pop(), index--" class="item-remove">
                         <svg>
                             <use xlink:href="#svg-minus"></use>
                         </svg>
@@ -126,7 +126,7 @@
                 </template>
                 <template x-if="index == emergencyContactPhones.length - 1">
                     {{-- Add new phone if button is clicked --}}
-                    <button x-on:click="emergencyContactPhones.push({ type: '', number: '' })"
+                    <button @click="emergencyContactPhones.push({ type: '', number: '' })"
                             class="item-add lg:justify-self-start"
                             :class="{ 'lg:justify-self-start': index > 0 }" {{-- Apply this style only if it's not a first phone group --}}
                     >

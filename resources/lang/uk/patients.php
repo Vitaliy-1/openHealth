@@ -27,6 +27,7 @@ return [
     'code_and_name' => 'Код та назва',
     'write_comment_here' => 'Напишіть коментар тут',
     'diagnoses' => 'Діагнози',
+    'date' => 'Дата',
 
     'relation_type' => [
         'primary' => 'Основний',
@@ -146,10 +147,20 @@ return [
     'evidence_conditions' => 'Докази - стани',
     'condition' => 'Стан',
 
-    // Додаткові дані
+    // Additional data
     'additional_data' => 'Додаткові дані',
-    'data' => 'Дата',
     'period_start' => 'Час початку',
     'period_end' => 'Час закінчення',
-    'division_name' => 'Місце надання послуг'
+    'division_name' => 'Місце надання послуг',
+
+    // Immunization
+    'immunization' => 'Вакцинації',
+    'dosage' => 'Дозування',
+    'execution_state' => 'Стан проведення',
+    'reason' => 'Причина',
+    'has_it_been_done' => 'Чи була проведена',
+    'reasons' => 'Причини',
+    'source_link' => 'Посилання на джерело',
+    'data' => 'Дані',
+    'time' => 'Час'
 ];

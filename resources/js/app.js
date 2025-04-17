@@ -33,7 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 maxDate: maxDate,
                 format: format,
                 language: 'uk',
-                autohide: true
+                autohide: true,
+                showOnFocus: false
             });
 
             datepickerEl.setAttribute('data-initialized', 'true'); // Avoidance of reinitialisation

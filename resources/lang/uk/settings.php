@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -11,6 +13,5 @@ return [
     | e.g., patient search, patient-related API request messages, etc,
     |
     */
-
 
 ];

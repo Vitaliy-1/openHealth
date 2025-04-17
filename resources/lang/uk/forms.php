@@ -142,7 +142,7 @@ return [
     'startDateWork' => 'Дата початку роботи',
     'division' => 'Підрозділ',
     'selectDivision' => 'Обрати підрозділ',
-    'additionalInfo' => 'Додаткова інформація',
+    'additional_info' => 'Додаткова інформація',
     'aboutMyself' => 'Про мене',
     'workingExperience' => 'Досвід роботи',
     'selectCountry' => 'Обрати країну',
@@ -237,5 +237,8 @@ return [
     'nothing_found' => 'Нічого не знайдено',
     'sign' => 'Підписати',
     'sign_with_KEP' => 'Підписати КЕПом',
-    'complete_the_interaction_and_sign' => 'Завершити взаємодію та підписати'
+    'complete_the_interaction_and_sign' => 'Завершити взаємодію та підписати',
+    'patient' => 'Пацієнт',
+    'yes' => 'Так',
+    'no' => 'Ні'
 ];

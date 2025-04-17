@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -12,13 +14,11 @@ return [
     | you want to customize your views to better match your application.
     */
 
-
     '404' => 'Помилка 404',
     '500' => 'Помилка 500',
     'goBack' => 'Повернутися назад',
     'home' => 'На головну',
     'oops' => 'Ой, щось пішло не так',
     'pageNotFound' => 'Сторінку не знайдено',
-
 
 ];
