@@ -12,6 +12,7 @@ use App\Livewire\Encounter\Forms\Api\EncounterRequestApi;
 use App\Livewire\Encounter\Forms\Encounter as EncounterForm;
 use App\Models\Employee\Employee;
 use App\Models\Person\Person;
+use App\Repositories\EncounterRepository;
 use App\Traits\FormTrait;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
@@ -33,7 +34,9 @@ class EncounterCreate extends Component
     public EncounterForm $form;
 
     #[Locked]
-    public int $id;
+    public int $patientId;
+    #[Locked]
+    public ?int $encounterId = null;
     public string $patientUuid;
 
     /**
@@ -75,7 +78,10 @@ class EncounterCreate extends Component
         'eHealth/condition_clinical_statuses',
         'eHealth/condition_verification_statuses',
         'eHealth/condition_severities',
-        'eHealth/report_origins'
+        'eHealth/report_origins',
+        'eHealth/reason_explanations',
+        'eHealth/reason_not_given_explanations',
+        'eHealth/immunization_report_origins'
     ];
 
     public string $encounterUuid;
@@ -102,14 +108,24 @@ class EncounterCreate extends Component
         return view('livewire.encounter.encounter');
     }
 
-    public function mount(int $id): void
+    public function mount(int $patientId, ?int $encounterId = null): void
     {
-        $this->id = $id;
-        $this->setUuids();
-        $this->setDefaultDate();
+        $this->patientId = $patientId;
+        $this->encounterId = $encounterId;
 
-        $this->loadPatientData();
-        $this->setEmployeePartyData();
+        if ($this->encounterId) {
+            $this->form->encounter = EncounterRepository::getEncounterData($this->patientId);
+            $this->form->episode = EncounterRepository::getEpisodeData($this->encounterId);
+            $this->form->conditions = EncounterRepository::getConditionData($this->encounterId);
+            $this->form->conditions = $this->convertArrayKeysToCamelCase($this->form->conditions);
+            $this->form->conditions = $this->formatConditions($this->form->conditions, $this->form->encounter['diagnoses']);
+        } else {
+            $this->setUuids();
+            $this->setEmployeePartyData();
+        }
+
+        $this->setDefaultDate();
+        $this->setPatientData();
         $this->getDictionary();
 
         $this->adjustEpisodeTypes();
@@ -180,8 +196,30 @@ class EncounterCreate extends Component
      * @return void
      * @throws ValidationException
      */
-    public function save()
+    public function save(): void
     {
+        // update or create
+        if ($this->encounterId) {
+            $formEncounter = $this->updatePeriodDate($this->form->encounter);
+            $createdEncounterId = EncounterRepository::storeEncounterRequest(
+                $formEncounter,
+                $this->form->episode,
+                $this->patientId
+            );
+            EncounterRepository::storeCondition($this->form->conditions, $createdEncounterId);
+        } else {
+            $encounter = $this->formatEncounterRequest();
+            $episode = $this->formatEpisodeRequest();
+            $condition = $this->formatConditionRequest();
+            $immunizations = $this->formatImmunizationsRequest();
+            $createdEncounterId = EncounterRepository::storeEncounterRequest(
+                $encounter['encounter'],
+                $episode,
+                $this->patientId
+            );
+            EncounterRepository::storeCondition($condition['conditions'], $createdEncounterId);
+        }
+
         $encounter = PatientApi::getShortEncounterBySearchParams($this->patientUuid);
         $job = PatientApi::getJobsDetailsById('67e64af98c67240046bb4b2f');
     }
@@ -253,31 +291,26 @@ class EncounterCreate extends Component
      */
     private function createEpisode(): void
     {
-        $this->form->episode['id'] = $this->episodeUuid;
-        $this->form->episode['managingOrganization']['identifier']['value'] = Auth::user()->legalEntity->uuid;
-        $this->form->episode['period']['start'] = convertToISO8601($this->form->encounter['period']['date'] . $this->form->encounter['period']['start']);
-
-        $preEpisodeRequest = schemaService()
-            ->setDataSchema($this->form->episode, app(PatientApi::class))
-            ->requestSchemaNormalize('schemaEpisodeRequest')
-            ->getNormalizedData();
-
         try {
-            $createEpisode = PatientApi::createEpisode($this->patientUuid, $preEpisodeRequest);
+            PatientApi::createEpisode($this->patientUuid, $this->formatEpisodeRequest());
         } catch (ApiException) {
             $this->dispatch('flashMessage', [
                 'message' => __('Виникла помилка при створенні епізоду. Зверніться до адміністратора.'),
                 'type' => 'error'
             ]);
         }
-
-        //        dd($createEpisode);
     }
 
-    private function loadPatientData(): void
+    /**
+     * Set patient and related data.
+     *
+     * @return void
+     */
+    private function setPatientData(): void
     {
-        $patient = Person::select(['uuid', 'first_name', 'last_name', 'second_name'])
-            ->where('id', $this->id)
+        $patient = Person::with(['encounters'])
+            ->select(['id', 'uuid', 'first_name', 'last_name', 'second_name'])
+            ->where('id', $this->patientId)
             ->first()
             ?->toArray();
 
@@ -304,6 +337,11 @@ class EncounterCreate extends Component
         $this->form->episode['careManager']['identifier']['value'] = $employee?->uuid;
     }
 
+    /**
+     * Get all user divisions, and set default if only one exists.
+     *
+     * @return void
+     */
     protected function getDivisionData(): void
     {
         $this->divisions = Auth::user()->legalEntity->division->toArray();
@@ -436,8 +474,15 @@ class EncounterCreate extends Component
      */
     private function setDefaultDate(): void
     {
-        $this->form->encounter['period']['start'] = CarbonImmutable::now()->format('H:i');
-        $this->form->encounter['period']['end'] = CarbonImmutable::now()->addMinutes(15)->format('H:i');
+        if ($this->encounterId) {
+            $this->form->encounter['period']['date'] = CarbonImmutable::parse($this->form->encounter['period']['start'])->format('Y-m-d');
+            $this->form->encounter['period']['start'] = CarbonImmutable::parse($this->form->encounter['period']['start'])->format('H:i');
+            $this->form->encounter['period']['end'] = CarbonImmutable::parse($this->form->encounter['period']['end'])->format('H:i');
+        } else {
+            $now = CarbonImmutable::now();
+            $this->form->encounter['period']['start'] = $now->format('H:i');
+            $this->form->encounter['period']['end'] = $now->addMinutes(15)->format('H:i');
+        }
     }
 
     /**
@@ -473,7 +518,7 @@ class EncounterCreate extends Component
         if ($this->form->encounter['division']['identifier']['value']) {
             $this->form->encounter['division']['identifier']['type']['coding'][0] = [
                 'system' => 'eHealth/resources',
-                'code' => 'division',
+                'code' => 'division'
             ];
         }
 
@@ -519,9 +564,11 @@ class EncounterCreate extends Component
                 }
 
                 // convert dates
-                $condition['onsetDate'] = convertToISO8601($condition['onsetDate'] . $condition['onsetTime']);
-                $condition['assertedDate'] = convertToISO8601($condition['assertedDate'] . $condition['assertedTime']);
-                unset($condition['onsetTime'], $condition['assertedTime'], $condition['diagnoses']);
+                if (isset($condition['onsetTime'])) {
+                    $condition['onsetDate'] = convertToISO8601($condition['onsetDate'] . $condition['onsetTime']);
+                    $condition['assertedDate'] = convertToISO8601($condition['assertedDate'] . $condition['assertedTime']);
+                    unset($condition['onsetTime'], $condition['assertedTime'], $condition['diagnoses']);
+                }
 
                 return $condition;
             },
@@ -531,6 +578,92 @@ class EncounterCreate extends Component
 
         return schemaService()
             ->setDataSchema(['conditions' => $conditions], app(PatientApi::class))
+            ->requestSchemaNormalize()
+            ->getNormalizedData();
+    }
+
+    /**
+     * Formatting conditions for showing in frontend.
+     *
+     * @param  array  $conditions
+     * @param  array  $diagnoses
+     * @return array
+     */
+    protected function formatConditions(array $conditions, array $diagnoses): array
+    {
+        return collect($conditions)
+            ->map(function (array $condition, int $index) use ($diagnoses) {
+                // add diagnoses array to conditions
+                if (isset($diagnoses[$index])) {
+                    $condition['diagnoses'] = $diagnoses[$index];
+                }
+
+                $originalOnsetDate = $condition['onsetDate'];
+                $originalAssertedDate = $condition['assertedDate'];
+
+                // set date
+                $condition['onsetDate'] = CarbonImmutable::parse($originalOnsetDate)->format('Y-m-d');
+                $condition['onsetTime'] = CarbonImmutable::parse($originalOnsetDate)->format('H:i');
+                $condition['assertedDate'] = CarbonImmutable::parse($originalAssertedDate)->format('Y-m-d');
+                $condition['assertedTime'] = CarbonImmutable::parse($originalAssertedDate)->format('H:i');
+
+                return $condition;
+            })
+            ->toArray();
+    }
+
+    /**
+     * Validate and format episode data requests.
+     *
+     * @return array
+     */
+    protected function formatEpisodeRequest(): array
+    {
+        $this->form->episode['id'] = $this->episodeUuid;
+        $this->form->episode['managingOrganization']['identifier']['value'] = Auth::user()->legalEntity->uuid;
+        $this->form->episode['period']['start'] = convertToISO8601($this->form->encounter['period']['date'] . $this->form->encounter['period']['start']);
+
+        return schemaService()
+            ->setDataSchema($this->form->episode, app(PatientApi::class))
+            ->requestSchemaNormalize('schemaEpisodeRequest')
+            ->getNormalizedData();
+    }
+
+    /**
+     * /**
+     *  Validate and format immunizations data requests.
+     *
+     * @return array
+     */
+    protected function formatImmunizationsRequest(): array
+    {
+        $immunizations = array_map(static function ($immunization) {
+            $immunization['id'] = Str::uuid()->toString();
+
+            if ($immunization['primarySource']) {
+                unset($immunization['reportOrigin']);
+
+                // TODO: потім взяти employee авторизованого
+                $employee = Employee::findOrFail(1);
+                $immunization['performer']['identifier']['value'] = $employee->uuid;
+            } else {
+                unset($immunization['performer']);
+            }
+
+            if ($immunization['notGiven']) {
+                unset($immunization['explanation']['reasons']);
+            } else {
+                unset($immunization['explanation']['reasonsNotGiven']);
+            }
+
+            $immunization['date'] = convertToISO8601($immunization['date'] . $immunization['time']);
+            unset($immunization['time']);
+
+            return $immunization;
+        }, $this->form->immunizations);
+
+        return schemaService()
+            ->setDataSchema(['immunizations' => $immunizations], app(PatientApi::class))
             ->requestSchemaNormalize()
             ->getNormalizedData();
     }

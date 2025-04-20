@@ -30,9 +30,7 @@
                     <td class="td-input"
                         x-text="`${ reason.coding[0].code } - ${ dictionary[reason.coding[0].code] }`"
                     ></td>
-                    <td class="td-input"
-                        x-text="`${ reason.text }`"
-                    ></td>
+                    <td class="td-input" x-text="`${ reason.text }`"></td>
                     <td class="td-input">
                         {{-- That all that is needed for the dropdown --}}
                         <div x-data="{
@@ -242,7 +240,10 @@
 
         constructor(obj = null) {
             if (obj) {
-                JSON.parse(JSON.stringify(this, obj));
+                this.text = obj.text || '';
+                this.coding = Array.isArray(obj.coding)
+                    ? obj.coding.map(c => ({ ...c }))
+                    : this.coding;
             }
         }
     }

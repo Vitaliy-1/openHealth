@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -103,7 +105,7 @@ Route::middleware([
             Route::get('/{id}/episodes', PatientEpisodes::class)->name('patient.episodes');
 
             Route::prefix('encounter')->group(function () {
-                Route::get('/create/{id}', EncounterCreate::class)->name('encounter.form');
+                Route::get('/create/{patientId}/{encounterId?}', EncounterCreate::class)->name('encounter.form');
             });
         });
     });
