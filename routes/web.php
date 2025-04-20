@@ -45,15 +45,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home.index');
 Route::post('/send-email', [EmailController::class, 'sendEmail'])->name('send.email');
 
 Route::get('/ehealth/oauth/', [oAuthEhealth::class, 'callback'])->name('ehealth.oauth.callback');
-//Route::get('/login', [LoginController::class, 'index'])->middleware('guest')->name('index.login');
 Route::post('/login', [LoginController::class, 'login'])->middleware('guest')->name('login');
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-//    'verified',
-])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
