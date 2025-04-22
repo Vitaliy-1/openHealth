@@ -13,6 +13,7 @@ use App\Livewire\Encounter\Forms\Encounter as EncounterForm;
 use App\Models\Employee\Employee;
 use App\Models\Person\Person;
 use App\Repositories\EncounterRepository;
+use App\Services\EncounterService;
 use App\Traits\FormTrait;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
@@ -81,11 +82,14 @@ class EncounterCreate extends Component
         'eHealth/report_origins',
         'eHealth/reason_explanations',
         'eHealth/reason_not_given_explanations',
-        'eHealth/immunization_report_origins'
+        'eHealth/immunization_report_origins',
+        'eHealth/immunization_statuses',
+        'eHealth/vaccine_codes',
+        'eHealth/immunization_dosage_units',
+        'eHealth/vaccination_routes',
+        'eHealth/immunization_body_sites'
     ];
 
-    public string $encounterUuid;
-    public array $diagnoseUuids;
     public string $visitUuid;
     public string $episodeUuid;
     protected string $legalEntityType;
@@ -193,31 +197,47 @@ class EncounterCreate extends Component
     /**
      * Validate and save data.
      *
+     * @param  EncounterService  $service
      * @return void
-     * @throws ValidationException
      */
-    public function save(): void
+    public function save(EncounterService $service): void
     {
         // update or create
         if ($this->encounterId) {
-            $formEncounter = $this->updatePeriodDate($this->form->encounter);
-            $createdEncounterId = EncounterRepository::storeEncounterRequest(
+            $formEncounter = $service->formatEncounterPeriod($this->form->encounter);
+            $createdEncounterId = EncounterRepository::storeEncounter(
                 $formEncounter,
                 $this->form->episode,
                 $this->patientId
             );
             EncounterRepository::storeCondition($this->form->conditions, $createdEncounterId);
         } else {
-            $encounter = $this->formatEncounterRequest();
-            $episode = $this->formatEpisodeRequest();
-            $condition = $this->formatConditionRequest();
-            $immunizations = $this->formatImmunizationsRequest();
-            $createdEncounterId = EncounterRepository::storeEncounterRequest(
-                $encounter['encounter'],
-                $episode,
+            $formattedEncounter = $service->formatEncounterRequest($this->form->encounter, $this->form->conditions);
+            $formattedEpisode = $service->formatEpisodeRequest($this->form->episode, $this->form->encounter['period']);
+            $formattedConditions = $service->formatConditionsRequest($this->form->conditions);
+            $formattedImmunizations = $service->formatImmunizationsRequest($this->form->immunizations);
+
+            // Validate formatted data
+            try {
+                $this->form->validateForm('encounter', $formattedEncounter);
+                $this->form->validateForm('episode', $formattedEpisode);
+                $this->form->validateForm('conditions', $formattedConditions);
+                $this->form->validateForm('immunizations', $formattedImmunizations);
+            } catch (ValidationException $e) {
+                $this->dispatch('flashMessage', [
+                    'message' => $e->validator->errors()->first(),
+                    'type' => 'error'
+                ]);
+
+                return;
+            }
+
+            $createdEncounterId = EncounterRepository::storeEncounter(
+                $formattedEncounter,
+                $formattedEpisode,
                 $this->patientId
             );
-            EncounterRepository::storeCondition($condition['conditions'], $createdEncounterId);
+            EncounterRepository::storeCondition($formattedConditions, $createdEncounterId);
         }
 
         $encounter = PatientApi::getShortEncounterBySearchParams($this->patientUuid);
@@ -230,7 +250,7 @@ class EncounterCreate extends Component
      * @return void
      * @throws ApiException|ValidationException
      */
-    public function signPerson(): void
+    public function signPerson(EncounterService $service): void
     {
         try {
             $this->form->rulesForModelValidate(['encounter', 'episode', 'conditions']);
@@ -247,8 +267,8 @@ class EncounterCreate extends Component
 
         // Note: No update operations are allowed. All IDs, submitted as PK, should be unique for eHealth.
         // TODO: додати перевірку на унікальність uuid, трішки потім. uuid має бути унікальний для пацієнта а не унікальним в цілому?
-        $preRequestEncounter = $this->formatEncounterRequest();
-        $preRequestCondition = $this->formatConditionRequest();
+        $preRequestEncounter = $service->formatEncounterRequest($this->form->encounter, $this->form->conditions);
+        $preRequestCondition = $service->formatConditionsRequest($this->form->conditions);
 
         $base64EncryptedData = $this->sendEncryptedData(
             array_merge(
@@ -259,9 +279,9 @@ class EncounterCreate extends Component
         );
 
         $prepareSubmitEncounter = [
-            'visit' => (object) [
+            'visit' => (object)[
                 'id' => $this->visitUuid,
-                'period' => (object) [
+                'period' => (object)[
                     'start' => $preRequestEncounter['encounter']['period']['start'],
                     'end' => $preRequestEncounter['encounter']['period']['end']
                 ]
@@ -287,12 +307,13 @@ class EncounterCreate extends Component
     /**
      * Create episode for patient.
      *
+     * @param  EncounterService  $service
      * @return void
      */
-    private function createEpisode(): void
+    private function createEpisode(EncounterService $service): void
     {
         try {
-            PatientApi::createEpisode($this->patientUuid, $this->formatEpisodeRequest());
+            PatientApi::createEpisode($this->patientUuid, $service->formatEpisodeRequest($this->form->episode, $this->form->encounter['period']));
         } catch (ApiException) {
             $this->dispatch('flashMessage', [
                 'message' => __('Виникла помилка при створенні епізоду. Зверніться до адміністратора.'),
@@ -462,7 +483,6 @@ class EncounterCreate extends Component
      */
     private function setUuids(): void
     {
-        $this->encounterUuid = Str::uuid()->toString();
         $this->visitUuid = Str::uuid()->toString();
         $this->episodeUuid = Str::uuid()->toString();
     }
@@ -483,103 +503,6 @@ class EncounterCreate extends Component
             $this->form->encounter['period']['start'] = $now->format('H:i');
             $this->form->encounter['period']['end'] = $now->addMinutes(15)->format('H:i');
         }
-    }
-
-    /**
-     * Validate and format encounter data requests.
-     *
-     * @return array
-     */
-    private function formatEncounterRequest(): array
-    {
-        $this->form->encounter['id'] = $this->encounterUuid;
-        $this->form->encounter['visit']['identifier']['value'] = $this->visitUuid;
-        $this->form->encounter['episode']['identifier']['value'] = $this->episodeUuid;
-
-        // add system if priority is provided or when it's required
-        if ($this->form->encounter['class']['code'] === 'INPATIENT' || $this->form->encounter['class']['code']) {
-            $this->form->encounter['priority']['coding'][0]['system'] = 'eHealth/encounter_priority';
-        }
-
-        $this->form->encounter['diagnoses'] = array_map(function (array $diagnose) {
-            // Create a unique UUID for each diagnosis, and use them in condition
-            $diagnoseUuid = Str::uuid()->toString();
-            $diagnose['diagnoses']['condition']['identifier']['value'] = $diagnoseUuid;
-            $this->diagnoseUuids[] = $diagnoseUuid;
-
-            // delete rank if not provided
-            if ($diagnose['diagnoses']['rank'] === '') {
-                unset($diagnose['diagnoses']['rank']);
-            }
-
-            return $diagnose['diagnoses'];
-        }, $this->form->conditions);
-
-        if ($this->form->encounter['division']['identifier']['value']) {
-            $this->form->encounter['division']['identifier']['type']['coding'][0] = [
-                'system' => 'eHealth/resources',
-                'code' => 'division'
-            ];
-        }
-
-        $encounterForm = $this->updatePeriodDate($this->form->encounter);
-
-        return schemaService()
-            ->setDataSchema(['encounter' => $encounterForm], app(PatientApi::class))
-            ->requestSchemaNormalize()
-            ->getNormalizedData();
-    }
-
-    /**
-     * Validate and format condition data requests.
-     *
-     * @return array
-     */
-    private function formatConditionRequest(): array
-    {
-        $conditions = array_map(
-            function (array $condition, int $index) {
-                // set ID same as diagnose
-                $condition['id'] = $this->diagnoseUuids[$index];
-
-                $condition['context']['identifier']['type']['coding'][0] = [
-                    'system' => 'eHealth/resources',
-                    'code' => 'encounter'
-                ];
-                $condition['context']['identifier']['value'] = $this->encounterUuid;
-
-                // unset if code not provided
-                if ($condition['severity']['coding'][0]['code'] === '') {
-                    unset($condition['severity']);
-                }
-
-                if ($condition['primarySource']) {
-                    // TODO: потім взяти employee авторизованого
-                    $employee = Employee::find(1);
-                    $condition['asserter']['identifier']['value'] = $employee?->uuid;
-
-                    unset($condition['reportOrigin']);
-                } else {
-                    unset($condition['asserter']);
-                }
-
-                // convert dates
-                if (isset($condition['onsetTime'])) {
-                    $condition['onsetDate'] = convertToISO8601($condition['onsetDate'] . $condition['onsetTime']);
-                    $condition['assertedDate'] = convertToISO8601($condition['assertedDate'] . $condition['assertedTime']);
-                    unset($condition['onsetTime'], $condition['assertedTime'], $condition['diagnoses']);
-                }
-
-                return $condition;
-            },
-            $this->form->conditions,
-            array_keys($this->form->conditions)
-        );
-
-        return schemaService()
-            ->setDataSchema(['conditions' => $conditions], app(PatientApi::class))
-            ->requestSchemaNormalize()
-            ->getNormalizedData();
     }
 
     /**
@@ -610,61 +533,5 @@ class EncounterCreate extends Component
                 return $condition;
             })
             ->toArray();
-    }
-
-    /**
-     * Validate and format episode data requests.
-     *
-     * @return array
-     */
-    protected function formatEpisodeRequest(): array
-    {
-        $this->form->episode['id'] = $this->episodeUuid;
-        $this->form->episode['managingOrganization']['identifier']['value'] = Auth::user()->legalEntity->uuid;
-        $this->form->episode['period']['start'] = convertToISO8601($this->form->encounter['period']['date'] . $this->form->encounter['period']['start']);
-
-        return schemaService()
-            ->setDataSchema($this->form->episode, app(PatientApi::class))
-            ->requestSchemaNormalize('schemaEpisodeRequest')
-            ->getNormalizedData();
-    }
-
-    /**
-     * /**
-     *  Validate and format immunizations data requests.
-     *
-     * @return array
-     */
-    protected function formatImmunizationsRequest(): array
-    {
-        $immunizations = array_map(static function ($immunization) {
-            $immunization['id'] = Str::uuid()->toString();
-
-            if ($immunization['primarySource']) {
-                unset($immunization['reportOrigin']);
-
-                // TODO: потім взяти employee авторизованого
-                $employee = Employee::findOrFail(1);
-                $immunization['performer']['identifier']['value'] = $employee->uuid;
-            } else {
-                unset($immunization['performer']);
-            }
-
-            if ($immunization['notGiven']) {
-                unset($immunization['explanation']['reasons']);
-            } else {
-                unset($immunization['explanation']['reasonsNotGiven']);
-            }
-
-            $immunization['date'] = convertToISO8601($immunization['date'] . $immunization['time']);
-            unset($immunization['time']);
-
-            return $immunization;
-        }, $this->form->immunizations);
-
-        return schemaService()
-            ->setDataSchema(['immunizations' => $immunizations], app(PatientApi::class))
-            ->requestSchemaNormalize()
-            ->getNormalizedData();
     }
 }

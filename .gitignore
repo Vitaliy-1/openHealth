@@ -23,5 +23,6 @@ yarn-error.log
 /app/livewire/.DS_Store
 _ide_helper.php
 _ide_helper_models.php
-composer.lock
-/.osp
+docker-compose.yml
+/docker
+/storage/debugbar

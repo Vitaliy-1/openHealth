@@ -11,6 +11,7 @@
                   conditions: $wire.entangle('form.conditions'),
                   diagnoses: $wire.entangle('form.encounter.diagnoses'),
                   openModal:false,
+                  showPrimaryWarning: false,
                   modalCondition: new Condition(),
                   newCondition: false,
                   item: 0,
@@ -462,18 +463,18 @@
                                 </div>
                             </div>
 
-                            <div x-data="{ primarySource: 'performer' }" class="mt-12">
+                            <div class="mt-12">
                                 <div class="flex gap-20 md:mb-5 mb-4">
                                     <h2 class="default-p">{{ __('patients.primary_source') }}</h2>
                                     <div class="flex items-center">
-                                        <input @change="primarySource = 'performer'"
+                                        <input @change="modalCondition.conditions.primarySource = true"
                                                x-model.boolean="modalCondition.conditions.primarySource"
                                                id="performer"
                                                type="radio"
                                                value="true"
                                                name="primarySource"
                                                class="default-radio"
-                                               :checked="primarySource === 'performer'"
+                                               :checked="modalCondition.conditions.primarySource === true"
                                         >
                                         <label for="performer"
                                                class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
@@ -483,14 +484,14 @@
                                     </div>
 
                                     <div class="flex items-center">
-                                        <input @change="primarySource = 'otherSource'"
+                                        <input @change="modalCondition.conditions.primarySource = false"
                                                x-model.boolean="modalCondition.conditions.primarySource"
                                                id="otherSource"
                                                type="radio"
                                                value="false"
                                                name="primarySource"
                                                class="default-radio"
-                                               :checked="primarySource === 'otherSource'"
+                                               :checked="modalCondition.conditions.primarySource === false"
                                         >
                                         <label for="otherSource"
                                                class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
@@ -500,7 +501,7 @@
                                     </div>
                                 </div>
 
-                                <div x-show="primarySource === 'performer'">
+                                <div x-show="modalCondition.conditions.primarySource === true">
                                     <div class="form-row-modal">
                                         <div class="form-group group">
                                                 <textarea x-model="modalCondition.conditions.asserter.identifier.type.text"
@@ -514,7 +515,7 @@
                                     </div>
                                 </div>
 
-                                <div x-show="primarySource === 'otherSource'">
+                                <div x-show="modalCondition.conditions.primarySource === false">
                                     <div class="form-row-modal !mb-12">
                                         <div>
                                             <label for="reportOrigin" class="label-modal">
@@ -540,34 +541,51 @@
                                 </div>
                             </div>
 
-                            <div class="mt-6 flex justify-between space-x-2">
+                            <div class="mt-6 flex justify-between space-x-2 items-start">
                                 <button type="button"
                                         @click="openModal = false"
-                                        class="button-minor"
+                                        class="button-minor w-auto"
                                 >
                                     {{ __('forms.cancel') }}
                                 </button>
 
-                                <button @click.prevent="
-                                            delete modalCondition.query;
-                                            modalCondition.conditions.code.coding = modalCondition.conditions.code.coding.filter(c => c.code.trim() !== '');
+                                <div class="flex flex-col items-end">
+                                    <button @click.prevent="
+                                                delete modalCondition.query;
+                                                modalCondition.conditions.code.coding = modalCondition.conditions.code.coding.filter(c => c.code.trim() !== '');
 
-                                            if(newCondition !== false) {
-                                                diagnoses.push(modalCondition.conditions.diagnoses);
-                                                conditions.push(modalCondition.conditions);
-                                            } else {
-                                                conditions[item] = modalCondition.conditions;
-                                            }
+                                                const isPrimaryNew = modalCondition.conditions.diagnoses?.role?.coding?.[0]?.code === 'primary';
+                                                const hasPrimaryAlready = diagnoses.some(d => d.role?.coding?.[0]?.code === 'primary');
 
-                                            openModal = false;
-                                        "
-                                        class="button-primary"
-                                        :disabled="!(modalCondition.conditions.clinicalStatus.trim().length > 0 && modalCondition.conditions.verificationStatus.trim().length > 0
-                                            && modalCondition.conditions.code.coding[0].code.trim().length > 0 && modalCondition.conditions.diagnoses.role.coding[0].code
-                                        )"
-                                >
-                                    {{ __('forms.save') }}
-                                </button>
+                                                if (isPrimaryNew && hasPrimaryAlready) {
+                                                    showPrimaryWarning = true;
+                                                    return;
+                                                }
+
+                                                if (newCondition !== false) {
+                                                    diagnoses.push(modalCondition.conditions.diagnoses);
+                                                    conditions.push(modalCondition.conditions);
+                                                } else {
+                                                    conditions[item] = modalCondition.conditions;
+                                                }
+
+                                                openModal = false;
+                                                showPrimaryWarning = false;
+                                            "
+                                            class="button-primary justify-end"
+                                            :disabled="
+                                                !(modalCondition.conditions.clinicalStatus.trim().length > 0 && modalCondition.conditions.verificationStatus.trim().length > 0
+                                                && modalCondition.conditions.code.coding[0].code.trim().length > 0 && modalCondition.conditions.diagnoses.role.coding[0].code
+                                            )"
+                                    >
+                                        {{ __('forms.save') }}
+                                    </button>
+                                    <template x-if="showPrimaryWarning">
+                                        <p class="text-red-600 mt-2 text-sm text-right">
+                                            {!! __('patients.new_primary_diagnose') !!}
+                                        </p>
+                                    </template>
+                                </div>
                             </div>
                         </form>
                     </div>

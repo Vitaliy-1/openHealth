@@ -99,9 +99,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{id}/summary', PatientSummary::class)->name('patient.summary');
             Route::get('/{id}/episodes', PatientEpisodes::class)->name('patient.episodes');
 
-            Route::prefix('encounter')->group(function () {
-                Route::get('/create/{patientId}/{encounterId?}', EncounterCreate::class)->name('encounter.form');
-            });
+            Route::get('/{patientId}/encounter/create', EncounterCreate::class)->name('encounter.create');
+            Route::get('/{patientId}/encounter/{encounterId}', EncounterCreate::class)->name('encounter.edit');
         });
     });
 
