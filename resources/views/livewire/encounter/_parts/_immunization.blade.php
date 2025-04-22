@@ -200,10 +200,10 @@
                                                 openModal = false;
                                             "
                                             class="button-primary"
-                                            {{--                                            :disabled="!(modalImmunization.date.trim().length > 0 &&--}}
-                                            {{--                                                modalImmunization.time.trim().length > 0--}}
-                                            {{--                                                && (modalImmunization.explanation.reasons[0].coding[0].code.trim().length > 0 || modalImmunization.explanation.reasonsNotGiven.coding[0].code.trim().length > 0))--}}
-                                            {{--                                            "--}}
+                                            :disabled="!(modalImmunization.date.trim().length > 0 &&
+                                                modalImmunization.time.trim().length > 0
+                                                && (modalImmunization.explanation.reasons[0].coding[0].code.trim().length > 0 || modalImmunization.explanation.reasonsNotGiven.coding[0].code.trim().length > 0))
+                                            "
                                     >
                                         {{ __('forms.save') }}
                                     </button>

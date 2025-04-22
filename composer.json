@@ -1,4 +1,5 @@
 {
+    "name": "open-health/mis",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
     "keywords": ["open", "health", "laravel", "framework"],
@@ -8,7 +9,7 @@
         "ext-openssl": "*",
         "guzzlehttp/guzzle": "^7.9",
         "kirkbushell/eloquence": "^12.0",
-        "laravel/fortify": "*",
+        "laravel/fortify": "^1.25",
         "laravel/framework": "^12.0.1",
         "laravel/jetstream": "^5.3",
         "laravel/tinker": "^2.10.1",
