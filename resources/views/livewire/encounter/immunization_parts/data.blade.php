@@ -52,8 +52,8 @@
                        autocomplete="off"
                        required
                 >
-
             </div>
+
             <p class="text-error text-xs" x-show="modalImmunization.time.trim() === ''">
                 {{ __('forms.field_empty') }}
             </p>
@@ -114,6 +114,12 @@
                                     </option>
                                 @endforeach
                             </select>
+
+                            <p class="text-error text-xs"
+                               x-show="!Object.keys(reasonExplanationsDictionary).includes(reason.coding[0].code)"
+                            >
+                                {{ __('forms.field_empty') }}
+                            </p>
                         </div>
 
                         <!-- Remove Button -->
@@ -145,7 +151,7 @@
                 </template>
             </div>
 
-            <div x-show="modalImmunization.notGiven === true" class="form-group group !w-1/3">
+            <div x-show="modalImmunization.notGiven === true" class="form-group group !w-1/2">
                 <label for="reasonsNotGiven" class="label-modal">
                     {{ __('patients.reasons') }}
                 </label>
@@ -162,6 +168,12 @@
                         </option>
                     @endforeach
                 </select>
+
+                <p class="text-error text-xs"
+                   x-show="!Object.keys(reasonNotGivenExplanationsDictionary).includes(modalImmunization.explanation.reasonsNotGiven.coding[0].code)"
+                >
+                    {{ __('forms.field_empty') }}
+                </p>
             </div>
         </div>
     </div>

@@ -7,8 +7,13 @@ namespace App\Livewire\Encounter\Forms;
 use App\Models\Employee\Employee;
 use App\Rules\Cyrillic;
 use App\Rules\InDictionary;
+use App\Rules\OnlyOnePrimaryDiagnosis;
 use App\Rules\TimeInPast;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\ProhibitedIf;
+use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -16,9 +21,8 @@ use Livewire\Form;
 class Encounter extends Form
 {
     #[Validate([
-        'encounter.period.date' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
-        'encounter.period.start' => ['required', 'date_format:H:i', new TimeInPast()],
-        'encounter.period.end' => ['required', 'date_format:H:i', 'after:encounter.period.start', new TimeInPast()],
+        'encounter.period.start' => ['required', 'date', 'before_or_equal:now'],
+        'encounter.period.end' => ['required', 'date', 'after:encounter.period.start'],
         'encounter.class.code' => ['required', 'string', new InDictionary('eHealth/encounter_classes')],
         'encounter.type.coding.*.code' => ['required', 'string', new InDictionary('eHealth/encounter_types')],
         'encounter.priority' => ['required_if:encounter.class.code,INPATIENT', 'array'],
@@ -26,10 +30,9 @@ class Encounter extends Form
         'encounter.reasons' => ['required_if:encounter.class.code,PHC', 'array'],
         'encounter.reasons.*.coding.*.code' => ['required', 'string', new InDictionary('eHealth/ICPC2/reasons')],
         'encounter.reasons.*.text' => ['nullable', 'string', new Cyrillic()],
-        // TODO: Encounter must have exactly one primary diagnosis
-        'encounter.diagnoses' => ['required_unless:encounter.type.coding.0.code,intervention', 'array'],
-        'encounter.diagnoses.role.coding.*.code' => ['required', 'string', new InDictionary('eHealth/diagnosis_roles')],
-        'encounter.diagnoses.rank' => ['nullable', 'integer', 'min:1', 'max:10'],
+        'encounter.diagnoses' => ['required_unless:encounter.type.coding.0.code,intervention', new OnlyOnePrimaryDiagnosis(), 'array'],
+        'encounter.diagnoses.*.role.coding.*.code' => ['required', 'string', new InDictionary('eHealth/diagnosis_roles')],
+        'encounter.diagnoses.*.rank' => ['nullable', 'integer', 'min:1', 'max:10'],
         'encounter.actions' => [
             'required_if:encounter.class.code,PHC', 'prohibited_unless:encounter.class.code,PHC', 'array'
         ],
@@ -66,9 +69,9 @@ class Encounter extends Form
     ];
 
     #[Validate([
-        'episode' => ['required', 'array'],
         'episode.type.code' => ['required', 'string', new InDictionary('eHealth/episode_types')],
-        'episode.name' => ['required', 'string', new Cyrillic()]
+        'episode.name' => ['required', 'string', new Cyrillic()],
+        'episode.period.start' => ['required', 'date', 'before_or_equal:now']
     ])]
     public array $episode = [
         'type' => [
@@ -112,60 +115,79 @@ class Encounter extends Form
 
     public array $evidences;
 
-    #[Validate([
-        'immunizations.*.primarySource' => ['required', 'boolean'],
-        'immunizations.*.performer' => [
-            'required_if:immunizations.*.primarySource,true', 'prohibited_if:immunizations.*.primarySource,false',
-            'array'
-        ],
-        'immunizations.*.reportOrigin' => [
-            'required_if:immunizations.*.primarySource,false', 'prohibited_if:immunizations.*.primarySource,true'
-        ],
-        'immunizations.*.reportOrigin.coding.*.code' => [
-            'string', new InDictionary('eHealth/immunization_report_origins')
-        ],
-        'immunizations.*.notGiven' => ['declined_if:immunizations.*.primarySource,false', 'boolean'],
-        'immunizations.*.explanation.reasons' => [
-            'required_if:immunizations.*.notGiven,false', 'prohibited_if:immunizations.*.notGiven,true', 'array'
-        ],
-        'immunizations.*.explanation.reasons.*.coding.*.code' => [
-            'string', new InDictionary('eHealth/reason_explanations')
-        ],
-        'immunizations.*.manufacturer' => [
-            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'string'
-        ],
-        'immunizations.*.lotNumber' => [
-            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'string'
-        ],
-        'immunizations.*.expirationDate' => [
-            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'string'
-        ],
-        'immunizations.*.doseQuantity.value' => ['required_if:immunizations.*.notGiven,false', 'integer'],
-        'immunizations.*.doseQuantity.unit' => ['required_if:immunizations.*.notGiven,false', 'string'],
-        'immunizations.*.doseQuantity.code' => [
-            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'string'
-        ],
-        'immunizations.*.site' => [
-            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'array'
-        ],
-        'immunizations.*.route' => [
-            'required_if:immunizations.*.primarySource,true', 'required_if:immunizations.*.notGiven,false', 'array'
-        ],
-        'immunizations.*.vaccinationProtocols.doseSequence' => ['required', 'integer'],
-        'immunizations.*.vaccinationProtocols.authority' => ['required', 'array'],
-        'immunizations.*.vaccinationProtocols.series' => ['required', 'string'],
-        'immunizations.*.vaccinationProtocols.seriesDoses' => ['required', 'integer'],
-        'immunizations.*.vaccinationProtocols.targetDiseases' => ['required', 'array'],
-        'immunizations.*.explanation.reasonsNotGiven' => [
-            'required_if:immunizations.*.notGiven,true', 'prohibited_if:immunizations.*.notGiven,false', 'array'
-        ],
-        'immunizations.*.explanation.reasonsNotGiven.coding.*.code' => [
-            'string', new InDictionary('eHealth/reason_not_given_explanations')
-        ],
-        'immunizations.*.date' => ['required', 'before:tomorrow', 'date_format:Y-m-d'],
-        'immunizations.*.time' => ['required', 'date_format:H:i', new TimeInPast()]
-    ])]
     public array $immunizations;
+
+    protected function rules(): array
+    {
+        return [
+            'immunizations.*.primarySource' => ['required', 'boolean'],
+            'immunizations.*.performer' => [
+                'required_if:immunizations.*.primarySource,true', 'prohibited_if:immunizations.*.primarySource,false',
+                'array'
+            ],
+            'immunizations.*.reportOrigin' => [
+                'required_if:immunizations.*.primarySource,false', 'prohibited_if:immunizations.*.primarySource,true'
+            ],
+            'immunizations.*.reportOrigin.coding.*.code' => [
+                'string', new InDictionary('eHealth/immunization_report_origins')
+            ],
+            'immunizations.*.notGiven' => ['declined_if:immunizations.*.primarySource,false', 'boolean'],
+            'immunizations.*.explanation.reasonsNotGiven' => [
+                $this->requiredIfPrimarySourceAndNotGivenTrue(), 'prohibited_if:immunizations.*.notGiven,false', 'array'
+            ],
+            'immunizations.*.explanation.reasonsNotGiven.coding.*.code' => [
+                'required', 'string', new InDictionary('eHealth/reason_not_given_explanations')
+            ],
+            'immunizations.*.vaccineCode.coding.*.code' => [
+                'required', 'string', new InDictionary('eHealth/vaccine_codes')
+            ],
+            'immunizations.*.explanation.reasons' => [
+                Rule::unless(
+                    fn () => collect($this->immunizations)->contains(
+                        fn ($immunization) => $immunization['primarySource'] === false &&
+                            $immunization['notGiven'] === true
+                    ),
+                    'required'
+                ),
+                $this->prohibitedIfPrimarySourceAndNotGivenTrue(), 'array'
+            ],
+            'immunizations.*.explanation.reasons.*.coding.*.code' => [
+                'required', 'string', new InDictionary('eHealth/reason_explanations')
+            ],
+            'immunizations.*.manufacturer' => [$this->requiredIfPrimarySourceTrueAndNotGivenFalse(), 'string'],
+            'immunizations.*.lotNumber' => [$this->requiredIfPrimarySourceTrueAndNotGivenFalse(), 'string'],
+            'immunizations.*.expirationDate' => [$this->requiredIfPrimarySourceTrueAndNotGivenFalse(), 'string'],
+
+            'immunizations.*.doseQuantity.value' => [
+                $this->requiredIfPrimarySourceTrueAndNotGivenFalse(), $this->requiredIfPrimarySourceAndNotGivenFalse(),
+                'integer'
+            ],
+            'immunizations.*.doseQuantity.unit' => [
+                $this->requiredIfPrimarySourceTrueAndNotGivenFalse(), $this->requiredIfPrimarySourceAndNotGivenFalse(),
+                'string'
+            ],
+            'immunizations.*.doseQuantity.code' => [
+                $this->requiredIfPrimarySourceTrueAndNotGivenFalse(),
+                new InDictionary('eHealth/immunization_dosage_units'), 'string'
+            ],
+            'immunizations.*.site' => [
+                $this->requiredIfPrimarySourceTrueAndNotGivenFalse(), 'array'
+            ],
+            'immunizations.*.site.coding.*.code' => [
+                'required', 'string', new InDictionary('eHealth/immunization_body_sites')
+            ],
+            'immunizations.*.route' => [$this->requiredIfPrimarySourceTrueAndNotGivenFalse(), 'array'],
+            'immunizations.*.route.coding.*.code' => [
+                'required', 'string', new InDictionary('eHealth/vaccination_routes')
+            ],
+            'immunizations.*.vaccinationProtocols.doseSequence' => ['required', 'integer'],
+            'immunizations.*.vaccinationProtocols.authority' => ['required', 'array'],
+            'immunizations.*.vaccinationProtocols.series' => ['required', 'string'],
+            'immunizations.*.vaccinationProtocols.seriesDoses' => ['required', 'integer'],
+            'immunizations.*.vaccinationProtocols.targetDiseases' => ['required', 'array'],
+            'immunizations.*.date' => ['required', 'before:tomorrow', 'date']
+        ];
+    }
 
     /**
      * Validate provided models by corresponding rules.
@@ -187,6 +209,34 @@ class Encounter extends Form
         $this->addAllowedEncounterTypes($rules);
 
         return $this->validate($rules);
+    }
+
+    /**
+     * Validate form by name.
+     *
+     * @param  string  $formName
+     * @param  array  $formData
+     * @return void
+     * @throws ValidationException
+     */
+    public function validateForm(string $formName, array $formData): void
+    {
+        $validator = Validator::make($formData, $this->getRulesForModel($formName));
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+    }
+
+    /**
+     * Get all the rules for the provided model name.
+     *
+     * @param  string  $model
+     * @return array
+     */
+    public function getRulesForModel(string $model): array
+    {
+        return $this->rulesForModel($model)->toArray();
     }
 
     /**
@@ -264,5 +314,61 @@ class Encounter extends Form
     private function addAllowedRule(array &$rules, string $ruleKey, array $allowedValues): void
     {
         $rules[$ruleKey][] = 'in:' . implode(',', $allowedValues);
+    }
+
+    /**
+     * Add a rule that makes the field required if primarySource equals true and NotGiven equals false.
+     *
+     * @return RequiredIf
+     */
+    private function requiredIfPrimarySourceTrueAndNotGivenFalse(): RequiredIf
+    {
+        return Rule::requiredIf(
+            fn () => collect($this->immunizations)->contains(
+                fn ($immunization) => $immunization['primarySource'] === true && $immunization['notGiven'] === false
+            )
+        );
+    }
+
+    /**
+     * Add a rule that makes the field required if primarySource and NotGiven equals true.
+     *
+     * @return RequiredIf
+     */
+    private function requiredIfPrimarySourceAndNotGivenTrue(): RequiredIf
+    {
+        return Rule::requiredIf(
+            fn () => collect($this->immunizations)->contains(
+                fn ($immunization) => $immunization['primarySource'] === true && $immunization['notGiven'] === true
+            )
+        );
+    }
+
+    /**
+     * Add a rule that makes the field required if primarySource and NotGiven equals false.
+     *
+     * @return RequiredIf
+     */
+    private function requiredIfPrimarySourceAndNotGivenFalse(): RequiredIf
+    {
+        return Rule::requiredIf(
+            fn () => collect($this->immunizations)->contains(
+                fn ($immunization) => $immunization['primarySource'] === false && $immunization['notGiven'] === false
+            )
+        );
+    }
+
+    /**
+     * Add a rule that makes the field required if primarySource and NotGiven equals false.
+     *
+     * @return ProhibitedIf
+     */
+    private function prohibitedIfPrimarySourceAndNotGivenTrue(): ProhibitedIf
+    {
+        return Rule::prohibitedIf(
+            fn () => collect($this->immunizations)->contains(
+                fn ($immunization) => $immunization['primarySource'] === true && $immunization['notGiven'] === true
+            )
+        );
     }
 }
