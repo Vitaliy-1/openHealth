@@ -21,7 +21,7 @@ final class Repository
         return app(CodeableConceptRepository::class);
     }
 
-    public static function encounter(): EncounterRepository
+    public function encounter(): EncounterRepository
     {
         return app(EncounterRepository::class);
     }

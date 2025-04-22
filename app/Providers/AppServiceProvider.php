@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\LegalEntity as LegalEntityModel;
+use App\Services\LegalEntityContext;
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -20,6 +22,12 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isLocal()) {
             $this->app->register(IdeHelperServiceProvider::class);
         }
+
+        $this->app->singleton(LegalEntityContext::class, function ($app) {
+            return new LegalEntityContext();
+        });
+
+        $this->app->alias(LegalEntityModel::class, 'legalEntity');
     }
 
     /**

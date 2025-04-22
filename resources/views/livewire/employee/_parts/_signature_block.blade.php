@@ -9,17 +9,17 @@
         </x-slot>
         <x-slot name="input">
             <x-forms.select class="default-input"
-                            wire:model="knedp"
+                            wire:model="form.knedp"
                             id="knedp">
                 <x-slot name="option">
                     <option value="">{{__('forms.select')}}</option>
-                    @foreach($getCertificateAuthority as $k =>$certificate_type)
-                        <option value="{{$certificate_type['id']}}">{{$certificate_type['name']}}</option>
+                    @foreach($certificateAuthorities as $k => $certificate_type)
+                        <option value="{{ $certificate_type['id'] }}">{{ $certificate_type['name'] }}</option>
                     @endforeach
                 </x-slot>
             </x-forms.select>
         </x-slot>
-        @error('knedp')
+        @error('form.knedp')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -32,14 +32,16 @@
         <x-slot name="label">
             <x-forms.label class="default-label" for="keyContainerUpload"
                            name="label">
-                {{__('forms.keyContainerUpload')}} *
+                {{__('forms.key_container_upload')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.file wire:model="file"
-                          :id="'keyContainerUpload'"/>
+            <x-forms.file wire:model="form.keyContainerUpload"
+                          :id="'keyContainerUpload'"
+                          :file="$this->form->keyContainerUpload?->getClientOriginalName()"
+            />
         </x-slot>
-        @error('keyContainerUpload')
+        @error('form.keyContainerUpload')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -55,10 +57,10 @@
             </x-forms.label>
         </x-slot>
         <x-slot name="input">
-            <x-forms.input class="default-input" wire:model="password"
+            <x-forms.input class="default-input" wire:model="form.password"
                            type="password" id="password"/>
         </x-slot>
-        @error('password')
+        @error('form.password')
         <x-slot name="error">
             <x-forms.error>
                 {{$message}}
@@ -67,16 +69,3 @@
         @enderror
     </x-forms.form-group>
 </x-forms.form-row>
-<x-forms.form-row class="">
-    <div class="xl:w-1/2 text-left">
-        <x-secondary-button wire:click="closeModalModel()">
-            {{__('Назад')}}
-        </x-secondary-button>
-    </div>
-    <div class="xl:w-1/2 text-right">
-        <button wire:click="sendApiRequest()" type="button" class="default-button">
-            {{__('forms.send_for_approval')}}
-        </button>
-    </div>
-</x-forms.form-row>
-

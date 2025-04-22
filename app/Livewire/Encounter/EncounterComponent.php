@@ -164,10 +164,6 @@ class EncounterComponent extends Component
         'eHealth/ICF/qualifiers/performance',
         'eHealth/ICF/qualifiers/capacity',
         'eHealth/ICF/qualifiers/barrier_or_facilitator',
-        'eHealth/observation_methods',
-        'eHealth/observation_interpretations',
-        'eHealth/body_sites',
-        'eHealth/ucum/units'
     ];
 
     /**
@@ -273,7 +269,7 @@ class EncounterComponent extends Component
         }
 
         $this->codeableConceptValues = collect(config('ehealth.observation_code_values'))
-            ->filter(static fn (array $value) => $value[1] === 'valueCodeableConcept')
+            ->filter(static fn (array $value) => $value[1] === 'value_codeable_concept')
             ->mapWithKeys(fn (array $value) => [
                 $value[0] => $this->dictionaries[$value[0]] ?? [],
             ])

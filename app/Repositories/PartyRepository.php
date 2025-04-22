@@ -3,20 +3,39 @@
 namespace App\Repositories;
 
 use App\Models\Relations\Party;
+use Exception;
 
 class PartyRepository
 {
     /**
-     * @param $data
+     * Creates a new Party record.
+     *
+     * @param array $data
      * @return Party
      */
-    public function createOrUpdate($data): Party
+    public function create(array $data): Party
     {
-        return Party::updateOrCreate(
-            [
-                'uuid' => $data['uuid'] ?? null,
-            ],
-            $data
-        );
+        try {
+            return Party::create($data);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Updates an existing Party record.
+     *
+     * @param Party $party
+     * @param array $data
+     * @return Party
+     */
+    public function update(Party $party, array $data): Party
+    {
+        try {
+            $party->update($data);
+            return $party;
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 }

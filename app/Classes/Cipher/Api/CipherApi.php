@@ -229,4 +229,18 @@ class CipherApi
             }
         }
     }
+
+    /**
+     * @throws ApiException
+     */
+    public function getCertificateAuthorityApi(): array
+    {
+        $data = new Request('get', '/certificateAuthority/supported', '')->sendRequest();
+
+        if ($data === false) {
+            throw new \RuntimeException('Failed to fetch data from the API.');
+        }
+
+        return $data['ca'] ?? [];
+    }
 }

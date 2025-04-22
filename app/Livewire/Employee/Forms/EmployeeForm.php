@@ -3,145 +3,271 @@
 namespace App\Livewire\Employee\Forms;
 
 use App\Rules\BirthDate;
+use App\Rules\Email;
 use App\Rules\Name;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 use Livewire\Form;
+use App\Rules\PhoneNumber;
+use Illuminate\Validation\ValidationException;
 
-use function Livewire\of;
-
+/**
+ * @property-read array $rules
+ */
 class EmployeeForm extends Form
 {
-
     public string $status = 'NEW';
 
-    /**
-     * Default values are transferred to the Alpine on the frontend
-     */
-    public ?array $party = [
-        'position' => '',
-        'employeeType' => '',
-        'phones' => [
+    public array $party = [
+        'position'      => '',
+        'employeeType'  => '',
+        'phones'        => [
             [
-                'type' => '',
+                'type'   => '',
                 'number' => '',
             ]
-        ]
+        ],
     ];
 
     public array $documents = [];
-    public ?array $education = [
-        'country' => '',
-    ];
-    public ?array $educations = [];
-    public ?array $speciality = [];
-    public ?array $specialities = [];
-    public ?array $scienceDegree = [];
-    public ?array $qualification = [];
-    public ?array $qualifications = [];
+    public array $educations = [];
+    public array $specialities = [];
+    public array $scienceDegrees = [];
+    public array $qualifications = [];
 
-    protected function rules()
+
+    public ?string $knedp = null;
+    public $keyContainerUpload;
+    public ?string $password = null;
+
+
+    //TODO rework validation rules
+    /**
+     * Defines the validation rules for the form.
+     * @return array
+     */
+    protected function rules(): array
+    {
+        return array_merge(
+            $this->partyRules(),
+            $this->documentsRules(),
+            $this->educationsRules(),
+            $this->specialitiesRules(),
+            $this->scienceDegreesRules(),
+            $this->qualificationsRules(),
+            $this->kepRules()
+        );
+    }
+
+    /**
+     * Defines validation rules for party-related data.
+     * @return array
+     */
+    protected function partyRules(): array
     {
         return [
-            // Party
-            'party.lastName' => ['required', new Name()],
-            'party.firstName' => ['required', new Name()],
-            'party.secondName' => [new Name()],
-            'party.gender' => ['required'],
-            'party.birthDate' => ['required', 'date', new BirthDate()],
-            'party.phones.*.number' => 'required|string:digits:13',
-            'party.phones.*.type' => 'required|string',
-            'party.email' => 'required|email',
-            'party.taxId' => 'required|min:8|max:10',
-            'party.employeeType' => 'required|string',
-            'party.position' => 'required|string',
-            'party.startDate' => 'date',
+            'party.lastName'         => ['required', new Name()],
+            'party.firstName'        => ['required', new Name()],
+            'party.secondName'       => [new Name()],
+            'party.gender'           => ['required'],
+            'party.birthDate'        => ['required', 'date', new BirthDate()],
+            'party.phones.*.number'  => [new PhoneNumber()],
+            'party.phones.*.type'    => 'required',
+            'party.employeeType'     => ['required', 'string'],
+            'party.position'         => ['required', 'string'],
+            'party.taxId'            => ['nullable', 'string', 'digits:10'],
+            'party.noTaxId'          => ['boolean'],
+            'party.email'            => ['nullable', 'email', new Email()],
+            'party.startDate'        => ['required', 'date'],
+        ];
+    }
 
-            // Documents
-            'documents' => 'required',
-            'documents.*.type' => 'required|string|min:3',
-            'documents.*.number' => 'required|string|min:3',
+    /**
+     * Defines validation rules for document-related data.
+     * @return array
+     */
+    protected function documentsRules(): array
+    {
+        return [
+            'documents'               => ['required', 'array', 'min:1'],
+            'documents.*.type'        => ['required', 'string'],
+            'documents.*.series'      => ['nullable', 'string', 'max:255'],
+            'documents.*.number'      => ['required', 'string', 'max:255'],
+            'documents.*.issuedAt'    => ['required', 'date'],
+            'documents.*.issuedBy'    => ['required', 'string', 'max:255'],
+        ];
+    }
 
-            // Education
-            'education.country'         => 'string',
-            'education.city'            => 'string|min:3',
-            'education.institutionName' => 'string|min:3',
-            'education.diplomaNumber'   => 'string|min:3',
-            'education.degree'          => 'string|min:3',
-            'education.speciality'      => 'string|min:3',
+    /**
+     * Defines validation rules for education-related data.
+     * @return array
+     */
+    protected function educationsRules(): array
+    {
+        return [
+            'educations'                    => ['nullable', 'array'],
+            'educations.*.institution_name' => ['required', 'string', 'max:255'],
+            'educations.*.country'          => ['required', 'string', 'max:255'],
+            'educations.*.city'             => ['required', 'string', 'max:255'],
+            'educations.*.degree'           => ['required', 'string', 'max:255'],
+            'educations.*.diploma_number'   => ['nullable', 'string', 'max:255'],
+        ];
+    }
 
-            // Speciality
-            'speciality.speciality'        => 'string|min:3',
-            'speciality.level'             => 'string|min:3',
-            'speciality.qualificationType' => 'string|min:3',
-            'speciality.attestationName'   => 'string|min:3',
-            'speciality.attestationDate'   => 'date',
-            'speciality.certificateNumber' => 'string|min:3',
+    /**
+     * Defines validation rules for speciality-related data.
+     * @return array
+     */
+    protected function specialitiesRules(): array
+    {
+        return [
+            'specialities'                  => ['nullable', 'array'],
+            'specialities.*.speciality'     => ['required', 'string', 'max:255'],
+            'specialities.*.level'          => ['required', 'string', 'max:255'],
+            'specialities.*.attestation_name' => ['required', 'string', 'max:255'],
+            'specialities.*.attestation_date' => ['required', 'date'],
+            'specialities.*.certificate_number' => ['nullable', 'string', 'max:255'],
+            'specialities.*.speciality_officio' => ['boolean'],
+            'specialities.*.qualification_type' => ['nullable', 'string'],
+        ];
+    }
 
-            // Science degree
-            'scienceDegree.country'         => 'string',
-            'scienceDegree.city'            => 'string',
-            'scienceDegree.degree'          => 'string',
-            'scienceDegree.institutionName' => 'string',
-            'scienceDegree.diplomaNumber'   => 'string',
-            'scienceDegree.speciality'      => 'string',
+    /**
+     * Defines validation rules for science degree-related data.
+     * @return array
+     */
+    protected function scienceDegreesRules(): array
+    {
+        return [
+            'scienceDegrees'                      => ['nullable', 'array'],
+            'scienceDegrees.*.degree'             => ['required', 'string', 'max:255'],
+            'scienceDegrees.*.country'            => ['required', 'string', 'max:255'],
+            'scienceDegrees.*.city'               => ['required', 'string', 'max:255'],
+            'scienceDegrees.*.institution_name'   => ['required', 'string', 'max:255'],
+            'scienceDegrees.*.speciality'         => ['required', 'string', 'max:255'],
+            'scienceDegrees.*.diploma_number'     => ['nullable', 'string', 'max:255'],
+        ];
+    }
 
-            // Qualification
-            'qualification.type'              => 'string',
-            'qualification.institutionName'   => 'string',
-            'qualification.speciality'        => 'string',
-            'qualification.issuedDate'        => 'date',
-            'qualification.certificateNumber' => 'string',
+    /**
+     * Defines validation rules for qualification-related data.
+     * @return array
+     */
+    protected function qualificationsRules(): array
+    {
+        return [
+            'qualifications'                      => ['nullable', 'array'],
+            'qualifications.*.type'               => ['required', 'string', 'max:255'],
+            'qualifications.*.licence_series'     => ['nullable', 'string', 'max:255'],
+            'qualifications.*.licence_number'     => ['nullable', 'string', 'max:255'],
+            'qualifications.*.licence_expires_date' => ['nullable', 'date', 'after_or_equal:licence_issued_date'],
+        ];
+    }
+
+    /**
+     * Defines validation rules for KEP (Key Electronic Signature) related fields.
+     * These are directly on the form object.
+     * @return array
+     */
+    protected function kepRules(): array
+    {
+        return [
+            'knedp'              => ['nullable', 'string'],
+            'password'           => ['nullable', 'string'],
+            'keyContainerUpload' => ['nullable', 'file', 'mimes:p7s,jks,pfx'],
         ];
     }
 
     /**
      * @throws ValidationException
      */
-    public function rulesForModelValidate(string $model): array
+    public function validated(array $rules = null, array $messages = [], array $attributes = []): array
     {
-        return $this->validate($this->rulesForModel($model)->toArray());
+        $rules = $rules ?? $this->rules(); // Якщо правила не передані, беремо з цього класу
+
+        // DD для всіх даних форми перед валідацією
+        // dd('Дані EmployeeForm перед валідацією:', $this->all());
+
+        $validator = Validator::make($this->all(), $rules, $messages, $attributes);
+
+        try {
+            $validatedData = $validator->validate();
+        } catch (ValidationException $e) {
+            // DD для всіх помилок валідації
+            dd('Помилки валідації EmployeeForm:', $e->errors());
+            // Livewire автоматично обробляє ValidationException,
+            // але ви можете додати додаткову логіку тут, якщо потрібно.
+            throw $e;
+        }
+
+        return $validatedData;
     }
 
+    public function reset(...$properties): void
+    {
+        parent::reset(...$properties);
+        $this->party = [
+            'position'      => '',
+            'employeeType'  => '',
+            'phones'        => [
+                [
+                    'type'   => '',
+                    'number' => '',
+                ]
+            ],
+        ];
+        $this->documents = [];
+        $this->educations = [];
+        $this->specialities = [];
+        $this->scienceDegrees = [];
+        $this->qualifications = [];
+        $this->knedp = null;
+        $this->keyContainerUpload = null;
+        $this->password = null;
+        $this->status = 'NEW';
+    }
+
+    /**
+     * Additional validation before sending the form to an external API.
+     * (This method is not used for Livewire's form validation, but for additional checks)
+     * @return array
+     */
     public function validateBeforeSendApi(): array
     {
+        $doctorTypes = config('ehealth.doctors_type');
 
-        $doctorTypes = config('ehealth.doctors_type'); // Get doctor types from config
-
-        // Check if documents is empty
         if (empty($this->documents)) {
             return [
-                'error'   => true,
+                'error' => true,
                 'message' => __('validation.custom.documentsEmpty'),
             ];
         }
 
-        // Check if taxId is empty
-        if (isset($this->party['taxId']) && empty($this->party['taxId'])) {
-            return [
-                'error'   => true,
-                'message' => __('validation.custom.documentsEmpty'),
-            ];
-        }
-        // Check if doctor type is empty
-        if ( in_array($this->party['employeeType'],$doctorTypes) && empty($this->specialities)) {
-            return [
-                'error'   => true,
-                'message' => __('validation.custom.specialityTable'),
-            ];
-        }
-        // Check if doctor type is empty
-        if ( in_array($this->party['employeeType'],$doctorTypes) && empty($this->educations)) {
-            return [
-                'error'   => true,
-                'message' => __('validation.custom.educationTable'),
-            ];
+        if (in_array($this->party['employeeType'], $doctorTypes, true)) {
+            if (empty($this->specialities)) {
+                return [
+                    'error' => true,
+                    'message' => __('validation.custom.specialityTable'),
+                ];
+            }
+
+            if (empty($this->educations)) {
+                return [
+                    'error' => true,
+                    'message' => __('validation.custom.educationTable'),
+                ];
+            }
+
+            if (empty($this->scienceDegrees)) {
+                return [
+                    'error' => true,
+                    'message' => __('validation.custom.science_degreesTable'),
+                ];
+            }
         }
 
         return [
-            'error'   => false,
+            'error' => false,
             'message' => '',
         ];
     }
-
-
 }

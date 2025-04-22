@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use Log;
 use Exception;
+use App\Core\Arr;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Division;
@@ -22,165 +23,208 @@ use Illuminate\Contracts\Validation\Validator as ResponseValidator;
 
 class EmployeeRepository
 {
-    /**
-     * @param  LegalEntity  $legalEntity
-     * @param  UserRepository  $userRepository
-     * @param  EmployeeRepository  $employeeRepository
-     * @param  PartyRepository  $partyRepository
-     * @param  PhoneRepository  $phoneRepository
-     * @param  DocumentRepository  $documentRepository
-     * @param  EducationRepository  $educationRepository
-     * @param  ScienceDegreeRepository  $scienceDegreeRepository
-     * @param  QualificationRepository  $qualificationRepository
-     * @param  SpecialityRepository  $specialityRepository
-     * @param  RevisionRepository $revisionRepository
-     */
-
-    protected ?UserRepository $userRepository;
-    protected ?EmployeeRepository $employeeRepository;
-    protected ?PartyRepository $partyRepository;
-    protected ?PhoneRepository $phoneRepository;
-    protected ?DocumentRepository $documentRepository;
-    protected ?EducationRepository $educationRepository;
+    protected ?UserRepository          $userRepository;
+    protected ?PartyRepository         $partyRepository;
+    protected ?PhoneRepository         $phoneRepository;
+    protected ?DocumentRepository      $documentRepository;
+    protected ?EducationRepository     $educationRepository;
     protected ?ScienceDegreeRepository $scienceDegreeRepository;
     protected ?QualificationRepository $qualificationRepository;
-    protected SpecialityRepository $specialityRepository;
-    protected  RevisionRepository $revisionRepository;
-
+    protected ?SpecialityRepository    $specialityRepository;
+    protected ?RevisionRepository      $revisionRepository;
 
     public function __construct(
-        UserRepository $userRepository,
-        PartyRepository $partyRepository,
-        PhoneRepository $phoneRepository,
-        DocumentRepository $documentRepository,
-        EducationRepository $educationRepository,
+        UserRepository          $userRepository,
+        PartyRepository         $partyRepository,
+        PhoneRepository         $phoneRepository,
+        DocumentRepository      $documentRepository,
+        EducationRepository     $educationRepository,
         ScienceDegreeRepository $scienceDegreeRepository,
         QualificationRepository $qualificationRepository,
-        SpecialityRepository $specialityRepository,
-        RevisionRepository $revisionRepository
-    ) {
-        $this->userRepository = $userRepository;
-        $this->partyRepository = $partyRepository;
-        $this->phoneRepository = $phoneRepository;
-        $this->documentRepository = $documentRepository;
-        $this->educationRepository = $educationRepository;
+        SpecialityRepository    $specialityRepository,
+        RevisionRepository      $revisionRepository
+    )
+    {
+        $this->userRepository          = $userRepository;
+        $this->partyRepository         = $partyRepository;
+        $this->phoneRepository         = $phoneRepository;
+        $this->documentRepository      = $documentRepository;
+        $this->educationRepository     = $educationRepository;
         $this->scienceDegreeRepository = $scienceDegreeRepository;
         $this->qualificationRepository = $qualificationRepository;
-        $this->specialityRepository = $specialityRepository;
-        $this->revisionRepository = $revisionRepository;
+        $this->specialityRepository    = $specialityRepository;
+        $this->revisionRepository      = $revisionRepository;
     }
 
     /**
-     * @param $data
-     * @return Employee
+     * Saves or updates employee-related data, including EmployeeRequest, Party, and associated details.
+     *
+     * @param array $formData
+     * @param LegalEntity $legalEntity
+     * @param BaseEmployee|EmployeeRequest|null $employeeModel
+     * @param string|null $employeeUUID
+     * @return void
+     * @throws Exception
      */
-    public function createOrUpdate($data, Employee|EmployeeRequest $employeeModel, LegalEntity $legalEntity): BaseEmployee
+    public function saveEmployeeData(
+        array                        $formData,
+        LegalEntity                  $legalEntity,
+        BaseEmployee|EmployeeRequest $employeeModel = null,
+        ?string                      $employeeUUID = null
+    ): void
     {
-        $employee =  $employeeModel::updateOrCreate(
-            [
-                'uuid' => $data['uuid'] ?? '',
-            ],
-            $data
-        );
+        DB::beginTransaction();
+        try {
+            $employeeRequestData = [
+                'uuid'              => Arr::get($formData, 'uuid', null),
+                'legal_entity_uuid' => Arr::get($formData, 'legal_entity_uuid', $legalEntity->uuid),
+                'legal_entity_id'   => Arr::get($formData, 'legal_entity_id', $legalEntity->id),
+                'user_id'           => Arr::get($formData, 'user_id', auth()->id()),
+                'position'          => Arr::get($formData, 'position'),
+                'status'            => Arr::get($formData, 'status', 'NEW'),
+                'employee_type'     => Arr::get($formData, 'employee_type'),
+                'start_date'        => Arr::get($formData, 'start_date'),
+                'end_date'          => Arr::get($formData, 'end_date'),
+                'inserted_at'       => now()->toIso8601String(),
+                'division_uuid'     => Arr::get($formData, 'division_uuid', null),
+                'division_id'       => Arr::get($formData, 'division_uuid') ? Division::where(
+                    'uuid',
+                    Arr::get(
+                        $formData,
+                        'division_uuid'
+                    )
+                )->first()?->id : null,
+            ];
 
-        $employee->legalEntity()->associate($legalEntity);
+            $partyData = Arr::get($formData, 'party', []);
+            $partyData = Arr::toSnakeCase($partyData);
 
-        return  $employee;
+            $phonesData = $partyData['phones'] ?? [];
+            unset($partyData['phones']);
 
-    }
+            $documentsData = $partyData['documents'] ?? [];
+            unset($partyData['documents']);
 
-    public function saveEmployeeData($response, LegalEntity $legalEntity,  Employee|EmployeeRequest $employeeModel, ?string $employeeUUID = null): Employee|EmployeeRequest|null
-    {
-       try {
-            $partyData = $response['party'];
-            unset($response['party']);
+            $doctorData = Arr::get($formData, 'doctor', []);
 
-            if (!empty($partyData['phones'])) {
-                $phonesData = $partyData['phones'];
-                unset($partyData['phones']);
-            }
-
-            if (!empty($partyData['documents'])) {
-                $documentsData = $partyData['documents'];
-                unset($partyData['documents']);
-            }
-
-            if(!empty($response['doctor'])) {
-                $doctorData = $response['doctor'];
-                unset($response['doctor']);
-            }
-
-            unset($response['updated_at']);
-
-            // Create or update User depends on it's Email (if exist email therefore user can be created too)
-            if (isset($partyData['email']) && !empty($partyData['email'])) {
-                $this->userRepository->createIfNotExist($partyData, $response['employee_type'], $legalEntity);
-            }
-
-            // Create or update Employee or EmployeeRequest
-            $employee = $this->createOrUpdate($response,$employeeModel,$legalEntity);
+            $employee = $this->createOrUpdate(
+                $employeeRequestData,
+                $employeeModel ?? new EmployeeRequest(),
+                $legalEntity
+            );
 
             $isEmployeRequest = $employee instanceof EmployeeRequest;
 
-            $employeeInstance = Employee::where('uuid', $employeeUUID)?->first();
+            $party = null;
+            $email = $partyData['email'] ?? null;
+            $primaryPhone = null;
 
-            $alreadyExistParty = $employeeInstance?->party;
-
-            // Create or update Party
-            $party = $alreadyExistParty ?? $this->partyRepository->createOrUpdate($partyData);
-
-            if ($isEmployeRequest) {
-                optional($employeeInstance, fn($instance) => $employee->employee()->associate($instance));
+            foreach ($phonesData as $phone) {
+                if (($phone['type'] ?? '') === 'MOBILE') {
+                    $primaryPhone = $phone['number'];
+                    break;
+                }
             }
 
-            /**
-             * If $alreadyExistParty == null it only means that EmployeeRequest expect to create through creation of the LegalEntity
-             * Because if $employee is EmployeeRequest the data below mustn't be changed until valid user approved this changes.
-             * And therefore, if $employee is Employee the data should be updated or created
-             */
-            if (!$isEmployeRequest || !$alreadyExistParty) {
-                // Add documents for Party
-                $this->documentRepository->syncDocuments($party, $documentsData ?? []);
-
-                // Add phones for Party
-                $this->phoneRepository->syncPhones($party, $phonesData ?? []);
-
-                // Add educations
-                $this->educationRepository->addEducations($employee, $doctorData['educations'] ?? []);
-
-                // Add science degrees
-                $this->scienceDegreeRepository->addScienceDegrees($employee, $doctorData['science_degree'] ?? []);
-
-                // Add qualifications
-                $this->qualificationRepository->addQualifications($employee, $doctorData['qualifications'] ?? []);
-
-                // Add specialities
-                $this->specialityRepository->addSpecialities($employee, $doctorData['specialities'] ?? []);
+            if ($email || $primaryPhone) {
+                $query = Party::query();
+                if ($email) {
+                    $query->where('email', $email);
+                }
+                if ($primaryPhone) {
+                    $query->orWhereHas('phones', function($q) use ($primaryPhone) {
+                        $q->where('number', $primaryPhone);
+                    });
+                }
+                $party = $query->first();
             }
 
-            // Bind employee to Party
+            if ($party) {
+                $this->partyRepository->update($party, $partyData);
+            } else {
+                $party = $this->partyRepository->create($partyData);
+            }
+
+            // Add documents for Party
+            $this->documentRepository->syncDocuments($party, $documentsData);
+
+            // Add phones for Party
+            $this->phoneRepository->syncPhones($party, $phonesData);
+
+            // Add educations
+            $this->educationRepository->addEducations($employee, $doctorData['educations'] ?? []);
+
+            // Add science degrees
+            $this->scienceDegreeRepository->addScienceDegrees($employee, $doctorData['science_degree'] ?? []);
+
+            // Add qualifications
+            $this->qualificationRepository->addQualifications($employee, $doctorData['qualifications'] ?? []);
+
+            // Add specialities
+            $this->specialityRepository->addSpecialities($employee, $doctorData['specialities'] ?? []);
+
+            // Attach employee to Party
             $party->employees()->save($employee);
 
-            // Here is should be created record in the revisions table depends one the $employeeModel and it's id
+            // Create revision entry
             if ($isEmployeRequest) {
-                $responseData = [
-                    'response' => $response,
-                    'party' => $partyData,
-                    'documents' => $documentsData,
-                    'phones' => $phonesData,
-                    'doctor' => $doctorData ?? []
+                $revisionData = [
+                    'employeeRequestData' => $employeeRequestData,
+                    'partyData'           => $partyData,
+                    'documentsData'       => $documentsData,
+                    'phonesData'          => $phonesData,
+                    'doctorData'          => $doctorData ?? []
                 ];
 
                 $this->revisionRepository->saveRevision($employee, [
-                    'data' => json_encode($responseData),
+                    'data'   => json_encode($revisionData, JSON_THROW_ON_ERROR),
                     'status' => Revision::STATUS_PENDING,
                 ]);
             }
 
-            return $employee;
-       } catch (Exception $err) {
+            DB::commit();
+
+        } catch (Exception $err) {
+            DB::rollBack();
             throw new Exception(__('Create Employee Error') . ' : ' . $err->getMessage());
-       }
+        }
+    }
+
+    protected function createOrUpdate(array $data, Employee|EmployeeRequest|null $model, LegalEntity $legalEntity): Employee|EmployeeRequest
+    {
+        $modelData = [
+            'uuid' => $data['uuid'] ?? null,
+            'legal_entity_uuid' => $data['legal_entity_uuid'],
+            'position' => $data['position'],
+            'status' => $data['status'],
+            'employee_type' => $data['employee_type'],
+            'inserted_at' => $data['inserted_at'],
+            'user_id' => $data['user_id'],
+            'legal_entity_id' => $data['legal_entity_id'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+            'division_uuid' => $data['division_uuid'] ?? null,
+            'division_id' => $data['division_id'] ?? null,
+        ];
+
+        $uuid = $modelData['uuid'];
+        $employee = null;
+
+        if ($uuid) {
+            $employee = $model::where('uuid', $uuid)->first();
+            if ($employee) {
+                $employee->update($modelData);
+            }
+        }
+
+        if (!$employee) {
+            $employee = $model::create($modelData);
+        }
+
+        $employee->legalEntity()->associate($legalEntity);
+        $employee->save();
+
+        return $employee;
     }
 
     /**
@@ -586,7 +630,8 @@ class EmployeeRepository
             'party.phones.*.number' => 'required_with:party.phones|string',
             'status' => 'required|string',
             'position' => 'required|string',
-            'updated_at' => 'required|string',
+            'start_date' => 'required|string',
+            'end_date' => 'nullable|string',
         ]);
     }
 }

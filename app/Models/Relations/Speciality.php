@@ -6,6 +6,7 @@ use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * @mixin IdeHelperSpeciality
@@ -37,5 +38,10 @@ class Speciality extends Model
     public function specialityable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function qualifications(): MorphMany
+    {
+        return $this->morphMany(Qualification::class, 'qualificationable');
     }
 }
