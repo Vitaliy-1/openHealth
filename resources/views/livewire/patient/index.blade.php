@@ -107,15 +107,16 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <template x-for="patient in filteredPatients()" :key="patient.id">
+                            <template x-for="patient in filteredPatients" :key="patient.id">
                                 <tr class="border-b dark:border-gray-700">
                                     <th scope="row" class="table-cell-primary">
-                                        <div
+                                        <div class="text-base"
                                             x-text="`${patient.last_name} ${patient.first_name} ${patient.second_name || ''}`"></div>
                                         <template x-if="patient.status === 'APPLICATION'">
                                             <div class="flex gap-2 mt-2">
                                                 <a :href="`{{ route('patient.form', ['id' => '']) }}/${patient.id}`"
-                                                   class="default-button">
+                                                   class="default-button"
+                                                >
                                                     {{ __('patients.continue_registration') }}
                                                 </a>
                                             </div>

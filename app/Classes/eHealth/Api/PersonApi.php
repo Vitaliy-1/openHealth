@@ -21,7 +21,7 @@ class PersonApi
      */
     public static function searchForPersonByParams(array $params = []): array
     {
-        return (new Request(HttpMethod::GET, self::ENDPOINT_PERSON, $params))->sendRequest();
+        return new Request(HttpMethod::GET, self::ENDPOINT_PERSON, $params)->sendRequest();
     }
 
     /**
@@ -33,7 +33,7 @@ class PersonApi
      */
     public static function getPersonVerificationDetails(string $personId): array
     {
-        return (new Request(HttpMethod::GET, self::ENDPOINT_PERSON . "/$personId/verification", []))->sendRequest();
+        return new Request(HttpMethod::GET, self::ENDPOINT_PERSON . "/$personId/verification", [])->sendRequest();
     }
 
     /**
@@ -46,11 +46,11 @@ class PersonApi
      */
     public static function getConfidantPersonRelationships(string $personId, array $params): array
     {
-        return (new Request(
+        return new Request(
             HttpMethod::GET,
             self::ENDPOINT_PERSON . "/$personId/confidant_person_relationships",
             $params
-        ))->sendRequest();
+        )->sendRequest();
     }
 
     /**
@@ -62,11 +62,11 @@ class PersonApi
      */
     public static function getAuthenticationMethods(string $personId): array
     {
-        return (new Request(
+        return new Request(
             HttpMethod::GET,
             self::ENDPOINT_PERSON . "/$personId/authentication_methods",
             []
-        ))->sendRequest();
+        )->sendRequest();
     }
 
     /**
@@ -78,10 +78,10 @@ class PersonApi
      */
     public static function createConfidantRelationship(string $personId): array
     {
-        return (new Request(
+        return new Request(
             HttpMethod::POST,
             self::ENDPOINT_PERSON . "/$personId/confidant_person_relationship_requests",
             []
-        ))->sendRequest();
+        )->sendRequest();
     }
 }

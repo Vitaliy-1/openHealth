@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class EncounterRepository
+class EncounterRepository extends BaseRepository
 {
     /**
      * Create encounter in DB for person with related data.
@@ -27,9 +27,9 @@ class EncounterRepository
      * @return false|int
      * @throws Throwable
      */
-    public static function storeEncounter(array $encounterData, array $episodeData, int $personId): false|int
+    public function storeEncounter(array $encounterData, array $episodeData, int $personId): false|int
     {
-        return DB::transaction(static function () use ($encounterData, $episodeData, $personId) {
+        return DB::transaction(function () use ($encounterData, $episodeData, $personId) {
             try {
                 $visit = self::createIdentifier($encounterData['visit']['identifier']['value']);
 
@@ -47,7 +47,7 @@ class EncounterRepository
 
                 $division = self::createIdentifier($encounterData['division']['identifier']['value']);
 
-                $encounter = Encounter::create([
+                $encounter = $this->model::create([
                     'person_id' => $personId,
                     'uuid' => $encounterData['uuid'] ?? $encounterData['id'],
                     'status' => $encounterData['status'],

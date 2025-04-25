@@ -6,7 +6,7 @@
 
         <x-slot name="navigation">
             <div class="sm:flex md:divide-x md:divide-gray-100 dark:divide-gray-700 mb-8">
-                <a href="{{ route('encounter.form', ['id' => $id]) }}" class="flex items-center gap-2 button-sync">
+                <a href="{{ route('encounter.create', ['patientId' => $id]) }}" class="flex items-center gap-2 button-sync">
                     <svg width="16" height="16">
                         <use xlink:href="#svg-plus"></use>
                     </svg>
@@ -46,7 +46,7 @@
                     @foreach($navItems as $route => $translation)
                         <li class="w-full focus-within:z-10">
                             <a href="{{ route('patient.' . $route, ['id' => $id]) }}"
-                               x-on:click="currentPath = '{{ route('patient.' . $route, ['id' => $id]) }}'"
+                               @click="currentPath = '{{ route('patient.' . $route, ['id' => $id]) }}'"
                                class="inline-block w-full p-4 border-gray-200 dark:border-gray-700 focus:ring-4 focus:ring-blue-300 focus:outline-none"
                                :class="currentPath.includes('{{ $route }}')
                                    ? 'text-gray-900 bg-gray-100 dark:bg-gray-700 dark:text-white'
