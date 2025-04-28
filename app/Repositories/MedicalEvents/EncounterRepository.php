@@ -2,22 +2,35 @@
 
 declare(strict_types=1);
 
-namespace App\Repositories;
+namespace App\Repositories\MedicalEvents;
 
-use App\Models\Encounter\CodeableConcept;
-use App\Models\Encounter\Coding;
-use App\Models\Encounter\Condition;
-use App\Models\Encounter\Encounter;
-use App\Models\Encounter\EncounterDiagnose;
-use App\Models\Encounter\Episode;
-use App\Models\Encounter\Identifier;
+use App\Classes\eHealth\Api\PatientApi;
+use App\Models\Employee\Employee;
+use App\Models\MedicalEvents\Sql\EncounterDiagnose;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Throwable;
 
 class EncounterRepository extends BaseRepository
 {
+    protected string $encounterUuid;
+    protected array $diagnoseUuids;
+    protected string $visitUuid;
+    protected string $episodeUuid;
+
+    public function __construct(Model $model)
+    {
+        parent::__construct($model);
+
+        $this->encounterUuid = Str::uuid()->toString();
+        $this->visitUuid = Str::uuid()->toString();
+        $this->episodeUuid = Str::uuid()->toString();
+    }
+
     /**
      * Create encounter in DB for person with related data.
      *
@@ -27,25 +40,27 @@ class EncounterRepository extends BaseRepository
      * @return false|int
      * @throws Throwable
      */
-    public function storeEncounter(array $encounterData, array $episodeData, int $personId): false|int
+    public function store(array $encounterData, array $episodeData, int $personId): false|int
     {
         return DB::transaction(function () use ($encounterData, $episodeData, $personId) {
+            $repository = new Repository();
+
             try {
-                $visit = self::createIdentifier($encounterData['visit']['identifier']['value']);
+                $visit = $repository::identifier()->store($encounterData['visit']['identifier']['value']);
 
-                $episode = self::createIdentifier($encounterData['episode']['identifier']['value']);
+                $episode = $repository::identifier()->store($encounterData['episode']['identifier']['value']);
 
-                $class = self::createCoding($encounterData['class']);
+                $class = $repository::coding()->store($encounterData['class']);
 
-                $type = self::createCodeableConcept($encounterData['type']);
+                $type = $repository::codeableConcept()->store($encounterData['type']);
 
                 if (isset($encounterData['priority'])) {
-                    $priority = self::createCodeableConcept($encounterData['priority']);
+                    $priority = $repository::codeableConcept()->store($encounterData['priority']);
                 }
 
-                $performer = self::createIdentifier($encounterData['performer']['identifier']['value']);
+                $performer = $repository::identifier()->store($encounterData['performer']['identifier']['value']);
 
-                $division = self::createIdentifier($encounterData['division']['identifier']['value']);
+                $division = $repository::identifier()->store($encounterData['division']['identifier']['value']);
 
                 $encounter = $this->model::create([
                     'person_id' => $personId,
@@ -65,18 +80,18 @@ class EncounterRepository extends BaseRepository
                     'end' => $encounterData['period']['end']
                 ]);
 
-                self::attachCodeableConcept($visit, $encounterData['visit']);
+                $repository::codeableConcept()->attach($visit, $encounterData['visit']);
 
-                self::attachCodeableConcept($episode, $encounterData['episode']);
+                $repository::codeableConcept()->attach($episode, $encounterData['episode']);
 
-                self::storeEpisode($episodeData, $encounter->id);
+                $repository::episode()->store($episodeData, $encounter->id);
 
-                self::attachCodeableConcept($performer, $encounterData['performer']);
+                $repository::codeableConcept()->attach($performer, $encounterData['performer']);
 
                 $reasonIds = [];
 
                 foreach ($encounterData['reasons'] as $reasonData) {
-                    $reason = self::createCodeableConcept($reasonData);
+                    $reason = $repository::codeableConcept()->store($reasonData);
 
                     $reasonIds[] = $reason->id;
                 }
@@ -84,10 +99,10 @@ class EncounterRepository extends BaseRepository
                 $encounter->reasons()->attach($reasonIds);
 
                 foreach ($encounterData['diagnoses'] as $diagnoseData) {
-                    $condition = self::createIdentifier($diagnoseData['condition']['identifier']['value']);
-                    self::attachCodeableConcept($condition, $diagnoseData['condition']);
+                    $condition = $repository::identifier()->store($diagnoseData['condition']['identifier']['value']);
+                    $repository::codeableConcept()->attach($condition, $diagnoseData['condition']);
 
-                    $role = self::createCodeableConcept($diagnoseData['role']);
+                    $role = $repository::codeableConcept()->store($diagnoseData['role']);
 
                     EncounterDiagnose::create([
                         'encounter_id' => $encounter->id,
@@ -100,131 +115,18 @@ class EncounterRepository extends BaseRepository
                 $actionIds = [];
 
                 foreach ($encounterData['actions'] as $actionData) {
-                    $action = self::createCodeableConcept($actionData);
+                    $action = $repository::codeableConcept()->store($actionData);
 
                     $actionIds[] = $action->id;
                 }
 
                 $encounter->actions()->attach($actionIds);
 
-                self::attachCodeableConcept($division, $encounterData['division']);
+                $repository::codeableConcept()->attach($division, $encounterData['division']);
 
                 return $encounter->id;
             } catch (Exception $e) {
                 Log::channel('db_errors')->error('Error saving encounter', [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine()
-                ]);
-
-                throw $e;
-            }
-        });
-    }
-
-    /**
-     * Store condition in DB.
-     *
-     * @param  array  $data
-     * @param  int  $encounterId
-     * @return void
-     * @throws Throwable
-     */
-    public static function storeCondition(array $data, int $encounterId): void
-    {
-        DB::transaction(static function () use ($data, $encounterId) {
-            try {
-                foreach ($data as $datum) {
-                    $reportOrigin = null;
-                    $asserter = null;
-                    $severity = null;
-
-                    if (isset($datum['asserter'])) {
-                        $asserter = self::createIdentifier($datum['asserter']['identifier']['value']);
-                    }
-
-                    $context = self::createIdentifier($datum['context']['identifier']['value']);
-
-                    if (isset($datum['report_origin'])) {
-                        $reportOrigin = self::createCodeableConcept($datum['report_origin']);
-                    }
-
-                    $code = self::createCodeableConcept($datum['code']);
-
-                    if (isset($datum['severity'])) {
-                        $severity = self::createCodeableConcept($datum['severity']);
-                    }
-
-                    Condition::create([
-                        'uuid' => $datum['id'],
-                        'encounter_id' => $encounterId,
-                        'primary_source' => $datum['primary_source'],
-                        'asserter_id' => $asserter?->id,
-                        'report_origin_id' => $reportOrigin?->id,
-                        'context_id' => $context->id,
-                        'code_id' => $code->id,
-                        'clinical_status' => $datum['clinical_status'],
-                        'verification_status' => $datum['verification_status'],
-                        'severity_id' => $severity?->id,
-                        'onset_date' => $datum['onset_date'],
-                        'asserted_date' => $datum['asserted_date'] ?? null
-                    ]);
-
-                    if (isset($datum['asserter'])) {
-                        self::attachCodeableConcept($asserter, $datum['asserter']);
-                    }
-
-                    self::attachCodeableConcept($context, $datum['context']);
-                }
-            } catch (Exception $e) {
-                Log::channel('db_errors')->error('Error saving condition', [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine()
-                ]);
-
-                throw $e;
-            }
-        });
-    }
-
-    /**
-     * Create episode for encounter in DB.
-     *
-     * @param  array  $data
-     * @param  int  $encounterId
-     * @return void
-     * @throws Throwable
-     */
-    protected static function storeEpisode(array $data, int $encounterId): void
-    {
-        DB::transaction(static function () use ($data, $encounterId) {
-            try {
-                $type = self::createCoding($data['type']);
-
-                $managingOrganization = self::createIdentifier($data['managing_organization']['identifier']['value']);
-
-                $careManager = self::createIdentifier($data['care_manager']['identifier']['value']);
-
-                $episode = Episode::create([
-                    'uuid' => $data['id'],
-                    'encounter_id' => $encounterId,
-                    'episode_type_id' => $type->id,
-                    'status' => $data['status'],
-                    'name' => $data['name'],
-                    'managing_organization_id' => $managingOrganization->id,
-                    'care_manager_id' => $careManager->id
-                ]);
-
-                $episode->period()->create([
-                    'start' => $data['period']['start']
-                ]);
-
-                self::attachCodeableConcept($managingOrganization, $data['managing_organization']);
-
-                self::attachCodeableConcept($careManager, $data['care_manager']);
-            } catch (Exception $e) {
-                Log::channel('db_errors')->error('Error saving episode', [
                     'error' => $e->getMessage(),
                     'file' => $e->getFile(),
                     'line' => $e->getLine()
@@ -241,9 +143,9 @@ class EncounterRepository extends BaseRepository
      * @param  int  $patientId
      * @return array
      */
-    public static function getEncounterData(int $patientId): array
+    public function get(int $patientId): array
     {
-        return Encounter::with([
+        return $this->model::with([
             'period',
             'visit',
             'episode',
@@ -261,105 +163,189 @@ class EncounterRepository extends BaseRepository
     }
 
     /**
-     * Get condition data that is related to the encounter.
+     * Format encounter data before request.
      *
-     * @param  int  $encounterId
+     * @param  array  $encounter
+     * @param  array  $conditions
      * @return array
      */
-    public static function getConditionData(int $encounterId): array
+    public function formatEncounterRequest(array $encounter, array $conditions): array
     {
-        return Condition::with([
-            'asserter',
-            'reportOrigin.coding',
-            'context',
-            'code.coding',
-            'severity.coding'
-        ])
-            ->where('encounter_id', $encounterId)
-            ->get()->toArray();
+        $encounter['id'] = $this->encounterUuid;
+        $encounter['visit']['identifier']['value'] = $this->visitUuid;
+        $encounter['episode']['identifier']['value'] = $this->episodeUuid;
+
+        // add system if priority is provided or when it's required
+        if ($encounter['class']['code'] === 'INPATIENT' || $encounter['class']['code']) {
+            $encounter['priority']['coding'][0]['system'] = 'eHealth/encounter_priority';
+        }
+
+        $encounter['diagnoses'] = array_map(function (array $diagnose) {
+            // Create a unique UUID for each diagnosis, and use them in condition
+            $diagnoseUuid = Str::uuid()->toString();
+            $diagnose['diagnoses']['condition']['identifier']['value'] = $diagnoseUuid;
+            $this->diagnoseUuids[] = $diagnoseUuid;
+
+            // delete rank if not provided
+            if ($diagnose['diagnoses']['rank'] === '') {
+                unset($diagnose['diagnoses']['rank']);
+            }
+
+            return $diagnose['diagnoses'];
+        }, $conditions);
+
+        if ($encounter['division']['identifier']['value']) {
+            $encounter['division']['identifier']['type']['coding'][0] = [
+                'system' => 'eHealth/resources',
+                'code' => 'division'
+            ];
+        }
+
+        $encounterForm = $this->formatPeriod($encounter);
+
+        return schemaService()
+            ->setDataSchema(['encounter' => $encounterForm], app(PatientApi::class))
+            ->requestSchemaNormalize()
+            ->getNormalizedData();
     }
 
     /**
-     * Get episode data that is related to the encounter.
+     * Format episode data before request.
      *
-     * @param  int  $encounterId
+     * @param  array  $episode
+     * @param  array  $encounterPeriod
      * @return array
      */
-    public static function getEpisodeData(int $encounterId): array
+    public function formatEpisodeRequest(array $episode, array $encounterPeriod): array
     {
-        return Episode::with([
-            'type',
-            'managingOrganization',
-            'careManager'
-        ])
-            ->where('encounter_id', $encounterId)
-            ->first()?->toArray();
+        $episode['id'] = $this->episodeUuid;
+        $episode['managingOrganization']['identifier']['value'] = Auth::user()->legalEntity->uuid;
+        $episode['period']['start'] = convertToISO8601($encounterPeriod['date'] . $encounterPeriod['start']);
+
+        $normalizedData = schemaService()
+            ->setDataSchema($episode, app(PatientApi::class))
+            ->requestSchemaNormalize('schemaEpisodeRequest')
+            ->getNormalizedData();
+
+        return ['episode' => $normalizedData];
     }
 
     /**
-     * Create identifier in DB.
+     * Format Conditions data before request.
      *
-     * @param  string  $value
-     * @return Identifier
+     * @param  array  $conditions
+     * @return array
      */
-    protected static function createIdentifier(string $value): Identifier
+    public function formatConditionsRequest(array $conditions): array
     {
-        return Identifier::create(['value' => $value]);
+        $conditionForm = array_map(
+            function (array $condition, int $index) {
+                // set ID same as diagnose
+                $condition['id'] = $this->diagnoseUuids[$index];
+
+                $condition['context']['identifier']['type']['coding'][0] = [
+                    'system' => 'eHealth/resources',
+                    'code' => 'encounter'
+                ];
+                $condition['context']['identifier']['value'] = $this->encounterUuid;
+
+                // unset if code not provided
+                if ($condition['severity']['coding'][0]['code'] === '') {
+                    unset($condition['severity']);
+                }
+
+                if ($condition['primarySource']) {
+                    // TODO: потім взяти employee авторизованого
+                    $employee = Employee::find(1);
+                    $condition['asserter']['identifier']['value'] = $employee?->uuid;
+
+                    unset($condition['reportOrigin']);
+                } else {
+                    unset($condition['asserter']);
+                }
+
+                // convert dates
+                if (isset($condition['onsetTime'])) {
+                    $condition['onsetDate'] = convertToISO8601($condition['onsetDate'] . $condition['onsetTime']);
+                    $condition['assertedDate'] = convertToISO8601($condition['assertedDate'] . $condition['assertedTime']);
+                    unset($condition['onsetTime'], $condition['assertedTime'], $condition['diagnoses']);
+                }
+
+                return $condition;
+            },
+            $conditions,
+            array_keys($conditions)
+        );
+
+        return schemaService()
+            ->setDataSchema(['conditions' => $conditionForm], app(PatientApi::class))
+            ->requestSchemaNormalize()
+            ->getNormalizedData();
     }
 
     /**
-     * Create codeable concept in DB by provided data and attach coding.
+     * Format immunizations data before request.
      *
-     * @param  array  $codeableConceptData
-     * @return CodeableConcept
+     * @param  array  $immunizations
+     * @return array
      */
-    protected static function createCodeableConcept(array $codeableConceptData): CodeableConcept
+    public function formatImmunizationsRequest(array $immunizations): array
     {
-        $codeableConcept = CodeableConcept::create([
-            'text' => $codeableConceptData['text'] ?? null
-        ]);
+        $immunizationForm = array_map(function ($immunization) {
+            $immunization['id'] = Str::uuid()->toString();
 
-        $codeableConcept->coding()->create([
-            'system' => $codeableConceptData['coding'][0]['system'],
-            'code' => $codeableConceptData['coding'][0]['code']
-        ]);
+            $immunization['status'] = 'completed';
 
-        return $codeableConcept;
+            $immunization['context']['identifier']['type']['coding'][0] = [
+                'system' => 'eHealth/resources',
+                'code' => 'encounter'
+            ];
+            $immunization['context']['identifier']['value'] = $this->encounterUuid;
+
+            if ($immunization['primarySource']) {
+                unset($immunization['reportOrigin']);
+
+                // TODO: потім взяти employee авторизованого
+                $employee = Employee::findOrFail(1);
+                $immunization['performer']['identifier']['value'] = $employee->uuid;
+            } else {
+                unset($immunization['performer']);
+            }
+
+            if ($immunization['notGiven']) {
+                unset($immunization['explanation']['reasons']);
+            } else {
+                unset($immunization['explanation']['reasonsNotGiven']);
+            }
+
+            $immunization['date'] = convertToISO8601($immunization['date'] . $immunization['time']);
+            unset($immunization['time']);
+
+            if ($immunization['expirationDate']) {
+                $immunization['expirationDate'] = convertToISO8601($immunization['expirationDate'] . now()->format('H:i'));
+            }
+
+            return $immunization;
+        }, $immunizations);
+
+        return schemaService()
+            ->setDataSchema(['immunizations' => $immunizationForm], app(PatientApi::class))
+            ->requestSchemaNormalize()
+            ->getNormalizedData();
     }
 
     /**
-     * Create codeable concept in DB for identifier.
+     * Format encounter period to ISO8601 format.
      *
-     * @param  Identifier  $identifier
-     * @param  array  $codeableConceptData
-     * @return CodeableConcept
+     * @param  array  $encounterForm
+     * @return array
      */
-    protected static function attachCodeableConcept(Identifier $identifier, array $codeableConceptData): CodeableConcept
+    public function formatPeriod(array $encounterForm): array
     {
-        /** @var CodeableConcept $codeableConcept */
-        $codeableConcept = $identifier->type()->create([
-            'text' => $codeableConceptData['identifier']['type']['text'] ?? null
-        ]);
+        $encounterForm['period']['start'] = convertToISO8601($encounterForm['period']['date'] . $encounterForm['period']['start']);
+        $encounterForm['period']['end'] = convertToISO8601($encounterForm['period']['date'] . $encounterForm['period']['end']);
+        unset($encounterForm['period']['date']);
 
-        $codeableConcept->coding()->create([
-            'system' => $codeableConceptData['identifier']['type']['coding'][0]['system'],
-            'code' => $codeableConceptData['identifier']['type']['coding'][0]['code']
-        ]);
-
-        return $codeableConcept;
-    }
-
-    /**
-     * Crate coding in DB by provided data.
-     *
-     * @param  array  $coding
-     * @return Coding
-     */
-    protected static function createCoding(array $coding): Coding
-    {
-        return Coding::create([
-            'system' => $coding['system'],
-            'code' => $coding['code']
-        ]);
+        return $encounterForm;
     }
 }

@@ -1,5 +1,4 @@
 {
-    "name": "open-health/mis",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
     "keywords": ["open", "health", "laravel", "framework"],
