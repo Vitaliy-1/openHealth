@@ -24,9 +24,9 @@ return new class extends Migration
             $table->foreignId('code_id')->constrained('codeable_concepts')->cascadeOnDelete();
             $table->enum('clinical_status', ['active', 'finished', 'recurrence', 'remission', 'resolved']);
             $table->enum('verification_status', ['confirmed', 'differential', 'entered_in_error', 'provisional', 'refuted']);
-            $table->foreignId('severity_id')->constrained('codeable_concepts')->cascadeOnDelete();
-            $table->timestampTz('onset_date');
-            $table->timestampTz('asserted_date')->nullable();
+            $table->foreignId('severity_id')->nullable()->constrained('codeable_concepts')->cascadeOnDelete();
+            $table->timestamp('onset_date');
+            $table->timestamp('asserted_date')->nullable();
             $table->timestamps();
         });
     }
