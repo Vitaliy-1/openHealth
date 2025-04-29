@@ -10,10 +10,11 @@ use App\Repositories\MedicalEvents\ConditionRepository;
 use App\Repositories\MedicalEvents\EncounterRepository;
 use App\Repositories\MedicalEvents\EpisodeRepository;
 use App\Repositories\MedicalEvents\IdentifierRepository;
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use RuntimeException;
 
-class MedicalEventsDBServiceProvider extends ServiceProvider
+class MedicalEventsDBServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Register services.
@@ -52,5 +53,22 @@ class MedicalEventsDBServiceProvider extends ServiceProvider
 
             return new $repositoryClass(new $modelClass());
         });
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides(): array
+    {
+        return [
+            EncounterRepository::class,
+            IdentifierRepository::class,
+            CodingRepository::class,
+            CodeableConceptRepository::class,
+            EpisodeRepository::class,
+            ConditionRepository::class
+        ];
     }
 }
