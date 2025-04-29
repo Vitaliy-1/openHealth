@@ -15,13 +15,6 @@ trait FormTrait
     public bool|string $showModal = false;
 
     /**
-     * @var array|array[]
-     */
-    public array $phones = [
-        ['type' => '', 'number' => '']
-    ];
-
-    /**
      * @var array|null
      */
     public ?array $dictionaries = [];
@@ -45,40 +38,6 @@ trait FormTrait
     public function closeModal(): void
     {
         $this->showModal = false;
-    }
-
-    /**
-     * Add a new phone row to the list of phones.
-     *
-     * @return array|null The newly added phone row
-     */
-    public function addRowPhone($property = '', $value = 'phones'): array|null
-    {
-        if (!empty($property)) {
-            return $this->handleDynamicProperty($property)[$value][] = ['type' => '', 'number' => ''];
-        }
-
-        return null;
-    }
-
-    /**
-     * Removes a phone number from the list of phones.
-     *
-     * @param  string  $key  The key of the phone number to be removed
-     * @param  string  $property  The property of the phone number to be removed
-     * @param  string  $value  The value of the phone number to be removed
-     * @return void
-     */
-    public function removePhone(string $key, string $property = '', string $value = 'phones'): void
-    {
-        if (!empty($property)) {
-            // Remove the phone number from the property
-            $this->handleDynamicProperty($property);
-            // Remove the phone number from the property
-            if (isset($this->handleDynamicProperty($property)[$value][$key])) {
-                unset($this->handleDynamicProperty($property)[$value][$key]);
-            }
-        }
     }
 
     protected function &handleDynamicProperty(string $property): mixed
@@ -143,10 +102,11 @@ trait FormTrait
         $this->showModal = false;
     }
 
-        /**
+    /**
      * Convert all keys in address array (course, only of need to) to the snake-case format.
      * This need to do because DB table store it's attributes in the snake-case
      *
+     * @param  array  $array
      * @return array
      */
     public function convertArrayKeysToSnakeCase(array $array): array
@@ -161,12 +121,13 @@ trait FormTrait
     }
 
     /**
-     * Convert all keys in address array (course, only of need to) to thecamelCase format.
+     * Convert all keys in address array (course, only of need to) to the CamelCase format.
      * This need to do because DB table has it's attributes in the snake-case but the form uses camelCase
      *
+     * @param  array  $array
      * @return array
      */
-    public function convertArrayKeysToCamelCase(array $array ): array
+    public function convertArrayKeysToCamelCase(array $array): array
     {
         return collect($array)
             ->mapWithKeys(function ($value, $key) {
@@ -180,7 +141,7 @@ trait FormTrait
     /**
      * Retrieves all attributes from a model object (includes relations).
      *
-     * @param object $model The model object to extract attributes from
+     * @param  object  $model  The model object to extract attributes from
      *
      * @return array An array containing all attributes of the model
      */
@@ -211,13 +172,13 @@ trait FormTrait
      * Flattens a multi-dimensional array.
      * All non-firstlevel keys are concatenated with a dot.
      *
-     * @param array $array The multi-dimensional array to flatten
+     * @param  array  $array  The multi-dimensional array to flatten
      *
-     * @param string $keyPrefix The prefix to add to the keys
+     * @param  string  $keyPrefix  The prefix to add to the keys
      *
      * @return array The flattened array
      */
-    protected function flattenArray(array $array, $keyPrefix = ""): array
+    protected function flattenArray(array $array, string $keyPrefix = ''): array
     {
         $flattenedArray = [];
 

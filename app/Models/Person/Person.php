@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models\Person;
 
 use App\Models\Employee\Employee;
-use App\Models\Encounter\Encounter;
+use App\Models\MedicalEvents\Sql\Encounter;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
