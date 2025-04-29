@@ -12,7 +12,7 @@
             </label>
             <div class="relative flex items-center">
                 <svg width="20" height="20"
-                     class="svg-input absolute left-1 pointer-events-none"
+                     class="svg-input absolute left-2.5 pointer-events-none"
                 >
                     <use xlink:href="#svg-calendar-week"></use>
                 </svg>
@@ -21,7 +21,7 @@
                        type="text"
                        name="immunizationDate"
                        id="immunizationDate"
-                       class="datepicker-input input-modal"
+                       class="datepicker-input input-modal !pl-10"
                        autocomplete="off"
                        required
                 >
@@ -39,7 +39,7 @@
 
             <div class="relative flex items-center">
                 <svg width="20" height="20"
-                     class="svg-input absolute right-3 pointer-events-none"
+                     class="svg-input absolute left-2.5 pointer-events-none"
                 >
                     <use xlink:href="#svg-clock"></use>
                 </svg>
@@ -48,7 +48,7 @@
                        type="time"
                        name="immunizationTime"
                        id="immunizationTime"
-                       class="input-modal pl-10"
+                       class="input-modal !pl-10"
                        autocomplete="off"
                        required
                 >
