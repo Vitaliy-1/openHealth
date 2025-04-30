@@ -132,7 +132,7 @@
                           d="M5 12h14m-7 7V5"
                     />
                 </svg>
-                 {{ __('forms.add') }}
+                {{ __('forms.add') }}
             </button>
 
             {{-- Modal --}}
@@ -158,7 +158,7 @@
                     >
                         <div @click.stop
                              x-trap.noscroll.inert="openModal"
-                             class="modal-content h-fit"
+                             class="modal-content h-fit w-full lg:max-w-4xl"
                         >
                             {{-- Title --}}
                             <h3 class="modal-header" :id="$id('modal-title')">{{ __('forms.action') }}</h3>
@@ -170,18 +170,10 @@
                                         <label for="actionCode" class="label-modal">
                                             {{ __('patients.icpc-2_status_code') }}
                                         </label>
-                                        <select x-model="modalAction.coding[0].code"
-                                                id="actionCode"
-                                                class="input-modal"
-                                                type="text"
-                                                required
-                                        >
-                                            <option value="" disabled selected>{{ __('forms.select') }}</option>
-                                            @foreach($this->dictionaries['eHealth/ICPC2/actions'] as $key => $action)
-                                                <option value="{{ $key }}">{{ $key }} - {{ $action }}</option>
-                                            @endforeach
-                                        </select>
-                                        {{-- Check if the picked value is the one from the dictionary --}}
+                                        <x-select2 modelPath="modalAction.coding[0].code"
+                                                   :dictionary="$this->dictionaries['eHealth/ICPC2/actions']"
+                                                   id="actionCode"
+                                        />
                                         <p class="text-error text-xs"
                                            x-show="!Object.keys(dictionary).includes(modalAction.coding[0].code)"
                                         >

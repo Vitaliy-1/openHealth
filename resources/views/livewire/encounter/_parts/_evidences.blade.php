@@ -232,7 +232,7 @@
 
         constructor(obj = null) {
             if (obj) {
-                JSON.parse(JSON.stringify(this, obj));
+                Object.assign(this, JSON.parse(JSON.stringify(obj)));
             }
         }
     }

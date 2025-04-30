@@ -1,8 +1,3 @@
-@php
-    $conditionCodes = $this->dictionaries['eHealth/ICPC2/condition_codes'];
-    ksort($conditionCodes);
-@endphp
-
 {{-- Component to input values to the table through the Modal, built with Alpine --}}
 <fieldset class="fieldset"
           {{-- Binding conditions to Alpine, it will be re-used in the modal.
@@ -12,6 +7,7 @@
                   diagnoses: $wire.entangle('form.encounter.diagnoses'),
                   openModal:false,
                   showPrimaryWarning: false,
+                  showDuplicateCodeWarning: false,
                   modalCondition: new Condition(),
                   newCondition: false,
                   item: 0,
@@ -189,20 +185,10 @@
                                     <label for="conditionReasonCode" class="label-modal">
                                         {{ __('patients.icpc-2_status_code') }}
                                     </label>
-                                    <select x-model="modalCondition.conditions.code.coding[0].code"
-                                            id="conditionReasonCode"
-                                            class="input-modal"
-                                            type="text"
-                                            required
-                                    >
-                                        <option selected>{{ __('forms.select') }}</option>
-                                        @foreach($conditionCodes as $key => $conditionCode)
-                                            <option value="{{ $key }}" wire:key="{{ $key }}">
-                                                {{ $key }} - {{ $conditionCode }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    {{-- Check if the picked value is the one from the dictionary --}}
+                                    <x-select2 modelPath="modalCondition.conditions.code.coding[0].code"
+                                               :dictionary="$this->dictionaries['eHealth/ICPC2/condition_codes']"
+                                               id="conditionReasonCode"
+                                    />
                                     <p class="text-error text-xs"
                                        x-show="!Object.keys(conditionCodesDictionary).includes(modalCondition.conditions.code.coding[0].code)"
                                     >
@@ -353,7 +339,7 @@
 
                                 <div class="relative">
                                     <svg width="20" height="20"
-                                         class="svg-input absolute left-1 !top-2/3 transform -translate-y-1/2 pointer-events-none"
+                                         class="svg-input absolute left-2.5 !top-2/3 transform -translate-y-1/2 pointer-events-none"
                                     >
                                         <use xlink:href="#svg-calendar-week"></use>
                                     </svg>
@@ -365,7 +351,7 @@
                                            type="text"
                                            name="onsetDate"
                                            id="onsetDate"
-                                           class="datepicker-input input-modal"
+                                           class="datepicker-input input-modal !pl-10"
                                            autocomplete="off"
                                            required
                                     >
@@ -379,7 +365,7 @@
 
                                 <div class="relative" onclick="document.getElementById('onsetTime').showPicker()">
                                     <svg width="20" height="20"
-                                         class="svg-input absolute right-3 !top-2/3 transform -translate-y-1/2 pointer-events-none"
+                                         class="svg-input absolute left-2.5 !top-2/3 transform -translate-y-1/2 pointer-events-none"
                                     >
                                         <use xlink:href="#svg-clock"></use>
                                     </svg>
@@ -391,7 +377,7 @@
                                            type="time"
                                            name="onsetTime"
                                            id="onsetTime"
-                                           class="input-modal"
+                                           class="input-modal !pl-10"
                                            autocomplete="off"
                                            required
                                     >
@@ -405,7 +391,7 @@
 
                                 <div class="relative">
                                     <svg width="20" height="20"
-                                         class="svg-input absolute left-1 !top-2/3 transform -translate-y-1/2 pointer-events-none"
+                                         class="svg-input absolute left-2.5 !top-2/3 transform -translate-y-1/2 pointer-events-none"
                                     >
                                         <use xlink:href="#svg-calendar-week"></use>
                                     </svg>
@@ -417,7 +403,7 @@
                                            type="text"
                                            name="assertedDate"
                                            id="assertedDate"
-                                           class="datepicker-input input-modal"
+                                           class="datepicker-input input-modal !pl-10"
                                            autocomplete="off"
                                            required
                                     >
@@ -425,7 +411,7 @@
 
                                 <div class="relative" onclick="document.getElementById('assertedTime').showPicker()">
                                     <svg width="20" height="20"
-                                         class="svg-input absolute right-3 !top-2/3 transform -translate-y-1/2 pointer-events-none"
+                                         class="svg-input absolute left-2.5 !top-2/3 transform -translate-y-1/2 pointer-events-none"
                                     >
                                         <use xlink:href="#svg-clock"></use>
                                     </svg>
@@ -437,7 +423,7 @@
                                            type="time"
                                            name="assertedTime"
                                            id="assertedTime"
-                                           class="input-modal"
+                                           class="input-modal !pl-10"
                                            autocomplete="off"
                                            required
                                     >
@@ -543,7 +529,11 @@
 
                             <div class="mt-6 flex justify-between space-x-2 items-start">
                                 <button type="button"
-                                        @click="openModal = false"
+                                        @click="
+                                            openModal = false;
+                                            showPrimaryWarning = false;
+                                            showDuplicateCodeWarning = false;
+                                        "
                                         class="button-minor w-auto"
                                 >
                                     {{ __('forms.cancel') }}
@@ -553,12 +543,17 @@
                                     <button @click.prevent="
                                                 delete modalCondition.query;
                                                 modalCondition.conditions.code.coding = modalCondition.conditions.code.coding.filter(c => c.code.trim() !== '');
+                                                const primaryExist = diagnoses.some(d => d.role.coding.some(c => c.code === 'primary'));
+                                                const newCode = modalCondition.conditions.code.coding[0]?.code;
+                                                const alreadyHasCode = conditions.some(c => c.code.coding[0]?.code === newCode);
 
-                                                const isPrimaryNew = modalCondition.conditions.diagnoses?.role?.coding?.[0]?.code === 'primary';
-                                                const hasPrimaryAlready = diagnoses.some(d => d.role?.coding?.[0]?.code === 'primary');
-
-                                                if (isPrimaryNew && hasPrimaryAlready) {
+                                                if (primaryExist) {
                                                     showPrimaryWarning = true;
+                                                    return;
+                                                }
+
+                                                if (alreadyHasCode) {
+                                                    showDuplicateCodeWarning = true;
                                                     return;
                                                 }
 
@@ -571,6 +566,7 @@
 
                                                 openModal = false;
                                                 showPrimaryWarning = false;
+                                                showDuplicateCodeWarning = false;
                                             "
                                             class="button-primary justify-end"
                                             :disabled="
@@ -583,6 +579,11 @@
                                     <template x-if="showPrimaryWarning">
                                         <p class="text-red-600 mt-2 text-sm text-right">
                                             {!! __('patients.new_primary_diagnose') !!}
+                                        </p>
+                                    </template>
+                                    <template x-if="showDuplicateCodeWarning">
+                                        <p class="text-red-600 mt-2 text-sm text-right">
+                                            {!! __('patients.duplicate_code_warning') !!}
                                         </p>
                                     </template>
                                 </div>

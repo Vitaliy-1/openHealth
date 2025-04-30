@@ -6,7 +6,7 @@
     <div>
         <div class="form-row-3">
             <div class="form-group group">
-                <svg class="svg-input" width="20" height="20">
+                <svg class="svg-input left-2.5" width="20" height="20">
                     <use xlink:href="#svg-calendar-week"></use>
                 </svg>
                 <input wire:model="form.encounter.period.date"
@@ -15,7 +15,7 @@
                        type="text"
                        name="date"
                        id="date"
-                       class="datepicker-input input peer @error('form.encounter.period.date') input-error @enderror"
+                       class="datepicker-input input peer !pl-10 @error('form.encounter.period.date') input-error @enderror"
                        placeholder=" "
                        required
                 >
@@ -32,14 +32,14 @@
 
             <div class="form-row-modal">
                 <div class="form-group group" onclick="document.getElementById('periodStart').showPicker()">
-                    <svg class="svg-input right-1" width="16" height="16">
+                    <svg class="svg-input left-2.5" width="16" height="16">
                         <use xlink:href="#svg-clock"></use>
                     </svg>
                     <input wire:model="form.encounter.period.start"
                            type="time"
                            name="periodStart"
                            id="periodStart"
-                           class="input peer @error('form.encounter.period.start') input-error @enderror"
+                           class="input peer !pl-10 @error('form.encounter.period.start') input-error @enderror"
                            placeholder=" "
                            required
                     />
@@ -55,14 +55,14 @@
                 </div>
 
                 <div class="form-group group" onclick="document.getElementById('periodEnd').showPicker()">
-                    <svg class="svg-input right-1" width="16" height="16">
+                    <svg class="svg-input left-2.5" width="16" height="16">
                         <use xlink:href="#svg-clock"></use>
                     </svg>
                     <input wire:model="form.encounter.period.end"
                            type="time"
                            name="periodEnd"
                            id="periodEnd"
-                           class="input peer @error('form.encounter.period.end') input-error @enderror"
+                           class="input peer !pl-10 @error('form.encounter.period.end') input-error @enderror"
                            placeholder=" "
                            required
                     />

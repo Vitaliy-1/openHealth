@@ -183,6 +183,7 @@
                             <form>
                                 @include('livewire.encounter.immunization_parts.data')
                                 @include('livewire.encounter.immunization_parts.information_about')
+                                @include('livewire.encounter.immunization_parts.vaccination_protocol')
 
                                 <div class="mt-6 flex justify-between space-x-2">
                                     <button type="button"
