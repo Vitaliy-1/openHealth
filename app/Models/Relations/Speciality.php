@@ -5,6 +5,7 @@ namespace App\Models\Relations;
 use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * @mixin IdeHelperSpeciality
@@ -24,4 +25,9 @@ class Speciality extends Model
         'valid_to_date',
         'certificate_number'
     ];
+
+    public function specialityable(): MorphTo
+    {
+        return $this->morphTo();
+    }
 }

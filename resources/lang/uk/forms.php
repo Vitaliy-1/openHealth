@@ -165,9 +165,10 @@ return [
     'add' => 'Додати',
     'addEducation' => 'Додати освіту',
     'addSpeciality' => 'Додати спеціальність',
-    'addQualification' => 'Додати кваліфікація',
+    'addQualification' => 'Додати кваліфікацію',
     'addScienceDegree' => 'Додати науковий ступінь',
     'add_document' => 'Додати документ',
+    'add_qualification' => 'Додати кваліфікацію',
     'close' => 'Закрити',
     'cancel' => 'Скасувати',
     'nameOfInstitution' => 'Назва закладу',
@@ -240,5 +241,5 @@ return [
     'complete_the_interaction_and_sign' => 'Завершити взаємодію та підписати',
     'patient' => 'Пацієнт',
     'yes' => 'Так',
-    'no' => 'Ні'
+    'no' => 'Ні',
 ];

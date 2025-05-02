@@ -157,19 +157,19 @@ class EmployeeForm extends Component
     }
 
 
-    public function getLegalEntity()
+    public function getLegalEntity(): void
     {
         $this->legalEntity = auth()->user()->legalEntity;
     }
 
-    public function getDivisions()
+    public function getDivisions(): void
     {
         $this->divisions = $this->legalEntity->division()
             ->where('status', 'ACTIVE')
             ->get();
     }
 
-    public function openModalModel($model, $singleProperty = '')
+    public function openModalModel($model, $singleProperty = ''): void
     {
         $this->showModal = $model;
         $this->singleProperty = $singleProperty;
@@ -357,7 +357,6 @@ class EmployeeForm extends Component
         return redirect()->route('employee.index');
 
     }
-
 
     //Response from api
     public function apiResponse($response):void

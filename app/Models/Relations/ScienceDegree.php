@@ -23,8 +23,8 @@ class ScienceDegree extends Model
         'degree',
         'diploma_number',
         'speciality',
-        'issued_date'
     ];
+
 
     public function science_degreeable(): MorphTo
     {
