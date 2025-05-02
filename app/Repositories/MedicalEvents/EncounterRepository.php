@@ -291,7 +291,7 @@ class EncounterRepository extends BaseRepository
      */
     public function formatImmunizationsRequest(array $immunizations): array
     {
-        $immunizationForm = array_map(function ($immunization) {
+        $immunizationForm = array_map(function (array $immunization) {
             $immunization['id'] = Str::uuid()->toString();
 
             $immunization['status'] = 'completed';

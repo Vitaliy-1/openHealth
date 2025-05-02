@@ -1,12 +1,10 @@
 {{-- Component to input values to the table through the Modal, built with Alpine --}}
-
-<div class="overflow-x-auto relative"> {{-- This required for table overflow scrolling --}}
+<div class="relative"> {{-- This required for table overflow scrolling --}}
     <fieldset class="fieldset"
               {{-- Binding evidenceCodes to Alpine, it will be re-used in the modal.
                 Note that it's necessary for modal to work properly --}}
               x-data="{
-                  evidences: $wire.entangle('form.evidences'),
-                  openModal:false,
+                  openModal: false,
                   modalEvidenceCode: new ConditionEvidence(),
                   newEvidenceCode: false,
                   item: 0,
@@ -25,10 +23,10 @@
             </tr>
             </thead>
             <tbody>
-            <template x-for="(evidence, index) in evidences">
+            <template x-for="(evidence, index) in modalCondition.conditions.evidences">
                 <tr>
                     <td class="td-input"
-                        x-text="`${evidence.evidences[0].codes[0].coding[0].code} - ${dictionary[evidence.evidences[0].codes[0].coding[0].code]}`"
+                        x-text="`${evidence.codes[0].coding[0].code} - ${dictionary[evidence.codes[0].coding[0].code]}`"
                     ></td>
                     <td class="td-input">
                         {{-- That all that is needed for the dropdown --}}
@@ -63,7 +61,7 @@
                                     :aria-controls="$id('dropdown-button')"
                                     type="button"
                             >
-                                <svg class="w-6 h-6 text-gray-800 dark:text-gray-200" aria-hidden="true"
+                                <svg class="w-6 h-6 text-gray-800 dark:text-gray-200 cursor-pointer" aria-hidden="true"
                                      xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                      viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="square" stroke-linejoin="round"
@@ -151,7 +149,7 @@
                     >
                         <div @click.stop
                              x-trap.noscroll.inert="openModal"
-                             class="modal-content h-fit"
+                             class="modal-content h-fit w-full lg:max-w-4xl"
                         >
                             {{-- Title --}}
                             <h3 class="modal-header" :id="$id('modal-title')">{{ __('forms.add') }}</h3>
@@ -163,20 +161,13 @@
                                         <label for="evidenceCode" class="label-modal">
                                             {{ __('patients.icpc-2_status_code') }}
                                         </label>
-                                        <select x-model="modalEvidenceCode.evidences[0].codes[0].coding[0].code"
-                                                id="evidenceCode"
-                                                class="input-modal"
-                                                type="text"
-                                                required
-                                        >
-                                            <option selected>{{ __('forms.select') }}</option>
-                                            @foreach($this->dictionaries['eHealth/ICPC2/condition_codes'] as $key => $conditionCode)
-                                                <option value="{{ $key }}">{{ $key }} - {{ $conditionCode }}</option>
-                                            @endforeach
-                                        </select>
-                                        {{-- Check if the picked value is the one from the dictionary --}}
+                                        <x-select2 modelPath="modalEvidenceCode.codes[0].coding[0].code"
+                                                   :dictionary="$this->dictionaries['eHealth/ICPC2/condition_codes']"
+                                                   id="evidenceCode"
+                                        />
+
                                         <p class="text-error text-xs"
-                                           x-show="!Object.keys(dictionary).includes(modalEvidenceCode.evidences[0].codes[0].coding[0].code)"
+                                           x-show="!Object.keys(dictionary).includes(modalEvidenceCode.codes[0].coding[0].code)"
                                         >
                                             {{ __('forms.field_empty') }}
                                         </p>
@@ -185,6 +176,7 @@
 
                                 <div class="mt-6 flex justify-between space-x-2">
                                     <button type="button"
+                                            @click.prevent
                                             @click="openModal = false"
                                             class="button-minor"
                                     >
@@ -193,13 +185,13 @@
 
                                     <button @click.prevent="
                                                 newEvidenceCode !== false
-                                                ? evidences.push(modalEvidenceCode)
-                                                : evidences[item] = modalEvidenceCode;
+                                                ? modalCondition.conditions.evidences.push(modalEvidenceCode)
+                                                : modalCondition.conditions.evidences[item] = modalEvidenceCode;
 
                                                 openModal = false;
                                             "
                                             class="button-primary"
-                                            :disabled="!(modalEvidenceCode.evidences[0].codes[0].coding[0].code.trim().length > 0)"
+                                            :disabled="!(modalEvidenceCode.codes[0].coding[0].code.trim().length > 0)"
                                     >
                                         {{ __('forms.save') }}
                                     </button>
@@ -218,17 +210,13 @@
      * Representation of the user's personal evidenceCode
      */
     class ConditionEvidence {
-        evidences = [
+        codes = [
             {
-                codes: [
-                    {
-                        coding: [
-                            { system: 'eHealth/ICPC2/reasons', code: '' }
-                        ]
-                    }
+                coding: [
+                    { system: 'eHealth/ICPC2/reasons', code: '' }
                 ]
             }
-        ];
+        ]
 
         constructor(obj = null) {
             if (obj) {

@@ -5,7 +5,7 @@
           x-data="{
                   conditions: $wire.entangle('form.conditions'),
                   diagnoses: $wire.entangle('form.encounter.diagnoses'),
-                  openModal:false,
+                  openModal: false,
                   showPrimaryWarning: false,
                   showDuplicateCodeWarning: false,
                   modalCondition: new Condition(),
@@ -14,7 +14,7 @@
                   conditionCodesDictionary: $wire.dictionaries['eHealth/ICPC2/condition_codes'],
                   diagnosisRolesDictionary: $wire.dictionaries['eHealth/diagnosis_roles'],
                   conditionClinicalStatusesRolesDictionary: $wire.dictionaries['eHealth/condition_clinical_statuses'],
-                  conditionVerificationStatusesDictionary: $wire.dictionaries['eHealth/condition_verification_statuses'],
+                  conditionVerificationStatusesDictionary: $wire.dictionaries['eHealth/condition_verification_statuses']
               }"
 >
     <legend class="legend">
@@ -647,7 +647,8 @@
                     coding: [{ system: 'eHealth/diagnosis_roles', code: '' }]
                 },
                 rank: ''
-            }
+            },
+            evidences: []
         };
         query = '';
 

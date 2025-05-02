@@ -124,7 +124,7 @@ class EncounterCreate extends Component
         $this->encounterId = $encounterId;
 
         if ($this->encounterId) {
-            $this->form->encounter = $this->repository::encounter()->get($this->patientId);
+            $this->form->encounter = $this->repository->encounter()->get($this->patientId);
             $this->form->episode = $this->repository::episode()->get($this->encounterId);
             $this->form->conditions = $this->repository::condition()->get($this->encounterId);
             $this->form->conditions = $this->convertArrayKeysToCamelCase($this->form->conditions);
@@ -209,7 +209,7 @@ class EncounterCreate extends Component
     {
         // update or create
         if ($this->encounterId) {
-            $formattedEncounter = $this->repository::encounter()->formatPeriod($this->form->encounter);
+            $formattedEncounter = $this->repository->encounter()->formatPeriod($this->form->encounter);
 
             // Validate formatted data
             try {
@@ -226,23 +226,26 @@ class EncounterCreate extends Component
                 return;
             }
 
-            $createdEncounterId = $this->repository::encounter()->store(
+            $createdEncounterId = $this->repository->encounter()->store(
                 $formattedEncounter,
                 $this->form->episode,
                 $this->patientId
             );
             $this->repository::condition()->store($this->form->conditions, $createdEncounterId);
         } else {
-            $formattedEncounter = $this->repository::encounter()->formatEncounterRequest($this->form->encounter, $this->form->conditions);
-            $formattedEpisode = $this->repository::encounter()->formatEpisodeRequest($this->form->episode, $this->form->encounter['period']);
-            $formattedConditions = $this->repository::encounter()->formatConditionsRequest($this->form->conditions);
-            $formattedImmunizations = $this->repository::encounter()->formatImmunizationsRequest($this->form->immunizations);
+            $encounterRepository = $this->repository->encounter();
+
+            $formattedEncounter = $encounterRepository->formatEncounterRequest($this->form->encounter, $this->form->conditions);
+            $formattedEpisode = $encounterRepository->formatEpisodeRequest($this->form->episode, $this->form->encounter['period']);
+            $formattedConditions = $encounterRepository->formatConditionsRequest($this->form->conditions);
+            $formattedImmunizations = $encounterRepository->formatImmunizationsRequest($this->form->immunizations);
 
             // Validate formatted data
             try {
                 $this->form->validateForm('encounter', $formattedEncounter);
                 $this->form->validateForm('episode', $formattedEpisode);
                 $this->form->validateForm('conditions', $this->convertArrayKeysToCamelCase($formattedConditions));
+                $this->form->validateForm('immunizations', $this->convertArrayKeysToCamelCase($formattedImmunizations));
 
                 if (!empty($formattedConditions)) {
                     $this->form->validateForm('immunizations', $this->convertArrayKeysToCamelCase($formattedImmunizations));
@@ -256,7 +259,7 @@ class EncounterCreate extends Component
                 return;
             }
 
-            $createdEncounterId = $this->repository::encounter()->store(
+            $createdEncounterId = $this->repository->encounter()->store(
                 $formattedEncounter['encounter'],
                 $formattedEpisode['episode'],
                 $this->patientId
@@ -291,8 +294,8 @@ class EncounterCreate extends Component
 
         // Note: No update operations are allowed. All IDs, submitted as PK, should be unique for eHealth.
         // TODO: додати перевірку на унікальність uuid, трішки потім. uuid має бути унікальний для пацієнта а не унікальним в цілому?
-        $preRequestEncounter = $this->repository::encounter()->formatEncounterRequest($this->form->encounter, $this->form->conditions);
-        $preRequestCondition = $this->repository::encounter()->formatConditionsRequest($this->form->conditions);
+        $preRequestEncounter = $this->repository->encounter()->formatEncounterRequest($this->form->encounter, $this->form->conditions);
+        $preRequestCondition = $this->repository->encounter()->formatConditionsRequest($this->form->conditions);
 
         $base64EncryptedData = $this->sendEncryptedData(
             array_merge(
@@ -336,7 +339,7 @@ class EncounterCreate extends Component
     private function createEpisode(): void
     {
         try {
-            PatientApi::createEpisode($this->patientUuid, $this->repository::encounter()->formatEpisodeRequest($this->form->episode, $this->form->encounter['period']));
+            PatientApi::createEpisode($this->patientUuid, $this->repository->encounter()->formatEpisodeRequest($this->form->episode, $this->form->encounter['period']));
         } catch (ApiException) {
             $this->dispatch('flashMessage', [
                 'message' => __('Виникла помилка при створенні епізоду. Зверніться до адміністратора.'),

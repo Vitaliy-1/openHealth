@@ -273,6 +273,7 @@
             system: 'eHealth/immunization_dosage_units',
             code: ''
         };
+        vaccinationProtocols = [];
 
         constructor(obj = null) {
             if (obj) {

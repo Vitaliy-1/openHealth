@@ -18,12 +18,12 @@ class DatabaseSeeder extends Seeder
              * populates permissions and roles tables, see spaties laravel-permissions docs
              * https://spatie.be/docs/laravel-permission/v6/introduction
              */
-            RolesPermissionsSeeder::class,
-            /*
-             * populates following tables legal_entities, users and model has roles with test data
-             * TODO: shouldn't be used in production
-             */
-            TestUserMigrate::class
+            RolesPermissionsSeeder::class
         ]);
+
+        if (app()->isLocal()) {
+            // Populates following tables legal_entities, users and model has roles with test data
+            $this->call(TestUserMigrate::class);
+        }
     }
 }

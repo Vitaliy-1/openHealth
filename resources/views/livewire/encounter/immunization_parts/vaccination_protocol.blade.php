@@ -1,11 +1,9 @@
 {{-- Component to input values to the table through the Modal, built with Alpine --}}
-
 <div class="relative"> {{-- This required for table overflow scrolling --}}
     <fieldset class="fieldset"
               {{-- Binding vaccinationProtocolCodes to Alpine, it will be re-used in the modal.
                 Note that it's necessary for modal to work properly --}}
               x-data="{
-                  vaccinationProtocols: $wire.entangle('form.vaccinationProtocols'),
                   openModal: false,
                   modalVaccinationProtocol: new VaccinationProtocol(),
                   newVaccinationProtocol: false,
@@ -28,7 +26,7 @@
             </tr>
             </thead>
             <tbody>
-            <template x-for="(vaccinationProtocol, index) in vaccinationProtocols">
+            <template x-for="(vaccinationProtocol, index) in modalImmunization.vaccinationProtocols">
                 <tr>
                     <td class="td-input"
                         x-text="vaccinationProtocol.doseSequence"
@@ -324,8 +322,8 @@
                                     <button @click.prevent
                                             @click="
                                                 newVaccinationProtocol !== false
-                                                ? vaccinationProtocols.push(modalVaccinationProtocol)
-                                                : vaccinationProtocols[item] = modalVaccinationProtocol;
+                                                ? modalImmunization.vaccinationProtocols.push(modalVaccinationProtocol)
+                                                : modalImmunization.vaccinationProtocols[item] = modalVaccinationProtocol;
 
                                                 openModal = false;
                                             "
@@ -352,14 +350,14 @@
         doseSequence;
         description;
         authority = {
-            coding: [{ system: 'eHealth/vaccination_authorities', code: ''}],
+            coding: [{ system: 'eHealth/vaccination_authorities', code: '' }],
             text: ''
         };
         series;
         seriesDoses;
         targetDiseases = [
             {
-                coding: [{ system: 'eHealth/vaccination_target_diseases', code: ''}],
+                coding: [{ system: 'eHealth/vaccination_target_diseases', code: '' }],
             }
         ];
 
