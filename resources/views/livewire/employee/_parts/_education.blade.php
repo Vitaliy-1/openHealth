@@ -6,9 +6,13 @@
                   modalEducation: new Education(),
                   newEducation: false,
                   item: 0,
-                  specDict: @js($this->dictionaries['SPECIALITY_TYPE']),
-                  degreeDict: @js($this->dictionaries['EDUCATION_DEGREE']),
-                  countryDict: @js($this->dictionaries['COUNTRY']),
+                  degreeDict: {
+                      'BACHELOR': '{{ __('forms.bachelor') }}',
+                      'MASTER': '{{ __('forms.master') }}',
+                      'PHD': '{{ __('forms.phd') }}',
+                      'ASSOCIATE': '{{ __('forms.associate') }}',
+                      'SPECIALIST': '{{ __('forms.specialist') }}'
+                  }
               }"
     >
         <legend class="legend">
@@ -29,13 +33,12 @@
             </tr>
             </thead>
             <tbody>
-
             <template x-for="(education, index) in educations">
                 <tr>
-                    <td class="td-input" x-text="countryDict[education.country] || educations.country"></td>
+                    <td class="td-input" x-text="education.country"></td>
                     <td class="td-input" x-text="education.city"></td>
                     <td class="td-input" x-text="education.institution_name"></td>
-                    <td class="td-input" x-text="specDict[education.speciality] || educations.speciality"></td>
+                    <td class="td-input" x-text="education.speciality"></td>
                     <td class="td-input" x-text="degreeDict[education.degree] || education.degree"></td>
                     <td class="td-input" x-text="education.issued_date"></td>
                     <td class="td-input" x-text="education.diploma_number"></td>
@@ -78,45 +81,35 @@
                                 </svg>
                             </button>
 
-                            <div class="relative">
-                                <div class="absolute top-0 left-0 right-0 z-10 bg-white shadow-lg">
-                                    <div
-                                        x-ref="panel"
-                                        x-show="openDropdown"
-                                        x-transition:enter="transition transform duration-300 ease-out"
-                                        x-transition:enter-start="opacity-0 translate-y-2"
-                                        x-transition:enter-end="opacity-100 translate-y-0"
-                                        x-transition:leave="transition transform duration-200 ease-in"
-                                        x-transition:leave-start="opacity-100 translate-y-0"
-                                        x-transition:leave-end="opacity-0 translate-y-2"
-                                        @click.outside="close($refs.button)"
-                                        :id="$id('dropdown-button')"
-                                        x-cloak
-                                        class="dropdown-panel relative"
-                                        style="top: -100%; left: 50%; transform: translateX(-50%);"
-                                    >
-                                        <button
-                                            @click="
-                                                openModal = true;
-                                                item = index;
-                                                modalEducation = new Education(education);
-                                                newEducation = false;
-                                                close($refs.button);
-                                            "
+                            <div class="absolute" style="left: 50%">
+                                <div
+                                    x-ref="panel"
+                                    x-show="openDropdown"
+                                    x-transition.origin.top.left
+                                    @click.outside="close($refs.button)"
+                                    :id="$id('dropdown-button')"
+                                    x-cloak
+                                    class="dropdown-panel relative"
+                                    style="left: -50%"
+                                >
+                                    <button @click="
+                                                    openModal = true;
+                                                    item = index;
+                                                    modalEducation = new Education(education);
+                                                    newEducation = false;
+                                                    close($refs.button);
+                                                "
                                             @click.prevent
                                             class="dropdown-button"
-                                        >
-                                            {{ __('forms.edit') }}
-                                        </button>
+                                    >
+                                        {{__('forms.edit')}}
+                                    </button>
 
-                                        <button
-                                            @click="educations.splice(index, 1); close($refs.button)"
+                                    <button @click="educations.splice(index, 1); close($refs.button)"
                                             @click.prevent
-                                            class="dropdown-button dropdown-delete"
-                                        >
-                                            {{ __('forms.delete') }}
-                                        </button>
-                                    </div>
+                                            class="dropdown-button dropdown-delete">
+                                        {{__('forms.delete')}}
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -163,20 +156,14 @@
                              class="modal-content h-fit"
                         >
                             <h3 class="modal-header" :id="$id('modal-title')">
-                                <span x-text="newEducation ? '{{ __('forms.addEducation') }}' : '{{ __('forms.edit') . ' ' . __('forms.education') }}'"></span>
+                                <span x-text="newEducation ? '{{ __('forms.add_education') }}' : '{{ __('forms.edit_education') }}'"></span>
                             </h3>
 
                             <form>
                                 <div class="form-row-modal grid grid-cols-2 gap-4">
                                     <div>
                                         <label for="educationCountry" class="label-modal">{{__('forms.country')}}</label>
-                                        <select x-model="modalEducation.country" id="educationCountry" class="input-modal" required>
-                                            @foreach($this->dictionaries['COUNTRY'] as $typeValue => $typeDescription)
-                                                <option value="{{$typeValue}}">{{$typeDescription}}</option>
-                                            @endforeach
-                                        </select>
-                                        <p class="text-error text-xs"
-                                           x-show="!Object.keys(dictionary).includes(modalEducation.country)">{{__('forms.field_empty')}}</p>
+                                        <input x-model="modalEducation.country" type="text" id="educationCountry" class="input-modal" required>
                                         <p class="text-error text-xs" x-show="!modalEducation.country.trim().length > 0">{{__('forms.field_empty')}}</p>
                                     </div>
                                     <div>
@@ -191,28 +178,23 @@
                                     </div>
                                     <div>
                                         <label for="educationSpeciality" class="label-modal">{{__('forms.speciality')}}</label>
-                                        <select x-model="modalEducation.speciality" id="educationSpeciality" class="input-modal" required>
-                                            @foreach($this->dictionaries['SPECIALITY_TYPE'] as $typeValue => $typeDescription)
-                                                <option value="{{$typeValue}}">{{$typeDescription}}</option>
-                                            @endforeach
-                                        </select>
-                                        <p class="text-error text-xs"
-                                           x-show="!Object.keys(dictionary).includes(modalEducation.speciality)">{{__('forms.field_empty')}}</p>
+                                        <input x-model="modalEducation.speciality" type="text" id="educationSpeciality" class="input-modal" required>
+                                        <p class="text-error text-xs" x-show="!modalEducation.speciality.trim().length > 0">{{__('forms.field_empty')}}</p>
                                     </div>
                                     <div>
                                         <label for="educationDegree" class="label-modal">{{__('forms.degree')}}</label>
                                         <select x-model="modalEducation.degree" id="educationDegree" class="input-modal" required>
-                                            @foreach($this->dictionaries['EDUCATION_DEGREE'] as $typeValue => $typeDescription)
-                                                <option value="{{$typeValue}}">{{$typeDescription}}</option>
-                                            @endforeach
+                                            <option value="" disabled selected>{{ __('forms.select') }}</option>
+                                            <option value="BACHELOR">{{ __('forms.bachelor') }}</option>
+                                            <option value="MASTER">{{ __('forms.master') }}</option>
+                                            <option value="PHD">{{ __('forms.phd') }}</option>
+                                            <option value="ASSOCIATE">{{ __('forms.associate') }}</option>
+                                            <option value="SPECIALIST">{{ __('forms.specialist') }}</option>
                                         </select>
-                                        <p class="text-error text-xs"
-                                           x-show="!Object.keys(dictionary).includes(modalEducation.degree)">{{__('forms.field_empty')}}</p>
                                     </div>
                                     <div>
                                         <label for="educationIssuedDate" class="label-modal">{{__('forms.issuedDate')}}</label>
-                                        <input id="educationIssuedDate" x-model="modalEducation.issued_date"  class="input-modal datepicker-input"
-                                               autocomplete="off" required>
+                                        <input x-model="modalEducation.issued_date" type="date" id="educationIssuedDate" class="input-modal">
                                     </div>
                                     <div>
                                         <label for="educationDiplomaNumber" class="label-modal">{{__('forms.diplomaNumber')}}</label>
