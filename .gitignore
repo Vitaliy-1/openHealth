@@ -25,3 +25,6 @@ _ide_helper.php
 _ide_helper_models.php
 composer.lock
 /.osp
+/Makefile
+/docker-compose.yml
+/.qodo
