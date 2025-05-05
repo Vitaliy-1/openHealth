@@ -2,9 +2,9 @@
 
 namespace App\Models\Relations;
 
+use Illuminate\Database\Eloquent\Model;
 use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
@@ -12,20 +12,21 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class Education extends Model
 {
-    use HasFactory;
-    use HasCamelCasing;
+    use HasFactory, HasCamelCasing;
+
+    protected $table = 'educations';
 
     protected $fillable = [
         'country',
         'city',
         'institution_name',
+        'speciality',
+        'degree',
         'issued_date',
         'diploma_number',
-        'degree',
-        'speciality',
+        'educationable_id',
+        'educationable_type',
     ];
-
-    protected $table = 'educations';//TODO: Перевірити чому laravel підтягую назву таблиці education
 
     public function educationable(): MorphTo
     {

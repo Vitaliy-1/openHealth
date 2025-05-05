@@ -4,6 +4,7 @@ namespace App\Livewire\Employee\Forms;
 
 use App\Rules\BirthDate;
 use App\Rules\Name;
+use App\Traits\HandlesSnakeCaseForm;
 use Illuminate\Validation\ValidationException;
 use Livewire\Form;
 
@@ -11,6 +12,7 @@ use function Livewire\of;
 
 class EmployeeForm extends Form
 {
+    use HandlesSnakeCaseForm;
 
     public string $status = 'NEW';
 
@@ -20,6 +22,7 @@ class EmployeeForm extends Form
     public ?array $party = [
         'position' => '',
         'employeeType' => '',
+        'startDate' => '',
         'phones' => [
             [
                 'type' => '',
@@ -27,6 +30,11 @@ class EmployeeForm extends Form
             ]
         ]
     ];
+
+    public function mount()
+    {
+        $this->party['startDate'] = now()->toDateString();
+    }
 
     public array $documents = [];
     public ?array $education = [
@@ -39,7 +47,7 @@ class EmployeeForm extends Form
     public ?array $qualification = [];
     public ?array $qualifications = [];
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
             // Party
@@ -143,5 +151,9 @@ class EmployeeForm extends Form
         ];
     }
 
+    public function validated(): array
+    {
+        return $this->validate($this->rules());
+    }
 
 }
