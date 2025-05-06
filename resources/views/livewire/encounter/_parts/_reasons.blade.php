@@ -1,5 +1,5 @@
 {{-- Component to input values to the table through the Modal, built with Alpine --}}
-<div class="overflow-x-auto relative" id="reasons-section"> {{-- This required for table overflow scrolling --}}
+<div class="relative" id="reasons-section"> {{-- This required for table overflow scrolling --}}
     <fieldset class="fieldset"
               {{-- Binding Reason to Alpine, it will be re-used in the modal.
                 Note that it's necessary for modal to work properly --}}
@@ -130,7 +130,7 @@
                           d="M5 12h14m-7 7V5"
                     />
                 </svg>
-                 {{ __('forms.add') }}
+                {{ __('forms.add') }}
             </button>
 
             {{-- Modal --}}
@@ -156,7 +156,7 @@
                     >
                         <div @click.stop
                              x-trap.noscroll.inert="openModal"
-                             class="modal-content h-fit"
+                             class="modal-content h-fit w-full lg:max-w-4xl"
                         >
                             {{-- Title --}}
                             <h3 class="modal-header" :id="$id('modal-title')">{{ __('patients.reason_for_visit') }}</h3>
@@ -168,18 +168,10 @@
                                         <label for="reasonCode" class="label-modal">
                                             {{ __('patients.icpc-2_status_code') }}
                                         </label>
-                                        <select x-model="modalReason.coding[0].code"
-                                                id="reasonCode"
-                                                class="input-modal"
-                                                type="text"
-                                                required
-                                        >
-                                            <option value="" disabled selected>{{ __('forms.select') }}</option>
-                                            @foreach($this->dictionaries['eHealth/ICPC2/reasons'] as $key => $reason)
-                                                <option value="{{ $key }}">{{ $key }} - {{ $reason }}</option>
-                                            @endforeach
-                                        </select>
-                                        {{-- Check if the picked value is the one from the dictionary --}}
+                                        <x-select2 modelPath="modalReason.coding[0].code"
+                                                   :dictionary="$this->dictionaries['eHealth/ICPC2/reasons']"
+                                                   id="reasonCode"
+                                        />
                                         <p class="text-error text-xs"
                                            x-show="!Object.keys(dictionary).includes(modalReason.coding[0].code)"
                                         >

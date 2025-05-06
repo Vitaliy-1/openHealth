@@ -11,7 +11,6 @@ use App\Rules\OnlyOnePrimaryDiagnosis;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\ProhibitedIf;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\ValidationException;
 use Livewire\Form;
@@ -69,8 +68,6 @@ class Encounter extends Form
 
     public array $conditions;
 
-    public array $evidences;
-
     public array $immunizations;
 
     protected function rules(): array
@@ -112,6 +109,9 @@ class Encounter extends Form
             ],
             'conditions.*.onsetDate' => ['required', 'before:tomorrow', 'date'],
             'conditions.*.assertedDate' => ['nullable', 'before:tomorrow', 'date'],
+            'conditions.*.evidences.*.codes.*.coding.*.code' => [
+                'nullable', 'string', new InDictionary('eHealth/condition_codes')
+            ],
 
             'immunizations.*.primarySource' => ['required', 'boolean'],
             'immunizations.*.performer' => [
@@ -136,14 +136,13 @@ class Encounter extends Form
             ],
             'immunizations.*.date' => ['required', 'before:tomorrow', 'date'],
             'immunizations.*.explanation.reasons' => [
-                Rule::unless(
+                'array',
+                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(false, false),
+                Rule::prohibitedIf(
                     fn () => collect($this->immunizations)->contains(
-                        fn ($immunization) => $immunization['primarySource'] === false &&
-                            $immunization['notGiven'] === true
-                    ),
-                    'required'
-                ),
-                $this->prohibitedIfPrimarySourceAndNotGivenTrue(), 'array'
+                        fn ($immunization) => $immunization['primarySource'] === true && $immunization['notGiven'] === true
+                    )
+                )
             ],
             'immunizations.*.explanation.reasons.*.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/reason_explanations')
@@ -151,7 +150,6 @@ class Encounter extends Form
             'immunizations.*.manufacturer' => [$this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'],
             'immunizations.*.lotNumber' => [$this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'],
             'immunizations.*.expirationDate' => [$this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'],
-
             'immunizations.*.doseQuantity.value' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(false, false),
                 'integer'
@@ -174,11 +172,40 @@ class Encounter extends Form
             'immunizations.*.route.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/vaccination_routes')
             ],
-            'immunizations.*.vaccinationProtocols.doseSequence' => ['required', 'integer'],
-            'immunizations.*.vaccinationProtocols.authority' => ['required', 'array'],
-            'immunizations.*.vaccinationProtocols.series' => ['required', 'string'],
-            'immunizations.*.vaccinationProtocols.seriesDoses' => ['required', 'integer'],
-            'immunizations.*.vaccinationProtocols.targetDiseases' => ['required', 'array']
+            'immunizations.*.vaccinationProtocols.doseSequence' => [
+                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                'integer',
+                // Required if vaccinationProtocols.authority.coding.*.code === MoH
+                Rule::requiredIf(function () {
+                    return collect($this->immunizations)
+                        ->flatMap(fn (array $immunization) => $immunization['vaccinationProtocols'])
+                        ->flatMap(fn (array $protocol) => $protocol['authority']['coding'])
+                        ->contains(fn (array $coding) => $coding['code'] === 'MoH');
+                })
+            ],
+            'immunizations.*.vaccinationProtocols.description' => ['nullable', 'string', 'max:255'],
+            'immunizations.*.vaccinationProtocols.authority' => [
+                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                $this->requiredIfPrimarySourceAndNotGiven(false, false), 'array'
+            ],
+            'immunizations.*.vaccinationProtocols.authority.coding.*.code' => [
+                'required', 'string', new InDictionary('eHealth/vaccination_authorities')
+            ],
+            'immunizations.*.vaccinationProtocols.series' => [
+                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                'required_if:immunizations.*.vaccinationProtocols.authority.coding.*.code,MoH', 'string', 'max:255'
+            ],
+            'immunizations.*.vaccinationProtocols.seriesDoses' => [
+                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                'required_if:immunizations.*.vaccinationProtocols.authority.coding.*.code,MoH', 'integer'
+            ],
+            'immunizations.*.vaccinationProtocols.targetDiseases' => [
+                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                $this->requiredIfPrimarySourceAndNotGiven(false, false), 'array'
+            ],
+            'immunizations.*.vaccinationProtocols.targetDiseases.coding.*.code' => [
+                'required', 'string', new InDictionary('eHealth/vaccination_target_diseases')
+            ]
         ];
     }
 
@@ -321,20 +348,6 @@ class Encounter extends Form
         return Rule::requiredIf(
             fn () => collect($this->immunizations)->contains(
                 fn ($immunization) => $immunization['primarySource'] === $primarySource && $immunization['notGiven'] === $notGiven
-            )
-        );
-    }
-
-    /**
-     * Add a rule that makes the field required if primarySource and NotGiven equals false.
-     *
-     * @return ProhibitedIf
-     */
-    private function prohibitedIfPrimarySourceAndNotGivenTrue(): ProhibitedIf
-    {
-        return Rule::prohibitedIf(
-            fn () => collect($this->immunizations)->contains(
-                fn ($immunization) => $immunization['primarySource'] === true && $immunization['notGiven'] === true
             )
         );
     }

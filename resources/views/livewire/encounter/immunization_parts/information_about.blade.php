@@ -86,14 +86,14 @@
                 {{ __('patients.expiration_date') }}
             </label>
             <div class="relative flex items-center">
-                <svg width="20" height="20" class="svg-input absolute left-1 pointer-events-none">
+                <svg width="20" height="20" class="svg-input absolute left-2.5 pointer-events-none">
                     <use xlink:href="#svg-calendar-week"></use>
                 </svg>
                 <input x-model="modalImmunization.expirationDate"
                        type="text"
                        name="expirationDate"
                        id="expirationDate"
-                       class="datepicker-input input-modal"
+                       class="datepicker-input input-modal !pl-10"
                        autocomplete="off"
                        required
                 >

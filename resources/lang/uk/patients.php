@@ -143,6 +143,7 @@ return [
     'other_source' => 'Інше джерело',
     'information_source' => 'Джерело інформації',
     'new_primary_diagnose' => "Ви вказали новий основний діагноз.<br> Підтвердження дії змінить основний діагноз епізоду медичної допомоги!",
+    'duplicate_code_warning' => 'Діагноз із таким кодом вже існує',
 
     // Evidences
     'evidence_conditions' => 'Докази - стани',
@@ -171,4 +172,11 @@ return [
     'measurement_units' => 'Одиниці виміру',
     'input_route' => 'Шлях введення',
     'body_part' => 'Частина тіла',
+    'vaccination_protocol' => 'Протокол імунізації',
+    'dose_sequence' => 'Порядковий номер дози',
+    'immunization_series' => 'Етап імунізації',
+    'target_diseases' => 'Протидія загрозам',
+    'protocol_author' => 'Автор протоколу',
+    'series_of_doses_by_protocol' => 'Кількість доз по протоколу',
+    'protocol_description' => 'Опис протоколу',
 ];
