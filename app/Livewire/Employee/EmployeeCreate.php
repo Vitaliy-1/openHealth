@@ -84,6 +84,7 @@ class EmployeeCreate extends EmployeeComponent
             }
         });
 
+        dd('ok');
         session()->flash('success', __('forms.saved_successfully'));
     }
 
