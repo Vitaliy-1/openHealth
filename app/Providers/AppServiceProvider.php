@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\LegalEntityContext;
+use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,8 +15,12 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         if ($this->app->isLocal()) {
-            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+            $this->app->register(IdeHelperServiceProvider::class);
         }
+
+        $this->app->singleton(LegalEntityContext::class, function () {
+            return new LegalEntityContext();
+        });
     }
 
     /**
