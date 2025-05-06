@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Employee;
 
+use App\Livewire\Employee\Forms\Api\EmployeeRequestApi;
 use App\Models\Employee\Employee as Employee;
 
 class EmployeeEdit extends EmployeeComponent
@@ -18,7 +19,10 @@ class EmployeeEdit extends EmployeeComponent
     public function render()
     {
         $pageTitle =  __('Змінити дані по співробітнику');
-        $currentEmployee = $this->employee;
+        $currentEmployee = EmployeeRequestApi::getEmployees($this->employee->legalEntityUuid);
+
+        $pageTitle =  dd($currentEmployee[0]);
+
         return view('livewire.employee.employee-edit', compact(['pageTitle', 'currentEmployee']));
     }
 }
