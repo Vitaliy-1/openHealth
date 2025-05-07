@@ -2,15 +2,21 @@
 
 namespace App\Traits;
 
-use App\Traits\ArrayCaseCaster;
+use App\Core\ArrayCaseCaster;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 
 trait HandlesSnakeCaseForm
 {
     /**
-     * Calls validate() and transforms all keys into snake_case
      * @throws ValidationException
      */
+    public function validate($rules = null, $messages = [], $attributes = [])
+    {
+        $validated = parent::validate($rules, $messages, $attributes);
+        return Arr::snakeKeys($validated);
+    }
+
     public function validatedSnakeCase(): array
     {
         return ArrayCaseCaster::toSnakeCase($this->validate());
@@ -18,7 +24,6 @@ trait HandlesSnakeCaseForm
 
     /**
      * If only a specific key is needed
-     * @throws ValidationException
      */
     public function validatedFieldSnakeCase(string $key)
     {
