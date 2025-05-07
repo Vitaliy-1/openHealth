@@ -38,7 +38,6 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\SetLegalEntityContext::class,
             \App\Classes\eHealth\Middleware\CheckSessionToken::class,
-            \App\Http\Middleware\SetLegalEntityContext::class,
         ],
 
         'api' => [
