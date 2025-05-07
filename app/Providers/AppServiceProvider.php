@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\LegalEntity;
 use App\Services\LegalEntityContext;
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -18,9 +20,13 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(IdeHelperServiceProvider::class);
         }
 
-        $this->app->singleton(LegalEntityContext::class, function () {
-            return new LegalEntityContext();
+        $this->app->singletonIf(LegalEntity::class, function () {
+            dd(Auth::user());
+            return Auth::user()?->legalEntity;
         });
+
+        // додатково alias для зручного доступу (опційно)
+        $this->app->alias(LegalEntity::class, 'legalEntity');
     }
 
     /**
