@@ -1,7 +1,7 @@
 <div>
 
     <x-section-navigation class="breadcrumb-form">
-        <x-slot name="title">{{ __('Додати співробітника') }}</x-slot>
+        <x-slot name="title">{{ $pageTitle  }}</x-slot>
     </x-section-navigation>
 
     <section class="section-form">

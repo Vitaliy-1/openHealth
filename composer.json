@@ -8,8 +8,9 @@
         "ext-openssl": "*",
         "guzzlehttp/guzzle": "^7.9",
         "kirkbushell/eloquence": "^12.0",
-        "laravel/fortify": "^1.25",
+        "laravel/fortify": "*",
         "laravel/framework": "^12.0.1",
+        "laravel/jetstream": "^5.3",
         "laravel/tinker": "^2.10.1",
         "livewire/livewire": "^3.5",
         "spatie/laravel-permission": "^6.16"
