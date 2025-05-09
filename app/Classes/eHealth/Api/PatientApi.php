@@ -6,7 +6,7 @@ namespace App\Classes\eHealth\Api;
 
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Classes\eHealth\Request;
-use App\Enums\HttpMethod;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 
 class PatientApi
 {
@@ -21,7 +21,7 @@ class PatientApi
      */
     public static function getJobsDetailsById(string $jobId): array
     {
-        return new Request(HttpMethod::GET, "/api/jobs/$jobId", [])->sendRequest();
+        return new Request(HttpRequest::METHOD_GET, "/api/jobs/$jobId", [])->sendRequest();
     }
 
     /**
@@ -35,7 +35,7 @@ class PatientApi
     public static function createEpisode(string $patientId, array $params): array
     {
         return new Request(
-            HttpMethod::POST,
+            HttpRequest::METHOD_POST,
             self::ENDPOINT_PATIENT . "/$patientId/episodes",
             $params
         )->sendRequest();
@@ -52,16 +52,23 @@ class PatientApi
     public static function submitEncounter(string $patientId, array $params): array
     {
         return new Request(
-            HttpMethod::POST,
+            HttpRequest::METHOD_POST,
             self::ENDPOINT_PATIENT . "/$patientId/encounter_package",
             $params
         )->sendRequest();
     }
 
+    /**
+     * Get short encounter data by provided parameters.
+     *
+     * @param  string  $patientId
+     * @return array
+     * @throws ApiException
+     */
     public static function getShortEncounterBySearchParams(string $patientId): array
     {
         return new Request(
-            HttpMethod::GET,
+            HttpRequest::METHOD_GET,
             self::ENDPOINT_PATIENT . "/$patientId/summary/encounters",
             []
         )->sendRequest();
@@ -78,7 +85,7 @@ class PatientApi
     public static function getShortEpisodes(string $patientId, array $params): array
     {
         return new Request(
-            HttpMethod::GET,
+            HttpRequest::METHOD_GET,
             self::ENDPOINT_PATIENT . "/$patientId/summary/episodes",
             $params
         )->sendRequest();
@@ -95,7 +102,7 @@ class PatientApi
     public static function getEpisodeById(string $patientId, string $episodeId): array
     {
         return new Request(
-            HttpMethod::GET,
+            HttpRequest::METHOD_GET,
             self::ENDPOINT_PATIENT . "/$patientId/episodes/$episodeId",
             []
         )->sendRequest();
@@ -112,7 +119,7 @@ class PatientApi
     public static function getApprovedEpisodes(string $patientId, array $params): array
     {
         return new Request(
-            HttpMethod::GET,
+            HttpRequest::METHOD_GET,
             self::ENDPOINT_PATIENT . "/$patientId/episodes/approved",
             $params
         )->sendRequest();
@@ -130,7 +137,7 @@ class PatientApi
     public static function getEpisodeBySearchParams(string $patientId, array $params): array
     {
         return new Request(
-            HttpMethod::GET,
+            HttpRequest::METHOD_GET,
             self::ENDPOINT_PATIENT . "/$patientId/episodes",
             $params
         )->sendRequest();
@@ -147,7 +154,7 @@ class PatientApi
     public static function getActiveDiagnoses(string $patientId, array $params): array
     {
         return new Request(
-            HttpMethod::GET,
+            HttpRequest::METHOD_GET,
             self::ENDPOINT_PATIENT . "/$patientId/summary/diagnoses",
             $params
         )->sendRequest();
@@ -164,7 +171,7 @@ class PatientApi
     public static function getConditions(string $patientId, array $params): array
     {
         return new Request(
-            HttpMethod::GET,
+            HttpRequest::METHOD_GET,
             self::ENDPOINT_PATIENT . "/$patientId/conditions",
             $params
         )->sendRequest();
@@ -181,7 +188,7 @@ class PatientApi
     public static function getObservations(string $patientId, array $params): array
     {
         return new Request(
-            HttpMethod::GET,
+            HttpRequest::METHOD_GET,
             self::ENDPOINT_PATIENT . "/$patientId/summary/observations",
             $params
         )->sendRequest();

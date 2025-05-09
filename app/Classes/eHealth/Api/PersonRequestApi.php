@@ -6,7 +6,7 @@ namespace App\Classes\eHealth\Api;
 
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Classes\eHealth\Request;
-use App\Enums\HttpMethod;
+use Symfony\Component\HttpFoundation\Request as RequestHttp;
 
 class PersonRequestApi
 {
@@ -22,7 +22,7 @@ class PersonRequestApi
      */
     public static function createPersonRequest(array $params): array
     {
-        return (new Request(HttpMethod::POST, self::ENDPOINT_PERSON_REQUESTS_V2, $params))->sendRequest();
+        return new Request(RequestHttp::METHOD_POST, self::ENDPOINT_PERSON_REQUESTS_V2, $params)->sendRequest();
     }
 
     /**
@@ -35,11 +35,11 @@ class PersonRequestApi
      */
     public static function approvePersonRequest(string $personId, array $params): array
     {
-        return (new Request(
-            HttpMethod::PATCH,
+        return new Request(
+            RequestHttp::METHOD_PATCH,
             self::ENDPOINT_PERSON_REQUESTS_V2 . "/$personId/actions/approve",
             $params
-        ))->sendRequest();
+        )->sendRequest();
     }
 
     /**
@@ -52,7 +52,7 @@ class PersonRequestApi
      */
     public static function uploadFileRequest(string $url, array $params): array
     {
-        return (new Request(HttpMethod::PUT, $url, $params))->sendRequest();
+        return new Request(RequestHttp::METHOD_PUT, $url, $params)->sendRequest();
     }
 
     /**
@@ -66,11 +66,12 @@ class PersonRequestApi
      */
     public static function singPersonRequest(string $personId, array $params = [], string $mspDrfo = ''): array
     {
-        return (new Request(
-            HttpMethod::PATCH,
-            self::ENDPOINT_PERSON_REQUESTS_V2 . "/$personId/actions/sign", $params,
+        return new Request(
+            RequestHttp::METHOD_PATCH,
+            self::ENDPOINT_PERSON_REQUESTS_V2 . "/$personId/actions/sign",
+            $params,
             mspDrfo: $mspDrfo
-        ))->sendRequest();
+        )->sendRequest();
     }
 
     /**
@@ -82,7 +83,7 @@ class PersonRequestApi
      */
     public static function getCreatedPersonsList(array $params = []): array
     {
-        return (new Request(HttpMethod::GET, self::ENDPOINT_PERSON_REQUESTS, $params))->sendRequest();
+        return new Request(RequestHttp::METHOD_GET, self::ENDPOINT_PERSON_REQUESTS, $params)->sendRequest();
     }
 
     /**
@@ -94,7 +95,7 @@ class PersonRequestApi
      */
     public static function getCreatedPersonById(string $personId): array
     {
-        return (new Request(HttpMethod::GET, self::ENDPOINT_PERSON_REQUESTS_V2 . "/$personId", []))->sendRequest();
+        return new Request(RequestHttp::METHOD_GET, self::ENDPOINT_PERSON_REQUESTS_V2 . "/$personId", [])->sendRequest();
     }
 
     /**
@@ -106,11 +107,11 @@ class PersonRequestApi
      */
     public static function resendAuthorizationSms(string $personId): array
     {
-        return (new Request(
-            HttpMethod::POST,
+        return new Request(
+            RequestHttp::METHOD_POST,
             self::ENDPOINT_PERSON_REQUESTS . "/$personId/actions/resend_otp",
             []
-        ))->sendRequest();
+        )->sendRequest();
     }
 
     /**

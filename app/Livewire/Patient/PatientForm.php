@@ -214,7 +214,7 @@ class PatientForm extends Component
 
         $buildSearchRequest = PatientRequestApi::buildSearchForPerson($this->form->patientsFilter);
 
-        $this->confidantPerson = arrayKeysToCamel(PersonApi::searchForPersonByParams($buildSearchRequest));
+        $this->confidantPerson = $this->convertArrayKeysToCamelCase(PersonApi::searchForPersonByParams($buildSearchRequest));
         $this->searchPerformed = true;
     }
 
@@ -253,7 +253,7 @@ class PatientForm extends Component
             }
 
             if (isset($response['data']['person']['confidant_person'])) {
-                $response['data']['person']['confidant_person']['confidantPersonInfo'] = arrayKeysToSnake($this->confidantPerson[0]);
+                $response['data']['person']['confidant_person']['confidantPersonInfo'] = $this->convertArrayKeysToSnakeCase($this->confidantPerson[0]);
             }
             // save in DB
             $personSaved = PersonRepository::savePersonResponseData($response['data'], PersonRequest::class);
@@ -293,7 +293,7 @@ class PatientForm extends Component
         $this->validatePersonRequest(['patient', 'documents', 'documentsRelationship']);
 
         $response = PersonRepository::savePersonResponseData(
-            arrayKeysToSnake($this->form->toArray()),
+            $this->convertArrayKeysToSnakeCase($this->form->toArray()),
             PersonRequest::class
         );
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Classes\eHealth;
 
-use App\Enums\HttpMethod;
 use App\Auth\EHealth\Services\TokenStorage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
@@ -21,7 +20,7 @@ class Request
     //private bool $isApiKey;
 
     public function __construct(
-        private string|HttpMethod $method,
+        private readonly string $method,
         private string $url,
         private array $params,
         private bool $isToken = true,
@@ -77,7 +76,7 @@ class Request
         }
 
         //TODO DELETE AFTER TESTING
-        if (config('ehealth.api.key') == null && empty(config('ehealth.api.key'))) {
+        if (config('ehealth.api.key') === null && empty(config('ehealth.api.key'))) {
             $data = [
                 'method' => $this->method,
                 'url' => $this->makeApiUrl(),
