@@ -115,7 +115,8 @@ class CipherApi
 
     private function sendRequest(string $method, string $url, array $data = [], bool $isFileUpload = false)
     {
-        return (new Request($method, $url, json_encode($data), $isFileUpload))->sendRequest();
+        // return (new Request($method, $url, json_encode($data), $isFileUpload))->sendRequest();
+        return new Request($method, $url, json_encode($data))->sendRequest();
     }
 
     // Additional methods for decoding file container
@@ -198,7 +199,7 @@ class CipherApi
             // Check if key is not a personal key
             if (!$isBusinessKey) {
                 ErrorHandler::throwError([
-                    'message' => __('validation.custom.cipher.initiatorDifferBusiness'),
+                    'message' => __('validation.custom.cipher.initiator_differ_business'),
                     'failureCause' => ''
                 ]);
             }
@@ -214,7 +215,7 @@ class CipherApi
             // Check if key is a personal key
             if ($isBusinessKey) {
                 ErrorHandler::throwError([
-                    'message' => __('validation.custom.cipher.initiatorDifferPerson'),
+                    'message' => __('validation.custom.cipher.initiator_differ_person'),
                     'failureCause' => ''
                 ]);
             }

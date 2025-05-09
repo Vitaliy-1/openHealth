@@ -10,7 +10,11 @@
 <fieldset
     class="fieldset"
     xmlns="http://www.w3.org/1999/html"
-    x-data="{ title: '{{ __('forms.licenses') }}', index: 6 }"
+    x-data="{
+        title: '{{ __('forms.licenses') }}',
+        index: 6,
+        isDisabled: @json($isEdit)
+    }"
     x-init="typeof addHeader !== 'undefined' && addHeader(title, index)"
     x-show="activeStep === index || isEdit"
     x-cloak
@@ -28,6 +32,8 @@
                 wire:model.defer="legalEntityForm.license.type"
                 aria-describedby="{{ $hasLicenseTypeError ? 'licenseTypeErrorHelp' : '' }}"
                 class="input-select text-gray-800 {{ $hasLicenseTypeError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             >
                 <option value="_placeholder_" selected hidden>-- {{ __('forms.select') }} --</option>
 
@@ -56,6 +62,8 @@
                 id="licenseNumber"
                 wire:model="legalEntityForm.license.licenseNumber"
                 class="input peer"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             />
 
             <label for="licenseNumber" class="label z-10">
@@ -72,6 +80,8 @@
                 wire:model="legalEntityForm.license.issuedBy"
                 aria-describedby="{{ $hasLicenseIssuedByError ? 'licenseIssuedByErrorHelp' : '' }}"
                 class="input {{ $hasLicenseIssuedByError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             />
 
             @if($hasLicenseIssuedByError)
@@ -98,6 +108,8 @@
                 wire:model="legalEntityForm.license.issuedDate"
                 aria-describedby="{{ $hasLicenseIssuedDateError ? 'licenseIssuedDateErrorHelp' : '' }}"
                 class="input datepicker-input {{ $hasLicenseIssuedDateError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             />
 
             @if($hasLicenseIssuedDateError)
@@ -124,6 +136,8 @@
                 wire:model="legalEntityForm.license.activeFromDate"
                 aria-describedby="{{ $hasLicenseActiveFromDateError ? 'licenseActiveFromDateErrorHelp' : '' }}"
                 class="input datepicker-input {{ $hasLicenseActiveFromDateError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             />
 
             @if($hasLicenseActiveFromDateError)
@@ -149,6 +163,8 @@
                 wire:model="legalEntityForm.license.expiryDate"
                 class="input datepicker-input peer"
                 aria-describedby="{{ $hasLicenseExpirationDateError ? 'licenseExpirationDateErrorHelp' : '' }}"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             />
 
             @if($hasLicenseExpirationDateError)
@@ -169,6 +185,8 @@
                 id="licenseWhatLicensed"
                 wire:model="legalEntityForm.license.whatLicensed"
                 class="input peer"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             />
 
             <label for="licenseWhatLicensed" class="label z-10">
@@ -185,6 +203,8 @@
                 wire:model="legalEntityForm.license.orderNo"
                 aria-describedby="{{ $hasLicenseOrderNumberError ? 'licenseOrderNumberErrorHelp' : '' }}"
                 class="input {{ $hasLicenseOrderNumberError ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             />
 
             @if($hasLicenseOrderNumberError)

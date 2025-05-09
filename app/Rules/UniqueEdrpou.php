@@ -38,9 +38,10 @@ class UniqueEdrpou implements ValidationRule
                 $query->where('id', '<>', $this->legalEntityId); //Exclude the current entity
             })
             ->exists();
+
         // If it exists, fail the validation
         if ($exists) {
-            $fail('Поле :attribute вже зареєстровано в системі.'); // Message for validation
+            $fail(__('validation.custom.unique_edrpou')); // Message for validation
         }
     }
 }

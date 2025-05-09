@@ -2,22 +2,18 @@
 
 namespace App\Classes\eHealth\Middleware;
 
-use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealth;
-use App\Classes\eHealth\Api\oAuthEhealth\oAuthEhealthInterface;
-use Carbon\Carbon;
 use Closure;
+use Carbon\Carbon;
+use App\Auth\EHealth\Services\TokenStorage;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 
 class CheckSessionToken
 {
+    protected  TokenStorage $tokenStorage;
 
-
-    protected  oAuthEhealth $oauthEhealth;
-
-    public function __construct(oAuthEhealth $oauthEhealth )
+    public function __construct(TokenStorage $tokenStorage)
     {
-        $this->oauthEhealth = $oauthEhealth;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -29,20 +25,25 @@ class CheckSessionToken
      */
     public function handle($request, Closure $next)
     {
+        $tokenExpiresAt = $this->tokenStorage->getExpiresAt();
 
         // Check if the auth token and its expiration time exist
-        if (Auth::check() && Session::has('auth_token') && Session::has('auth_token_expires_at')) {
-            $expiresAt = Carbon::parse(Session::get('auth_token_expires_at'));
+        if (Auth::check() && $this->tokenStorage->hasBearerToken() && $tokenExpiresAt) {
+            $expiresTime = Carbon::parse($tokenExpiresAt);
+
             // If the token has expired, try to refresh it using the refresh token
-            if (Carbon::now()->greaterThanOrEqualTo($expiresAt)) {
-                if (Session::has('refresh_token')) {
-                    $newTokenData = $this->oauthEhealth->refreshAuthToken();
+            if (Carbon::now()->greaterThanOrEqualTo($expiresTime)) {
+                if ($this->tokenStorage->getRefreshToken()) {
+                    $newTokenData = $this->tokenStorage->refreshBearerToken();
+
                     if (!$newTokenData) {
-                        Auth::guard('web')->logout();
-                        return redirect()->route('login')->withErrors('Session expired, please log in again.');                    } else {
+                        Auth::logout();
+
+                        return redirect()->route('login')->withErrors('Session expired, please log in again.');
                     }
                 } else {
-                    Auth::guard('web')->logout();
+                    Auth::logout();
+
                     return redirect()->route('login')->withErrors('Session expired, please log in again.');
                 }
             }
@@ -50,5 +51,4 @@ class CheckSessionToken
 
         return $next($request);
     }
-
 }

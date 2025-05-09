@@ -19,7 +19,7 @@ use App\Repositories\PhoneRepository;
 use Illuminate\Support\Facades\Session;
 use App\Repositories\AddressRepository;
 use App\Classes\eHealth\Api\EmployeeApi;
-use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Models\Employee\EmployeeRequest;
 use App\Repositories\EmployeeRepository;
 use Illuminate\Validation\ValidationException;
@@ -527,7 +527,7 @@ class LegalEntity extends Component
                 }
             });
 
-            app(LogoutController::class)->logout(request(), false);
+            app(LoginController::class)->logout(request(), false);
 
             return $this->redirect('/login', navigate: true);
         } catch (Exception $err) {

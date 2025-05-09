@@ -1,4 +1,6 @@
 <x-guest-layout>
+    <x-messages />
+
     <x-authentication-card>
         <x-slot name="logo">
             <x-authentication-card-logo />
@@ -6,11 +8,7 @@
         <x-auth.title>
             <x-slot name="title">{{ __('Вхід') }}</x-slot>
         </x-auth.title>
-        @if (session('status'))
-            <x-message.successes>
-                <x-slot name="status">{{ session('status') }}</x-slot>
-            </x-message.successes>
-        @endif
+
         <form
             x-data="{ is_ehealth_auth: true }"
             autocomplete="off"

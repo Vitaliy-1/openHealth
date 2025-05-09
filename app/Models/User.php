@@ -2,22 +2,23 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
-use App\Models\Employee\EmployeeRequest;
-use App\Models\Person\Person;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Laravel\Fortify\TwoFactorAuthenticatable;
+use App\Models\Person\Person;
+use App\Models\Employee\Employee;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Collection;
 use Laravel\Jetstream\HasProfilePhoto;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Employee\EmployeeRequest;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * @mixin IdeHelperUser
@@ -101,6 +102,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->legalEntity->client_id ?? false;
     }
 
+    // TODO: Check why need it for??????
     public function licenses(): HasMany
     {
         return $this->hasMany(License::class, 'legal_entity_id', 'legal_entity_id');
@@ -111,6 +113,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(EmployeeRequest::class);
     }
 
+    public function employees(): HasMany
+    {
+        return $this->hasMany(Employee::class);
+    }
+
     /**
      * Overides trait's method to exclude unused scopes
      * @return Collection<Permission> a list of scopes associated with the user and entity type
@@ -118,12 +125,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getAllPermissions(): Collection
     {
         $scopes = $this->getAllPermissionsTrait();
+
         $legalEntityType = $this->legalEntity->type;
+
         $exclude = []; // exclude scopes not used by the entity
+
         switch ($legalEntityType) {
 
             case LegalEntity::TYPE_PRIMARY_CARE:
-                $exclude = array_merge($exclude, ['contract:', 'contract_request:']);
+                $exclude = array_merge($exclude, ['contract_request:sign', 'contract_request:terminate', 'contract:write', 'contract_request:approve', 'contract_request:create']);
                 break;
         }
 
@@ -142,5 +152,23 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getScopes(): string
     {
         return $this->getAllPermissions()->unique()->pluck('name')->join(' ');
+    }
+
+    /**
+     * Get email verified at timestamp in camelCase
+     *
+     * @return mixed
+     */
+    public function getEmailVerifiedAtAttribute()
+    {
+        return $this->attributes['email_verified_at'];
+    }
+
+    /**
+     * Scope a query to get an user depends on email and LegalEntity ID's
+     */
+    public function scopeByEmailAndLegalEntity(Builder $query, string $email, int $legalEntityID): void
+    {
+        $query->where('email', $email)->where('legal_entity_id', $legalEntityID);
     }
 }

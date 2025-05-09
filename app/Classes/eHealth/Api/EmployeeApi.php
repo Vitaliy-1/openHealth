@@ -2,11 +2,13 @@
 
 namespace App\Classes\eHealth\Api;
 
+use App\Models\User;
 use App\Classes\eHealth\Request;
+use Illuminate\Support\Facades\Redirect;
+use App\Classes\eHealth\Exceptions\ApiException;
 
 class EmployeeApi
 {
-
     public const URL_REQUEST = '/api/employee_requests';
     public const URL_REQUEST_MIS = '/api/mis/employee_requests';
     public const URL_REQUEST_V2 = '/api/v2/employee_requests';
@@ -15,40 +17,143 @@ class EmployeeApi
 
     public static function _get($params): array
     {
-        return (new Request('GET', self::URL, $params))->sendRequest();
+        return new Request('GET', self::URL, $params)->sendRequest();
     }
 
     public static function _create($params = []): array
     {
-        return (new Request('POST', self::URL_REQUEST_V2, $params))->sendRequest();
+        return new Request('POST', self::URL_REQUEST_V2, $params)->sendRequest();
     }
 
 
     public static function _dismissed($id): array
     {
-        return (new Request('POST', self::URL.'/'.$id.'/actions/deactivate', []))->sendRequest();
+        return new Request('POST', self::URL.'/'.$id.'/actions/deactivate', [])->sendRequest();
     }
 
     public static function _getById($id)
     {
-        return (new Request('GET', self::URL.'/'.$id, []))->sendRequest();
+        return new Request('GET', self::URL.'/'.$id, [])->sendRequest();
     }
 
     public static function _getRequestList($data): array
     {
-        return (new Request('GET', self::URL_REQUEST, $data))->sendRequest();
+        return new Request('GET', self::URL_REQUEST, $data)->sendRequest();
     }
 
     public static function _getRequestById($id): array
     {
-        return (new Request('GET', self::URL_REQUEST.'/'.$id, []))->sendRequest();
+        return new Request('GET', self::URL_REQUEST.'/'.$id, [])->sendRequest();
     }
 
     public static function _getRequestByIdMis($id): array
     {
-        return (new Request('GET', self::URL_REQUEST_MIS.'/'.$id, []))->sendRequest();
+        return new Request('GET', self::URL_REQUEST_MIS.'/'.$id, [])->sendRequest();
     }
 
+    public function getApikey(): string
+    {
+        return config('ehealth.api.api_key');
+    }
+
+    /**
+     * Authenticate user with eHealth
+     *
+     * @param string $code
+     *
+     * @return mixed
+     */
+    public static function authenticate(string $code): mixed
+    {
+        $user = User::find(\session()->get(config('ehealth.api.auth_ehealth')));
+
+        if (!$user) {
+            return Redirect::route('login')->with('error', __('auth.login.error.user_identity'));
+        }
+
+        $data = [
+            'token' => [
+                'client_id'     => $user->legalEntity->client_id ?? '',
+                'client_secret' => $user->legalEntity->client_secret ?? '',
+                'grant_type'    => 'authorization_code',
+                'code'          => $code,
+                'redirect_uri'  => config('ehealth.api.redirect_uri'),
+                'scope'         => $user->getScopes()
+            ]
+        ];
+
+        return new Request('POST', config('ehealth.api.oauth.tokens'), $data, false)->sendRequest();
+    }
+
+    /**
+     * @throws ApiException
+     */
+    public static function getUserDetails(): array
+    {
+        return new Request('GET', config('ehealth.api.oauth.user'), [])->sendRequest();
+    }
+
+    /**
+     * Get all Employee data list for specified LegalEntity (by it's UUID)
+     *
+     * @param string $legalEntityUuid
+     *
+     * @return array
+     */
+    public static function getEmployeesList(string $legalEntityUuid):array
+    {
+        $baseUrl = config('ehealth.api.domain');
+
+        // Base query parameters
+        $queryParams = [
+            'legal_entity_id' => $legalEntityUuid,
+            'page'          => 1,
+            'per_page'      => 100
+        ];
+
+        // Build the full URL with query parameters
+        $url = $baseUrl . '/api/employees?' . http_build_query($queryParams);
+
+        $request = new Request('GET', $url, [])->sendRequest();
+
+        // Here is moving the OWNER data to the top of the array. This need for properly creating Legal Entity employees workflow.
+        if (count($request) > 1) {
+            $ownerIndex = array_search('OWNER', array_column($request, 'employee_type'));
+            $tmp = $request[$ownerIndex];
+            $request[$ownerIndex] = $request[0];
+            $request[0] = $tmp;
+        }
+
+        return $request;
+    }
+
+    /**
+     * Retrieve Employee Details by it's uuid
+     *
+     * @param string $employeeId
+     *
+     * @return array
+     */
+    public static function getEmployeeData(string $employeeId): array
+    {
+        $url = config('ehealth.api.domain') . "/api/employees/$employeeId";
+
+        return new Request('GET', $url, [])->sendRequest();
+    }
+
+    /**
+     * Retrieve EmployeeRequest Details by it's uuid
+     *
+     * @param string $employeeId
+     *
+     * @return array
+     */
+    public static function getEmployeeRequeestData(string $requestId): array
+    {
+        $url = config('ehealth.api.domain') . "/api/employee_requests/$requestId";
+
+        return new Request('GET', $url, [])->sendRequest();
+    }
 
     public static function schemaRequest(): array
     {
@@ -592,5 +697,4 @@ class EmployeeApi
             ]
         ];
     }
-
 }

@@ -6,20 +6,21 @@ namespace App\Models\Employee;
 
 use App\Models\User;
 use App\Enums\Status;
-use App\Models\Declaration;
 use App\Models\Division;
+use App\Models\Declaration;
 use App\Models\LegalEntity;
-use App\Models\Relations\Education;
 use App\Models\Relations\Party;
+use App\Models\Relations\Education;
+use App\Models\Relations\Speciality;
 use App\Models\Relations\Qualification;
 use App\Models\Relations\ScienceDegree;
-use App\Models\Relations\Speciality;
 use Illuminate\Database\Eloquent\Model;
 use Eloquence\Behaviours\HasCamelCasing;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @mixin IdeHelperBaseEmployee
@@ -40,7 +41,8 @@ class BaseEmployee extends Model
         'end_date',
         'party_id',
         'employee_type',
-        'user_id'
+        'user_id',
+        'division_id'
     ];
 
     protected $casts = [
@@ -151,5 +153,27 @@ class BaseEmployee extends Model
         $employeeData->documents = $employeeData->party->documents()->get()->toArray() ?? [];
 
         return $employeeData->toArray();
+    }
+
+    /**
+     * Scope a query to get an employee data depends on user id and it's legal entity relation
+     *
+     * @param Builder $query
+     * @param int $userId User's ID from MIS DB table 'users'
+     * @param string $legalEntityUUID UUID of the LegalEntity when user (with $userId) is belongs to
+     * @param array $roles Specify ROLEs that shouldn't be inclued in query
+     *
+     * @return void
+     */
+    public function scopeEmployeeInstance(Builder $query, int $userId, string $legalEntityUUID, array $roles, bool $isInclude = false): void
+    {
+        $query->where('user_id', $userId)
+            ->where('legal_entity_uuid', $legalEntityUUID);
+
+            if ($isInclude) {
+                $query->whereIn('employee_type', $roles);
+            } else {
+                $query->whereNotIn('employee_type', $roles);
+            }
     }
 }

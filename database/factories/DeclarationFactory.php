@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 use App\Models\Declaration;
-use App\Models\Employee;
+use App\Models\Employee\Employee;
 use App\Models\LegalEntity;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
