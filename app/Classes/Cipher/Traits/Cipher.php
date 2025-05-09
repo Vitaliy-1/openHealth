@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Classes\Cipher\Traits;
 
 use App\Classes\Cipher\Api\CipherApi;
@@ -7,6 +9,7 @@ use App\Classes\Cipher\Exceptions\ApiException;
 use App\Classes\Cipher\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 trait Cipher
 {
@@ -51,7 +54,7 @@ trait Cipher
     ): string|array {
         $this->validate($this->rules());
 
-        return (new CipherApi())->sendSession(
+        return new CipherApi()->sendSession(
             json_encode($data),
             $this->password,
             $this->convertFileToBase64(),
@@ -74,6 +77,7 @@ trait Cipher
 
             if ($filePath) {
                 $fileContents = file_get_contents(storage_path('app/public/' . $filePath));
+
                 if ($fileContents !== false) {
                     $base64Content = base64_encode($fileContents);
                     Storage::disk('public')->delete($filePath);
@@ -95,10 +99,10 @@ trait Cipher
     public function getCertificateAuthority(): array
     {
         if (!Cache::has('knedp_certificate_authority')) {
-            $data = (new Request('get', '/certificateAuthority/supported', ''))->sendRequest();
+            $data = new Request('get', '/certificateAuthority/supported', '')->sendRequest();
 
             if ($data === false) {
-                throw new \RuntimeException('Failed to fetch data from the API.');
+                throw new RuntimeException('Failed to fetch data from the API.');
             }
 
             $this->getCertificateAuthority = Cache::put('knedp_certificate_authority', $data['ca'], now()->addDays(7));
