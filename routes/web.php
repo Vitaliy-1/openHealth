@@ -15,6 +15,7 @@ use App\Livewire\Employee\EmployeeCreate;
 use App\Livewire\Employee\EmployeeEdit;
 use App\Livewire\Employee\EmployeeIndex;
 use App\Livewire\Encounter\EncounterCreate;
+use App\Livewire\Encounter\EncounterEdit;
 use App\Livewire\LegalEntity\CreateLegalEntity;
 use App\Livewire\LegalEntity\EditLegalEntity;
 use App\Livewire\License\Forms\CreateNewLicense;
@@ -89,8 +90,8 @@ Route::middleware(['auth:web,ehealth'])->group(function () {
         });
     });
 
-    Route::group(['middleware' => ['role:OWNER|ADMIN|DOCTOR']], function () {
-        Route::prefix('patient')->group(function () {
+    Route::group(['middleware' => ['role:OWNER|ADMIN|DOCTOR']], static function () {
+        Route::prefix('patient')->group(static function () {
             Route::get('/', PatientIndex::class)->name('patient.index');
             Route::get('/create/{id?}', PatientForm::class)->name('patient.form');
             Route::get('/{id}/patient-data', PatientData::class)->name('patient.patient-data');
@@ -98,7 +99,7 @@ Route::middleware(['auth:web,ehealth'])->group(function () {
             Route::get('/{id}/episodes', PatientEpisodes::class)->name('patient.episodes');
 
             Route::get('/{patientId}/encounter/create', EncounterCreate::class)->name('encounter.create');
-            Route::get('/{patientId}/encounter/{encounterId}', EncounterCreate::class)->name('encounter.edit');
+            Route::get('/{patientId}/encounter/{encounterId}', EncounterEdit::class)->name('encounter.edit');
         });
     });
 

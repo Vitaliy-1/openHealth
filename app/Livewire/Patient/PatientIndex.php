@@ -120,7 +120,7 @@ class PatientIndex extends Component
      */
     public function redirectToEncounter(array $patientData): void
     {
-        $this->handleRedirect($patientData, 'encounter.form');
+        $this->handleRedirect($patientData, 'encounter.create');
     }
 
     /**
@@ -166,7 +166,7 @@ class PatientIndex extends Component
             $person = $this->storeNewPerson($originalPatientData);
         }
 
-        $this->redirectRoute($routeName, ['id' => $person->id]);
+        $this->redirectRoute($routeName, ['patientId' => $person->id] ?? null);
     }
 
     /**

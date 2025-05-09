@@ -6,7 +6,7 @@ namespace App\Classes\eHealth\Api;
 
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Classes\eHealth\Request;
-use App\Enums\HttpMethod;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 
 class PersonApi
 {
@@ -21,7 +21,7 @@ class PersonApi
      */
     public static function searchForPersonByParams(array $params = []): array
     {
-        return new Request(HttpMethod::GET, self::ENDPOINT_PERSON, $params)->sendRequest();
+        return new Request(HttpRequest::METHOD_GET, self::ENDPOINT_PERSON, $params)->sendRequest();
     }
 
     /**
@@ -33,7 +33,7 @@ class PersonApi
      */
     public static function getPersonVerificationDetails(string $personId): array
     {
-        return new Request(HttpMethod::GET, self::ENDPOINT_PERSON . "/$personId/verification", [])->sendRequest();
+        return new Request(HttpRequest::METHOD_GET, self::ENDPOINT_PERSON . "/$personId/verification", [])->sendRequest();
     }
 
     /**
@@ -47,7 +47,7 @@ class PersonApi
     public static function getConfidantPersonRelationships(string $personId, array $params): array
     {
         return new Request(
-            HttpMethod::GET,
+            HttpRequest::METHOD_GET,
             self::ENDPOINT_PERSON . "/$personId/confidant_person_relationships",
             $params
         )->sendRequest();
@@ -63,7 +63,7 @@ class PersonApi
     public static function getAuthenticationMethods(string $personId): array
     {
         return new Request(
-            HttpMethod::GET,
+            HttpRequest::METHOD_GET,
             self::ENDPOINT_PERSON . "/$personId/authentication_methods",
             []
         )->sendRequest();
@@ -79,7 +79,7 @@ class PersonApi
     public static function createConfidantRelationship(string $personId): array
     {
         return new Request(
-            HttpMethod::POST,
+            HttpRequest::METHOD_POST,
             self::ENDPOINT_PERSON . "/$personId/confidant_person_relationship_requests",
             []
         )->sendRequest();

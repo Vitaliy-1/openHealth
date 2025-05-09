@@ -6,7 +6,7 @@ namespace App\Classes\eHealth\Api;
 
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Classes\eHealth\Request;
-use App\Enums\HttpMethod;
+use Symfony\Component\HttpFoundation\Request as RequestHttp;
 
 class ServiceRequestApi
 {
@@ -21,6 +21,6 @@ class ServiceRequestApi
      */
     public static function searchForServiceRequestsByParams(array $params): array
     {
-        return new Request(HttpMethod::GET, self::ENDPOINT_SERVICE_REQUESTS, $params)->sendRequest();
+        return new Request(RequestHttp::METHOD_GET, self::ENDPOINT_SERVICE_REQUESTS, $params)->sendRequest();
     }
 }
