@@ -81,35 +81,45 @@
                                 </svg>
                             </button>
 
-                            <div class="absolute" style="left: 50%">
-                                <div
-                                    x-ref="panel"
-                                    x-show="openDropdown"
-                                    x-transition.origin.top.left
-                                    @click.outside="close($refs.button)"
-                                    :id="$id('dropdown-button')"
-                                    x-cloak
-                                    class="dropdown-panel relative"
-                                    style="left: -50%"
-                                >
-                                    <button @click="
-                                                    openModal = true;
-                                                    item = index;
-                                                    modalEducation = new Education(education);
-                                                    newEducation = false;
-                                                    close($refs.button);
-                                                "
+                            <div class="relative">
+                                <div class="absolute top-0 left-0 right-0 z-10 bg-white shadow-lg">
+                                    <div
+                                        x-ref="panel"
+                                        x-show="openDropdown"
+                                        x-transition:enter="transition transform duration-300 ease-out"
+                                        x-transition:enter-start="opacity-0 translate-y-2"
+                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                        x-transition:leave="transition transform duration-200 ease-in"
+                                        x-transition:leave-start="opacity-100 translate-y-0"
+                                        x-transition:leave-end="opacity-0 translate-y-2"
+                                        @click.outside="close($refs.button)"
+                                        :id="$id('dropdown-button')"
+                                        x-cloak
+                                        class="dropdown-panel relative"
+                                        style="top: -100%; left: 50%; transform: translateX(-50%);"
+                                    >
+                                        <button
+                                            @click="
+                    openModal = true;
+                    item = index;
+                    modalEducation = new Education(education);
+                    newEducation = false;
+                    close($refs.button);
+                "
                                             @click.prevent
                                             class="dropdown-button"
-                                    >
-                                        {{__('forms.edit')}}
-                                    </button>
+                                        >
+                                            {{ __('forms.edit') }}
+                                        </button>
 
-                                    <button @click="educations.splice(index, 1); close($refs.button)"
+                                        <button
+                                            @click="educations.splice(index, 1); close($refs.button)"
                                             @click.prevent
-                                            class="dropdown-button dropdown-delete">
-                                        {{__('forms.delete')}}
-                                    </button>
+                                            class="dropdown-button dropdown-delete"
+                                        >
+                                            {{ __('forms.delete') }}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
