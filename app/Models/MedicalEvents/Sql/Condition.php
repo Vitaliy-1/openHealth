@@ -4,15 +4,22 @@ declare(strict_types=1);
 
 namespace App\Models\MedicalEvents\Sql;
 
+use Eloquence\Behaviours\HasCamelCasing;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @mixin IdeHelperCondition
  */
 class Condition extends Model
 {
+    use HasCamelCasing;
+
     protected $guarded = [];
+
+    protected $appends = ['evidences'];
 
     protected $hidden = [
         'id',
@@ -54,5 +61,23 @@ class Condition extends Model
     public function severity(): BelongsTo
     {
         return $this->belongsTo(CodeableConcept::class, 'severity_id');
+    }
+
+    public function evidencesRelation(): HasMany
+    {
+        return $this->hasMany(ConditionEvidence::class, 'condition_id');
+    }
+
+    public function evidences(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => [
+                'codes' => $this->evidencesRelation()
+                    ->with(['codes.coding'])
+                    ->get()
+                    ->map(fn (ConditionEvidence $evidence) => $evidence->codes->toArray())
+                    ->toArray()
+            ]
+        );
     }
 }

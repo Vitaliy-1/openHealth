@@ -7,6 +7,7 @@ namespace App\Repositories\MedicalEvents;
 use App\Classes\eHealth\Api\PatientApi;
 use App\Models\Employee\Employee;
 use App\Models\MedicalEvents\Sql\EncounterDiagnose;
+use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -43,24 +44,26 @@ class EncounterRepository extends BaseRepository
     public function store(array $encounterData, array $episodeData, int $personId): false|int
     {
         return DB::transaction(function () use ($encounterData, $episodeData, $personId) {
-            $repository = new Repository();
-
             try {
-                $visit = $repository::identifier()->store($encounterData['visit']['identifier']['value']);
+                $visit = Repository::identifier()->store($encounterData['visit']['identifier']['value']);
+                Repository::codeableConcept()->attach($visit, $encounterData['visit']);
 
-                $episode = $repository::identifier()->store($encounterData['episode']['identifier']['value']);
+                $episode = Repository::identifier()->store($encounterData['episode']['identifier']['value']);
+                Repository::codeableConcept()->attach($episode, $encounterData['episode']);
 
-                $class = $repository::coding()->store($encounterData['class']);
+                $class = Repository::coding()->store($encounterData['class']);
 
-                $type = $repository::codeableConcept()->store($encounterData['type']);
+                $type = Repository::codeableConcept()->store($encounterData['type']);
 
                 if (isset($encounterData['priority'])) {
-                    $priority = $repository::codeableConcept()->store($encounterData['priority']);
+                    $priority = Repository::codeableConcept()->store($encounterData['priority']);
                 }
 
-                $performer = $repository::identifier()->store($encounterData['performer']['identifier']['value']);
+                $performer = Repository::identifier()->store($encounterData['performer']['identifier']['value']);
+                Repository::codeableConcept()->attach($performer, $encounterData['performer']);
 
-                $division = $repository::identifier()->store($encounterData['division']['identifier']['value']);
+                $division = Repository::identifier()->store($encounterData['division']['identifier']['value']);
+                Repository::codeableConcept()->attach($division, $encounterData['division']);
 
                 $encounter = $this->model::create([
                     'person_id' => $personId,
@@ -80,18 +83,12 @@ class EncounterRepository extends BaseRepository
                     'end' => $encounterData['period']['end']
                 ]);
 
-                $repository::codeableConcept()->attach($visit, $encounterData['visit']);
-
-                $repository::codeableConcept()->attach($episode, $encounterData['episode']);
-
-                $repository::episode()->store($episodeData, $encounter->id);
-
-                $repository::codeableConcept()->attach($performer, $encounterData['performer']);
+                Repository::episode()->store($episodeData, $encounter->id);
 
                 $reasonIds = [];
 
                 foreach ($encounterData['reasons'] as $reasonData) {
-                    $reason = $repository::codeableConcept()->store($reasonData);
+                    $reason = Repository::codeableConcept()->store($reasonData);
 
                     $reasonIds[] = $reason->id;
                 }
@@ -99,10 +96,10 @@ class EncounterRepository extends BaseRepository
                 $encounter->reasons()->attach($reasonIds);
 
                 foreach ($encounterData['diagnoses'] as $diagnoseData) {
-                    $condition = $repository::identifier()->store($diagnoseData['condition']['identifier']['value']);
-                    $repository::codeableConcept()->attach($condition, $diagnoseData['condition']);
+                    $condition = Repository::identifier()->store($diagnoseData['condition']['identifier']['value']);
+                    Repository::codeableConcept()->attach($condition, $diagnoseData['condition']);
 
-                    $role = $repository::codeableConcept()->store($diagnoseData['role']);
+                    $role = Repository::codeableConcept()->store($diagnoseData['role']);
 
                     EncounterDiagnose::create([
                         'encounter_id' => $encounter->id,
@@ -115,14 +112,12 @@ class EncounterRepository extends BaseRepository
                 $actionIds = [];
 
                 foreach ($encounterData['actions'] as $actionData) {
-                    $action = $repository::codeableConcept()->store($actionData);
+                    $action = Repository::codeableConcept()->store($actionData);
 
                     $actionIds[] = $action->id;
                 }
 
                 $encounter->actions()->attach($actionIds);
-
-                $repository::codeableConcept()->attach($division, $encounterData['division']);
 
                 return $encounter->id;
             } catch (Exception $e) {
@@ -138,12 +133,12 @@ class EncounterRepository extends BaseRepository
     }
 
     /**
-     * Get encounter data that is related to the patient.
+     * Get encounter data by encounter ID form URL.
      *
-     * @param  int  $patientId
+     * @param  int  $encounterId
      * @return array
      */
-    public function get(int $patientId): array
+    public function get(int $encounterId): array
     {
         return $this->model::with([
             'period',
@@ -158,8 +153,9 @@ class EncounterRepository extends BaseRepository
             'actions.coding',
             'division'
         ])
-            ->where('person_id', $patientId)
-            ->first()?->toArray();
+            ->where('id', $encounterId)
+            ->first()
+            ?->toArray();
     }
 
     /**
@@ -225,6 +221,7 @@ class EncounterRepository extends BaseRepository
         $normalizedData = schemaService()
             ->setDataSchema($episode, app(PatientApi::class))
             ->requestSchemaNormalize('schemaEpisodeRequest')
+            ->camelCaseKeys()
             ->getNormalizedData();
 
         return ['episode' => $normalizedData];
@@ -280,7 +277,38 @@ class EncounterRepository extends BaseRepository
         return schemaService()
             ->setDataSchema(['conditions' => $conditionForm], app(PatientApi::class))
             ->requestSchemaNormalize()
+            ->camelCaseKeys()
             ->getNormalizedData();
+    }
+
+    /**
+     * Formatting conditions for showing in frontend.
+     *
+     * @param  array  $conditions
+     * @param  array  $diagnoses
+     * @return array
+     */
+    public function formatConditions(array $conditions, array $diagnoses): array
+    {
+        return collect($conditions)
+            ->map(function (array $condition, int $index) use ($diagnoses) {
+                // add diagnoses array to conditions
+                if (isset($diagnoses[$index])) {
+                    $condition['diagnoses'] = $diagnoses[$index];
+                }
+
+                $originalOnsetDate = $condition['onsetDate'];
+                $originalAssertedDate = $condition['assertedDate'];
+
+                // set date
+                $condition['onsetDate'] = CarbonImmutable::parse($originalOnsetDate)->format('Y-m-d');
+                $condition['onsetTime'] = CarbonImmutable::parse($originalOnsetDate)->format('H:i');
+                $condition['assertedDate'] = CarbonImmutable::parse($originalAssertedDate)->format('Y-m-d');
+                $condition['assertedTime'] = CarbonImmutable::parse($originalAssertedDate)->format('H:i');
+
+                return $condition;
+            })
+            ->toArray();
     }
 
     /**
@@ -318,6 +346,10 @@ class EncounterRepository extends BaseRepository
                 unset($immunization['explanation']['reasonsNotGiven']);
             }
 
+            if (is_null($immunization['doseQuantity']['value'])) {
+                unset($immunization['doseQuantity']);
+            }
+
             $immunization['date'] = convertToISO8601($immunization['date'] . $immunization['time']);
             unset($immunization['time']);
 
@@ -331,6 +363,7 @@ class EncounterRepository extends BaseRepository
         return schemaService()
             ->setDataSchema(['immunizations' => $immunizationForm], app(PatientApi::class))
             ->requestSchemaNormalize()
+            ->camelCaseKeys()
             ->getNormalizedData();
     }
 

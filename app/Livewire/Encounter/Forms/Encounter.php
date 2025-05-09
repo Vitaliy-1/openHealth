@@ -10,8 +10,8 @@ use App\Rules\InDictionary;
 use App\Rules\OnlyOnePrimaryDiagnosis;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ConditionalRules;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\ValidationException;
 use Livewire\Form;
 
@@ -109,8 +109,8 @@ class Encounter extends Form
             ],
             'conditions.*.onsetDate' => ['required', 'before:tomorrow', 'date'],
             'conditions.*.assertedDate' => ['nullable', 'before:tomorrow', 'date'],
-            'conditions.*.evidences.*.codes.*.coding.*.code' => [
-                'nullable', 'string', new InDictionary('eHealth/condition_codes')
+            'conditions.*.evidences.codes.*.coding.*.code' => [
+                'nullable', 'string', new InDictionary('eHealth/ICPC2/reasons')
             ],
 
             'immunizations.*.primarySource' => ['required', 'boolean'],
@@ -124,7 +124,7 @@ class Encounter extends Form
             'immunizations.*.reportOrigin.coding.*.code' => [
                 'string', new InDictionary('eHealth/immunization_report_origins')
             ],
-            'immunizations.*.notGiven' => ['declined_if:immunizations.*.primarySource,false', 'boolean'],
+            'immunizations.*.notGiven' => ['required', 'boolean'],
             'immunizations.*.explanation.reasonsNotGiven' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, true), 'prohibited_if:immunizations.*.notGiven,false', 'array'
             ],
@@ -166,11 +166,11 @@ class Encounter extends Form
                 $this->requiredIfPrimarySourceAndNotGiven(true, false), 'array'
             ],
             'immunizations.*.site.coding.*.code' => [
-                'required', 'string', new InDictionary('eHealth/immunization_body_sites')
+                'nullable', 'string', new InDictionary('eHealth/immunization_body_sites')
             ],
             'immunizations.*.route' => [$this->requiredIfPrimarySourceAndNotGiven(true, false), 'array'],
             'immunizations.*.route.coding.*.code' => [
-                'required', 'string', new InDictionary('eHealth/vaccination_routes')
+                'nullable', 'string', new InDictionary('eHealth/vaccination_routes')
             ],
             'immunizations.*.vaccinationProtocols.doseSequence' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(true, true),
@@ -341,14 +341,13 @@ class Encounter extends Form
      *
      * @param  bool  $primarySource
      * @param  bool  $notGiven
-     * @return RequiredIf
+     * @return ConditionalRules
      */
-    private function requiredIfPrimarySourceAndNotGiven(bool $primarySource, bool $notGiven): RequiredIf
+    private function requiredIfPrimarySourceAndNotGiven(bool $primarySource, bool $notGiven): ConditionalRules
     {
-        return Rule::requiredIf(
-            fn () => collect($this->immunizations)->contains(
-                fn ($immunization) => $immunization['primarySource'] === $primarySource && $immunization['notGiven'] === $notGiven
-            )
+        return Rule::when(
+            static fn ($input) => ($input['primarySource']) === $primarySource && ($input['notGiven']) === $notGiven,
+            'required'
         );
     }
 }

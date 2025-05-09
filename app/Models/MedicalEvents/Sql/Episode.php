@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\MedicalEvents\Sql;
 
+use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  */
 class Episode extends Model
 {
+    use HasCamelCasing;
+
     protected $guarded = [];
 
     protected $hidden = [

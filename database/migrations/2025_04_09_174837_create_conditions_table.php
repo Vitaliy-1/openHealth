@@ -29,6 +29,14 @@ return new class extends Migration
             $table->timestamp('asserted_date')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('condition_evidences', static function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('condition_id')->constrained('conditions')->cascadeOnDelete();
+            $table->foreignId('codes_id')->nullable()->constrained('codeable_concepts')->cascadeOnDelete();
+            $table->foreignId('details_id')->nullable()->constrained('identifiers')->cascadeOnDelete();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -36,6 +44,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('condition_evidences');
         Schema::dropIfExists('conditions');
     }
 };

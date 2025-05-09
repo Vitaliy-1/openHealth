@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repositories\MedicalEvents;
 
+use App\Models\MedicalEvents\Sql\ConditionEvidence;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -22,8 +23,6 @@ class ConditionRepository extends BaseRepository
     public function store(array $data, int $encounterId): void
     {
         DB::transaction(function () use ($data, $encounterId) {
-            $repository = new Repository();
-
             try {
                 foreach ($data as $datum) {
                     $reportOrigin = null;
@@ -31,41 +30,48 @@ class ConditionRepository extends BaseRepository
                     $severity = null;
 
                     if (isset($datum['asserter'])) {
-                        $asserter = $repository::identifier()->store($datum['asserter']['identifier']['value']);
+                        $asserter = Repository::identifier()->store($datum['asserter']['identifier']['value']);
+                        Repository::codeableConcept()->attach($asserter, $datum['asserter']);
                     }
 
-                    $context = $repository::identifier()->store($datum['context']['identifier']['value']);
+                    $context = Repository::identifier()->store($datum['context']['identifier']['value']);
+                    Repository::codeableConcept()->attach($context, $datum['context']);
 
-                    if (isset($datum['report_origin'])) {
-                        $reportOrigin = $repository::codeableConcept()->store($datum['report_origin']);
+                    if (isset($datum['reportOrigin'])) {
+                        $reportOrigin = Repository::codeableConcept()->store($datum['reportOrigin']);
                     }
 
-                    $code = $repository::codeableConcept()->store($datum['code']);
+                    $code = Repository::codeableConcept()->store($datum['code']);
 
                     if (isset($datum['severity'])) {
-                        $severity = $repository::codeableConcept()->store($datum['severity']);
+                        $severity = Repository::codeableConcept()->store($datum['severity']);
                     }
 
-                    $this->model::create([
+                    $condition = $this->model::create([
                         'uuid' => $datum['id'],
                         'encounter_id' => $encounterId,
-                        'primary_source' => $datum['primary_source'],
+                        'primary_source' => $datum['primarySource'],
                         'asserter_id' => $asserter?->id,
                         'report_origin_id' => $reportOrigin?->id,
                         'context_id' => $context->id,
                         'code_id' => $code->id,
-                        'clinical_status' => $datum['clinical_status'],
-                        'verification_status' => $datum['verification_status'],
+                        'clinical_status' => $datum['clinicalStatus'],
+                        'verification_status' => $datum['verificationStatus'],
                         'severity_id' => $severity?->id,
-                        'onset_date' => $datum['onset_date'],
-                        'asserted_date' => $datum['asserted_date'] ?? null
+                        'onset_date' => $datum['onsetDate'],
+                        'asserted_date' => $datum['assertedDate'] ?? null
                     ]);
 
-                    if (isset($datum['asserter'])) {
-                        $repository::codeableConcept()->attach($asserter, $datum['asserter']);
-                    }
+                    if (!empty($datum['evidences'])) {
+                        foreach ($datum['evidences']['codes'] as $evidence) {
+                            $codes = Repository::codeableConcept()->store($evidence);
 
-                    $repository::codeableConcept()->attach($context, $datum['context']);
+                            ConditionEvidence::create([
+                                'condition_id' => $condition->id,
+                                'codes_id' => $codes->id,
+                            ]);
+                        }
+                    }
                 }
             } catch (Exception $e) {
                 Log::channel('db_errors')->error('Error saving condition', [
@@ -90,11 +96,12 @@ class ConditionRepository extends BaseRepository
         return $this->model::with([
             'asserter',
             'reportOrigin.coding',
-            'context',
+            'context.type.coding',
             'code.coding',
             'severity.coding'
         ])
             ->where('encounter_id', $encounterId)
-            ->get()->toArray();
+            ->get()
+            ->toArray();
     }
 }

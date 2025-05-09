@@ -37,16 +37,20 @@
                         x-text="`${ immunization.vaccineCode.coding[0]['code'] } - ${ vaccineCodesDictionary[immunization.vaccineCode.coding[0]['code']] }`"
                     ></td>
                     <td class="td-input"
-                        x-text="`${ immunization.doseQuantity.value } ${ immunization.doseQuantity.unit }`"
+                        x-text="
+                            immunization.doseQuantity?.value && immunization.doseQuantity?.unit
+                                ? `${immunization.doseQuantity.value} ${immunization.doseQuantity.unit}`
+                                : ''
+                            "
                     ></td>
                     <td class="td-input"
                         x-text="immunization.notGiven === false ? 'проведена' : 'не проведена'"
                     ></td>
                     <td class="td-input"
                         x-text="
-                            immunization.explanation.reasons[0].coding[0].code !== ''
-                            ? `${ reasonExplanationsDictionary[immunization.explanation.reasons[0].coding[0].code] }`
-                            : `${ reasonNotGivenExplanationsDictionary[immunization.explanation.reasonsNotGiven.coding[0].code] }`
+                            immunization.explanation.reasons?.[0]?.coding?.[0]?.code
+                                ? reasonExplanationsDictionary[immunization.explanation.reasons[0].coding[0].code]
+                                : reasonNotGivenExplanationsDictionary[immunization.explanation.reasonsNotGiven?.coding?.[0]?.code]
                         "
                     ></td>
                     <td class="td-input" x-text="immunization.date"></td>
@@ -203,7 +207,7 @@
                                             class="button-primary"
                                             :disabled="!(modalImmunization.date.trim().length > 0 &&
                                                 modalImmunization.time.trim().length > 0
-                                                && (modalImmunization.explanation.reasons[0].coding[0].code.trim().length > 0 || modalImmunization.explanation.reasonsNotGiven.coding[0].code.trim().length > 0))
+                                                && (modalImmunization.explanation?.reasons?.[0]?.coding?.[0]?.code?.trim?.().length > 0 || modalImmunization.explanation?.reasonsNotGiven?.coding?.[0]?.code?.trim?.().length > 0))
                                             "
                                     >
                                         {{ __('forms.save') }}
@@ -256,9 +260,9 @@
             ],
             text: ''
         };
-        manufacturer = '';
-        lotNumber = '';
-        expirationDate = '';
+        manufacturer = null;
+        lotNumber = null;
+        expirationDate = null;
         site = {
             coding: [{ system: 'eHealth/immunization_body_sites', code: '' }],
             text: ''
@@ -268,8 +272,8 @@
             text: ''
         };
         doseQuantity = {
-            value: '',
-            unit: '',
+            value: null,
+            unit: null,
             system: 'eHealth/immunization_dosage_units',
             code: ''
         };

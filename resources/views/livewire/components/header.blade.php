@@ -136,7 +136,6 @@
                           clip-rule="evenodd"
                     />
                 </svg>
-
             </button>
 
             <div
@@ -145,11 +144,10 @@
             >
                 <div class="py-3 px-4">
                     <span class="block text-sm font-semibold text-gray-900 dark:text-white">
-                        {{-- TODO Get the name of the current user --}}
-                        {{ auth()->user()->name}}
+                        {{-- TODO: Get and show the name of the current user --}}
                     </span>
                     <span class="block text-sm text-gray-900 truncate dark:text-white">
-                        {{auth()->user()->email}}
+                        {{ auth()->user()->email }}
                     </span>
                 </div>
 
@@ -157,10 +155,10 @@
                     aria-labelledby="dropdown"
                 >
                     <li>
-                        <a href="{{route('profile.show')}}"
+                        <a href="{{ route('profile.show') }}"
                            class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-400 dark:hover:text-white"
                         >
-                            {{__('general.profile')}}
+                            {{ __('general.profile') }}
                         </a>
                     </li>
 
@@ -177,10 +175,7 @@
                         </form>
                     </li>
                 </ul>
-
             </div>
         </div>
-
-
     </div>
 </nav>
