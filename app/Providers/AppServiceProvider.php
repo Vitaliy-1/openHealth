@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->app->singletonIf(LegalEntity::class, function () {
-            dd(Auth::user());
+
             return Auth::user()?->legalEntity;
         });
 

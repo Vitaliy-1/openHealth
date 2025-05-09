@@ -17,7 +17,7 @@
             {{ __('forms.scienceDegree') }}
         </h5>
 
-        <template x-if="scienceDegree && scienceDegree.degree">
+        <template x-if="true">
             <table class="table-input w-full">
                 <thead class="thead-input">
                 <tr>
@@ -30,7 +30,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
+                <tr x-show="scienceDegree">
                     <td class="td-input" x-text="dictionary[scienceDegree.degree] || scienceDegree.degree"></td>
                     <td class="td-input" x-text="scienceDegree.issued_date"></td>
                     <td class="td-input" x-text="scienceDegree.institution_name"></td>
@@ -38,14 +38,8 @@
                     <td class="td-input" x-text="scienceDegree.diploma_number"></td>
                     <td class="td-input">
                         <div class="flex space-x-2">
-                            <button @click.prevent="openModal = true; modalScienceDegree = new ScienceDegree(scienceDegree)"
-                                    class="text-blue-600 hover:text-blue-800">
-                                ✎
-                            </button>
-                            <button @click.prevent="scienceDegree = null"
-                                    class="text-red-600 hover:text-red-800">
-                                ✕
-                            </button>
+                            <button @click.prevent="openModal = true; modalScienceDegree = new ScienceDegree(scienceDegree)" class="text-blue-600 hover:text-blue-800">✎</button>
+                            <button @click.prevent="scienceDegree = null" class="text-red-600 hover:text-red-800">✕</button>
                         </div>
                     </td>
                 </tr>

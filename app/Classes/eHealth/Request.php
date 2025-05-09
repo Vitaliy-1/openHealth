@@ -113,7 +113,6 @@ class Request
                 'errors' => $errors
             ]);
 
-            dd($errors);
             return (new ErrorHandler())->handleError($errors);
         }
     }
