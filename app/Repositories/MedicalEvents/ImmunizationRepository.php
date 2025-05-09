@@ -141,9 +141,9 @@ class ImmunizationRepository extends BaseRepository
      * Get condition data that is related to the encounter.
      *
      * @param  int  $encounterId
-     * @return array
+     * @return array|null
      */
-    public function get(int $encounterId): array
+    public function get(int $encounterId): ?array
     {
         return $this->model::with([
             'vaccineCode.coding',
@@ -158,7 +158,7 @@ class ImmunizationRepository extends BaseRepository
         ])
             ->where('encounter_id', $encounterId)
             ->get()
-            ->toArray();
+            ?->toArray();
     }
 
     /**

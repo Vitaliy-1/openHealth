@@ -17,7 +17,7 @@ use Livewire\Form;
 
 class Encounter extends Form
 {
-    public array $encounter = [
+    public ?array $encounter = [
         'status' => 'finished',
         'visit' => [
             'identifier' => [

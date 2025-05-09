@@ -136,9 +136,9 @@ class EncounterRepository extends BaseRepository
      * Get encounter data by encounter ID form URL.
      *
      * @param  int  $encounterId
-     * @return array
+     * @return array|null
      */
-    public function get(int $encounterId): array
+    public function get(int $encounterId): ?array
     {
         return $this->model::with([
             'period',

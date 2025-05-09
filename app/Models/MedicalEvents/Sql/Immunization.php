@@ -98,7 +98,7 @@ class Immunization extends Model
                     ->flatten()
                     ->filter()
                     ->first()
-                    ?->toArray() ?? ['text' => null, 'coding' => [['system' => 'eHealth/reason_not_given_explanations', 'code' => '']]]
+                    ?->toArray() ?: ['text' => null, 'coding' => [['system' => 'eHealth/reason_not_given_explanations', 'code' => '']]]
             ]
         );
     }

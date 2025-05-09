@@ -60,9 +60,9 @@ class EpisodeRepository extends BaseRepository
      * Get episode data that is related to the encounter.
      *
      * @param  int  $encounterId
-     * @return array
+     * @return array|null
      */
-    public function get(int $encounterId): array
+    public function get(int $encounterId): ?array
     {
         return $this->model::with([
             'type',
@@ -70,6 +70,7 @@ class EpisodeRepository extends BaseRepository
             'careManager'
         ])
             ->where('encounter_id', $encounterId)
-            ->first()?->toArray();
+            ->first()
+            ?->toArray();
     }
 }
