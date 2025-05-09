@@ -648,7 +648,9 @@
                 },
                 rank: ''
             },
-            evidences: []
+            evidences: {
+                codes: []
+            }
         };
         query = '';
 

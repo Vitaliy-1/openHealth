@@ -23,10 +23,10 @@
             </tr>
             </thead>
             <tbody>
-            <template x-for="(evidence, index) in modalCondition.conditions.evidences">
+            <template x-for="(evidence, index) in modalCondition.conditions.evidences.codes">
                 <tr>
                     <td class="td-input"
-                        x-text="`${evidence.codes[0].coding[0].code} - ${dictionary[evidence.codes[0].coding[0].code]}`"
+                        x-text="`${evidence.coding[0].code} - ${dictionary[evidence.coding[0].code]}`"
                     ></td>
                     <td class="td-input">
                         {{-- That all that is needed for the dropdown --}}
@@ -185,7 +185,7 @@
 
                                     <button @click.prevent="
                                                 newEvidenceCode !== false
-                                                ? modalCondition.conditions.evidences.push(modalEvidenceCode)
+                                                ? modalCondition.conditions.evidences.codes.push(modalEvidenceCode.codes[0])
                                                 : modalCondition.conditions.evidences[item] = modalEvidenceCode;
 
                                                 openModal = false;

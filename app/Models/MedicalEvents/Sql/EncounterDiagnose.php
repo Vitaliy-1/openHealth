@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class EncounterDiagnose extends Model
 {
-    protected $table = 'encounter_diagnose';
     protected $guarded = [];
 
     protected $hidden = [

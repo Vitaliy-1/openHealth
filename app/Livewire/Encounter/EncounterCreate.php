@@ -118,11 +118,14 @@ class EncounterCreate extends Component
         $this->encounterId = $encounterId;
 
         if ($this->encounterId) {
-            $this->form->encounter = Repository::encounter()->get($this->patientId);
+            $this->form->encounter = Repository::encounter()->get($this->encounterId);
             $this->form->episode = Repository::episode()->get($this->encounterId);
 
             $this->form->conditions = Repository::condition()->get($this->encounterId);
             $this->form->conditions = Repository::encounter()->formatConditions($this->form->conditions, $this->form->encounter['diagnoses']);
+
+            $this->form->immunizations = Repository::immunization()->get($this->encounterId);
+            $this->form->immunizations = Repository::immunization()->formatForView($this->form->immunizations);
         } else {
             $this->setUuids();
             $this->setEmployeePartyData();
@@ -232,16 +235,23 @@ class EncounterCreate extends Component
             $formattedEncounter = $encounterRepository->formatEncounterRequest($this->form->encounter, $this->form->conditions);
             $formattedEpisode = $encounterRepository->formatEpisodeRequest($this->form->episode, $this->form->encounter['period']);
             $formattedConditions = $encounterRepository->formatConditionsRequest($this->form->conditions);
-            $formattedImmunizations = $encounterRepository->formatImmunizationsRequest($this->form->immunizations);
+
+            if (!empty($this->form->immunizations)) {
+                $formattedImmunizations = $encounterRepository->formatImmunizationsRequest($this->form->immunizations);
+            }
 
             // Validate formatted data
             try {
                 $this->form->validateForm('encounter', $formattedEncounter);
                 $this->form->validateForm('episode', $formattedEpisode);
-                $this->form->validateForm('conditions', $this->convertArrayKeysToCamelCase($formattedConditions));
+                foreach ($formattedConditions['conditions'] as $index => $formattedCondition) {
+                    $this->form->validateForm("conditions.$index", $formattedCondition);
+                }
 
-                if (!empty($formattedImmunizations)) {
-                    $this->form->validateForm('immunizations', $this->convertArrayKeysToCamelCase($formattedImmunizations));
+                if (isset($formattedImmunizations)) {
+                    foreach ($formattedImmunizations['immunizations'] as $index => $formattedImmunization) {
+                        $this->form->validateForm("immunizations.$index", $formattedImmunization);
+                    }
                 }
             } catch (ValidationException $e) {
                 $this->dispatch('flashMessage', [
@@ -257,7 +267,12 @@ class EncounterCreate extends Component
                 $formattedEpisode['episode'],
                 $this->patientId
             );
+
             Repository::condition()->store($formattedConditions['conditions'], $createdEncounterId);
+
+            if (isset($formattedImmunizations)) {
+                Repository::immunization()->store($formattedImmunizations['immunizations'], $createdEncounterId);
+            }
         }
 
         $encounter = PatientApi::getShortEncounterBySearchParams($this->patientUuid);
@@ -512,35 +527,5 @@ class EncounterCreate extends Component
             $this->form->encounter['period']['start'] = $now->format('H:i');
             $this->form->encounter['period']['end'] = $now->addMinutes(15)->format('H:i');
         }
-    }
-
-    /**
-     * Formatting conditions for showing in frontend.
-     *
-     * @param  array  $conditions
-     * @param  array  $diagnoses
-     * @return array
-     */
-    protected function formatConditions(array $conditions, array $diagnoses): array
-    {
-        return collect($conditions)
-            ->map(function (array $condition, int $index) use ($diagnoses) {
-                // add diagnoses array to conditions
-                if (isset($diagnoses[$index])) {
-                    $condition['diagnoses'] = $diagnoses[$index];
-                }
-
-                $originalOnsetDate = $condition['onsetDate'];
-                $originalAssertedDate = $condition['assertedDate'];
-
-                // set date
-                $condition['onsetDate'] = CarbonImmutable::parse($originalOnsetDate)->format('Y-m-d');
-                $condition['onsetTime'] = CarbonImmutable::parse($originalOnsetDate)->format('H:i');
-                $condition['assertedDate'] = CarbonImmutable::parse($originalAssertedDate)->format('Y-m-d');
-                $condition['assertedTime'] = CarbonImmutable::parse($originalAssertedDate)->format('H:i');
-
-                return $condition;
-            })
-            ->toArray();
     }
 }

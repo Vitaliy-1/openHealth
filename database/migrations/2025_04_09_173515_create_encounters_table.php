@@ -28,14 +28,14 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('encounter_reason', static function (Blueprint $table) {
+        Schema::create('encounter_reasons', static function (Blueprint $table) {
             $table->id();
             $table->foreignId('encounter_id')->constrained('encounters')->cascadeOnDelete();
             $table->foreignId('codeable_concept_id')->constrained('codeable_concepts')->cascadeOnDelete();
             $table->timestamps();
         });
 
-        Schema::create('encounter_diagnose', static function (Blueprint $table) {
+        Schema::create('encounter_diagnoses', static function (Blueprint $table) {
             $table->id();
             $table->foreignId('encounter_id')->constrained('encounters')->cascadeOnDelete();
             $table->foreignId('condition_id')->constrained('identifiers')->cascadeOnDelete();
@@ -44,7 +44,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('encounter_action', static function (Blueprint $table) {
+        Schema::create('encounter_actions', static function (Blueprint $table) {
             $table->id();
             $table->foreignId('encounter_id')->constrained('encounters')->cascadeOnDelete();
             $table->foreignId('codeable_concept_id')->constrained('codeable_concepts')->cascadeOnDelete();
@@ -57,9 +57,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('encounter_action');
-        Schema::dropIfExists('encounter_diagnose');
-        Schema::dropIfExists('encounter_reason');
+        Schema::dropIfExists('encounter_actions');
+        Schema::dropIfExists('encounter_diagnoses');
+        Schema::dropIfExists('encounter_reasons');
         Schema::dropIfExists('encounters');
     }
 };

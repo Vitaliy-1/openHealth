@@ -68,7 +68,7 @@ class Encounter extends Model
 
     public function reasons(): BelongsToMany
     {
-        return $this->belongsToMany(CodeableConcept::class, 'encounter_reason');
+        return $this->belongsToMany(CodeableConcept::class, 'encounter_reasons');
     }
 
     public function diagnoses(): HasMany
@@ -78,7 +78,7 @@ class Encounter extends Model
 
     public function actions(): BelongsToMany
     {
-        return $this->belongsToMany(CodeableConcept::class, 'encounter_action');
+        return $this->belongsToMany(CodeableConcept::class, 'encounter_actions');
     }
 
     public function division(): BelongsTo

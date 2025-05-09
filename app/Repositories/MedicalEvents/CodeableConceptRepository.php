@@ -40,7 +40,7 @@ class CodeableConceptRepository extends BaseRepository
     {
         /** @var SqlCodeableConcept $codeableConcept */
         $codeableConcept = $identifier->type()->create([
-            'text' => $codeableConceptData['identifier']['type']['text'] ?? null
+            'text' => $codeableConceptData['identifier']['type']['text'] ?? ''
         ]);
 
         $codeableConcept->coding()->create([

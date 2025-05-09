@@ -35,4 +35,9 @@ final class Repository
     {
         return app(EpisodeRepository::class);
     }
+
+    public static function immunization(): ImmunizationRepository
+    {
+        return app(ImmunizationRepository::class);
+    }
 }

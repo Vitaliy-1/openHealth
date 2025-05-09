@@ -41,12 +41,12 @@
                    id="manufacturer"
                    class="input-modal"
                    autocomplete="off"
-                   required
+                   :required="modalImmunization.primarySource && !modalImmunization.notGiven"
             >
 
             <p class="text-error text-xs"
                x-show="(
-                   modalImmunization.manufacturer.trim().length < 1 &&
+                   ((modalImmunization.manufacturer?.trim() || '').length < 1) &&
                    (modalImmunization.primarySource === true && modalImmunization.notGiven === false)
                )"
             >
@@ -66,12 +66,12 @@
                    id="lotNumber"
                    class="input-modal"
                    autocomplete="off"
-                   required
+                   :required="modalImmunization.primarySource && !modalImmunization.notGiven"
             >
 
             <p class="text-error text-xs"
                x-show="(
-                   modalImmunization.lotNumber.trim().length < 1 &&
+                   ((modalImmunization.lotNumber?.trim() || '').length < 1) &&
                    (modalImmunization.primarySource === true && modalImmunization.notGiven === false)
                )"
             >
@@ -95,13 +95,13 @@
                        id="expirationDate"
                        class="datepicker-input input-modal !pl-10"
                        autocomplete="off"
-                       required
+                       :required="modalImmunization.primarySource && !modalImmunization.notGiven"
                 >
             </div>
 
             <p class="text-error text-xs"
                x-show="(
-                   modalImmunization.expirationDate.trim().length < 1 &&
+                   ((modalImmunization.expirationDate?.trim() || '').length < 1) &&
                    (modalImmunization.primarySource === true && modalImmunization.notGiven === false)
                )"
             >
@@ -116,7 +116,7 @@
                 <label for="amountOfInjected" class="label-modal">
                     {{ __('patients.amount_of_injected') }}
                 </label>
-                <input x-model="modalImmunization.doseQuantity.value"
+                <input x-model.number="modalImmunization.doseQuantity.value"
                        type="number"
                        name="amountOfInjected"
                        id="amountOfInjected"
@@ -126,7 +126,7 @@
                 >
 
                 <p class="text-error text-xs"
-                   x-show="(modalImmunization.doseQuantity.value.trim().length < 1 && modalImmunization.notGiven === false)"
+                   x-show="(modalImmunization.doseQuantity?.value < 1 && modalImmunization.notGiven === false)"
                 >
                     {{ __('forms.field_empty') }}
                 </p>
@@ -154,7 +154,7 @@
                 </select>
 
                 <p class="text-error text-xs"
-                   x-show="(modalImmunization.doseQuantity.unit.trim().length < 1 && modalImmunization.notGiven === false)"
+                   x-show="(modalImmunization.doseQuantity?.unit?.trim().length < 1 && modalImmunization.notGiven === false)"
                 >
                     {{ __('forms.field_empty') }}
                 </p>

@@ -37,6 +37,6 @@ class CodeableConcept extends Model
 
     public function encounters(): BelongsToMany
     {
-        return $this->belongsToMany(Encounter::class, 'encounter_reason');
+        return $this->belongsToMany(Encounter::class, 'encounter_reasons');
     }
 }

@@ -22,12 +22,14 @@ class EpisodeRepository extends BaseRepository
     public function store(array $data, int $encounterId): void
     {
         DB::transaction(function () use ($data, $encounterId) {
-            $repository = new Repository();
-
             try {
-                $type = $repository::coding()->store($data['type']);
-                $managingOrganization = $repository::identifier()->store($data['managing_organization']['identifier']['value']);
-                $careManager = $repository::identifier()->store($data['care_manager']['identifier']['value']);
+                $type = Repository::coding()->store($data['type']);
+
+                $managingOrganization = Repository::identifier()->store($data['managingOrganization']['identifier']['value']);
+                Repository::codeableConcept()->attach($managingOrganization, $data['managingOrganization']);
+
+                $careManager = Repository::identifier()->store($data['careManager']['identifier']['value']);
+                Repository::codeableConcept()->attach($careManager, $data['careManager']);
 
                 $episode = $this->model::create([
                     'uuid' => $data['id'],
@@ -42,9 +44,6 @@ class EpisodeRepository extends BaseRepository
                 $episode->period()->create([
                     'start' => $data['period']['start']
                 ]);
-
-                $repository::codeableConcept()->attach($managingOrganization, $data['managing_organization']);
-                $repository::codeableConcept()->attach($careManager, $data['care_manager']);
             } catch (Exception $e) {
                 Log::channel('db_errors')->error('Error saving episode', [
                     'error' => $e->getMessage(),
@@ -61,9 +60,9 @@ class EpisodeRepository extends BaseRepository
      * Get episode data that is related to the encounter.
      *
      * @param  int  $encounterId
-     * @return array
+     * @return array|null
      */
-    public function get(int $encounterId): array
+    public function get(int $encounterId): ?array
     {
         return $this->model::with([
             'type',
@@ -71,6 +70,7 @@ class EpisodeRepository extends BaseRepository
             'careManager'
         ])
             ->where('encounter_id', $encounterId)
-            ->first()?->toArray();
+            ->first()
+            ?->toArray();
     }
 }
