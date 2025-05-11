@@ -11,7 +11,7 @@ trait HandlesSnakeCaseForm
     /**
      * @throws ValidationException
      */
-    public function validate($rules = null, $messages = [], $attributes = [])
+    public function validate($rules = null, $messages = [], $attributes = []): array
     {
         $validated = parent::validate($rules, $messages, $attributes);
         return Arr::snakeKeys($validated);

@@ -4,7 +4,6 @@ namespace App\Livewire\Employee\Forms;
 
 use App\Rules\BirthDate;
 use App\Rules\Name;
-use App\Traits\HandlesSnakeCaseForm;
 use Illuminate\Validation\ValidationException;
 use Livewire\Form;
 
@@ -12,40 +11,43 @@ use function Livewire\of;
 
 class EmployeeForm extends Form
 {
-    use HandlesSnakeCaseForm;
 
     public string $status = 'NEW';
 
-    /**
-     * Default values are transferred to the Alpine on the frontend
-     */
-    public ?array $party = [
+    public array $party = [
         'position' => '',
-        'employeeType' => '',
-        'startDate' => '',
+        'employee_type' => '',
+        'start_date' => '',
         'phones' => [
-            [
-                'type' => '',
-                'number' => '',
-            ]
-        ]
+            ['type' => '', 'number' => '']
+        ],
+        'documents' => [],
+        'tax_id' => '',
+        'no_tax_id' => false,
+        'first_name' => '',
+        'last_name' => '',
+        'second_name' => '',
+        'birth_date' => '',
+        'gender' => '',
+        'email' => '',
+        'working_experience' => null,
+        'about_myself' => '',
     ];
 
-    public function mount()
-    {
-        $this->party['startDate'] = now()->toDateString();
-    }
-
-    public array $documents = [];
-    public ?array $education = [
-        'country' => '',
+    public array $doctor = [
+        'educations' => [],
+        'qualifications' => [],
+        'specialities' => [],
+        'science_degree' => [
+            'country' => '',
+            'city' => '',
+            'degree' => '',
+            'institution_name' => '',
+            'diploma_number' => '',
+            'speciality' => '',
+            'issued_date' => '',
+        ],
     ];
-    public ?array $educations = [];
-    public ?array $speciality = [];
-    public ?array $specialities = [];
-    public ?array $scienceDegree = [];
-    public ?array $qualification = [];
-    public ?array $qualifications = [];
 
     protected function rules(): array
     {
@@ -112,43 +114,38 @@ class EmployeeForm extends Form
 
     public function validateBeforeSendApi(): array
     {
+        $doctorTypes = config('ehealth.doctors_type');
 
-        $doctorTypes = config('ehealth.doctors_type'); // Get doctor types from config
-
-        // Check if documents is empty
-        if (empty($this->documents)) {
+        if (empty($this->party['documents'])) {
             return [
-                'error'   => true,
+                'error' => true,
                 'message' => __('validation.custom.documentsEmpty'),
             ];
         }
 
-        // Check if taxId is empty
-        if (isset($this->party['taxId']) && empty($this->party['taxId'])) {
+        if (!$this->party['no_tax_id'] && empty($this->party['tax_id'])) {
             return [
-                'error'   => true,
-                'message' => __('validation.custom.documentsEmpty'),
-            ];
-        }
-        // Check if doctor type is empty
-        if ( in_array($this->party['employeeType'],$doctorTypes) && empty($this->specialities)) {
-            return [
-                'error'   => true,
-                'message' => __('validation.custom.specialityTable'),
-            ];
-        }
-        // Check if doctor type is empty
-        if ( in_array($this->party['employeeType'],$doctorTypes) && empty($this->educations)) {
-            return [
-                'error'   => true,
-                'message' => __('validation.custom.educationTable'),
+                'error' => true,
+                'message' => __('validation.custom.taxIdMissing'),
             ];
         }
 
-        return [
-            'error'   => false,
-            'message' => '',
-        ];
+        if (in_array($this->party['employee_type'], $doctorTypes)) {
+            if (empty($this->doctor['specialities'])) {
+                return [
+                    'error' => true,
+                    'message' => __('validation.custom.specialityTable'),
+                ];
+            }
+            if (empty($this->doctor['educations'])) {
+                return [
+                    'error' => true,
+                    'message' => __('validation.custom.educationTable'),
+                ];
+            }
+        }
+
+        return ['error' => false, 'message' => ''];
     }
 
     public function validated(): array

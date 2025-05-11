@@ -166,7 +166,7 @@
                              class="modal-content h-fit"
                         >
                             <h3 class="modal-header" :id="$id('modal-title')">
-                                <span x-text="newEducation ? '{{ __('forms.add_education') }}' : '{{ __('forms.edit_education') }}'"></span>
+                                <span x-text="newEducation ? '{{ __('forms.addEducation') }}' : '{{ __('forms.edit') . ' ' . __('forms.education') }}'"></span>
                             </h3>
 
                             <form>
