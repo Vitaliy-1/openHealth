@@ -19,6 +19,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Component;
 use App\Livewire\Encounter\Forms\Encounter as EncounterForm;
 use Livewire\WithFileUploads;
+use RuntimeException;
 
 class EncounterComponent extends Component
 {
@@ -72,6 +73,18 @@ class EncounterComponent extends Component
     protected string $patientUuid;
 
     /**
+     * Legal entity type of auth user.
+     * @var string
+     */
+    protected string $legalEntityType;
+
+    /**
+     * Role of auth user.
+     * @var string
+     */
+    protected string $role;
+
+    /**
      * Value for finding ICD-10 code in DB.
      * @var string
      */
@@ -108,6 +121,19 @@ class EncounterComponent extends Component
         'eHealth/vaccination_authorities',
         'eHealth/vaccination_target_diseases'
     ];
+
+    public function __construct()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            throw new RuntimeException('Authenticated user not found');
+        }
+
+        $this->legalEntityType = $user->legalEntity->type;
+        $this->role = $user->roles->first()->name;
+        $this->divisions = $user->legalEntity->division->toArray();
+    }
 
     /**
      * Search for referral number.
@@ -189,11 +215,12 @@ class EncounterComponent extends Component
      */
     protected function adjustEpisodeTypes(): void
     {
-        $allowedValues = $this->getAllowedValues(
-            'ehealth.legal_entity_episode_types',
-            'ehealth.employee_episode_types'
+        $keys = $this->getFilteredKeysFromConfig(
+            "legal_entity_episode_types.$this->legalEntityType",
+            "employee_episode_types.$this->role"
         );
-        $this->adjustDictionary('eHealth/episode_types', $allowedValues);
+
+        $this->adjustDictionary('eHealth/episode_types', $keys);
     }
 
     /**
@@ -203,11 +230,12 @@ class EncounterComponent extends Component
      */
     protected function adjustEncounterClasses(): void
     {
-        $allowedValues = $this->getAllowedValues(
-            'ehealth.legal_entity_encounter_classes',
-            'ehealth.employee_encounter_classes'
+        $keys = $this->getFilteredKeysFromConfig(
+            "legal_entity_encounter_classes.$this->legalEntityType",
+            "employee_encounter_classes.$this->role"
         );
-        $this->adjustDictionary('eHealth/encounter_classes', $allowedValues);
+
+        $this->adjustDictionary('eHealth/encounter_classes', $keys);
 
         // set default encounter class, if there is only one
         if (count($this->dictionaries['eHealth/encounter_classes']) === 1) {
@@ -222,8 +250,10 @@ class EncounterComponent extends Component
      */
     protected function adjustEncounterTypes(): void
     {
-        $allowedValues = config('ehealth.encounter_class_encounter_types')[key($this->dictionaries['eHealth/encounter_classes'])];
-        $this->adjustDictionary('eHealth/encounter_types', $allowedValues);
+        $selectedClass = key($this->dictionaries['eHealth/encounter_classes']);
+        $keys = $this->getFilteredKeysFromConfig("encounter_class_encounter_types.$selectedClass");
+
+        $this->adjustDictionary('eHealth/encounter_types', $keys);
     }
 
     /**
@@ -233,8 +263,6 @@ class EncounterComponent extends Component
      */
     protected function getDivisionData(): void
     {
-        $this->divisions = Auth::user()->legalEntity->division->toArray();
-
         // set division if only one exist
         if (count($this->divisions) === 1) {
             $this->form->encounter['division']['identifier']['value'] = $this->divisions[0]['uuid'];
@@ -266,28 +294,6 @@ class EncounterComponent extends Component
     public function updatedFile(): void
     {
         $this->keyContainerUpload = $this->file;
-    }
-
-    /**
-     * Get allowed values.
-     *
-     * @param  string  $configKey
-     * @param  string|null  $additionalConfigKey
-     * @return array
-     */
-    private function getAllowedValues(string $configKey, ?string $additionalConfigKey = null): array
-    {
-        $allowedValues = config($configKey);
-
-        if ($additionalConfigKey) {
-            $additionalValues = config($additionalConfigKey);
-            $allowedValues = array_intersect(
-                $allowedValues[Auth::user()->legalEntity->type],
-                $additionalValues[Employee::find(1)->employeeType]
-            );
-        }
-
-        return $allowedValues;
     }
 
     /**

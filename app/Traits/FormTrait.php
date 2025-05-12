@@ -194,4 +194,23 @@ trait FormTrait
 
         return $flattenedArray;
     }
+
+    /**
+     * This method merges the values from two config paths (based on user-specific context),
+     * removes duplicates, and returns them as an array of keys to be used for filtering dictionaries.
+     *
+     * @param  string  $configPath
+     * @param  string|null  $additionalConfigPath
+     * @return array
+     */
+    public function getFilteredKeysFromConfig(string $configPath, ?string $additionalConfigPath = null): array
+    {
+        return collect([
+            config("ehealth.$configPath"),
+            config("ehealth.$additionalConfigPath", [])
+        ])
+            ->flatten()
+            ->unique()
+            ->all();
+    }
 }
