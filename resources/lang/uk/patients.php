@@ -143,7 +143,7 @@ return [
     'other_source' => 'Інше джерело',
     'information_source' => 'Джерело інформації',
     'new_primary_diagnose' => "Ви вказали новий основний діагноз.<br> Підтвердження дії змінить основний діагноз епізоду медичної допомоги!",
-    'duplicate_code_warning' => 'Діагноз із таким кодом вже існує',
+    'duplicate_code_warning' => 'Такий код вже існує',
 
     // Evidences
     'evidence_conditions' => 'Докази - стани',

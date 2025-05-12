@@ -3,6 +3,7 @@
               x-data="{
                   immunizations: $wire.entangle('form.immunizations'),
                   openModal: false,
+                  showDuplicateCodeWarning: false,
                   modalImmunization: new Immunization(),
                   newImmunization: false,
                   item: 0,
@@ -198,10 +199,21 @@
                                     </button>
 
                                     <button @click.prevent="
+                                                const newImmunizationCode = modalImmunization.vaccineCode.coding[0]?.code;
+                                                const matchingImmunizationCodesCount = immunizations.filter(
+                                                    c => c.vaccineCode.coding[0]?.code === newImmunizationCode
+                                                ).length;
+
+                                                if (matchingImmunizationCodesCount >= 1) {
+                                                    showDuplicateCodeWarning = true;
+                                                    return;
+                                                }
+
                                                 newImmunization !== false
                                                 ? immunizations.push(modalImmunization)
                                                 : immunizations[item] = modalImmunization;
 
+                                                showDuplicateCodeWarning = false;
                                                 openModal = false;
                                             "
                                             class="button-primary"
@@ -213,6 +225,11 @@
                                         {{ __('forms.save') }}
                                     </button>
                                 </div>
+                                <template x-if="showDuplicateCodeWarning">
+                                    <p class="text-error text-right">
+                                        {!! __('patients.duplicate_code_warning') !!}
+                                    </p>
+                                </template>
                             </form>
                         </div>
                     </div>

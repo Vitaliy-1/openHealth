@@ -539,55 +539,60 @@
                                     {{ __('forms.cancel') }}
                                 </button>
 
-                                <div class="flex flex-col items-end">
-                                    <button @click.prevent="
-                                                delete modalCondition.query;
-                                                modalCondition.conditions.code.coding = modalCondition.conditions.code.coding.filter(c => c.code.trim() !== '');
-                                                const primaryExist = diagnoses.some(d => d.role.coding.some(c => c.code === 'primary'));
-                                                const newCode = modalCondition.conditions.code.coding[0]?.code;
-                                                const alreadyHasCode = conditions.some(c => c.code.coding[0]?.code === newCode);
+                                <button @click.prevent="
+                                            delete modalCondition.query;
+                                            modalCondition.conditions.code.coding = modalCondition.conditions.code.coding.filter(c => c.code.trim() !== '');
+                                            const newTypeCode = modalCondition.conditions.diagnoses.role.coding[0]?.code;
+                                            const matchingPrimaryCount = diagnoses.filter(
+                                                diagnose => diagnose.role.coding[0]?.code === 'primary'
+                                            ).length;
 
-                                                if (primaryExist) {
-                                                    showPrimaryWarning = true;
-                                                    return;
-                                                }
+                                            const newCode = modalCondition.conditions.code.coding[0]?.code;
+                                            const matchingCodesCount = conditions.filter(
+                                                c => c.code.coding[0]?.code === newCode
+                                            ).length;
 
-                                                if (alreadyHasCode) {
-                                                    showDuplicateCodeWarning = true;
-                                                    return;
-                                                }
+                                            if (newTypeCode === 'primary' && matchingPrimaryCount >= 1) {
+                                                showPrimaryWarning = true;
+                                                return;
+                                            }
 
-                                                if (newCondition !== false) {
-                                                    diagnoses.push(modalCondition.conditions.diagnoses);
-                                                    conditions.push(modalCondition.conditions);
-                                                } else {
-                                                    conditions[item] = modalCondition.conditions;
-                                                }
+                                            if (matchingCodesCount >= 1) {
+                                                showDuplicateCodeWarning = true;
+                                                return;
+                                            }
 
-                                                openModal = false;
-                                                showPrimaryWarning = false;
-                                                showDuplicateCodeWarning = false;
-                                            "
-                                            class="button-primary justify-end"
-                                            :disabled="
-                                                !(modalCondition.conditions.clinicalStatus.trim().length > 0 && modalCondition.conditions.verificationStatus.trim().length > 0
-                                                && modalCondition.conditions.code.coding[0].code.trim().length > 0 && modalCondition.conditions.diagnoses.role.coding[0].code
-                                            )"
-                                    >
-                                        {{ __('forms.save') }}
-                                    </button>
-                                    <template x-if="showPrimaryWarning">
-                                        <p class="text-red-600 mt-2 text-sm text-right">
-                                            {!! __('patients.new_primary_diagnose') !!}
-                                        </p>
-                                    </template>
-                                    <template x-if="showDuplicateCodeWarning">
-                                        <p class="text-red-600 mt-2 text-sm text-right">
-                                            {!! __('patients.duplicate_code_warning') !!}
-                                        </p>
-                                    </template>
-                                </div>
+                                            if (newCondition !== false) {
+                                                diagnoses.push(modalCondition.conditions.diagnoses);
+                                                conditions.push(modalCondition.conditions);
+                                            } else {
+                                                diagnoses[item] = modalCondition.conditions.diagnoses;
+                                                conditions[item] = modalCondition.conditions;
+                                            }
+
+                                            openModal = false;
+                                            showPrimaryWarning = false;
+                                            showDuplicateCodeWarning = false;
+                                        "
+                                        class="button-primary justify-end"
+                                        :disabled="
+                                            !(modalCondition.conditions.clinicalStatus.trim().length > 0 && modalCondition.conditions.verificationStatus.trim().length > 0
+                                            && modalCondition.conditions.code.coding[0].code.trim().length > 0 && modalCondition.conditions.diagnoses.role.coding[0].code
+                                        )"
+                                >
+                                    {{ __('forms.save') }}
+                                </button>
                             </div>
+                            <template x-if="showPrimaryWarning">
+                                <p class="text-error text-right">
+                                    {!! __('patients.new_primary_diagnose') !!}
+                                </p>
+                            </template>
+                            <template x-if="showDuplicateCodeWarning">
+                                <p class="text-error text-right">
+                                    {!! __('patients.duplicate_code_warning') !!}
+                                </p>
+                            </template>
                         </form>
                     </div>
                 </div>

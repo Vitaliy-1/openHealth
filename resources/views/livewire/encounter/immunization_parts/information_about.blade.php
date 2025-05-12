@@ -17,7 +17,7 @@
                 <option selected>{{ __('forms.select') }}</option>
                 @foreach($this->dictionaries['eHealth/vaccine_codes'] as $key => $vaccineCode)
                     <option value="{{ $key }}" wire:key="{{ $key }}">
-                        {{ $vaccineCode }}
+                        {{ $key }} - {{ $vaccineCode }}
                     </option>
                 @endforeach
             </select>

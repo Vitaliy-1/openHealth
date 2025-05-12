@@ -6,6 +6,7 @@
               x-data="{
                   reasons: $wire.entangle('form.encounter.reasons'),
                   openModal: false,
+                  showDuplicateCodeWarning: false,
                   modalReason: new Reason(),
                   newReason: false,
                   item: 0,
@@ -199,10 +200,21 @@
                                     </button>
 
                                     <button @click.prevent="
+                                                const newReasonCode = modalReason.coding[0]?.code;
+                                                const matchingReasonCodesCount = reasons.filter(
+                                                    c => c.coding[0]?.code === newReasonCode
+                                                ).length;
+
+                                                if (matchingReasonCodesCount >= 1) {
+                                                    showDuplicateCodeWarning = true;
+                                                    return;
+                                                }
+
                                                 newReason !== false
                                                 ? reasons.push(modalReason)
                                                 : reasons[item] = modalReason;
 
+                                                showDuplicateCodeWarning = false;
                                                 openModal = false;
                                             "
                                             class="button-primary"
@@ -211,6 +223,11 @@
                                         {{ __('forms.save') }}
                                     </button>
                                 </div>
+                                <template x-if="showDuplicateCodeWarning">
+                                    <p class="text-error text-right">
+                                        {!! __('patients.duplicate_code_warning') !!}
+                                    </p>
+                                </template>
                             </form>
                         </div>
                     </div>
