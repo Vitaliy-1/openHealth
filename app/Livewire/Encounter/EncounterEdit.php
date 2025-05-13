@@ -17,13 +17,15 @@ class EncounterEdit extends EncounterComponent
 
     public function mount(int $patientId, int $encounterId): void
     {
-        $this->patientId = $patientId;
+        $this->initializeComponent($patientId);
+
         $this->encounterId = $encounterId;
 
         $encounter = $this->form->encounter = Repository::encounter()->get($this->encounterId);
         if (!$encounter) {
             abort(404);
         }
+
         $this->form->episode = Repository::episode()->get($this->encounterId);
 
         $this->form->conditions = Repository::condition()->get($this->encounterId);
@@ -33,15 +35,6 @@ class EncounterEdit extends EncounterComponent
         $this->form->immunizations = Repository::immunization()->formatForView($this->form->immunizations);
 
         $this->setDefaultDate();
-        $this->setPatientData();
-        $this->getDictionary();
-
-        $this->adjustEpisodeTypes();
-        $this->adjustEncounterClasses();
-        $this->adjustEncounterTypes();
-
-        $this->getDivisionData();
-        $this->setCertificateAuthority();
     }
 
     /**

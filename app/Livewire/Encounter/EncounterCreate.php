@@ -18,20 +18,9 @@ class EncounterCreate extends EncounterComponent
 {
     public function mount(int $patientId): void
     {
-        $this->patientId = $patientId;
-
+        $this->initializeComponent($patientId);
         $this->setEmployeePartyData();
-
         $this->setDefaultDate();
-        $this->setPatientData();
-        $this->getDictionary();
-
-        $this->adjustEpisodeTypes();
-        $this->adjustEncounterClasses();
-        $this->adjustEncounterTypes();
-
-        $this->getDivisionData();
-        $this->setCertificateAuthority();
     }
 
     /**

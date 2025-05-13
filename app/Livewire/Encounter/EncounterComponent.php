@@ -9,7 +9,6 @@ use App\Classes\Cipher\Traits\Cipher;
 use App\Classes\eHealth\Api\PatientApi;
 use App\Classes\eHealth\Api\ServiceRequestApi;
 use App\Livewire\Encounter\Forms\Api\EncounterRequestApi;
-use App\Models\Employee\Employee;
 use App\Models\Person\Person;
 use App\Traits\FormTrait;
 use Illuminate\Support\Arr;
@@ -122,19 +121,6 @@ class EncounterComponent extends Component
         'eHealth/vaccination_target_diseases'
     ];
 
-    public function __construct()
-    {
-        $user = Auth::user();
-
-        if (!$user) {
-            throw new RuntimeException('Authenticated user not found');
-        }
-
-        $this->legalEntityType = $user->legalEntity->type;
-        $this->role = $user->roles->first()->name;
-        $this->divisions = $user->legalEntity->division->toArray();
-    }
-
     /**
      * Search for referral number.
      *
@@ -144,7 +130,7 @@ class EncounterComponent extends Component
     public function searchForReferralNumber(): void
     {
         $buildSearchRequest = EncounterRequestApi::buildGetServiceRequestList($this->form->referralNumber);
-        $requisitionData = ServiceRequestApi::searchForServiceRequestsByParams($buildSearchRequest);
+        ServiceRequestApi::searchForServiceRequestsByParams($buildSearchRequest);
     }
 
     /**
@@ -156,7 +142,7 @@ class EncounterComponent extends Component
     public function searchForEpisode(): void
     {
         $buildSearchRequest = EncounterRequestApi::buildGetApprovedEpisodes();
-        $approvedEpisodesData = PatientApi::getApprovedEpisodes($this->patientUuid, $buildSearchRequest);
+        PatientApi::getApprovedEpisodes($this->patientUuid, $buildSearchRequest);
     }
 
     /**
@@ -168,26 +154,7 @@ class EncounterComponent extends Component
     public function searchForConditions(): void
     {
         $buildSearchRequest = EncounterRequestApi::buildGetConditions();
-        $conditionsData = PatientApi::getConditions($this->patientUuid, $buildSearchRequest);
-    }
-
-    /**
-     * Set patient and related data.
-     *
-     * @return void
-     */
-    protected function setPatientData(): void
-    {
-        $patient = Person::with(['encounters'])
-            ->select(['id', 'uuid', 'first_name', 'last_name', 'second_name'])
-            ->where('id', $this->patientId)
-            ->first()
-            ?->toArray();
-
-        $this->patientUuid = $patient['uuid'];
-        $this->firstName = $patient['first_name'];
-        $this->lastName = $patient['last_name'];
-        $this->secondName = $patient['second_name'] ?? null;
+        PatientApi::getConditions($this->patientUuid, $buildSearchRequest);
     }
 
     /**
@@ -206,6 +173,77 @@ class EncounterComponent extends Component
             ->limit(50)
             ->get()
             ->toArray();
+    }
+
+    /**
+     * Open modal by provided model name.
+     *
+     * @param  string  $model
+     * @return void
+     */
+    public function create(string $model): void
+    {
+        $this->openModal($model);
+    }
+
+    public function updatedFile(): void
+    {
+        $this->keyContainerUpload = $this->file;
+    }
+
+    /**
+     * Initialize the component data based on the patient ID.
+     *
+     * @param  int  $patientId
+     * @return void
+     */
+    protected function initializeComponent(int $patientId): void
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            throw new RuntimeException('Authenticated user not found');
+        }
+
+        $this->patientId = $patientId;
+        $this->legalEntityType = $user->legalEntity->type;
+        $this->role = $user->roles->first()->name;
+        $this->divisions = $user->legalEntity->division->toArray();
+
+        $this->getDictionary();
+        $this->adjustEpisodeTypes();
+        $this->adjustEncounterClasses();
+        $this->adjustEncounterTypes();
+
+        $this->setPatientData();
+        $this->getDivisionData();
+
+        try {
+            $this->setCertificateAuthority();
+        } catch (ApiException) {
+            $this->dispatch('flashMessage', [
+                'message' => __('Виникла помилка. Зверніться до адміністратора.'),
+                'type' => 'error'
+            ]);
+        }
+    }
+
+    /**
+     * Set patient and related data.
+     *
+     * @return void
+     */
+    protected function setPatientData(): void
+    {
+        $patient = Person::select(['uuid', 'first_name', 'last_name', 'second_name'])
+            ->where('id', $this->patientId)
+            ->firstOrFail()
+            ->toArray();
+
+        $this->patientUuid = $patient['uuid'];
+        $this->firstName = $patient['first_name'];
+        $this->lastName = $patient['last_name'];
+        $this->secondName = $patient['second_name'] ?? null;
     }
 
     /**
@@ -278,22 +316,6 @@ class EncounterComponent extends Component
     protected function setCertificateAuthority(): array
     {
         return $this->getCertificateAuthority = $this->getCertificateAuthority();
-    }
-
-    /**
-     * Open modal by provided model name.
-     *
-     * @param  string  $model
-     * @return void
-     */
-    public function create(string $model): void
-    {
-        $this->openModal($model);
-    }
-
-    public function updatedFile(): void
-    {
-        $this->keyContainerUpload = $this->file;
     }
 
     /**
