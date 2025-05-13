@@ -112,7 +112,7 @@ class EmployeeIndex extends Component
             __('Email'),
             __('Посада'),
             __('Статус'),
-            __('Дія'),
+            __('forms.action'),
         ];
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Division;
 
 use App\Traits\FormTrait;
@@ -13,7 +15,8 @@ use App\Livewire\Division\Api\DivisionRequestApi;
 
 class DivisionIndex extends Component
 {
-    use WithPagination, FormTrait;
+    use WithPagination;
+    use FormTrait;
 
     protected ?AddressRepository $addressRepository;
 
@@ -69,7 +72,7 @@ class DivisionIndex extends Component
             __('Телефон'),
             __('Email'),
             __('Статус'),
-            __('Дія'),
+            __('forms.action'),
         ];
     }
 

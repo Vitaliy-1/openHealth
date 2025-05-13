@@ -28,6 +28,7 @@ return [
     'write_comment_here' => 'Напишіть коментар тут',
     'diagnoses' => 'Діагнози',
     'date' => 'Дата',
+    'observation' => 'Обстеження',
 
     'relation_type' => [
         'primary' => 'Основний',
@@ -100,13 +101,11 @@ return [
     // Diagnoses record
 
     // Observations record
-    'observations' => 'Обстеження',
 
     // Encounter
     'interaction' => 'Взаємодія',
     'main_data' => 'Основні дані',
     'reasons_for_visit' => 'Причини звернення',
-    'examination' => 'Обстеження',
     'vaccinations' => 'Вакцинації',
     'prescriptions' => 'Рецепти',
     'referrals' => 'Направлення',
@@ -155,7 +154,7 @@ return [
     'period_end' => 'Час закінчення',
     'division_name' => 'Місце надання послуг',
 
-    // Immunization
+    // Immunizations
     'immunization' => 'Вакцинації',
     'dosage' => 'Дозування',
     'execution_state' => 'Стан проведення',
@@ -179,4 +178,11 @@ return [
     'protocol_author' => 'Автор протоколу',
     'series_of_doses_by_protocol' => 'Кількість доз по протоколу',
     'protocol_description' => 'Опис протоколу',
+
+    // Observations
+    'code' => 'Код',
+    'value' => 'Значення',
+    'coding_system' => 'Система кодувань',
+    'loinc_observation_dictionary' => 'Довідник спостережень LOINC',
+    'icf_dictionary_condition_patient' => 'Довідник станів пацієнта МКФ',
 ];

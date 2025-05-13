@@ -66,7 +66,7 @@
                         aria-expanded="false"
                         aria-controls="accordion-open-body-3"
                 >
-                    <span>{{ __('patients.observations') }}</span>
+                    <span>{{ __('patients.observation') }}</span>
                     <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0">
                         <use xlink:href="#svg-chevron"></use>
                     </svg>

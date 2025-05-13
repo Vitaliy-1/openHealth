@@ -70,6 +70,8 @@ class Encounter extends Form
 
     public array $immunizations;
 
+    public array $observations;
+
     protected function rules(): array
     {
         return [

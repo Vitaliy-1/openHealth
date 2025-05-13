@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Division;
 
 use App\Livewire\Division\Api\HealthcareServiceRequestApi;
@@ -15,8 +17,8 @@ use Livewire\WithPagination;
 
 class HealthcareServiceForm extends Component
 {
-    use WithPagination,
-        FormTrait;
+    use WithPagination;
+    use FormTrait;
 
     public HealthCareFormRequest $formService;
 
@@ -261,7 +263,7 @@ class HealthcareServiceForm extends Component
             __('Умови надання'),
             __('Тип спеціальності'),
             __('Статус'),
-            __('Дія'),
+            __('forms.action'),
         ];
     }
 

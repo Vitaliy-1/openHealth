@@ -40,7 +40,7 @@
                     <svg width="24" height="24" class="dark:text-white">
                         <use xlink:href="#svg-heart"></use>
                     </svg>
-                    <p class="default-p">{{ __('patients.examination') }}</p>
+                    <p class="default-p">{{ __('patients.observation') }}</p>
                 </a>
             </li>
             <li>

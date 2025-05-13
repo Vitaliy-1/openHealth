@@ -1,12 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\License;
 
-use Carbon\Carbon;
-use App\Models\License;
 use App\Traits\FormTrait;
 use App\Helpers\JsonHelper;
-// use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -17,10 +16,10 @@ use Livewire\WithPagination;
 
 class LicenseIndex extends Component
 {
-    use FormTrait,
-        WithPagination;
+    use FormTrait;
+    use WithPagination;
 
-    const CACHE_PREFIX = 'licenses_user_id';
+    public const CACHE_PREFIX = 'licenses_user_id';
 
     public object $licenses;
 
@@ -88,17 +87,17 @@ class LicenseIndex extends Component
                     'licenses.is_primary'
                 );
 
-            if ($this->selectedStatusOption === 'is_primary') {
-                $query->where('licenses.is_primary', true);
-            } elseif ($this->selectedStatusOption === 'is_additional') {
-                $query->where('licenses.is_primary', false);
-            }
+        if ($this->selectedStatusOption === 'is_primary') {
+            $query->where('licenses.is_primary', true);
+        } elseif ($this->selectedStatusOption === 'is_additional') {
+            $query->where('licenses.is_primary', false);
+        }
 
-            if ($this->selectedLicenseTypeOption !== 'all') {
-                $query->where('licenses.type', $this->selectedLicenseTypeOption);
-            }
+        if ($this->selectedLicenseTypeOption !== 'all') {
+            $query->where('licenses.type', $this->selectedLicenseTypeOption);
+        }
 
-            return $query;
+        return $query;
     }
 
     public function getLicenses(): void
@@ -132,7 +131,7 @@ class LicenseIndex extends Component
             __('Тип ліцензії'),
             __('Дата видачі'),
             __('Напрям діяльності, що ліцензовано'),
-            __('Дія'),
+            __('forms.action'),
         ];
     }
 
