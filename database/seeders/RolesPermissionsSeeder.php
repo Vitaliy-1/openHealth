@@ -534,11 +534,16 @@ class RolesPermissionsSeeder extends Seeder
      */
     public function run(): void
     {
-        foreach ($this->roles as $role => $permissions) {
-            $role = Role::firstOrCreate(['name' => $role]);
-            foreach ($permissions as $permissionName) {
-                $permission = Permission::firstOrCreate(['name' => $permissionName]);
-                $role->givePermissionTo($permission);
+        $guards = array_filter(array_keys(config('auth.guards')), fn($value, $key) => $value !== 'sanctum', ARRAY_FILTER_USE_BOTH);
+
+        foreach ($this->roles as $roleName => $permissions) {
+            foreach ($guards as $guard) {
+                $role = Role::firstOrCreate(['name' => $roleName, 'guard_name' => $guard]);
+
+                foreach ($permissions as $permissionName) {
+                    $permission = Permission::firstOrCreate(['name' => $permissionName, 'guard_name' => $guard]);
+                    $role->givePermissionTo($permission);
+                }
             }
         }
     }

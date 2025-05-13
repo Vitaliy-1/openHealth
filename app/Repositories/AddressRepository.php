@@ -27,6 +27,7 @@ class AddressRepository
                 );
 
                 $model->address()->save($address);
+                $model->refresh();
             }
         }
     }
