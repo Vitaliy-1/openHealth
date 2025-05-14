@@ -534,16 +534,34 @@ class RolesPermissionsSeeder extends Seeder
      */
     public function run(): void
     {
+        // Get all specified guards from section 'guards' from file config/auth.php
         $guards = array_filter(array_keys(config('auth.guards')), fn($value, $key) => $value !== 'sanctum', ARRAY_FILTER_USE_BOTH);
 
+        $permissions = [];
+
+        // Shrink all permissions to one array
+        foreach (array_values($this->roles) as $rolePermissions) {
+            $permissions = array_merge($permissions, $rolePermissions);
+        }
+
+        foreach ($guards as $guard) {
+            // Create all rolles for specified guard
+            Role::insert(array_map(function ($roleName) use($guard) {
+                return ['name' => $roleName, 'guard_name' => $guard];
+            }, array_keys($this->roles)));
+
+            // Create all permissions for specified guard
+            Permission::insert(array_map(function ($permission) use($guard) {
+                return ['name' => $permission, 'guard_name' => $guard];
+            }, array_unique($permissions)));
+        }
+
+        // Assign permissions for specified roles depends on the guard
         foreach ($this->roles as $roleName => $permissions) {
             foreach ($guards as $guard) {
-                $role = Role::firstOrCreate(['name' => $roleName, 'guard_name' => $guard]);
+                $role = Role::where('name', $roleName)->where('guard_name', $guard)->first();
 
-                foreach ($permissions as $permissionName) {
-                    $permission = Permission::firstOrCreate(['name' => $permissionName, 'guard_name' => $guard]);
-                    $role->givePermissionTo($permission);
-                }
+                $role->syncPermissions($permissions);
             }
         }
     }
