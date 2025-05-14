@@ -17,7 +17,7 @@ class EmployeeEdit extends EmployeeComponent
 
     public function render()
     {
-        $pageTitle = __('forms.edit_employee') . ' : ' . __($this->employee->getFullNameAttribute());
+        $pageTitle = __('forms.edit_employee' . ' : ' . $this->employee->getFullNameAttribute());
 
         return view('livewire.employee.employee-edit', compact('pageTitle'));
     }
