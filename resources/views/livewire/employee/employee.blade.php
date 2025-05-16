@@ -33,6 +33,7 @@
                 <button type="submit" class="button-primary">
                     {{__('forms.save')}}
                 </button>
+
                 <button wire:click="signedComplete('signedContent')" type="button" class="button-primary">
                     {{ __('forms.send_for_approval') }}
                 </button>
