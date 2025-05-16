@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolesPermissionsSeeder extends Seeder
 {
@@ -534,30 +535,45 @@ class RolesPermissionsSeeder extends Seeder
      */
     public function run(): void
     {
+        $rolesToInsert = [];
+        $permissionToInsert = [];
+
         // Get all specified guards from section 'guards' from file config/auth.php
         $guards = array_filter(array_keys(config('auth.guards')), fn($value, $key) => $value !== 'sanctum', ARRAY_FILTER_USE_BOTH);
 
-        $permissions = [];
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Shrink all permissions to one array
-        foreach (array_values($this->roles) as $rolePermissions) {
-            $permissions = array_merge($permissions, $rolePermissions);
-        }
+        $permissions = collect($this->roles)->flatten()->unique()->toArray();
 
+        // Prepare Role's and Permission's data to insert into DB
         foreach ($guards as $guard) {
-            // Create all rolles for specified guard
-            Role::insert(array_map(fn ($roleName) => ['name' => $roleName, 'guard_name' => $guard], array_keys($this->roles)));
+            foreach (array_keys($this->roles) as $roleName) {
+                $rolesToInsert[] = ['name' => $roleName, 'guard_name' => $guard];
+            }
 
-            // Create all permissions for specified guard
-            Permission::insert(array_map(fn ($permission)  => ['name' => $permission, 'guard_name' => $guard], array_unique($permissions)));
+            foreach ($permissions as $permissionName) {
+                $permissionToInsert[] = ['name' => $permissionName, 'guard_name' => $guard];
+            }
         }
+
+        Role::insert($rolesToInsert);
+
+        Permission::insert($permissionToInsert);
+
+        // update cache to know about the newly created permissions
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Assign permissions for specified roles depends on the guard
-        foreach ($this->roles as $roleName => $permissions) {
-            foreach ($guards as $guard) {
-                $role = Role::where('name', $roleName)->where('guard_name', $guard)->first();
+        foreach ($guards as $guard) {
+            $rolesByGuard = Role::whereIn('name', array_keys($this->roles))
+                ->where('guard_name', $guard)
+                ->get()
+                ->keyBy('name');
 
-                $role->syncPermissions($permissions);
+            foreach ($this->roles as $roleName => $permissions) {
+                if ($rolesByGuard->has($roleName)) {
+                    $rolesByGuard[$roleName]->givePermissionTo($permissions);
+                }
             }
         }
     }
