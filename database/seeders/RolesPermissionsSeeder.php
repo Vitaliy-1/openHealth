@@ -546,14 +546,10 @@ class RolesPermissionsSeeder extends Seeder
 
         foreach ($guards as $guard) {
             // Create all rolles for specified guard
-            Role::insert(array_map(function ($roleName) use($guard) {
-                return ['name' => $roleName, 'guard_name' => $guard];
-            }, array_keys($this->roles)));
+            Role::insert(array_map(fn ($roleName) => ['name' => $roleName, 'guard_name' => $guard], array_keys($this->roles)));
 
             // Create all permissions for specified guard
-            Permission::insert(array_map(function ($permission) use($guard) {
-                return ['name' => $permission, 'guard_name' => $guard];
-            }, array_unique($permissions)));
+            Permission::insert(array_map(fn ($permission)  => ['name' => $permission, 'guard_name' => $guard], array_unique($permissions)));
         }
 
         // Assign permissions for specified roles depends on the guard
