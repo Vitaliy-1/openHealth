@@ -6,13 +6,9 @@
                   modalEducation: new Education(),
                   newEducation: false,
                   item: 0,
-                  degreeDict: {
-                      'BACHELOR': '{{ __('forms.bachelor') }}',
-                      'MASTER': '{{ __('forms.master') }}',
-                      'PHD': '{{ __('forms.phd') }}',
-                      'ASSOCIATE': '{{ __('forms.associate') }}',
-                      'SPECIALIST': '{{ __('forms.specialist') }}'
-                  }
+                  specDict: @js($this->dictionaries['SPECIALITY_TYPE']),
+                  degreeDict: @js($this->dictionaries['EDUCATION_DEGREE']),
+                  countryDict: @js($this->dictionaries['COUNTRY']),
               }"
     >
         <legend class="legend">
@@ -35,10 +31,10 @@
             <tbody>
             <template x-for="(education, index) in educations">
                 <tr>
-                    <td class="td-input" x-text="education.country"></td>
+                    <td class="td-input" x-text="countryDict[education.country] || educations.country"></td>
                     <td class="td-input" x-text="education.city"></td>
                     <td class="td-input" x-text="education.institution_name"></td>
-                    <td class="td-input" x-text="education.speciality"></td>
+                    <td class="td-input" x-text="specDict[education.speciality] || educations.speciality"></td>
                     <td class="td-input" x-text="degreeDict[education.degree] || education.degree"></td>
                     <td class="td-input" x-text="education.issued_date"></td>
                     <td class="td-input" x-text="education.diploma_number"></td>
@@ -100,12 +96,12 @@
                                     >
                                         <button
                                             @click="
-                    openModal = true;
-                    item = index;
-                    modalEducation = new Education(education);
-                    newEducation = false;
-                    close($refs.button);
-                "
+                                                openModal = true;
+                                                item = index;
+                                                modalEducation = new Education(education);
+                                                newEducation = false;
+                                                close($refs.button);
+                                            "
                                             @click.prevent
                                             class="dropdown-button"
                                         >
@@ -204,7 +200,8 @@
                                     </div>
                                     <div>
                                         <label for="educationIssuedDate" class="label-modal">{{__('forms.issuedDate')}}</label>
-                                        <input x-model="modalEducation.issued_date" type="date" id="educationIssuedDate" class="input-modal">
+                                        <input id="educationIssuedDate" x-model="modalEducation.issued_date"  class="input-modal datepicker-input"
+                                               autocomplete="off" required>
                                     </div>
                                     <div>
                                         <label for="educationDiplomaNumber" class="label-modal">{{__('forms.diplomaNumber')}}</label>

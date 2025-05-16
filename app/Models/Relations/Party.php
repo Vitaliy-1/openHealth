@@ -31,7 +31,7 @@ class Party extends Model
         'tax_id',
         'no_tax_id',
         'about_myself',
-        'working_experience',
+        'working_experience'
     ];
 
     public $timestamps = false;
@@ -59,19 +59,20 @@ class Party extends Model
     {
         return $this->morphMany(Education::class, 'educationable');
     }
+
     public function specialities(): MorphMany
     {
         return $this->morphMany(Speciality::class, 'specialityable');
     }
 
-    public function science(): MorphOne
-    {
-        return $this->morphOne(ScienceDegree::class, 'scienceable');
-    }
-
     public function qualifications(): MorphMany
     {
         return $this->morphMany(Qualification::class, 'qualificationable');
+    }
+
+    public function scienceDegrees(): MorphOne
+    {
+        return $this->morphOne(ScienceDegree::class, 'science_degreeable');
     }
 
     public function phones(): MorphMany
