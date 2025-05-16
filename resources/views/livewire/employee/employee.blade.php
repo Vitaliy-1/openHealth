@@ -14,13 +14,8 @@
                 }
             }"
         >
-
             @include('livewire.employee._parts._employee')
             @include('livewire.employee._parts._documents')
-            @include('livewire.employee._parts._education')
-            @include('livewire.employee._parts._specialities')
-            @include('livewire.employee._parts._science_degree')
-            @include('livewire.employee._parts._qualifications')
 
             <template x-if="isDoctor()">
                 <div>
@@ -38,7 +33,6 @@
                 <button type="submit" class="button-primary">
                     {{__('forms.save')}}
                 </button>
-
                 <button wire:click="signedComplete('signedContent')" type="button" class="button-primary">
                     {{ __('forms.send_for_approval') }}
                 </button>

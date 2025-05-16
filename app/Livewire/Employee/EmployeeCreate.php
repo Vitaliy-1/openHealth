@@ -119,8 +119,6 @@ class EmployeeCreate extends EmployeeComponent
             throw new \Exception('Legal Entity ID not found in context when creating user.');
         }
 
-        DB::statement("SELECT setval('users_id_seq', (SELECT MAX(id) FROM users))");
-
         return User::create([
             'email' => $person->email,
             'password' => Hash::make(Str::random(12)),
@@ -204,6 +202,7 @@ class EmployeeCreate extends EmployeeComponent
     public function render()
     {
         $pageTitle = __('forms.add_employee');
+
         return view('livewire.employee.employee-create', compact('pageTitle'));
     }
 }
