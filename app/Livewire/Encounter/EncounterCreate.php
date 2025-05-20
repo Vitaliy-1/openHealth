@@ -41,17 +41,28 @@ class EncounterCreate extends EncounterComponent
             $formattedImmunizations = $encounterRepository->formatImmunizationsRequest($this->form->immunizations);
         }
 
+        if (!empty($this->form->observations)) {
+            $formattedObservations = $encounterRepository->formatObservationsRequest($this->form->observations);
+        }
+
         // Validate formatted data
         try {
             $this->form->validateForm('encounter', $formattedEncounter);
             $this->form->validateForm('episode', $formattedEpisode);
-            foreach ($formattedConditions['conditions'] as $index => $formattedCondition) {
-                $this->form->validateForm("conditions.$index", $formattedCondition);
+
+            foreach ($formattedConditions['conditions'] as $formattedCondition) {
+                $this->form->validateForm('conditions', ['conditions' => [$formattedCondition]]);
             }
 
             if (isset($formattedImmunizations)) {
-                foreach ($formattedImmunizations['immunizations'] as $index => $formattedImmunization) {
-                    $this->form->validateForm("immunizations.$index", $formattedImmunization);
+                foreach ($formattedImmunizations['immunizations'] as $formattedImmunization) {
+                    $this->form->validateForm('immunizations', ['immunizations' => [$formattedImmunization]]);
+                }
+            }
+
+            if (isset($formattedObservations)) {
+                foreach ($formattedObservations['observations'] as $formattedObservation) {
+                    $this->form->validateForm('observations', ['observations' => [$formattedObservation]]);
                 }
             }
         } catch (ValidationException $e) {

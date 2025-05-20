@@ -186,7 +186,7 @@
                                         {{ __('patients.icpc-2_status_code') }}
                                     </label>
                                     <x-select2 modelPath="modalCondition.conditions.code.coding[0].code"
-                                               :dictionary="$this->dictionaries['eHealth/ICPC2/condition_codes']"
+                                               dictionaryName="eHealth/ICPC2/condition_codes"
                                                id="conditionReasonCode"
                                     />
                                     <p class="text-error text-xs"
@@ -490,11 +490,11 @@
                                 <div x-show="modalCondition.conditions.primarySource === true">
                                     <div class="form-row-modal">
                                         <div class="form-group group">
-                                                <textarea x-model="modalCondition.conditions.asserter.identifier.type.text"
+                                                <textarea rows="4"
+                                                          x-model="modalCondition.conditions.asserter.identifier.type.text"
                                                           id="doctorComment"
                                                           name="doctorComment"
                                                           class="textarea"
-                                                          rows="4"
                                                           placeholder="{{ __('patients.write_comment_here') }}"
                                                 ></textarea>
                                         </div>
@@ -523,7 +523,7 @@
                                         </div>
                                     </div>
 
-                                    @include('livewire.encounter._parts._evidences')
+                                    @include('livewire.encounter.parts.evidences')
                                 </div>
                             </div>
 
@@ -542,7 +542,6 @@
                                 <button @click.prevent="
                                             delete modalCondition.query;
                                             modalCondition.conditions.code.coding = modalCondition.conditions.code.coding.filter(c => c.code.trim() !== '');
-                                            const newTypeCode = modalCondition.conditions.diagnoses.role.coding[0]?.code;
                                             const matchingPrimaryCount = diagnoses.filter(
                                                 diagnose => diagnose.role.coding[0]?.code === 'primary'
                                             ).length;
@@ -552,12 +551,12 @@
                                                 c => c.code.coding[0]?.code === newCode
                                             ).length;
 
-                                            if (newTypeCode === 'primary' && matchingPrimaryCount >= 1) {
+                                            if (matchingPrimaryCount === 1 && modalCondition.conditions.diagnoses.role.coding[0].code === 'primary') {
                                                 showPrimaryWarning = true;
                                                 return;
                                             }
 
-                                            if (matchingCodesCount >= 1) {
+                                            if (matchingCodesCount > 1) {
                                                 showDuplicateCodeWarning = true;
                                                 return;
                                             }

@@ -259,7 +259,7 @@ class HealthcareServiceForm extends Component
     {
         $this->tableHeaders = [
             __('ID E-health '),
-            __('Категорія'),
+            __('forms.category'),
             __('Умови надання'),
             __('Тип спеціальності'),
             __('Статус'),

@@ -9,7 +9,7 @@
             <x-forms.form-group class="xl:w-1/2">
                 <x-slot name="label">
                     <x-forms.label class="default-label" for="knedp" name="label">
-                        {{ __('forms.KNEDP') }} *
+                        {{ __('forms.knedp') }} *
                     </x-forms.label>
                 </x-slot>
 

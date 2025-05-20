@@ -68,3 +68,7 @@ This command:
 * generates unique application API key (see API_KEY global variable),
 * creates tables
 * populates tables with data, such as roles and permissions
+
+### Code Style
+- view file names: kebab-case
+- lang key: snake_case

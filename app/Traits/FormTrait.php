@@ -213,4 +213,17 @@ trait FormTrait
             ->unique()
             ->all();
     }
+
+    /**
+     * Flash general error message to the user.
+     *
+     * @return void
+     */
+    public function flashGeneralError(): void
+    {
+        $this->dispatch('flashMessage', [
+            'message' => __('Виникла помилка. Зверніться до адміністратора.'),
+            'type' => 'error',
+        ]);
+    }
 }

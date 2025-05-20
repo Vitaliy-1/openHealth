@@ -13,9 +13,9 @@ class InDictionary implements ValidationRule
     /**
      * Create a new rule instance.
      *
-     * @param  string  $dictionaryName  The name of the examined dictionary
+     * @param  string|array  $dictionaryNames  One or multiple dictionary names to check against
      */
-    public function __construct(protected string $dictionaryName = '')
+    public function __construct(protected string|array $dictionaryNames)
     {
     }
 
@@ -30,11 +30,27 @@ class InDictionary implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $dictionary = array_keys(dictionary()->getDictionary($this->dictionaryName)) ?? [];
+        // Normalize dictionary names to array for unified processing
+        $names = is_array($this->dictionaryNames)
+            ? $this->dictionaryNames
+            : [$this->dictionaryNames];
 
-        // Check if the field value belongs to appropriate dictionary
-        if (!in_array($value, $dictionary, true)) {
-            $fail(__('Недопустиме значення'));
+        // A flag to determine if the value exists in at least one dictionary
+        $isValid = false;
+
+        foreach ($names as $name) {
+            // Retrieve dictionary keys (assumed to be codes)
+            $dictionaryKeys = array_keys(dictionary()->getDictionary($name));
+
+            if (in_array($value, $dictionaryKeys, true)) {
+                $isValid = true;
+                break; // Stop checking once a match is found
+            }
+        }
+
+        // Fail validation if value not found in any dictionary
+        if (! $isValid) {
+            $fail(__('Недопустиме значення :attribute'));
         }
     }
 }

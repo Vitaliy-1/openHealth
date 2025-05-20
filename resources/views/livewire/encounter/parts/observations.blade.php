@@ -7,6 +7,17 @@
                   modalObservation: new Observation(),
                   newObservation: false,
                   item: 0,
+                  observationCategoriesDictionary: $wire.dictionaries['eHealth/observation_categories'],
+                  icfObservationCategoriesDictionary: $wire.dictionaries['eHealth/ICF/observation_categories'],
+                  observationCodesDictionary: $wire.dictionaries['eHealth/LOINC/observation_codes'],
+                  icfObservationCodesDictionary: $wire.dictionaries['eHealth/ICF/classifiers'],
+                  reportOriginsDictionary: $wire.dictionaries['eHealth/report_origins'],
+                  extentOrMagnitudeOfImpairmentDictionary: $wire.dictionaries['eHealth/ICF/qualifiers/extent_or_magnitude_of_impairment'],
+                  natureOfChangeInBodyStructureDictionary: $wire.dictionaries['eHealth/ICF/qualifiers/nature_of_change_in_body_structure'],
+                  anatomicalLocalizationDictionary: $wire.dictionaries['eHealth/ICF/qualifiers/anatomical_localization'],
+                  performanceDictionary: $wire.dictionaries['eHealth/ICF/qualifiers/performance'],
+                  capacityDictionary: $wire.dictionaries['eHealth/ICF/qualifiers/capacity'],
+                  barrierOrFacilitatorDictionary: $wire.dictionaries['eHealth/ICF/qualifiers/barrier_or_facilitator'],
               }"
     >
         <legend class="legend">
@@ -16,7 +27,6 @@
         <table class="table-input w-inherit">
             <thead class="thead-input">
             <tr>
-                <th scope="col" class="th-input">{{ __('forms.status') }}</th>
                 <th scope="col" class="th-input">{{ __('forms.category') }}</th>
                 <th scope="col" class="th-input">{{ __('patients.code') }}</th>
                 <th scope="col" class="th-input">{{ __('patients.value') }}</th>
@@ -28,14 +38,31 @@
             <template x-for="(observation, index) in observations">
                 <tr>
                     <td class="td-input"
+                        x-text="
+                            observationCategoriesDictionary[observation.categories.coding[0]['code']] ||
+                            icfObservationCategoriesDictionary[observation.categories.coding[0]['code']]
+                        "
                     ></td>
                     <td class="td-input"
+                        x-text="
+                            observationCodesDictionary[observation.code.coding[0]['code']] ||
+                            icfObservationCodesDictionary[observation.code.coding[0]['code']]
+                        "
                     ></td>
                     <td class="td-input"
+                        x-text="
+                            observation.valueBoolean !== undefined
+                                ? (observation.valueBoolean ? 'Так' : 'Ні')
+                            : observation.valueString !== undefined
+                                ? observation.valueString
+                            : observation.valueQuantity !== undefined
+                                ? observation.valueQuantity
+                            : (observation.valueDate !== undefined && observation.valueTime !== undefined)
+                                ? observation.valueDate + ' ' + observation.valueTime
+                            : $wire.dictionaries[observation.dictionaryName]?.[observation.valueCodeableConcept]
+                        "
                     ></td>
-                    <td class="td-input"
-                    ></td>
-                    <td class="td-input" x-text="observation"></td>
+                    <td class="td-input"></td>
                     <td class="td-input">
                         {{-- That all that is needed for the dropdown --}}
                         <div x-data="{
@@ -167,7 +194,8 @@
 
                             {{-- Content --}}
                             <form>
-                                @include('livewire.encounter.observation_parts.coding_system')
+                                @include('livewire.encounter.observation-parts.coding-system')
+                                @include('livewire.encounter.observation-parts.main-information')
 
                                 <div class="mt-6 flex justify-between space-x-2">
                                     <button type="button"
@@ -178,9 +206,18 @@
                                     </button>
 
                                     <button @click.prevent="
+                                                if (modalObservation.codingSystem === 'loinc') {
+                                                    modalObservation.categories.coding[0].system = 'eHealth/observation_categories';
+                                                    modalObservation.code.coding[0].system = 'eHealth/LOINC/observation_codes';
+                                                } else {
+                                                   modalObservation.categories.coding[0].system = 'eHealth/ICF/observation_categories';
+                                                   modalObservation.code.coding[0].system = 'eHealth/ICF/classifiers';
+                                                }
+
                                                 newObservation !== false
                                                 ? observations.push(modalObservation)
                                                 : observations[item] = modalObservation;
+                                                modalObservation.dictionaryName = $wire.observationValueMap[modalObservation.code.coding[0].code]?.[0];
 
                                                 showDuplicateCodeWarning = false;
                                                 openModal = false;
@@ -210,6 +247,45 @@
      */
     class Observation {
         codingSystem = 'loinc';
+        dictionaryName = '';
+        primarySource = true;
+        performer = {
+            identifier: {
+                type: {
+                    coding: [
+                        {system: 'eHealth/resources', code: 'employee'}
+                    ],
+                    text: ''
+                }
+            }
+        };
+        reportOrigin = {
+            coding: [
+                {system: 'eHealth/report_origins', code: ''}
+            ],
+            text: ''
+        };
+        categories = {
+            coding: [{system: '', code: ''}],
+            text: ''
+        };
+        code = {
+            coding: [{system: '', code: ''}],
+            text: ''
+        };
+        components = [
+            {
+                code: {
+                    coding: [{system: '', code: ''}],
+                    text: ''
+                },
+
+                interpretation: {
+                    coding: [{system: '', code: ''}],
+                    text: ''
+                }
+            }
+        ];
 
         constructor(obj = null) {
             if (obj) {

@@ -12,12 +12,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ConditionalRules;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\ValidationException;
 use Livewire\Form;
 
 class Encounter extends Form
 {
-    public ?array $encounter = [
+    public array $encounter = [
         'status' => 'finished',
         'visit' => [
             'identifier' => [
@@ -117,18 +118,19 @@ class Encounter extends Form
 
             'immunizations.*.primarySource' => ['required', 'boolean'],
             'immunizations.*.performer' => [
-                'required_if:immunizations.*.primarySource,true', 'prohibited_if:immunizations.*.primarySource,false',
-                'array'
+                'required_if:immunizations.*.primarySource,true', 'prohibited_if:immunizations.*.primarySource,false', 'array'
             ],
             'immunizations.*.reportOrigin' => [
-                'required_if:immunizations.*.primarySource,false', 'prohibited_if:immunizations.*.primarySource,true'
+                'required_if:immunizations.*.primarySource,false', 'prohibited_if:immunizations.*.primarySource,true', 'array'
             ],
             'immunizations.*.reportOrigin.coding.*.code' => [
                 'string', new InDictionary('eHealth/immunization_report_origins')
             ],
             'immunizations.*.notGiven' => ['required', 'boolean'],
             'immunizations.*.explanation.reasonsNotGiven' => [
-                $this->requiredIfPrimarySourceAndNotGiven(true, true), 'prohibited_if:immunizations.*.notGiven,false', 'array'
+                $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                'prohibited_if:immunizations.*.notGiven,false',
+                'array'
             ],
             'immunizations.*.explanation.reasonsNotGiven.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/reason_not_given_explanations')
@@ -149,20 +151,29 @@ class Encounter extends Form
             'immunizations.*.explanation.reasons.*.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/reason_explanations')
             ],
-            'immunizations.*.manufacturer' => [$this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'],
-            'immunizations.*.lotNumber' => [$this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'],
-            'immunizations.*.expirationDate' => [$this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'],
+            'immunizations.*.manufacturer' => [
+                $this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'
+            ],
+            'immunizations.*.lotNumber' => [
+                $this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'
+            ],
+            'immunizations.*.expirationDate' => [
+                $this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'
+            ],
             'immunizations.*.doseQuantity.value' => [
-                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(false, false),
+                $this->requiredIfPrimarySourceAndNotGiven(true, false),
+                $this->requiredIfPrimarySourceAndNotGiven(false, false),
                 'integer'
             ],
             'immunizations.*.doseQuantity.unit' => [
-                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(false, false),
+                $this->requiredIfPrimarySourceAndNotGiven(true, false),
+                $this->requiredIfPrimarySourceAndNotGiven(false, false),
                 'string'
             ],
             'immunizations.*.doseQuantity.code' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
-                new InDictionary('eHealth/immunization_dosage_units'), 'string'
+                new InDictionary('eHealth/immunization_dosage_units'),
+                'string'
             ],
             'immunizations.*.site' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false), 'array'
@@ -170,44 +181,71 @@ class Encounter extends Form
             'immunizations.*.site.coding.*.code' => [
                 'nullable', 'string', new InDictionary('eHealth/immunization_body_sites')
             ],
-            'immunizations.*.route' => [$this->requiredIfPrimarySourceAndNotGiven(true, false), 'array'],
+            'immunizations.*.route' => [
+                $this->requiredIfPrimarySourceAndNotGiven(true, false), 'array'
+            ],
             'immunizations.*.route.coding.*.code' => [
                 'nullable', 'string', new InDictionary('eHealth/vaccination_routes')
             ],
             'immunizations.*.vaccinationProtocols.doseSequence' => [
-                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                $this->requiredIfPrimarySourceAndNotGiven(true, false),
+                $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                $this->requiredIfHasMoHAuthority(),
                 'integer',
-                // Required if vaccinationProtocols.authority.coding.*.code === MoH
-                Rule::requiredIf(function () {
-                    return collect($this->immunizations)
-                        ->flatMap(fn (array $immunization) => $immunization['vaccinationProtocols'])
-                        ->flatMap(fn (array $protocol) => $protocol['authority']['coding'])
-                        ->contains(fn (array $coding) => $coding['code'] === 'MoH');
-                })
             ],
             'immunizations.*.vaccinationProtocols.description' => ['nullable', 'string', 'max:255'],
             'immunizations.*.vaccinationProtocols.authority' => [
-                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(true, true),
-                $this->requiredIfPrimarySourceAndNotGiven(false, false), 'array'
+                $this->requiredIfPrimarySourceAndNotGiven(true, false),
+                $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                $this->requiredIfPrimarySourceAndNotGiven(false, false),
+                'array'
             ],
             'immunizations.*.vaccinationProtocols.authority.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/vaccination_authorities')
             ],
             'immunizations.*.vaccinationProtocols.series' => [
-                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(true, true),
-                'required_if:immunizations.*.vaccinationProtocols.authority.coding.*.code,MoH', 'string', 'max:255'
+                $this->requiredIfPrimarySourceAndNotGiven(true, false),
+                $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                $this->requiredIfHasMoHAuthority(),
+                'max:255',
+                'string',
             ],
             'immunizations.*.vaccinationProtocols.seriesDoses' => [
-                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(true, true),
-                'required_if:immunizations.*.vaccinationProtocols.authority.coding.*.code,MoH', 'integer'
+                $this->requiredIfPrimarySourceAndNotGiven(true, false),
+                $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                $this->requiredIfHasMoHAuthority(),
+                'integer'
             ],
             'immunizations.*.vaccinationProtocols.targetDiseases' => [
-                $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(true, true),
-                $this->requiredIfPrimarySourceAndNotGiven(false, false), 'array'
+                $this->requiredIfPrimarySourceAndNotGiven(true, false),
+                $this->requiredIfPrimarySourceAndNotGiven(true, true),
+                $this->requiredIfPrimarySourceAndNotGiven(false, false),
+                'array'
             ],
             'immunizations.*.vaccinationProtocols.targetDiseases.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/vaccination_target_diseases')
-            ]
+            ],
+
+            'observations.*.primarySource' => ['required', 'boolean'],
+            'observations.*.performer' => [
+                'required_if:observations.*.primarySource,true', 'prohibited_if:observations.*.primarySource,false', 'array'
+            ],
+            'observations.*.reportOrigin' => [
+                'required_if:observations.*.primarySource,false', 'prohibited_if:observations.*.primarySource,true', 'array'
+            ],
+            'observations.*.categories' => ['required', 'array'],
+            'observations.*.categories.coding.*.code' => [
+                'required', 'string', new InDictionary(['eHealth/observation_categories', 'eHealth/ICF/observation_categories'])
+            ],
+            'observations.*.code' => ['required', 'array'],
+            'observations.*.code.coding.*.code' => [
+                'required', 'string', new InDictionary(['eHealth/LOINC/observation_codes', 'eHealth/ICF/classifiers'])
+            ],
+            'observations.*.valueQuantity' => ['sometimes', 'numeric'],
+            'observations.*.valueCodeableConcept' => ['sometimes', 'array'],
+            'observations.*.valueString' => ['sometimes', 'string'],
+            'observations.*.valueBoolean' => ['sometimes', 'boolean'],
+            'observations.*.valueDateTime' => ['sometimes', 'date']
         ];
     }
 
@@ -351,5 +389,20 @@ class Encounter extends Form
             static fn ($input) => ($input['primarySource']) === $primarySource && ($input['notGiven']) === $notGiven,
             'required'
         );
+    }
+
+    /**
+     * Required if vaccinationProtocols.authority.coding.*.code === MoH
+     *
+     * @return RequiredIf
+     */
+    private function requiredIfHasMoHAuthority(): RequiredIf
+    {
+        return Rule::requiredIf(function () {
+            return collect($this->immunizations)
+                ->flatMap(static fn (array $immunization) => $immunization['vaccinationProtocols'])
+                ->flatMap(static fn (array $protocol) => $protocol['authority']['coding'])
+                ->contains(static fn (array $coding) => $coding['code'] === 'MoH');
+        });
     }
 }

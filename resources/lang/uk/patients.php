@@ -29,6 +29,10 @@ return [
     'diagnoses' => 'Діагнози',
     'date' => 'Дата',
     'observation' => 'Обстеження',
+    'information_source' => 'Джерело інформації',
+    'other_source' => 'Інше джерело',
+    'performer' => 'Виконавець',
+    'source_link' => 'Посилання на джерело',
 
     'relation_type' => [
         'primary' => 'Основний',
@@ -138,9 +142,6 @@ return [
     'entry_time' => 'Час внесення',
     'severity_of_the_condition' => 'Ступінь тяжкості стану',
     'primary_source' => 'Первинне джерело',
-    'performer' => 'Виконавець',
-    'other_source' => 'Інше джерело',
-    'information_source' => 'Джерело інформації',
     'new_primary_diagnose' => "Ви вказали новий основний діагноз.<br> Підтвердження дії змінить основний діагноз епізоду медичної допомоги!",
     'duplicate_code_warning' => 'Такий код вже існує',
 
@@ -161,7 +162,6 @@ return [
     'reason' => 'Причина',
     'has_it_been_done' => 'Чи була проведена',
     'reasons' => 'Причини',
-    'source_link' => 'Посилання на джерело',
     'data' => 'Дані',
     'time' => 'Час',
     'manufacturer' => 'Виробник',
@@ -185,4 +185,8 @@ return [
     'coding_system' => 'Система кодувань',
     'loinc_observation_dictionary' => 'Довідник спостережень LOINC',
     'icf_dictionary_condition_patient' => 'Довідник станів пацієнта МКФ',
+    'main_information' => 'Основна інформація',
+    'components' => 'Компоненти',
+    'extent_or_magnitude_of_violation' => 'Обсяг або величина порушення',
+    'interpretation' => 'Інтерпретація',
 ];

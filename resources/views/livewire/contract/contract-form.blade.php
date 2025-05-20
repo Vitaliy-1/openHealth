@@ -278,7 +278,7 @@
                             <x-forms.form-group class='mt-4'>
                                 <x-slot name='label'>
                                     <x-forms.label for='MFO' class='default-label'>
-                                        {{ __('forms.MFO') }} *
+                                        {{ __('forms.mfo') }} *
                                     </x-forms.label>
                                 </x-slot>
                                 <x-slot name='input'>

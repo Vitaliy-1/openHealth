@@ -4,7 +4,7 @@
         <x-slot name="label">
             <x-forms.label class="default-label" for="knedp"
                            name="label">
-                {{__('forms.KNEDP')}} *
+                {{__('forms.knedp')}} *
             </x-forms.label>
         </x-slot>
         <x-slot name="input">

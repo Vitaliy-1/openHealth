@@ -186,9 +186,9 @@
 
                             {{-- Content --}}
                             <form>
-                                @include('livewire.encounter.immunization_parts.data')
-                                @include('livewire.encounter.immunization_parts.information_about')
-                                @include('livewire.encounter.immunization_parts.vaccination_protocol')
+                                @include('livewire.encounter.immunization-parts.data')
+                                @include('livewire.encounter.immunization-parts.information-about')
+                                @include('livewire.encounter.immunization-parts.vaccination-protocol')
 
                                 <div class="mt-6 flex justify-between space-x-2">
                                     <button type="button"
@@ -245,19 +245,19 @@
      */
     class Immunization {
         date = new Date().toISOString().split('T')[0];
-        time = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', hour12: false });
+        time = new Date().toLocaleTimeString('uk-UA', {hour: '2-digit', minute: '2-digit', hour12: false});
         notGiven = false;
         vaccineCode = {
-            coding: [{ system: 'eHealth/vaccine_codes', code: '' }]
+            coding: [{system: 'eHealth/vaccine_codes', code: ''}]
         };
         explanation = {
             reasons: [
                 {
-                    coding: [{ system: 'eHealth/reason_explanations', code: '' }]
+                    coding: [{system: 'eHealth/reason_explanations', code: ''}]
                 }
             ],
             reasonsNotGiven: {
-                coding: [{ system: 'eHealth/reason_not_given_explanations', code: '' }]
+                coding: [{system: 'eHealth/reason_not_given_explanations', code: ''}]
             }
         };
         primarySource = true;
@@ -265,7 +265,7 @@
             identifier: {
                 type: {
                     coding: [
-                        { system: 'eHealth/resources', code: 'employee' }
+                        {system: 'eHealth/resources', code: 'employee'}
                     ],
                     text: ''
                 }
@@ -273,7 +273,7 @@
         };
         reportOrigin = {
             coding: [
-                { system: 'eHealth/immunization_report_origins', code: '' }
+                {system: 'eHealth/immunization_report_origins', code: ''}
             ],
             text: ''
         };
@@ -281,11 +281,11 @@
         lotNumber = null;
         expirationDate = null;
         site = {
-            coding: [{ system: 'eHealth/immunization_body_sites', code: '' }],
+            coding: [{system: 'eHealth/immunization_body_sites', code: ''}],
             text: ''
         };
         route = {
-            coding: [{ system: 'eHealth/vaccination_routes', code: '' }],
+            coding: [{system: 'eHealth/vaccination_routes', code: ''}],
             text: ''
         };
         doseQuantity = {

@@ -106,4 +106,36 @@ class Dictionary extends Collection
 
         return $keys;
     }
+
+    /**
+     * Get flattened values with child.
+     *
+     * @return array
+     */
+    public function getFlattenedChildValues(): array
+    {
+        return $this->flatMap(function ($item) {
+            $collectDescriptions = static function (array $data) use (&$collectDescriptions) {
+                $result = [];
+
+                foreach ($data as $key => $value) {
+                    $code = is_string($key) ? $key : ($value['code'] ?? null);
+
+                    if ($code && isset($value['description'])) {
+                        $result[$code] = $value['description'];
+                    }
+
+                    if (!empty($value['child_values'])) {
+                        $childValues = $collectDescriptions($value['child_values']);
+                        $result += $childValues;
+                    }
+                }
+
+                return $result;
+            };
+
+            return collect($item)->flatMap(fn ($value) => $collectDescriptions([$value]));
+        })
+            ->toArray();
+    }
 }

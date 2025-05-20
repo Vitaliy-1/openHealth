@@ -14,14 +14,14 @@
     </x-section-navigation>
 
     <form class="form">
-        @include('livewire.encounter._parts._aside_navigation')
-        @include('livewire.encounter._parts._main_data')
-        @include('livewire.encounter._parts._reasons')
-        @include('livewire.encounter._parts._diagnoses')
-        @include('livewire.encounter._parts._actions')
-        @include('livewire.encounter._parts._additional_data')
-        @include('livewire.encounter._parts._immunizations')
-        @include('livewire.encounter._parts._observations')
+        @include('livewire.encounter.parts.aside-navigation')
+        @include('livewire.encounter.parts.main-data')
+        @include('livewire.encounter.parts.reasons')
+        @include('livewire.encounter.parts.diagnoses')
+        @include('livewire.encounter.parts.actions')
+        @include('livewire.encounter.parts.additional-data')
+        @include('livewire.encounter.parts.immunizations')
+        @include('livewire.encounter.parts.observations')
 
         <div class="flex gap-8">
             <button wire:click.prevent="" type="submit" class="button-minor">

@@ -518,6 +518,17 @@ return [
             'date' => 'дата вакцинації',
             'time' => 'час вакцинації',
         ],
+        'observations' => [
+            'primarySource' => 'джерело інформації',
+            'performer' => 'виконавець',
+            'reportOrigin' => 'інше джерело',
+            'categories.coding.*.code' => 'категорія',
+            'valueQuantity' => 'значення',
+            'valueCodeableConcept' => 'значення',
+            'valueString' => 'значення',
+            'valueBoolean' => 'значення',
+            'valueDateTime' => 'значення',
+        ],
         'errors' => [
             'email' => 'Неправильний формат електронної адреси',
             'wrongNumberFormat' => 'Неправильний формат номеру',

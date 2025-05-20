@@ -357,11 +357,73 @@ class EncounterRepository extends BaseRepository
                 $immunization['expirationDate'] = convertToISO8601($immunization['expirationDate'] . now()->format('H:i'));
             }
 
-            return $immunization;
+            // remove key where value is null
+            return array_filter($immunization, static fn (mixed $value) => !is_null($value));
         }, $immunizations);
 
         return schemaService()
             ->setDataSchema(['immunizations' => $immunizationForm], app(PatientApi::class))
+            ->requestSchemaNormalize()
+            ->camelCaseKeys()
+            ->getNormalizedData();
+    }
+
+    /**
+     * Format observations data before request.
+     *
+     * @param  array  $observations
+     * @return array
+     */
+    public function formatObservationsRequest(array $observations): array
+    {
+        $observationForm = array_map(function (array $observation) {
+            unset($observation['codingSystem']);
+
+            $observation['id'] = Str::uuid()->toString();
+
+            if (isset($observation['dictionaryName'])) {
+                unset($observation['dictionaryName']);
+            }
+
+            $observation['context']['identifier']['type']['coding'][0] = [
+                'system' => 'eHealth/resources',
+                'code' => 'encounter'
+            ];
+            $observation['context']['identifier']['value'] = $this->encounterUuid;
+
+            if ($observation['primarySource']) {
+                unset($observation['reportOrigin']);
+
+                // TODO: потім взяти employee авторизованого
+                $employee = Employee::findOrFail(1);
+                $observation['performer']['identifier']['value'] = $employee->uuid;
+            } else {
+                unset($observation['performer']);
+            }
+
+            // format to codeable concept type
+            if (isset($observation['valueCodeableConcept'])) {
+                $observation['valueCodeableConcept'] = [
+                    'coding' => [
+                        [
+                            'system' => 'eHealth/' . $observation['code']['coding'][0]['code'],
+                            'code' => $observation['valueCodeableConcept'],
+                        ]
+                    ],
+                    'text' => ''
+                ];
+            }
+
+            // combine date&time
+            if (isset($observation['valueDate'], $observation['valueTime'])) {
+                $observation['valueDateTime'] = convertToISO8601($observation['valueDate'] . $observation['valueTime']);
+            }
+
+            return $observation;
+        }, $observations);
+
+        return schemaService()
+            ->setDataSchema(['observations' => $observationForm], app(PatientApi::class))
             ->requestSchemaNormalize()
             ->camelCaseKeys()
             ->getNormalizedData();

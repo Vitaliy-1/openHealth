@@ -40,7 +40,7 @@
             @endif
 
             <label for="publicOfferKnedp" class="label z-10">
-                {{ __('forms.KNEDP') }}
+                {{ __('forms.knedp') }}
             </label>
         </div>
 

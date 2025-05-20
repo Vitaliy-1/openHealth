@@ -172,9 +172,10 @@
                                             {{ __('patients.icpc-2_status_code') }}
                                         </label>
                                         <x-select2 modelPath="modalAction.coding[0].code"
-                                                   :dictionary="$this->dictionaries['eHealth/ICPC2/actions']"
+                                                   dictionaryName="eHealth/ICPC2/actions"
                                                    id="actionCode"
                                         />
+
                                         <p class="text-error text-xs"
                                            x-show="!Object.keys(dictionary).includes(modalAction.coding[0].code)"
                                         >

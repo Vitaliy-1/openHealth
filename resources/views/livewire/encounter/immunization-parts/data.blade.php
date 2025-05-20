@@ -32,8 +32,8 @@
             </p>
         </div>
 
-        <div class="w-1/2">
-            <label for="immunizationTime" class="label-modal" onclick="document.getElementById('time').showPicker()">
+        <div class="w-1/2" onclick="document.getElementById('immunizationTime').showPicker()">
+            <label for="immunizationTime" class="label-modal">
                 {{ __('patients.time') }}
             </label>
 

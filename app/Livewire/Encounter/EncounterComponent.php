@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Encounter;
 
-use App\Classes\Cipher\Exceptions\ApiException;
+use App\Classes\Cipher\Exceptions\ApiException as CipherApiException;
+use App\Classes\eHealth\Exceptions\ApiException as eHealthApiException;
 use App\Classes\Cipher\Traits\Cipher;
 use App\Classes\eHealth\Api\PatientApi;
 use App\Classes\eHealth\Api\ServiceRequestApi;
@@ -95,7 +96,29 @@ class EncounterComponent extends Component
      */
     public array $results;
 
-    public array $dictionaryNames = [
+    /**
+     * List of observation codes for categories.
+     * @var array
+     */
+    public array $observationCodeMap;
+
+    /**
+     * List of observation values and type of data for specific categories.
+     * @var array
+     */
+    public array $observationValueMap;
+
+    /**
+     * List of values for codeable concept.
+     * @var array
+     */
+    public array $codeableConceptValues;
+
+    /**
+     * List of dictionary names.
+     * @var array|string[]
+     */
+    protected array $dictionaryNames = [
         'eHealth/encounter_statuses',
         'eHealth/encounter_classes',
         'eHealth/encounter_types',
@@ -118,14 +141,36 @@ class EncounterComponent extends Component
         'eHealth/vaccination_routes',
         'eHealth/immunization_body_sites',
         'eHealth/vaccination_authorities',
-        'eHealth/vaccination_target_diseases'
+        'eHealth/vaccination_target_diseases',
+        'eHealth/observation_categories',
+        'eHealth/ICF/observation_categories',
+        'eHealth/LOINC/observation_codes',
+        'eHealth/stature',
+        'eHealth/eye_colour',
+        'eHealth/hair_color',
+        'eHealth/hair_length',
+        'GENDER',
+        'eHealth/rankin_scale',
+        'eHealth/LOINC/LL2009-0',
+        'eHealth/LOINC/LL2021-5',
+        'eHealth/occupation_type',
+        'eHealth/vaccination_covid_groups',
+        'eHealth/LOINC/LL2451-4',
+        'eHealth/LOINC/LL360-9',
+        'eHealth/ICF/qualifiers',
+        'eHealth/ICF/qualifiers/extent_or_magnitude_of_impairment',
+        'eHealth/ICF/qualifiers/nature_of_change_in_body_structure',
+        'eHealth/ICF/qualifiers/anatomical_localization',
+        'eHealth/ICF/qualifiers/performance',
+        'eHealth/ICF/qualifiers/capacity',
+        'eHealth/ICF/qualifiers/barrier_or_facilitator',
     ];
 
     /**
      * Search for referral number.
      *
      * @return void
-     * @throws \App\Classes\eHealth\Exceptions\ApiException
+     * @throws eHealthApiException
      */
     public function searchForReferralNumber(): void
     {
@@ -137,7 +182,7 @@ class EncounterComponent extends Component
      * Search approved episode.
      *
      * @return void
-     * @throws \App\Classes\eHealth\Exceptions\ApiException
+     * @throws eHealthApiException
      */
     public function searchForEpisode(): void
     {
@@ -149,7 +194,7 @@ class EncounterComponent extends Component
      * Search conditions.
      *
      * @return void
-     * @throws \App\Classes\eHealth\Exceptions\ApiException
+     * @throws eHealthApiException
      */
     public function searchForConditions(): void
     {
@@ -210,7 +255,26 @@ class EncounterComponent extends Component
         $this->role = $user->roles->first()->name;
         $this->divisions = $user->legalEntity->division->toArray();
 
+        $this->observationCodeMap = config('ehealth.observation_category_codes');
+        $this->observationValueMap = config('ehealth.observation_code_values');
+
         $this->getDictionary();
+
+        try {
+            $this->dictionaries['eHealth/ICF/classifiers'] = dictionary()
+                ->getLargeDictionary(['name' => 'eHealth/ICF/classifiers'], false)
+                ->getFlattenedChildValues();
+        } catch (eHealthApiException) {
+            $this->flashGeneralError();
+        }
+
+        $this->codeableConceptValues = collect(config('ehealth.observation_code_values'))
+            ->filter(static fn (array $value) => $value[1] === 'value_codeable_concept')
+            ->mapWithKeys(fn (array $value) => [
+                $value[0] => $this->dictionaries[$value[0]] ?? [],
+            ])
+            ->toArray();
+
         $this->adjustEpisodeTypes();
         $this->adjustEncounterClasses();
         $this->adjustEncounterTypes();
@@ -220,11 +284,8 @@ class EncounterComponent extends Component
 
         try {
             $this->setCertificateAuthority();
-        } catch (ApiException) {
-            $this->dispatch('flashMessage', [
-                'message' => __('Виникла помилка. Зверніться до адміністратора.'),
-                'type' => 'error'
-            ]);
+        } catch (CipherApiException) {
+            $this->flashGeneralError();
         }
     }
 
@@ -311,7 +372,7 @@ class EncounterComponent extends Component
      * Get Certificate Authority from API.
      *
      * @return array
-     * @throws ApiException
+     * @throws CipherApiException
      */
     protected function setCertificateAuthority(): array
     {

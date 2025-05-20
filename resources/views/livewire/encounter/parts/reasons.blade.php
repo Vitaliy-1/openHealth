@@ -1,33 +1,37 @@
 {{-- Component to input values to the table through the Modal, built with Alpine --}}
-<div class="relative"> {{-- This required for table overflow scrolling --}}
+<div class="relative" id="reasons-section"> {{-- This required for table overflow scrolling --}}
     <fieldset class="fieldset"
-              {{-- Binding evidenceCodes to Alpine, it will be re-used in the modal.
+              {{-- Binding Reason to Alpine, it will be re-used in the modal.
                 Note that it's necessary for modal to work properly --}}
               x-data="{
+                  reasons: $wire.entangle('form.encounter.reasons'),
                   openModal: false,
-                  modalEvidenceCode: new ConditionEvidence(),
-                  newEvidenceCode: false,
+                  showDuplicateCodeWarning: false,
+                  modalReason: new Reason(),
+                  newReason: false,
                   item: 0,
-                  dictionary: $wire.dictionaries['eHealth/ICPC2/condition_codes']
+                  dictionary: $wire.dictionaries['eHealth/ICPC2/reasons']
               }"
     >
         <legend class="legend">
-            <h2>{{ __('patients.evidence_conditions') }}</h2>
+            <h2>{{ __('patients.reasons_for_visit') }}</h2>
         </legend>
 
         <table class="table-input w-inherit">
             <thead class="thead-input">
             <tr>
-                <th scope="col" class="th-input">{{ __('patients.condition') }}</th>
+                <th scope="col" class="th-input">{{ __('patients.code_and_name') }}</th>
+                <th scope="col" class="th-input">{{ __('forms.comment') }}</th>
                 <th scope="col" class="th-input">{{ __('forms.action') }}</th>
             </tr>
             </thead>
             <tbody>
-            <template x-for="(evidence, index) in modalCondition.conditions.evidences.codes">
+            <template x-for="(reason, index) in reasons">
                 <tr>
                     <td class="td-input"
-                        x-text="`${evidence.coding[0].code} - ${dictionary[evidence.coding[0].code]}`"
+                        x-text="`${ reason.coding[0].code } - ${ dictionary[reason.coding[0].code] }`"
                     ></td>
+                    <td class="td-input" x-text="`${ reason.text }`"></td>
                     <td class="td-input">
                         {{-- That all that is needed for the dropdown --}}
                         <div x-data="{
@@ -60,13 +64,16 @@
                                     :aria-expanded="openDropdown"
                                     :aria-controls="$id('dropdown-button')"
                                     type="button"
+                                    class="cursor-pointer"
                             >
-                                <svg class="w-6 h-6 text-gray-800 dark:text-gray-200 cursor-pointer" aria-hidden="true"
+                                <svg class="w-6 h-6 text-gray-800 dark:text-gray-200" aria-hidden="true"
                                      xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                     viewBox="0 0 24 24">
+                                     viewBox="0 0 24 24"
+                                >
                                     <path stroke="currentColor" stroke-linecap="square" stroke-linejoin="round"
                                           stroke-width="2"
-                                          d="M7 19H5a1 1 0 0 1-1-1v-1a3 3 0 0 1 3-3h1m4-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm7.441 1.559a1.907 1.907 0 0 1 0 2.698l-6.069 6.069L10 19l.674-3.372 6.07-6.07a1.907 1.907 0 0 1 2.697 0Z"/>
+                                          d="M7 19H5a1 1 0 0 1-1-1v-1a3 3 0 0 1 3-3h1m4-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm7.441 1.559a1.907 1.907 0 0 1 0 2.698l-6.069 6.069L10 19l.674-3.372 6.07-6.07a1.907 1.907 0 0 1 2.697 0Z"
+                                    />
                                 </svg>
                             </button>
 
@@ -83,18 +90,18 @@
                                 >
 
                                     <button @click.prevent="
-                                            openModal = true; {{-- Open the modal --}}
-                                            item = index; {{-- Identify the item we are corrently editing --}}
-                                            {{-- Replace the previous evidence with the current, don't assign object directly (modalEvidenceCode = evidence) to avoid reactiveness --}}
-                                            modalEvidenceCode = new ConditionEvidence(evidence)
-                                            newEvidenceCode = false; {{-- This evidence is already created --}}
-                                        "
+                                                openModal = true; {{-- Open the modal --}}
+                                                item = index; {{-- Identify the item we are corrently editing --}}
+                                                {{-- Replace the previous reason with the current, don't assign object directly (modalReason = reason) to avoid reactiveness --}}
+                                                modalReason = new Reason(reason);
+                                                newReason = false; {{-- This reason is already created --}}
+                                            "
                                             class="dropdown-button"
                                     >
                                         {{ __('forms.edit') }}
                                     </button>
 
-                                    <button @click.prevent="evidences.splice(index, 1); close($refs.button)"
+                                    <button @click.prevent="reasons.splice(index, 1); close($refs.button)"
                                             class="dropdown-button dropdown-delete"
                                     >
                                         {{ __('forms.delete') }}
@@ -112,13 +119,14 @@
             {{-- Button to trigger the modal --}}
             <button @click.prevent="
                         openModal = true; {{-- Open the Modal --}}
-                        newEvidenceCode = true; {{-- We are adding a new evidence --}}
-                        modalEvidenceCode = new ConditionEvidence(); {{-- Replace the data of the previous evidence with a new one--}}
+                        newReason = true; {{-- We are adding a new reason --}}
+                        modalReason = new Reason(); {{-- Replace the data of the previous reason with a new one--}}
                     "
                     class="item-add my-5"
             >
                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                     viewBox="0 0 24 24">
+                     viewBox="0 0 24 24"
+                >
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M5 12h14m-7 7V5"
                     />
@@ -152,31 +160,40 @@
                              class="modal-content h-fit w-full lg:max-w-4xl"
                         >
                             {{-- Title --}}
-                            <h3 class="modal-header" :id="$id('modal-title')">{{ __('forms.add') }}</h3>
+                            <h3 class="modal-header" :id="$id('modal-title')">{{ __('patients.reason_for_visit') }}</h3>
 
                             {{-- Content --}}
                             <form>
                                 <div class="form-row-modal">
                                     <div>
-                                        <label for="evidenceCode" class="label-modal">
+                                        <label for="reasonCode" class="label-modal">
                                             {{ __('patients.icpc-2_status_code') }}
                                         </label>
-                                        <x-select2 modelPath="modalEvidenceCode.codes[0].coding[0].code"
-                                                   :dictionary="$this->dictionaries['eHealth/ICPC2/condition_codes']"
-                                                   id="evidenceCode"
+                                        <x-select2 modelPath="modalReason.coding[0].code"
+                                                   dictionaryName="eHealth/ICPC2/reasons"
+                                                   id="reasonCode"
                                         />
 
                                         <p class="text-error text-xs"
-                                           x-show="!Object.keys(dictionary).includes(modalEvidenceCode.codes[0].coding[0].code)"
+                                           x-show="!Object.keys(dictionary).includes(modalReason.coding[0].code)"
                                         >
                                             {{ __('forms.field_empty') }}
                                         </p>
+                                    </div>
+
+                                    <div>
+                                        <textarea x-model="modalReason.text"
+                                                  id="reasonComment"
+                                                  name="reasonComment"
+                                                  class="textarea"
+                                                  rows="4"
+                                                  placeholder="{{ __('patients.write_comment_here') }}"
+                                        ></textarea>
                                     </div>
                                 </div>
 
                                 <div class="mt-6 flex justify-between space-x-2">
                                     <button type="button"
-                                            @click.prevent
                                             @click="openModal = false"
                                             class="button-minor"
                                     >
@@ -184,18 +201,34 @@
                                     </button>
 
                                     <button @click.prevent="
-                                                newEvidenceCode !== false
-                                                ? modalCondition.conditions.evidences.codes.push(modalEvidenceCode.codes[0])
-                                                : modalCondition.conditions.evidences[item] = modalEvidenceCode;
+                                                const newReasonCode = modalReason.coding[0]?.code;
+                                                const matchingReasonCodesCount = reasons.filter(
+                                                    c => c.coding[0]?.code === newReasonCode
+                                                ).length;
 
+                                                if (matchingReasonCodesCount >= 1) {
+                                                    showDuplicateCodeWarning = true;
+                                                    return;
+                                                }
+
+                                                newReason !== false
+                                                ? reasons.push(modalReason)
+                                                : reasons[item] = modalReason;
+
+                                                showDuplicateCodeWarning = false;
                                                 openModal = false;
                                             "
                                             class="button-primary"
-                                            :disabled="!(modalEvidenceCode.codes[0].coding[0].code.trim().length > 0)"
+                                            :disabled="!(modalReason.coding[0].code.trim().length > 0)"
                                     >
                                         {{ __('forms.save') }}
                                     </button>
                                 </div>
+                                <template x-if="showDuplicateCodeWarning">
+                                    <p class="text-error text-right">
+                                        {!! __('patients.duplicate_code_warning') !!}
+                                    </p>
+                                </template>
                             </form>
                         </div>
                     </div>
@@ -207,20 +240,20 @@
 
 <script>
     /**
-     * Representation of the user's personal evidenceCode
+     * Representation of the user's personal reason
      */
-    class ConditionEvidence {
-        codes = [
-            {
-                coding: [
-                    { system: 'eHealth/ICPC2/reasons', code: '' }
-                ]
-            }
-        ]
+    class Reason {
+        coding = [
+            { system: 'eHealth/ICPC2/reasons', code: '' }
+        ];
+        text = '';
 
         constructor(obj = null) {
             if (obj) {
-                Object.assign(this, JSON.parse(JSON.stringify(obj)));
+                this.text = obj.text || '';
+                this.coding = Array.isArray(obj.coding)
+                    ? obj.coding.map(c => ({ ...c }))
+                    : this.coding;
             }
         }
     }
