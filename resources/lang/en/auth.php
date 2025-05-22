@@ -29,7 +29,8 @@ return [
             'validation' => [
                 'auth' => 'Auth Response Schema:',
                 'user_details' => 'User Details Response Schema:',
-                'employee_data' => 'Employee Data Response Schema:'
+                'employee_data' => 'Employee Data Response Schema:',
+                'employee_request_data' => 'EmployeeRequest Data Response Schema:'
             ],
             'email_verification' => 'Your email has not been verified. Please check your email!',
             'common' => 'AUTH: Common error',
@@ -38,6 +39,7 @@ return [
             'legal_entity_identity' => 'AUTH: Legal entity identity error',
             'unexistent_legal_entity' => 'AUTH: Unexistent Legal Entity',
             'user_authentication' => 'AUTH: User authentication error',
+            'user_employee_update' => 'AUTH: User employee data fail update',
             'data_saving' => 'AUTH: An error occurred while saving authentication data',
             'employee_instance' => 'Not found any employee data for authenticated user',
             'get_employee_instance' => 'Cannot get any Employee or EmployeeRequest Instance'

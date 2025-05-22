@@ -31,7 +31,8 @@ return [
             'validation' => [
                 'auth' => 'Auth Response Schema:',
                 'user_details' => 'User Details Response Schema:',
-                'employee_data' => 'Employee Data Response Schema:'
+                'employee_data' => 'Employee Data Response Schema:',
+                'employee_request_data' => 'EmployeeRequest Data Response Schema:'
             ],
             'email_verification' => 'Ваш email не підтверджено. Перевірте свою електронну пошту!',
             'common' => 'AUTH: Загальна помилка',
@@ -40,6 +41,7 @@ return [
             'unexistent_legal_entity' => 'AUTH: Неіснуючий Legal Entity',
             'legal_entity_identity' => 'AUTH: Помилка ідентифікації закладу',
             'user_authentication' => 'AUTH: Помилка аутентифікації користувача',
+            'user_employee_update' => 'AUTH: Помилка під час оновлення даних співробітника',
             'data_saving' => 'AUTH: Сталася помилка під час збереження автентифікаційних даних',
             'employee_instance' => 'Не знайдено даних співробітника для автентифікованого користувача',
             'get_employee_instance' => 'Неможливо отримати екземпляр Employee чи EmployeeRequest'

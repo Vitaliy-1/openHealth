@@ -16,24 +16,28 @@ class UserRepository
 
     public function createIfNotExist($party, $role, LegalEntity $legalEntity): User|null
     {
-        if (isset($party['email']) && !empty($party['email'])) {
-            // Create User if not exists
-            $user = User::firstOrCreate(
-                [
-                    'email' => $party['email']
-                ],
-                [
-                    'tax_id'   => $party['tax_id'] ?? '',
-                    'password' => Hash::make(\Illuminate\Support\Str::random(8))
-                ]
-            );
-            // Set Role
-            $user->assignRole($role);
-            $user->legalEntity()->associate($legalEntity);
-            $user->save();
-            return $user;
+        if (empty($party['email'])) {
+            return null;
         }
 
-        return null;
+        // Create User if not exists
+        $user = User::firstOrCreate(
+            [
+                'email' => $party['email']
+            ],
+            [
+                'tax_id'   => $party['tax_id'] ?? '',
+                'password' => Hash::make(\Illuminate\Support\Str::random(8))
+            ]
+        );
+
+        // Set Role
+        auth()->shouldUse('ehealth'); // TODO: examine is this suitable for all user creation cases...
+
+        $user->assignRole($role);
+        $user->legalEntity()->associate($legalEntity);
+        $user->save();
+
+        return $user;
     }
 }

@@ -41,6 +41,8 @@
                 wire:model="legalEntityForm.owner.lastName"
                 aria-describedby="{{ $hasOwnerLastName ? 'ownerLastNameErrorHelp' : '' }}"
                 class="input {{ $hasOwnerLastName ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             />
 
             @if($hasOwnerLastName)
@@ -64,6 +66,8 @@
                 wire:model="legalEntityForm.owner.firstName"
                 aria-describedby="{{ $hasOwnerFirstName ? 'ownerFirstNameErrorHelp' : '' }}"
                 class="input {{ $hasOwnerFirstName ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             />
 
             @if($hasOwnerFirstName)
@@ -86,6 +90,8 @@
                 wire:model="legalEntityForm.owner.secondName"
                 aria-describedby="{{ $hasOwnerSecondName ? 'ownerSecondNameErrorHelp' : '' }}"
                 class="input {{ $hasOwnerSecondName ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             />
 
             @if($hasOwnerSecondName)
@@ -113,6 +119,8 @@
                 wire:model="legalEntityForm.owner.birthDate"
                 aria-describedby="{{ $hasOwnerBirthDate ? 'ownerBirthDateErrorHelp' : '' }}"
                 class="input datepicker-input {{ $hasOwnerBirthDate ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
+                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                :disabled="isDisabled"
             />
 
             @if($hasOwnerBirthDate)
@@ -151,6 +159,8 @@
                                     class="steps-owner_radio"
                                     id="owner_gender_{{ $k }}"
                                     wire:model="legalEntityForm.owner.gender"
+                                    :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
+                                    :disabled="isDisabled"
                                 >
                                 <label
                                     name="label"

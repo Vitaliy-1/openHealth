@@ -22,10 +22,12 @@ return new class extends Migration
             $table->string('employee_type');
             $table->date('inserted_at')->nullable();
             $table->string('status')->nullable();
+            $table->foreignId('employee_id')->nullable()->constrained('employees')->onDelete('cascade');
             $table->foreignId('legal_entity_id')->nullable()->constrained('legal_entities')->onDelete('cascade');
             $table->foreignId('division_id')->nullable()->constrained('divisions')->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->foreignId('party_id')->nullable()->constrained('parties')->onDelete('cascade');
+            $table->timestamp('applied_at')->nullable();
             $table->timestamps();
         });
     }

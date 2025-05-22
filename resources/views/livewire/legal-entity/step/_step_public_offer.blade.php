@@ -44,7 +44,7 @@
             </label>
         </div>
 
-        <div class="form-group group py-4">
+        <div wire:igonre class="form-group group py-4">
             <x-forms.file
                 required
                 wire:model="keyContainerUpload"

@@ -15,6 +15,14 @@ class ScienceDegree extends Model
     use HasFactory;
     use HasCamelCasing;
 
+    protected $hidden = [
+        'id',
+        'science_degreeable_id',
+        'science_degreeable_type',
+        'created_at',
+        'updated_at'
+    ];
+
     protected $fillable = [
         'country',
         'city',

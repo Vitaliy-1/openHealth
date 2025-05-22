@@ -2,17 +2,11 @@
 
 namespace App\Livewire\LegalEntity;
 
-use App\Mail\OwnerCredentialsMail;
-use App\Models\LegalEntity as LegalEntityModel;
+use Exception;
 use App\Models\License;
 use App\Models\Relations\Phone;
-use App\Models\User;
-use App\Models\Employee\Employee;
 use App\Models\Relations\Address;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use App\Repositories\PhoneRepository;
 use App\Repositories\AddressRepository;
@@ -20,13 +14,6 @@ use Illuminate\Validation\ValidationException;
 
 class CreateLegalEntity extends LegalEntity
 {
-    protected const string STEP_PATH='views/livewire/legal-entity/step';
-
-    /**
-     * @var string
-     */
-    protected const string CACHE_PREFIX = 'register_legal_entity_form';
-
     /**
      * @var int The current step of the process
      */
@@ -35,21 +22,6 @@ class CreateLegalEntity extends LegalEntity
         'accreditationShow' => false,
         'archivationShow' => false
     ];
-
-    /**
-     * @var string The Cache ID to store Legal Entity being filled by the current user
-     */
-    protected string $entityCacheKey;
-
-    /**
-     * @var string The Cache ID to store Owner being filled by the current user
-     */
-    protected string $ownerCacheKey;
-
-    /**
-     * @var string The Cache ID to store Owner being filled by the current user
-     */
-    protected string $stepCacheKey;
 
     public string $validationErrorStep = '';
 
@@ -61,10 +33,6 @@ class CreateLegalEntity extends LegalEntity
         PhoneRepository $phoneRepository
     ): void {
         parent::boot($addressRepository, $phoneRepository);
-
-        $this->entityCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . LegalEntityModel::class;
-        $this->ownerCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . Employee::class;
-        $this->stepCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . 'steps';
 
         $this->getLegalEntity();
 
@@ -220,8 +188,20 @@ class CreateLegalEntity extends LegalEntity
         // Convert all camelCase keys to snake_case because the Legal Entity model uses snake_case
         $formData = $this->convertArrayKeysToSnakeCase($this->legalEntityForm->toArray());
 
+        $fillableData = array_intersect_key($formData, array_flip([
+            'accreditation',
+            'archive',
+            'beneficiary',
+            'edrpou',
+            'email',
+            'receiver_funds_code',
+            'residence_address',
+            'type',
+            'website'
+        ]));
+
         // Fill the legal entity model with data from the form
-        $this->legalEntity->fill($formData);
+        $this->legalEntity->fill($fillableData);
 
         // Create the new Address (rely on $this->address)
         $address = new Address();
@@ -381,74 +361,6 @@ class CreateLegalEntity extends LegalEntity
         $this->legalEntityForm->rulesForSignificancy();
     }
 
-    protected function createUser(): ?User
-    {
-        // Get the currently authenticated user
-        $authenticatedUser = Auth::user();
-
-        // Retrieve the email address of the legal entity owner from the form or set it to null
-        $email = $this->legalEntityForm->owner['email'] ?? null;
-
-        // Generate a random password
-        $password = Str::random(10);
-
-        // Check if a user with the provided email already exists
-        $user = User::where('email', $email)->first();
-
-        // If the authenticated user claim self as the owner of the Legal Entity, use them as the user
-        $isOwner = isset($authenticatedUser->email) && strtolower($authenticatedUser->email) === $email;
-
-        if ($isOwner) {
-            // If the authenticated user is the LegalEntity owner, use them as the user
-            $user = $authenticatedUser;
-        } elseif (!$user) {
-            // If no user exists with that email, create a new user (new owner)
-            $user = User::create([
-                'email'    => $email,
-                'password' => Hash::make($password),
-            ]);
-        }
-
-        // Associate the legal entity with the user
-        $user->legalEntity()->associate($this->legalEntity);
-
-        try{
-            $user->save();
-        } catch (\Exception $e) {
-            $this->dispatchErrorMessage(__('Сталася помилка під час обробки запиту'), ['error' => $e->getMessage()]);
-
-            return null;
-        }
-
-        // Assign the 'OWNER' role to the user
-        $user->assignRole('OWNER');
-
-        if (!$isOwner) {
-            // Send an email with the owner credentials to the user
-            Mail::to($user->email)->send(new OwnerCredentialsMail($user->email, $password));
-            Mail::to($authenticatedUser->email)->send(new OwnerCredentialsMail( '', '', __('Нового користувача зареєстровано в системі. На вказану адресу ' . $user->email . ' надіслано дані для входу в систему')));
-        }
-
-        return $user;
-    }
-
-    /**
-     * Create a new license with the provided data.
-     *
-     * @param array $data The data to fill the license with.
-     */
-    protected function createLicense(array $data): void
-    {
-        $license = License::firstOrNew(['uuid' => $data['id']]);
-        $license->fill($data);
-        $license->uuid = $data['id'];
-        $license->is_primary = true;
-
-        if (isset($this->legalEntity)) {
-            $this->legalEntity->licenses()->save($license);
-        }
-    }
-
     /**
      * Summary of validationRequest
      *
@@ -512,13 +424,21 @@ class CreateLegalEntity extends LegalEntity
         return true;
     }
 
-    public function createLegalEntity(): void
+    public function createLegalEntity()
     {
         $this->stepSignificancy();
 
         // Validate All the data from the form
         if ($this->validationRequest()) {
-            $this->signLegalEntity();
+            $result = $this->signLegalEntity();
+
+            // Handle successful API response
+            try {
+                $this->handleSuccessResponse($result['response'], $result['request']);
+            } catch(Exception $err) {
+                // Dispatch error message for possible errors
+                $this->dispatchErrorMessage($err->getMessage());
+            }
         }
     }
 

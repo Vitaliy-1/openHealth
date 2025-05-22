@@ -7,6 +7,7 @@ namespace App\Models\Employee;
 use App\Models\User;
 use App\Enums\Status;
 use App\Models\Division;
+use App\Models\Revision;
 use App\Models\Declaration;
 use App\Models\LegalEntity;
 use App\Models\Relations\Party;
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -43,7 +45,7 @@ class BaseEmployee extends Model
         'employee_type',
         'user_id',
         'division_id',
-        'inserted_at'
+        'inserted_at',
     ];
 
     protected $casts = [
@@ -140,6 +142,11 @@ class BaseEmployee extends Model
         return $this->morphMany(Speciality::class, 'specialityable');
     }
 
+    public function revision(): MorphOne
+    {
+        return $this->morphOne(Revision::class, 'revisionable');
+    }
+
     public function scopeDoctor($query)
     {
         return $query->where('employee_type', 'DOCTOR');
@@ -176,5 +183,26 @@ class BaseEmployee extends Model
             } else {
                 $query->whereNotIn('employee_type', $roles);
             }
+    }
+
+    /**
+     * Scope query to identify an employee based on multiple criteria
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query The query builder instance
+     * @param string $employeeType The type of employee
+     * @param string $status The current status of the employee
+     * @param int $userId The user ID associated with the employee
+     * @param int $legalEntityId The legal entity ID the employee belongs to
+     * @param int $partyId The party ID associated with the employee
+     *
+     * @return void
+     */
+    public function scopeIdentifyEmployee(Builder $query, array $employeeTypes, string  $status, int $userId, int $legalEntityId, ?int $partyId): void
+    {
+        $query->whereIn('employee_type', $employeeTypes)
+                ->where('status', $status)
+                ->where('user_id', $userId)
+                ->where('legal_entity_id', $legalEntityId)
+                ->where('party_id', $partyId);
     }
 }

@@ -107,6 +107,7 @@
             <div
                 class="form-row"
             >
+
                 {{-- Step Body --}}
                 <form id="legal_entity_form">
                     @include('livewire.legal-entity.step._step_edrpou')

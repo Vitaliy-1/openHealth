@@ -565,7 +565,7 @@ class RolesPermissionsSeeder extends Seeder
 
         // Assign permissions for specified roles depends on the guard
         foreach ($guards as $guard) {
-            $rolesByGuard = Role::whereIn('name', array_keys($this->roles))
+            $rolesByGuard = Role::with('permissions')->whereIn('name', array_keys($this->roles))
                 ->where('guard_name', $guard)
                 ->with('permissions')
                 ->get()

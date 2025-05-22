@@ -16,6 +16,14 @@ class Education extends Model
 
     protected $table = 'educations';
 
+    protected $hidden = [
+        'id',
+        'educationable_id',
+        'educationable_type',
+        'created_at',
+        'updated_at'
+    ];
+
     protected $fillable = [
         'country',
         'city',

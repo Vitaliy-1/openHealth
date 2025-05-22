@@ -93,6 +93,8 @@ class Request
                 ->{$this->method}($this->makeApiUrl(), $this->params);
         }
 
+        Log::info('REQUEST: Headers: ' . json_encode($this->getHeaders(), JSON_PRETTY_PRINT) . ' URL: ' . $this->makeApiUrl() . ' data ' . json_encode($data, JSON_PRETTY_PRINT) . ' RESPONSE: ' . $response->body());
+
         if ($response->successful()) {
             $data = json_decode($response->body(), true);
 
@@ -116,6 +118,7 @@ class Request
                 'errors' => $errors
             ]);
 
+            dd('Request error', $errors);
             return (new ErrorHandler())->handleError($errors);
         }
     }

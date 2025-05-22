@@ -572,6 +572,7 @@ class EmployeeApi
                     'enum' => [
                         'NEW',
                         'REJECTED',
+                        'EXPIRED',
                         'APPROVED'
                     ]
                 ],

@@ -5,9 +5,7 @@ namespace App\Models;
 use Illuminate\Support\Str;
 use App\Models\Person\Person;
 use App\Models\Employee\Employee;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Collection;
-use Laravel\Jetstream\HasProfilePhoto;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Employee\EmployeeRequest;
 use Spatie\Permission\Models\Permission;
@@ -26,7 +24,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory;
-    use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
     use HasRoles {
@@ -39,7 +36,6 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
         'email',
         'password',
         'legal_entity_id',
@@ -84,6 +80,20 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $with = ['legalEntity', 'person'];
+
+    // This need to override because trait HasProfilePhoto was disabled to remove 'name' attribute calling
+    public function getProfilePhotoUrlAttribute(): string
+    {
+        return $this->profile_photo_path
+            ? asset('storage/' . $this->profile_photo_path)
+            : $this->defaultProfilePhotoUrl();
+    }
+
+    // This need to override because trait HasProfilePhoto was disabled to remove 'name' attribute calling
+    public function defaultProfilePhotoUrl(): string
+    {
+        return '';
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\belongsTo

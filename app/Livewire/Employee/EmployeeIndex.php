@@ -15,6 +15,7 @@ use App\Traits\FormTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -164,7 +165,6 @@ class EmployeeIndex extends Component
     public function syncEmployees(): void
     {
         $requests = EmployeeRequestApi::getEmployees($this->legalEntity->uuid);
-
         foreach ($requests as $request) {
             $response = EmployeeRequestApi::getEmployeeById($request['id']);
             $employeeResponse = schemaService()->setDataSchema($response, app(EmployeeApi::class))

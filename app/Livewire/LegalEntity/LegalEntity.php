@@ -6,22 +6,29 @@ use Log;
 use Exception;
 use Validator;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\License;
 use Livewire\Component;
 use App\Traits\FormTrait;
+use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
 use App\Traits\AddressSearch;
+use App\Models\Employee\Employee;
 use Illuminate\Support\Facades\DB;
+use App\Mail\OwnerCredentialsMail;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Classes\Cipher\Traits\Cipher;
 use App\Classes\Cipher\Api\CipherApi;
 use Illuminate\Support\Facades\Cache;
 use App\Repositories\PhoneRepository;
-use Illuminate\Support\Facades\Session;
 use App\Repositories\AddressRepository;
 use App\Classes\eHealth\Api\EmployeeApi;
-use App\Http\Controllers\Auth\LoginController;
 use App\Models\Employee\EmployeeRequest;
 use App\Repositories\EmployeeRepository;
+use Illuminate\Support\Facades\Redirect;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Validation\ValidationException;
 use App\Models\LegalEntity as LegalEntityModel;
 use App\Livewire\LegalEntity\Forms\LegalEntitiesForms;
@@ -33,6 +40,28 @@ class LegalEntity extends Component
         Cipher,
         WithFileUploads,
         AddressSearch;
+
+    protected const string STEP_PATH='views/livewire/legal-entity/step';
+
+    /**
+     * @var string
+     */
+    protected const string CACHE_PREFIX = 'register_legal_entity_form';
+
+    /**
+     * @var string The Cache ID to store Legal Entity being filled by the current user
+     */
+    protected string $entityCacheKey;
+
+    /**
+     * @var string The Cache ID to store Owner being filled by the current user
+     */
+    protected string $ownerCacheKey;
+
+    /**
+     * @var string The Cache ID to store Owner being filled by the current user
+     */
+    protected string $stepCacheKey;
 
     /**
      * @var LegalEntitiesForms The Form
@@ -81,6 +110,10 @@ class LegalEntity extends Component
     ): void{
         $this->addressRepository = $addressRepository;
         $this->phoneRepository = $phoneRepository;
+
+        $this->entityCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . LegalEntityModel::class;
+        $this->ownerCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . Employee::class;
+        $this->stepCacheKey = self::CACHE_PREFIX . '-' . Auth::id() . '-' . 'steps';
     }
 
     protected function mount(): void
@@ -175,7 +208,7 @@ class LegalEntity extends Component
     }
 
 
-    private function saveEmployeeResponse($response, $legalEntity, int|null $userId = null): void
+    protected function saveEmployeeResponse($response, $legalEntity, ?int $userId): void
     {
         $employeeResponse = schemaService()->setDataSchema($response, app(EmployeeApi::class))
             ->responseSchemaNormalize()
@@ -185,7 +218,20 @@ class LegalEntity extends Component
 
         $employeeResponse['user_id'] = $userId;
 
-        app(EmployeeRepository::class)->saveEmployeeData($employeeResponse, $legalEntity,new EmployeeRequest());
+        $partyID = $legalEntity->getOwner()?->partyId;
+
+        // Try to determine whether the Employee has own record in the DB. If so that UUID should be passed to update it's data
+        $employeeUUID = Employee::identifyEmployee(
+            [$employeeResponse['employee_type']],
+            'APPROVED',
+            $userId,
+            $legalEntity->id,
+            $partyID
+            )
+            ->first()
+            ?->uuid;
+
+        app(EmployeeRepository::class)->saveEmployeeData($employeeResponse, $legalEntity,new EmployeeRequest(), $employeeUUID);
     }
 
     /**
@@ -193,9 +239,11 @@ class LegalEntity extends Component
      *
      * @throws ValidationException
      */
-    protected function signLegalEntity(bool $isEdit = false): void
+    protected function signLegalEntity(): array|null
     {
-        // $this->legalEntityForm->customRulesValidation();  // TODO: Uncomment this after adding custom rules
+        if (! $this->legalEntityForm->customRulesValidation()) {
+            return null;
+        }
 
         // Prepare data for public offer
         $this->legalEntityForm->publicOffer = $this->preparePublicOffer();
@@ -214,7 +262,8 @@ class LegalEntity extends Component
         // Handle errors from encrypted data
         if (isset($base64Data['errors'])) {
             $this->dispatchErrorMessage($base64Data['errors']);
-            return;
+
+            return null;
         }
 
         // Prepare data for API request
@@ -227,9 +276,10 @@ class LegalEntity extends Component
         if (isset($request['errors']) && is_array($response['errors'])) {
             $this->dispatchErrorMessage(__('Запис не було збережено'), $response['errors']);
 
-            return;
+            return null;
         }
 
+        Log::info('Legal Entity Success SOURCE DATA', $data);
         Log::info('Legal Entity Success RESPONSE', $response); // TODO: Important! Delete after testing!!!
 
         try {
@@ -237,22 +287,22 @@ class LegalEntity extends Component
         } catch (Exception $err) {
             $this->dispatchErrorMessage($err->getMessage());
 
-            return;
+            return null;
         }
 
-        // Handle successful API request
-        try {
-            $this->handleSuccessResponse($response, $data);
-        } catch(Exception $err) {
-            // Dispatch error message for possible errors
-            $this->dispatchErrorMessage($err->getMessage());
+        if (empty($response) || !is_array($response)) {
+            $this->dispatchErrorMessage(__('auth.login.error.server.response'));
+
+            return null;
         }
+
+        return ['response' => $response, 'request' => $data];
     }
 
     /**
      * Check $response schema for errors
      */
-    private function validateResponse(mixed $data): array
+    protected function validateResponse(mixed $data): array
     {
         $validator = Validator::make($data, [
             'data' => 'required|array',
@@ -391,6 +441,22 @@ class LegalEntity extends Component
             $data['owner']['documents'] = [$data['owner']['documents']];
         }
 
+        if (isset($data['owner']['id'])) {
+            unset($data['owner']['id']);
+        }
+
+        if (isset($data['owner']['uuid'])) {
+            unset($data['owner']['uuid']);
+        }
+
+        if (isset($data['owner']['about_myself'])) {
+            unset($data['owner']['about_myself']);
+        }
+
+        if (isset($data['owner']['working_experience'])) {
+            unset($data['owner']['working_experience']);
+        }
+
         $data['residence_address'] = $this->convertArrayKeysToSnakeCase($this->address);
 
         // Converting accreditation to array
@@ -414,6 +480,14 @@ class LegalEntity extends Component
         return removeEmptyKeys($data);
     }
 
+    /**
+     * Prepare all data needs for creating EmployeeRequest throught LEgalEntity creation
+     *
+     * @param string $legalEntityId
+     * @param array $requestData
+     *
+     * @return array
+     */
     private function prepareEmployeeData(string $legalEntityId, array $requestData): array
     {
         $arr = [
@@ -463,7 +537,7 @@ class LegalEntity extends Component
      * @param array $response The response from the API request
      * @return void
      */
-    private function handleSuccessResponse(array $response, array $requestData = [])
+    protected function handleSuccessResponse(array $response, array $requestData = [])
     {
         /**
          * This need to check beacuse it's not always present.
@@ -497,21 +571,9 @@ class LegalEntity extends Component
                 }
 
                 try {
-                    $employeeData = $this->prepareEmployeeData($this->legalEntity->uuid, $requestData);
+                    $this->createEmployeeRequest($this->legalEntity, $requestData, $response['urgent']['employee_request_id'], $user?->id ?? null);
                 } catch (Exception $err) {
-                    throw new Exception('Error: prepareEmployeeData: ' . $err->getMessage(), 3);
-                }
-
-                try {
-                    $employeeResponse = $this->getEmployeeResponse(['employee_request' => $employeeData], $this->legalEntity->uuid, $response['urgent']['employee_request_id']);
-                } catch (Exception $err) {
-                    throw new Exception('Error: getEmployeeResponse:  ' . $err->getMessage(), 4);
-                }
-
-                try {
-                    $this->saveEmployeeResponse($employeeResponse, $this->legalEntity, $user?->id ?? null);
-                } catch (Exception $err) {
-                    throw new Exception('Error: saveEmployeeResponse: ' . $err->getMessage(), 5);
+                    throw new Exception('Error: createEmployeeRequest: ' . $err->getMessage(), $err->getCode());
                 }
 
                 if (Cache::has($this->entityCacheKey)) {
@@ -529,7 +591,7 @@ class LegalEntity extends Component
 
             app(LoginController::class)->logout(request(), false);
 
-            return $this->redirect('/login', navigate: true);
+            return Redirect::route('login') ?? null;
         } catch (Exception $err) {
             Log::error(__('Сталася помилка під час обробки запиту'), ['error' => $err->getMessage()]);
 
@@ -537,13 +599,56 @@ class LegalEntity extends Component
         }
     }
 
-    private function getEmployeeResponse(array $employeeData, string $legalEntityUUID, string $employeeRequestId): array
+    /**
+     * Prepare all data need for create EmployeeRequest (for case of creating Legal Entity only!)
+     * And store the EmployeeRequest record
+     *
+     * @param \App\Models\LegalEntity $legalEntity
+     * @param array $requestData
+     * @param string $employeeRequestId
+     * @param mixed $userId
+     *
+     * @throws \Exception
+     *
+     * @return void
+     */
+    protected function createEmployeeRequest(LegalEntityModel $legalEntity, array $requestData, string $employeeRequestId, ?string $userId): void
+    {
+        try {
+            $employeeData = $this->prepareEmployeeData($legalEntity->uuid, $requestData);
+        } catch (Exception $err) {
+            throw new Exception('Error: prepareEmployeeData: ' . $err->getMessage(), 3);
+        }
+
+        try {
+            $employeeResponse = $this->getEmployeeResponse(['employee_request' => $employeeData], $legalEntity->uuid, $employeeRequestId);
+        } catch (Exception $err) {
+            throw new Exception('Error: getEmployeeResponse:  ' . $err->getMessage(), 4);
+        }
+
+        try {
+            $this->saveEmployeeResponse($employeeResponse, $legalEntity, $userId);
+        } catch (Exception $err) {
+            throw new Exception('Error: saveEmployeeResponse: ' . $err->getMessage(), 5);
+        }
+    }
+
+    /**
+     * Emulate the EmployeeRequest response from the server (as if the really one will received)
+     *
+     * @param array $employeeData
+     * @param string $legalEntityUUID
+     * @param string $employeeRequestId
+     *
+     * @return array
+     */
+    protected function getEmployeeResponse(array $employeeData, string $legalEntityUUID, string $employeeRequestId): array
     {
         $employeeData = $employeeData['employee_request'];
 
         $party = $employeeData['party'];
 
-        return [
+        $arr = [
               "legal_entity_id" => $legalEntityUUID,
               "position" => $employeeData['position'],
               "start_date" => $employeeData['start_date'],
@@ -565,6 +670,8 @@ class LegalEntity extends Component
               "inserted_at" => Carbon::now()->format('Y-m-d'),
               "updated_at" => Carbon::now()->format('Y-m-d')
         ];
+
+        return $arr;
     }
 
     /**
@@ -574,14 +681,19 @@ class LegalEntity extends Component
      *
      * @return void
      */
-    private function createOrUpdateLegalEntity(array $data): LegalEntityModel|null
+    protected function createOrUpdateLegalEntity(array $data): LegalEntityModel|null
     {
         // Get the UUID from the data, if it exists
         $uuid = $data['data']['id'] ?? '';
+        unset($data['data']['id']);
 
         // This need because the LegalEntity has a separate table for the address
         $addressData = [$data['data']['residence_address']];
         unset($data['data']['residence_address']);
+
+        $phones = $data['data']['phones'];
+        unset($data['data']['phones']);
+        unset($data['data']['license']); // UNset this because it already set if create or present and dany to modify if edit
 
         try {
             // Find or create a new LegalEntity object by UUID
@@ -589,9 +701,6 @@ class LegalEntity extends Component
 
             // Fill the object with data
             $this->legalEntity->fill($data['data']);
-
-            // Set UUID from data or default to empty string
-            $this->legalEntity->uuid = $data['data']['id'] ?? '';
 
             // Set client secret from data or default to empty string
             $this->legalEntity->client_secret = $data['urgent']['security']['client_secret'] ?? $data['urgent']['security']['secret_key'] ?? null;
@@ -604,11 +713,84 @@ class LegalEntity extends Component
 
             $this->addressRepository->addAddresses($this->legalEntity, $addressData);
 
-            $this->phoneRepository->addPhones($this->legalEntity, $data['data']['phones']);
+            $this->phoneRepository->syncPhones($this->legalEntity, $phones);
         } catch (Exception $err) {
             throw new Exception('LegalEntity Create Error: ' . $err->getMessage());
         }
 
         return $this->legalEntity;
+    }
+
+    /**
+     * Create a new license with the provided data.
+     *
+     * @param array $data The data to fill the license with.
+     */
+    protected function createLicense(array $data): void
+    {
+        $uuid = $data['id'];
+        unset($data['id']);
+
+        $license = License::firstOrNew(['uuid' => $uuid]);
+        $license->fill($data);
+        $license->uuid = $uuid;
+        $license->is_primary = true;
+
+        if (isset($this->legalEntity)) {
+            $this->legalEntity->licenses()->save($license);
+        }
+    }
+
+    protected function createUser(): ?User
+    {
+        // Get the currently authenticated user
+        $authenticatedUser = Auth::user();
+
+        // Retrieve the email address of the legal entity owner from the form or set it to null
+        $email = $this->legalEntityForm->owner['email'] ?? null;
+
+        // Generate a random password
+        $password = Str::random(10);
+
+        // Check if a user with the provided email already exists
+        $user = User::where('email', $email)->first();
+
+        // If the authenticated user claim self as the owner of the Legal Entity, use them as the user
+        $isOwner = isset($authenticatedUser->email) && strtolower($authenticatedUser->email) === $email;
+
+        if ($isOwner) {
+            // If the authenticated user is the LegalEntity owner, use them as the user
+            $user = $authenticatedUser;
+        } elseif (!$user) {
+            // If no user exists with that email, create a new user (new owner)
+            $user = User::create([
+                'email'    => $email,
+                'password' => Hash::make($password),
+            ]);
+        }
+
+        // Associate the legal entity with the user
+        $user->legalEntity()->associate($this->legalEntity);
+
+        try{
+            $user->save();
+        } catch (\Exception $e) {
+            $this->dispatchErrorMessage(__('Сталася помилка під час обробки запиту'), ['error' => $e->getMessage()]);
+
+            return null;
+        }
+
+        auth()->shouldUse('ehealth');
+
+        // Assign the 'OWNER' role to the user
+        $user->assignRole('OWNER');
+
+        if (!$isOwner) {
+            // Send an email with the owner credentials to the user
+            Mail::to($user->email)->send(new OwnerCredentialsMail($user->email, $password));
+            Mail::to($authenticatedUser->email)->send(new OwnerCredentialsMail( '', '', __('Нового користувача зареєстровано в системі. На вказану адресу ' . $user->email . ' надіслано дані для входу в систему')));
+        }
+
+        return $user;
     }
 }

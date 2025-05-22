@@ -121,6 +121,7 @@ return [
         'uncompromised' => 'The given :attribute has appeared in a data leak. Please choose a different :attribute.',
     ],
     'phone' => 'The :attribute must be a valid phone number with a minimum of :min digits, no spaces or dots.',
+    'phone.dublicates' => 'Allowed only one number with the same phone type',
     'present' => 'The :attribute field must be present.',
     'prohibited' => 'The :attribute field is prohibited.',
     'prohibited_if' => 'The :attribute field is prohibited when :other is :value.',

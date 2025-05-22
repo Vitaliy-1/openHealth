@@ -6,7 +6,6 @@ use Exception;
 use App\Models\User;
 use App\Models\LegalEntity;
 use Illuminate\Http\Request;
-use App\Auth\EHealth\Services\TokenStorage;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -14,9 +13,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Classes\eHealth\Api\EmployeeApi;
-use App\Auth\EHealth\Services\EHealthLoginUserHandler;
 use Illuminate\Support\Facades\Validator;
+use App\Auth\EHealth\Services\TokenStorage;
 use App\Classes\eHealth\Request as eHealthRequest;
+use App\Auth\EHealth\Services\EHealthLoginUserHandler;
 use Illuminate\Contracts\Validation\Validator as ResponseValidator;
 
 class LoginController extends Controller
@@ -110,6 +110,8 @@ class LoginController extends Controller
 
             $isFirstLogin = (bool) ! User::where('uuid',$authUserUUID)->first()?->uuid;
 
+            auth()->shouldUse('ehealth');
+
             $user = $this->handleLoginUser->checkLoginedUser($legalEntity, $authUserUUID);
 
             if (!$user) {
@@ -188,7 +190,7 @@ class LoginController extends Controller
     /**
      * Check authentication $response schema for errors
      *
-     * @return array Returned only specified fields
+     * @return ResponseValidator Returned only specified fields
      */
     public function validateAuthResponse(array $data): ResponseValidator
     {

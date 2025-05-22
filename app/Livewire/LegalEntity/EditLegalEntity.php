@@ -2,8 +2,14 @@
 
 namespace App\Livewire\LegalEntity;
 
-use App\Models\Relations\Party;
+use Log;
+use Exception;
 use Illuminate\Support\Arr;
+use App\Models\Employee\Employee;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use App\Models\LegalEntity as LegalEntityModel;
 
 class EditLegalEntity extends LegalEntity
 {
@@ -88,36 +94,24 @@ class EditLegalEntity extends LegalEntity
             return;
         }
 
-        $ownerParty = $this->getOwnerParty($owner);
+        $ownerData = $this->prepareOwnerData($owner);
 
-        if (!$ownerParty) {
-            return;
-        }
-
-        $ownerData = $this->prepareOwnerData($ownerParty);
         $this->legalEntityForm->owner = array_merge($this->legalEntityForm->owner ?? [], $ownerData);
     }
 
-    private function getOwnerParty($owner): ?Party
+    private function prepareOwnerData(Employee $owner): array
     {
-        $ownerAttributes = $owner->attributesToArray();
-        return Party::find($ownerAttributes['partyId'] ?? null);
-    }
+        $ownerData = $owner->party->toArray() ?? [];
 
-    private function prepareOwnerData(Party $ownerParty): array
-    {
-        $ownerData = $ownerParty->toArray() ?? [];
-
-        $ownerData['documents'] = $this->prepareDocumentsData($ownerParty);
-        $ownerData['position'] = $ownerParty->position ?? null;
+        $ownerData['documents'] = $this->prepareDocumentsData($ownerData['documents']);
+        $ownerData['position'] = $owner->position;
+        $ownerData['employee_id'] = $owner->uuid;
 
         return $ownerData;
     }
 
-    private function prepareDocumentsData(Party $ownerParty): array
+    private function prepareDocumentsData(array $documents): array
     {
-        $documents = $ownerParty->documents->toArray() ?? [];
-
         if (empty($documents)) {
             return [];
         }
@@ -125,7 +119,8 @@ class EditLegalEntity extends LegalEntity
         return $this->convertArrayKeysToCamelCase($documents[0]);
     }
 
-    public function updateLegalEntity(): void
+
+    public function updateLegalEntity()
     {
         $this->legalEntityForm->onEditValidate();
 
@@ -133,7 +128,43 @@ class EditLegalEntity extends LegalEntity
             $this->dispatchBrowserEvent('scroll-to-error');
         }
 
-        $this->signLegalEntity(true);
+        $result = $this->signLegalEntity();
+
+        $response = $result['response'];
+        $data = $result['request'];
+
+        try {
+            /**
+             * The code below is need to save new client_secret if ESOZ returns successfull response
+             * Without it next login may be impossible!
+             */
+            $legalEntity = LegalEntityModel::where(['uuid' => $response['data']['id'] ])->first();
+
+            $legalEntity->clientSecret = $response['urgent']['security']['client_secret'] ?? $response['urgent']['security']['secret_key'] ?? null;
+
+            $legalEntity->save();
+            $legalEntity->refresh();
+
+            DB::transaction(function() use($response, $data) {
+                $this->createOrUpdateLegalEntity($response);
+
+                $user = Auth::user();
+
+                try {
+                    $this->createEmployeeRequest($this->legalEntity, $data, $response['urgent']['employee_request_id'], $user?->id ?? null);
+                } catch (Exception $err) {
+                    throw new Exception('Error: createEmployeeRequest: ' . $err->getMessage(), $err->getCode());
+                }
+            });
+        } catch (Exception $err) {
+            Log::error(__('forms.errors.update_data', [], 'en'), ['error' => $err->getMessage()]);
+
+            $this->dispatchErrorMessage(__('forms.errors.update_data'));
+
+            return null;
+        }
+
+        return Redirect::route('edit.legalEntities')->with('success', __('forms.update_successfull')) ?? null;
     }
 
     public function render()

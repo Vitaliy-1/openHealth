@@ -66,7 +66,8 @@ class LegalEntity extends Model
     protected $with = [
         'licenses',
         'address',
-        'phones'
+        'phones',
+        'revisions'
     ];
 
     protected $attributes = [
@@ -150,6 +151,11 @@ class LegalEntity extends Model
     public function phones(): MorphMany
     {
         return $this->morphMany(Phone::class, 'phoneable');
+    }
+
+    public function revisions(): MorphMany
+    {
+        return $this->morphMany(Revision::class, 'revisionable');
     }
 
     /**

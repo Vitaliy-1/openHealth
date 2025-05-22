@@ -4,7 +4,6 @@ namespace App\Auth\EHealth\Services;
 
 use App\Models\User;
 use App\Models\LegalEntity;
-use App\Auth\EHealth\Services\TokenStorage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use App\Repositories\EmployeeRepository;
@@ -12,6 +11,7 @@ use App\Classes\eHealth\Api\EmployeeApi;
 use App\Models\Employee\EmployeeRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use App\Auth\EHealth\Services\TokenStorage;
 use App\Classes\eHealth\Request as eHealthRequest;
 use Illuminate\Contracts\Validation\Validator as ResponseValidator;
 
@@ -42,6 +42,13 @@ class EHealthLoginUserHandler
             // Check if user has more than one Employee Role that hasn't been authorized
             if (!$this->employeeRepository->authenticateNewEmployees($authLegalEntityUUID, $alreadyAuthorizedUser, $authUserUUID)) {
                 Log::error(__('auth.login.error.user_authentication', [], 'en'));
+
+                return null;
+            }
+
+            // Check employee for updates
+            if (!$this->employeeRepository->checkForEmployeeUpdate($authLegalEntityUUID, $alreadyAuthorizedUser, $authUserUUID)) {
+                Log::error(__('auth.login.error.user_employee_update', [], 'en'));
 
                 return null;
             }

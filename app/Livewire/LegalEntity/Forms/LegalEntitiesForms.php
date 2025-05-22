@@ -2,20 +2,21 @@
 
 namespace App\Livewire\LegalEntity\Forms;
 
-use App\Rules\ExpiryDate;
 use Livewire\Form;
 use App\Rules\Name;
 use App\Models\User;
 use App\Rules\Email;
 use App\Rules\TaxId;
+use App\Rules\AgeCheck;
 use App\Rules\Cyrillic;
 use App\Rules\BirthDate;
-use App\Rules\DocumentNumber;
+use App\Rules\ExpiryDate;
+use App\Rules\PhoneNumber;
 use App\Rules\InDictionary;
 use App\Rules\UniqueEdrpou;
+use App\Rules\DocumentNumber;
+use App\Rules\PhoneDublicates;
 use App\Exceptions\CustomValidationException;
-use App\Rules\AgeCheck;
-use App\Rules\PhoneNumber;
 use Illuminate\Validation\ValidationException;
 
 class LegalEntitiesForms extends Form
@@ -277,15 +278,19 @@ class LegalEntitiesForms extends Form
      *
      * @return string
      */
-    public function customRulesValidation(): void
+    public function customRulesValidation(): bool
     {
         foreach ($this->customRules() as $rule) {
             try {
                 $rule->validate('', '', fn() => null);
             } catch (CustomValidationException $e) {
                 $this->component->dispatch('flashMessage', ['message' => $e->getMessage(), 'type' => 'error']);
+
+                return false;
             }
         }
+
+        return true;
     }
 
     /**
@@ -296,14 +301,12 @@ class LegalEntitiesForms extends Form
      */
     protected function customRules(): array
     {
-        $validationRules = [];
-
+        // Place here the custom validation rules to be checked through creation/updating of the LegalEntity
         $customValidationRules = [
-            // Place here the custom validation rules to be checked through creation/updating of the LegalEntity
+            new PhoneDublicates($this->phones),
+            new PhoneDublicates($this->owner['phones'])
         ];
 
-        $validationRules = array_merge($validationRules, $customValidationRules);
-
-        return $validationRules;
+        return $customValidationRules;
     }
 }

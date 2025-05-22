@@ -12,5 +12,8 @@ return [
     |
     */
     'edrpou'=>'Edrpou',
-
+    'step'=> 'Step :currentSteep with :totalSteps',
+    'errors' => [
+        'update_data' => 'An error has occurs during data update'
+    ]
 ];

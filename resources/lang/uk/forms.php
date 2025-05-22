@@ -21,7 +21,6 @@ return [
     'add_employee' => 'Додати співробітника',
     'edit_employee' => 'Зміна данних співробітника',
     'add_phone' => 'Додати номер',
-    'edit_employee' => 'Зміна данних співробітника',
     'owner' => 'Власник',
     'accreditation' => 'Акредитація',
     'contacts' => 'Контакти',
@@ -244,4 +243,8 @@ return [
     'certificate_number' => 'Номер свідоцтва',
     'yes' => 'Так',
     'no' => 'Ні',
+    'update_successfull' => 'Дані оновлено успішно',
+    'errors' => [
+        'update_data' => 'Сталася помилка під час оновлення даних'
+    ]
 ];

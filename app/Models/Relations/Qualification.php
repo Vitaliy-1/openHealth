@@ -15,6 +15,14 @@ class Qualification extends Model
     use HasFactory;
     use HasCamelCasing;
 
+    protected $hidden = [
+        'id',
+        'qualificationable_id',
+        'qualificationable_type',
+        'created_at',
+        'updated_at'
+    ];
+
     protected $fillable = [
         'type',
         'institution_name',
