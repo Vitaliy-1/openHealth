@@ -21,7 +21,6 @@ return [
     'add_employee' => 'Додати співробітника',
     'edit_employee' => 'Зміна данних співробітника',
     'add_phone' => 'Додати номер',
-    'edit_employee' => 'Зміна данних співробітника',
     'owner' => 'Власник',
     'accreditation' => 'Акредитація',
     'contacts' => 'Контакти',
