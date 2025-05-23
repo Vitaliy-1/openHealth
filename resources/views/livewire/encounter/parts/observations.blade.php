@@ -7,6 +7,7 @@
                   modalObservation: new Observation(),
                   newObservation: false,
                   item: 0,
+                  valueMap: $wire.entangle('observationValueMap'),
                   observationCategoriesDictionary: $wire.dictionaries['eHealth/observation_categories'],
                   icfObservationCategoriesDictionary: $wire.dictionaries['eHealth/ICF/observation_categories'],
                   observationCodesDictionary: $wire.dictionaries['eHealth/LOINC/observation_codes'],
@@ -17,7 +18,6 @@
                   anatomicalLocalizationDictionary: $wire.dictionaries['eHealth/ICF/qualifiers/anatomical_localization'],
                   performanceDictionary: $wire.dictionaries['eHealth/ICF/qualifiers/performance'],
                   capacityDictionary: $wire.dictionaries['eHealth/ICF/qualifiers/capacity'],
-                  barrierOrFacilitatorDictionary: $wire.dictionaries['eHealth/ICF/qualifiers/barrier_or_facilitator'],
               }"
     >
         <legend class="legend">
@@ -39,8 +39,8 @@
                 <tr>
                     <td class="td-input"
                         x-text="
-                            observationCategoriesDictionary[observation.categories.coding[0]['code']] ||
-                            icfObservationCategoriesDictionary[observation.categories.coding[0]['code']]
+                            observationCategoriesDictionary[observation.categories[0].coding[0]['code']] ||
+                            icfObservationCategoriesDictionary[observation.categories[0].coding[0]['code']]
                         "
                     ></td>
                     <td class="td-input"
@@ -56,13 +56,13 @@
                             : observation.valueString !== undefined
                                 ? observation.valueString
                             : observation.valueQuantity !== undefined
-                                ? observation.valueQuantity
+                                ? observation.valueQuantity.value
                             : (observation.valueDate !== undefined && observation.valueTime !== undefined)
                                 ? observation.valueDate + ' ' + observation.valueTime
                             : $wire.dictionaries[observation.dictionaryName]?.[observation.valueCodeableConcept]
                         "
                     ></td>
-                    <td class="td-input"></td>
+                    <td class="td-input" x-text="observation.date"></td>
                     <td class="td-input">
                         {{-- That all that is needed for the dropdown --}}
                         <div x-data="{
@@ -196,6 +196,7 @@
                             <form>
                                 @include('livewire.encounter.observation-parts.coding-system')
                                 @include('livewire.encounter.observation-parts.main-information')
+                                @include('livewire.encounter.observation-parts.additional-information')
 
                                 <div class="mt-6 flex justify-between space-x-2">
                                     <button type="button"
@@ -206,11 +207,35 @@
                                     </button>
 
                                     <button @click.prevent="
+                                                const selectedValueType = valueMap[modalObservation.code.coding[0].code]?.[1];
+
+                                                // Delete all types of filed except the last selected
+                                                const fieldsToDelete = [
+                                                    'valueQuantity',
+                                                    'valueCodeableConcept',
+                                                    'valueString',
+                                                    'valueBoolean',
+                                                    'valueDateTime'
+                                                ];
+
+                                                fieldsToDelete.forEach(field => {
+                                                    if (field !== selectedValueType) {
+                                                        // set empty value as default for valueQuantity
+                                                        if (field === 'valueQuantity') {
+                                                            if (modalObservation.valueQuantity) {
+                                                                modalObservation.valueQuantity.value = '';
+                                                            }
+                                                        } else {
+                                                            delete modalObservation[field];
+                                                        }
+                                                    }
+                                                });
+
                                                 if (modalObservation.codingSystem === 'loinc') {
-                                                    modalObservation.categories.coding[0].system = 'eHealth/observation_categories';
+                                                    modalObservation.categories[0].coding[0].system = 'eHealth/observation_categories';
                                                     modalObservation.code.coding[0].system = 'eHealth/LOINC/observation_codes';
                                                 } else {
-                                                   modalObservation.categories.coding[0].system = 'eHealth/ICF/observation_categories';
+                                                   modalObservation.categories[0].coding[0].system = 'eHealth/ICF/observation_categories';
                                                    modalObservation.code.coding[0].system = 'eHealth/ICF/classifiers';
                                                 }
 
@@ -223,6 +248,11 @@
                                                 openModal = false;
                                             "
                                             class="button-primary"
+                                            :disabled="!(
+                                                modalObservation.date.trim().length > 0 && modalObservation.time.trim().length > 0 &&
+                                                modalObservation.categories[0].coding[0].code.trim().length > 0 &&
+                                                modalObservation.code.coding[0].code.trim().length > 0
+                                            )"
                                     >
                                         {{ __('forms.save') }}
                                     </button>
@@ -265,10 +295,12 @@
             ],
             text: ''
         };
-        categories = {
-            coding: [{system: '', code: ''}],
-            text: ''
-        };
+        categories = [
+            {
+                coding: [{system: '', code: ''}],
+                text: ''
+            }
+        ];
         code = {
             coding: [{system: '', code: ''}],
             text: ''
@@ -286,6 +318,25 @@
                 }
             }
         ];
+        valueQuantity = {
+            value: ''
+        };
+        method = {
+            coding: [{system: 'eHealth/observation_methods', code: ''}],
+            text: ''
+        };
+        interpretation = {
+            coding: [{system: 'eHealth/observation_interpretations', code: ''}],
+            text: ''
+        };
+        bodySite = {
+            coding: [{system: 'eHealth/body_sites', code: ''}],
+            text: ''
+        };
+        date = '';
+        time = '';
+        effectiveDate = '';
+        effectiveTime = '';
 
         constructor(obj = null) {
             if (obj) {

@@ -33,6 +33,7 @@ return [
     'other_source' => 'Інше джерело',
     'performer' => 'Виконавець',
     'source_link' => 'Посилання на джерело',
+    'body_part' => 'Частина тіла',
 
     'relation_type' => [
         'primary' => 'Основний',
@@ -170,7 +171,6 @@ return [
     'amount_of_injected' => 'Кількість введеної',
     'measurement_units' => 'Одиниці виміру',
     'input_route' => 'Шлях введення',
-    'body_part' => 'Частина тіла',
     'vaccination_protocol' => 'Протокол імунізації',
     'dose_sequence' => 'Порядковий номер дози',
     'immunization_series' => 'Етап імунізації',
@@ -189,4 +189,8 @@ return [
     'components' => 'Компоненти',
     'extent_or_magnitude_of_violation' => 'Обсяг або величина порушення',
     'interpretation' => 'Інтерпретація',
+    'observation_method' => 'Метод спостереження',
+    'interpretation_of_observation' => 'Інтерпретація спостереження',
+    'date_and_time_of_receiving_the_indicators' => 'Дата та час отримання показників',
+    'date_and_time_of_entry' => 'Дата та час внесення',
 ];

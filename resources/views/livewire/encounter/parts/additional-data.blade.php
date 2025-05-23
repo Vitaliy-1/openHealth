@@ -36,6 +36,7 @@
                         <use xlink:href="#svg-clock"></use>
                     </svg>
                     <input wire:model="form.encounter.period.start"
+                           @input="$event.target.blur()"
                            type="time"
                            name="periodStart"
                            id="periodStart"
@@ -59,6 +60,7 @@
                         <use xlink:href="#svg-clock"></use>
                     </svg>
                     <input wire:model="form.encounter.period.end"
+                           @input="$event.target.blur()"
                            type="time"
                            name="periodEnd"
                            id="periodEnd"

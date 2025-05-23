@@ -252,7 +252,7 @@
                                         <label for="doseSequence" class="label-modal">
                                             {{ __('patients.dose_sequence') }}
                                         </label>
-                                        <input x-model="modalVaccinationProtocol.doseSequence"
+                                        <input x-model.number="modalVaccinationProtocol.doseSequence"
                                                type="number"
                                                name="doseSequence"
                                                id="doseSequence"
@@ -284,7 +284,7 @@
                                         <label for="seriesDoses" class="label-modal">
                                             {{ __('patients.series_of_doses_by_protocol') }}
                                         </label>
-                                        <input x-model="modalVaccinationProtocol.seriesDoses"
+                                        <input x-model.number="modalVaccinationProtocol.seriesDoses"
                                                type="number"
                                                name="seriesDoses"
                                                id="seriesDoses"

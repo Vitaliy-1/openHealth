@@ -134,7 +134,7 @@ class PatientApi
      * @return array
      * @throws ApiException
      */
-    public static function getEpisodeBySearchParams(string $patientId, array $params): array
+    public static function getEpisodeBySearchParams(string $patientId, array $params = []): array
     {
         return new Request(
             HttpRequest::METHOD_GET,

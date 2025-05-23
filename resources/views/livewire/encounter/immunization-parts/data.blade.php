@@ -44,6 +44,7 @@
                     <use xlink:href="#svg-clock"></use>
                 </svg>
                 <input x-model="modalImmunization.time"
+                       @input="$event.target.blur()"
                        datepicker-max-date="{{ now()->format('Y-m-d') }}"
                        type="time"
                        name="immunizationTime"

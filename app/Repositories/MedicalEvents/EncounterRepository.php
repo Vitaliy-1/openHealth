@@ -268,6 +268,10 @@ class EncounterRepository extends BaseRepository
                     unset($condition['onsetTime'], $condition['assertedTime'], $condition['diagnoses']);
                 }
 
+                if (empty($condition['evidences']['codes'])) {
+                    unset($condition['evidences']);
+                }
+
                 return $condition;
             },
             $conditions,
@@ -380,10 +384,21 @@ class EncounterRepository extends BaseRepository
             unset($observation['codingSystem']);
 
             $observation['id'] = Str::uuid()->toString();
+            $observation['status'] = 'valid';
 
             if (isset($observation['dictionaryName'])) {
                 unset($observation['dictionaryName']);
             }
+
+            $observation['effectiveDateTime'] = convertToISO8601($observation['effectiveDate'] . $observation['effectiveTime']);
+            unset($observation['effectiveDate'], $observation['effectiveTime']);
+
+            if (empty($observation['effectiveDateTime'])) {
+                unset($observation['effectiveDateTime']);
+            }
+
+            $observation['issued'] = convertToISO8601($observation['date'] . $observation['time']);
+            unset($observation['date'], $observation['time']);
 
             $observation['context']['identifier']['type']['coding'][0] = [
                 'system' => 'eHealth/resources',
@@ -399,6 +414,10 @@ class EncounterRepository extends BaseRepository
                 $observation['performer']['identifier']['value'] = $employee->uuid;
             } else {
                 unset($observation['performer']);
+            }
+
+            if ($observation['valueQuantity']['value'] === '') {
+                unset($observation['valueQuantity']);
             }
 
             // format to codeable concept type
@@ -417,6 +436,14 @@ class EncounterRepository extends BaseRepository
             // combine date&time
             if (isset($observation['valueDate'], $observation['valueTime'])) {
                 $observation['valueDateTime'] = convertToISO8601($observation['valueDate'] . $observation['valueTime']);
+            }
+
+            if (empty($observation['components'][0]['code']['coding'][0]['code'])) {
+                unset($observation['components']);
+            }
+
+            if (empty($observation['components'][0]['interpretation']['coding'][0]['code'])) {
+                unset($observation['components']);
             }
 
             return $observation;

@@ -138,7 +138,7 @@
                 </label>
                 <select type="text"
                         x-model="modalImmunization.doseQuantity.code"
-                        @change="modalImmunization.doseQuantity.unit = immunizationDosageUnitsDictionary[modalImmunization.doseQuantity.code]"
+                        @change="modalImmunization.doseQuantity.unit = modalImmunization.doseQuantity.code"
                         name="measurementUnits"
                         id="measurementUnits"
                         class="input-modal"

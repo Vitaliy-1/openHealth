@@ -168,6 +168,7 @@ class Encounter extends Form
             'immunizations.*.doseQuantity.unit' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(false, false),
+                new InDictionary('eHealth/immunization_dosage_units'),
                 'string'
             ],
             'immunizations.*.doseQuantity.code' => [
@@ -187,42 +188,42 @@ class Encounter extends Form
             'immunizations.*.route.coding.*.code' => [
                 'nullable', 'string', new InDictionary('eHealth/vaccination_routes')
             ],
-            'immunizations.*.vaccinationProtocols.doseSequence' => [
+            'immunizations.*.vaccinationProtocols.*.doseSequence' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
                 $this->requiredIfHasMoHAuthority(),
                 'integer',
             ],
-            'immunizations.*.vaccinationProtocols.description' => ['nullable', 'string', 'max:255'],
-            'immunizations.*.vaccinationProtocols.authority' => [
+            'immunizations.*.vaccinationProtocols.*.description' => ['nullable', 'string', 'max:255'],
+            'immunizations.*.vaccinationProtocols.*.authority' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
                 $this->requiredIfPrimarySourceAndNotGiven(false, false),
                 'array'
             ],
-            'immunizations.*.vaccinationProtocols.authority.coding.*.code' => [
+            'immunizations.*.vaccinationProtocols.*.authority.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/vaccination_authorities')
             ],
-            'immunizations.*.vaccinationProtocols.series' => [
+            'immunizations.*.vaccinationProtocols.*.series' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
                 $this->requiredIfHasMoHAuthority(),
                 'max:255',
                 'string',
             ],
-            'immunizations.*.vaccinationProtocols.seriesDoses' => [
+            'immunizations.*.vaccinationProtocols.*.seriesDoses' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
                 $this->requiredIfHasMoHAuthority(),
                 'integer'
             ],
-            'immunizations.*.vaccinationProtocols.targetDiseases' => [
+            'immunizations.*.vaccinationProtocols.*.targetDiseases' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
                 $this->requiredIfPrimarySourceAndNotGiven(false, false),
                 'array'
             ],
-            'immunizations.*.vaccinationProtocols.targetDiseases.coding.*.code' => [
+            'immunizations.*.vaccinationProtocols.*.targetDiseases.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/vaccination_target_diseases')
             ],
 
@@ -241,11 +242,23 @@ class Encounter extends Form
             'observations.*.code.coding.*.code' => [
                 'required', 'string', new InDictionary(['eHealth/LOINC/observation_codes', 'eHealth/ICF/classifiers'])
             ],
-            'observations.*.valueQuantity' => ['sometimes', 'numeric'],
+            'observations.*.valueQuantity' => ['sometimes', 'array'],
+            'observations.*.valueQuantity.value' => ['sometimes', 'numeric'],
+            'observations.*.valueQuantity.comparator' => ['sometimes', 'string'],
+            'observations.*.valueQuantity.unit' => ['sometimes', 'string'],
+            'observations.*.valueQuantity.system' => ['sometimes', 'string'],
+            'observations.*.valueQuantity.code' => ['sometimes', 'string'],
             'observations.*.valueCodeableConcept' => ['sometimes', 'array'],
             'observations.*.valueString' => ['sometimes', 'string'],
             'observations.*.valueBoolean' => ['sometimes', 'boolean'],
-            'observations.*.valueDateTime' => ['sometimes', 'date']
+            'observations.*.valueDateTime' => ['sometimes', 'date'],
+            'observations.*.method.coding.*.code' => [
+                'required', 'string', new InDictionary('eHealth/observation_methods')
+            ],
+            'observations.*.interpretation.coding.*.code' => [
+                'required', 'string', new InDictionary('eHealth/observation_interpretations')
+            ],
+            'observations.*.issued' => ['required', 'date'],
         ];
     }
 

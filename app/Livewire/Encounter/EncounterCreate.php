@@ -94,32 +94,63 @@ class EncounterCreate extends EncounterComponent
      * Submit encrypted data about person encounter.
      *
      * @return void
-     * @throws ApiException|ValidationException
+     * @throws ApiException
      */
     public function signPerson(): void
     {
+        // Note: No update operations are allowed. All IDs, submitted as PK, should be unique for eHealth.
+        // TODO: додати перевірку на унікальність uuid, трішки потім. uuid має бути унікальний для пацієнта а не унікальним в цілому?
+        $encounterRepository = Repository::encounter();
+
+        $formattedEncounter = $encounterRepository->formatEncounterRequest($this->form->encounter, $this->form->conditions);
+        $formattedEpisode = $encounterRepository->formatEpisodeRequest($this->form->episode, $this->form->encounter['period']);
+        $formattedConditions = $encounterRepository->formatConditionsRequest($this->form->conditions);
+
+        if (!empty($this->form->immunizations)) {
+            $formattedImmunizations = $encounterRepository->formatImmunizationsRequest($this->form->immunizations);
+        }
+
+        if (!empty($this->form->observations)) {
+            $formattedObservations = $encounterRepository->formatObservationsRequest($this->form->observations);
+        }
+
+        // Validate formatted data
         try {
-            $this->form->rulesForModelValidate(['encounter', 'episode', 'conditions']);
+            $this->form->validateForm('encounter', $formattedEncounter);
+            $this->form->validateForm('episode', $formattedEpisode);
+
+            foreach ($formattedConditions['conditions'] as $formattedCondition) {
+                $this->form->validateForm('conditions', ['conditions' => [$formattedCondition]]);
+            }
+
+            if (isset($formattedImmunizations)) {
+                foreach ($formattedImmunizations['immunizations'] as $formattedImmunization) {
+                    $this->form->validateForm('immunizations', ['immunizations' => [$formattedImmunization]]);
+                }
+            }
+
+            if (isset($formattedObservations)) {
+                foreach ($formattedObservations['observations'] as $formattedObservation) {
+                    $this->form->validateForm('observations', ['observations' => [$formattedObservation]]);
+                }
+            }
         } catch (ValidationException $e) {
             $this->dispatch('flashMessage', [
                 'message' => $e->validator->errors()->first(),
                 'type' => 'error'
             ]);
 
-            throw $e;
+            return;
         }
 
-        $this->createEpisode();
-
-        // Note: No update operations are allowed. All IDs, submitted as PK, should be unique for eHealth.
-        // TODO: додати перевірку на унікальність uuid, трішки потім. uuid має бути унікальний для пацієнта а не унікальним в цілому?
-        $preRequestEncounter = Repository::encounter()->formatEncounterRequest($this->form->encounter, $this->form->conditions);
-        $preRequestCondition = Repository::encounter()->formatConditionsRequest($this->form->conditions);
+        $this->createEpisode($formattedEpisode['episode']);
 
         $base64EncryptedData = $this->sendEncryptedData(
             array_merge(
-                $preRequestEncounter,
-                $preRequestCondition
+                $formattedEncounter,
+                $this->convertArrayKeysToSnakeCase($formattedConditions),
+                $this->convertArrayKeysToSnakeCase($formattedImmunizations),
+                $this->convertArrayKeysToSnakeCase($formattedObservations)
             ),
             Auth::user()->tax_id
         );
@@ -128,8 +159,8 @@ class EncounterCreate extends EncounterComponent
             'visit' => (object)[
                 'id' => Str::uuid()->toString(),
                 'period' => (object)[
-                    'start' => $preRequestEncounter['encounter']['period']['start'],
-                    'end' => $preRequestEncounter['encounter']['period']['end']
+                    'start' => $formattedEncounter['encounter']['period']['start'],
+                    'end' => $formattedEncounter['encounter']['period']['end']
                 ]
             ],
             'signed_data' => $base64EncryptedData
@@ -142,12 +173,13 @@ class EncounterCreate extends EncounterComponent
     /**
      * Create episode for patient.
      *
+     * @param  array  $formattedEpisode
      * @return void
      */
-    private function createEpisode(): void
+    private function createEpisode(array $formattedEpisode): void
     {
         try {
-            PatientApi::createEpisode($this->patientUuid, Repository::encounter()->formatEpisodeRequest($this->form->episode, $this->form->encounter['period']));
+            PatientApi::createEpisode($this->patientUuid, $this->convertArrayKeysToSnakeCase($formattedEpisode));
         } catch (ApiException) {
             $this->dispatch('flashMessage', [
                 'message' => __('Виникла помилка при створенні епізоду. Зверніться до адміністратора.'),

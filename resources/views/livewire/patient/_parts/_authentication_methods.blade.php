@@ -1,4 +1,4 @@
-@php use App\Enums\Person\AuthenticationMethod; @endphp
+@use('App\Enums\Person\AuthenticationMethod')
 
 <fieldset class="fieldset"
           x-data="{

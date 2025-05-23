@@ -1,7 +1,6 @@
-@php
-    use App\Enums\Person\AuthenticationMethod;
-    $svgSprite = file_get_contents(resource_path('images/sprite.svg'));
-@endphp
+@use('App\Enums\Person\AuthenticationMethod')
+
+@php $svgSprite = file_get_contents(resource_path('images/sprite.svg')); @endphp
 
 <x-layouts.patient :id="$id" :firstName="$firstName" :lastName="$lastName" :secondName="$secondName">
     <div aria-hidden="true" class="hidden">

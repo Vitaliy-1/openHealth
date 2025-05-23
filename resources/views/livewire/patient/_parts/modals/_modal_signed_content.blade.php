@@ -37,7 +37,7 @@
             <x-forms.form-group class="">
                 <x-slot name="label">
                     <x-forms.label class="default-label" for="keyContainerUpload" name="label">
-                        {{ __('forms.keyContainerUpload') }} *
+                        {{ __('forms.key_container_upload') }} *
                     </x-forms.label>
                 </x-slot>
                 <x-slot name="input">

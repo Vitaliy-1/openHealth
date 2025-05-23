@@ -567,6 +567,7 @@ class RolesPermissionsSeeder extends Seeder
         foreach ($guards as $guard) {
             $rolesByGuard = Role::whereIn('name', array_keys($this->roles))
                 ->where('guard_name', $guard)
+                ->with('permissions')
                 ->get()
                 ->keyBy('name');
 

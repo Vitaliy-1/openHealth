@@ -373,6 +373,7 @@
                                         {{ __('forms.start_time') }}
                                     </label>
                                     <input x-model="modalCondition.conditions.onsetTime"
+                                           @input="$event.target.blur()"
                                            datepicker-max-date="{{ now()->format('Y-m-d') }}"
                                            type="time"
                                            name="onsetTime"
@@ -419,6 +420,7 @@
                                         {{ __('patients.entry_time') }}
                                     </label>
                                     <input x-model="modalCondition.conditions.assertedTime"
+                                           @input="$event.target.blur()"
                                            datepicker-max-date="{{ now()->format('Y-m-d') }}"
                                            type="time"
                                            name="assertedTime"
