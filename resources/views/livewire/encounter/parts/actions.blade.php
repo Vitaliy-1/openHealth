@@ -204,9 +204,11 @@
 
                                     <button @click.prevent="
                                                 const newActionCode = modalAction.coding[0]?.code;
-                                                const matchingActionCodesCount = actions.filter(
-                                                    c => c.coding[0]?.code === newActionCode
-                                                ).length;
+                                                const matchingActionCodesCount = actions.filter((code, index) => {
+                                                    // If editing — ignore the current index
+                                                    if (newAction === false && index === item) return false;
+                                                    return code.coding[0]?.code === newActionCode;
+                                                }).length;
 
                                                 if (matchingActionCodesCount >= 1) {
                                                     showDuplicateCodeWarning = true;

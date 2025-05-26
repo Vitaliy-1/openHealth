@@ -235,14 +235,13 @@
                                                     modalObservation.categories[0].coding[0].system = 'eHealth/observation_categories';
                                                     modalObservation.code.coding[0].system = 'eHealth/LOINC/observation_codes';
                                                 } else {
-                                                   modalObservation.categories[0].coding[0].system = 'eHealth/ICF/observation_categories';
-                                                   modalObservation.code.coding[0].system = 'eHealth/ICF/classifiers';
+                                                    modalObservation.categories[0].coding[0].system = 'eHealth/ICF/observation_categories';
+                                                    modalObservation.code.coding[0].system = 'eHealth/ICF/classifiers';
                                                 }
 
                                                 newObservation !== false
                                                 ? observations.push(modalObservation)
                                                 : observations[item] = modalObservation;
-                                                modalObservation.dictionaryName = $wire.observationValueMap[modalObservation.code.coding[0].code]?.[0];
 
                                                 showDuplicateCodeWarning = false;
                                                 openModal = false;
@@ -307,7 +306,7 @@
         };
         components = [
             {
-                code: {
+                valueCodeableConcept: {
                     coding: [{system: '', code: ''}],
                     text: ''
                 },
@@ -333,10 +332,10 @@
             coding: [{system: 'eHealth/body_sites', code: ''}],
             text: ''
         };
-        date = '';
-        time = '';
-        effectiveDate = '';
-        effectiveTime = '';
+        date = new Date().toISOString().split('T')[0];
+        time = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', hour12: false });
+        effectiveDate = new Date().toISOString().split('T')[0];
+        effectiveTime = new Date().toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', hour12: false });
 
         constructor(obj = null) {
             if (obj) {

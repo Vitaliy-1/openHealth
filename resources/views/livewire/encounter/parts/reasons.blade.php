@@ -202,9 +202,11 @@
 
                                     <button @click.prevent="
                                                 const newReasonCode = modalReason.coding[0]?.code;
-                                                const matchingReasonCodesCount = reasons.filter(
-                                                    c => c.coding[0]?.code === newReasonCode
-                                                ).length;
+                                                const matchingReasonCodesCount = reasons.filter((code, index) => {
+                                                    // If editing — ignore the current index
+                                                    if (newReason === false && index === item) return false;
+                                                    return code.coding[0]?.code === newReasonCode;
+                                                }).length;
 
                                                 if (matchingReasonCodesCount >= 1) {
                                                     showDuplicateCodeWarning = true;

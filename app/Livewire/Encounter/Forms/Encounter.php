@@ -127,12 +127,12 @@ class Encounter extends Form
                 'string', new InDictionary('eHealth/immunization_report_origins')
             ],
             'immunizations.*.notGiven' => ['required', 'boolean'],
-            'immunizations.*.explanation.reasonsNotGiven' => [
+            'immunizations.*.explanation.*.reasonsNotGiven' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
                 'prohibited_if:immunizations.*.notGiven,false',
                 'array'
             ],
-            'immunizations.*.explanation.reasonsNotGiven.coding.*.code' => [
+            'immunizations.*.explanation.*.reasonsNotGiven.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/reason_not_given_explanations')
             ],
             'immunizations.*.vaccineCode.coding.*.code' => [

@@ -165,4 +165,22 @@
             </p>
         </div>
     </div>
+
+    <div class="form-row">
+        <div>
+            <label for="observationComment" class="label-modal">
+                {{ __('forms.comment') }}
+            </label>
+
+            <div>
+            <textarea rows="4"
+                      x-model="modalObservation.comment"
+                      id="observationComment"
+                      name="observationComment"
+                      class="textarea"
+                      placeholder="{{ __('patients.write_comment_here') }}"
+            ></textarea>
+            </div>
+        </div>
+    </div>
 </fieldset>

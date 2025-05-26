@@ -51,7 +51,7 @@
                         x-text="
                             immunization.explanation.reasons?.[0]?.coding?.[0]?.code
                                 ? reasonExplanationsDictionary[immunization.explanation.reasons[0].coding[0].code]
-                                : reasonNotGivenExplanationsDictionary[immunization.explanation.reasonsNotGiven?.coding?.[0]?.code]
+                                : reasonNotGivenExplanationsDictionary[immunization.explanation.reasonsNotGiven[0]?.coding?.[0]?.code]
                         "
                     ></td>
                     <td class="td-input" x-text="immunization.date"></td>
@@ -219,7 +219,7 @@
                                             class="button-primary"
                                             :disabled="!(modalImmunization.date.trim().length > 0 &&
                                                 modalImmunization.time.trim().length > 0 &&
-                                                (modalImmunization.explanation?.reasons?.[0]?.coding?.[0]?.code?.trim?.().length > 0 || modalImmunization.explanation?.reasonsNotGiven?.coding?.[0]?.code?.trim?.().length > 0))
+                                                (modalImmunization.explanation?.reasons?.[0]?.coding?.[0]?.code?.trim?.().length > 0 || modalImmunization.explanation?.reasonsNotGiven[0]?.coding?.[0]?.code?.trim?.().length > 0))
                                             "
                                     >
                                         {{ __('forms.save') }}
@@ -256,9 +256,11 @@
                     coding: [{system: 'eHealth/reason_explanations', code: ''}]
                 }
             ],
-            reasonsNotGiven: {
-                coding: [{system: 'eHealth/reason_not_given_explanations', code: ''}]
-            }
+            reasonsNotGiven: [
+                {
+                    coding: [{system: 'eHealth/reason_not_given_explanations', code: ''}]
+                }
+            ]
         };
         primarySource = true;
         performer = {

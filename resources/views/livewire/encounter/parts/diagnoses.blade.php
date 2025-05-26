@@ -654,9 +654,11 @@
                 },
                 rank: ''
             },
-            evidences: {
-                codes: []
-            }
+            evidences: [
+                {
+                    codes: []
+                }
+            ]
         };
         query = '';
 

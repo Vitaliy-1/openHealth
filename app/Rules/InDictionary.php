@@ -39,17 +39,22 @@ class InDictionary implements ValidationRule
         $isValid = false;
 
         foreach ($names as $name) {
-            // Retrieve dictionary keys (assumed to be codes)
-            $dictionaryKeys = array_keys(dictionary()->getDictionary($name));
+            if ($name === 'eHealth/ICF/classifiers') {
+                $dictionaryKeys = array_keys(dictionary()
+                    ->getLargeDictionary(['name' => 'eHealth/ICF/classifiers'], false)
+                    ->getFlattenedChildValues());
+            } else {
+                $dictionaryKeys = array_keys(dictionary()->getDictionary($name));
+            }
 
             if (in_array($value, $dictionaryKeys, true)) {
                 $isValid = true;
-                break; // Stop checking once a match is found
+                break;
             }
         }
 
         // Fail validation if value not found in any dictionary
-        if (! $isValid) {
+        if (!$isValid) {
             $fail(__('Недопустиме значення :attribute'));
         }
     }

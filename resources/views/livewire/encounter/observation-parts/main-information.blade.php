@@ -450,8 +450,8 @@
 
                         <select class="input-modal"
                                 x-init="
-                                    modalObservation.components[0].code.coding[0].code = 'extent_or_magnitude_of_impairment';
-                                    modalObservation.components[0].code.coding[0].system = 'eHealth/ICF/qualifiers';
+                                    modalObservation.components[0].valueCodeableConcept.coding[0].code = 'extent_or_magnitude_of_impairment';
+                                    modalObservation.components[0].valueCodeableConcept.coding[0].system = 'eHealth/ICF/qualifiers';
                                 "
                                 id="extentCode"
                                 type="text"
@@ -471,13 +471,13 @@
 
                         <select class="input-modal"
                                 x-model="modalObservation.components[0].interpretation.coding[0].code"
-                                @change="modalObservation.components[0].interpretation.coding[0].system = 'eHealth/ICF/qualifiers/extent_or_magnitude_of_impairment'"
+                                @change="modalObservation.components[0].interpretation.coding[0].system = 'eHealth/observation_interpretations'"
                                 id="extentInterpretationCode"
                                 type="text"
                                 required
                         >
                             <option selected>{{ __('forms.select') }}</option>
-                            @foreach($this->dictionaries['eHealth/ICF/qualifiers/extent_or_magnitude_of_impairment'] as $key => $code)
+                            @foreach($this->dictionaries['eHealth/observation_interpretations'] as $key => $code)
                                 <option value="{{ $key }}">{{ $code }}</option>
                             @endforeach
                         </select>
@@ -505,8 +505,8 @@
 
                         <select class="input-modal"
                                 x-init="
-                                    modalObservation.components[0].code.coding[0].code = 'extent_or_magnitude_of_impairment';
-                                    modalObservation.components[0].code.coding[0].system = 'eHealth/ICF/qualifiers';
+                                    modalObservation.components[0].valueCodeableConcept.coding[0].code = 'extent_or_magnitude_of_impairment';
+                                    modalObservation.components[0].valueCodeableConcept.coding[0].system = 'eHealth/ICF/qualifiers';
                                 "
                                 id="extentCode"
                                 type="text"
@@ -516,7 +516,7 @@
                             <option value="extent_or_magnitude_of_impairment">
                                 {{ $this->dictionaries['eHealth/ICF/qualifiers']['extent_or_magnitude_of_impairment'] }}
                             </option>
-                            @foreach($this->dictionaries['eHealth/ICF/qualifiers/extent_or_magnitude_of_impairment'] as $key => $code)
+                            @foreach($this->dictionaries['eHealth/observation_interpretations'] as $key => $code)
                                 <option value="{{ $key }}">{{ $code }}</option>
                             @endforeach
                         </select>
@@ -529,13 +529,13 @@
 
                         <select class="input-modal"
                                 x-model="modalObservation.components[0].interpretation.coding[0].code"
-                                @change="modalObservation.components[0].interpretation.coding[0].system = 'eHealth/ICF/qualifiers/extent_or_magnitude_of_impairment'"
+                                @change="modalObservation.components[0].interpretation.coding[0].system = 'eHealth/observation_interpretations'"
                                 id="extentInterpretationCode"
                                 type="text"
                                 required
                         >
                             <option selected>{{ __('forms.select') }}</option>
-                            @foreach($this->dictionaries['eHealth/ICF/qualifiers/extent_or_magnitude_of_impairment'] as $key => $code)
+                            @foreach($this->dictionaries['eHealth/observation_interpretations'] as $key => $code)
                                 <option value="{{ $key }}">{{ $code }}</option>
                             @endforeach
                         </select>
@@ -551,7 +551,7 @@
                 <div class="form-row-modal">
                     <div x-init="
                         modalObservation.components[1] = {
-                            code: {
+                            valueCodeableConcept: {
                                 coding: [{
                                     system: 'eHealth/ICF/qualifiers',
                                     code: 'nature_of_change_in_body_structure'
@@ -581,7 +581,7 @@
                             <option value="nature_of_change_in_body_structure">
                                 {{ $this->dictionaries['eHealth/ICF/qualifiers']['nature_of_change_in_body_structure'] }}
                             </option>
-                            @foreach($this->dictionaries['eHealth/ICF/qualifiers/nature_of_change_in_body_structure'] as $key => $code)
+                            @foreach($this->dictionaries['eHealth/observation_interpretations'] as $key => $code)
                                 <option value="{{ $key }}">{{ $code }}</option>
                             @endforeach
                         </select>
@@ -616,7 +616,7 @@
                 <div class="form-row-modal">
                     <div x-init="
                         modalObservation.components[2] = {
-                            code: {
+                            valueCodeableConcept: {
                                 coding: [{
                                     system: 'eHealth/ICF/qualifiers',
                                     code: 'anatomical_localization'
@@ -654,18 +654,18 @@
 
                     <div>
                         <label for="anatomicalInterpretationCode" class="label-modal">
-                            {{ __('atients.interpretation') }}
+                            {{ __('patients.interpretation') }}
                         </label>
 
                         <select class="input-modal"
                                 x-model="modalObservation.components[2].interpretation.coding[0].code"
-                                @change="modalObservation.components[2].interpretation.coding[0].system = 'eHealth/ICF/qualifiers/anatomical_localization'"
+                                @change="modalObservation.components[2].interpretation.coding[0].system = 'eHealth/observation_interpretations'"
                                 id="anatomicalInterpretationCode"
                                 type="text"
                                 required
                         >
                             <option selected>{{ __('forms.select') }}</option>
-                            @foreach($this->dictionaries['eHealth/ICF/qualifiers/anatomical_localization'] as $key => $code)
+                            @foreach($this->dictionaries['eHealth/observation_interpretations'] as $key => $code)
                                 <option value="{{ $key }}">{{ $code }}</option>
                             @endforeach
                         </select>
@@ -693,8 +693,8 @@
 
                         <select class="input-modal"
                                 x-init="
-                                    modalObservation.components[0].code.coding[0].code = 'performance';
-                                    modalObservation.components[0].code.coding[0].system = 'eHealth/ICF/qualifiers';
+                                    modalObservation.components[0].valueCodeableConcept.coding[0].code = 'eHealth/observation_interpretations';
+                                    modalObservation.components[0].valueCodeableConcept.coding[0].system = 'eHealth/ICF/qualifiers';
                                 "
                                 id="performanceCode"
                                 type="text"
@@ -704,7 +704,7 @@
                             <option value="performance">
                                 {{ $this->dictionaries['eHealth/ICF/qualifiers']['performance'] }}
                             </option>
-                            @foreach($this->dictionaries['eHealth/ICF/qualifiers/performance'] as $key => $code)
+                            @foreach($this->dictionaries['eHealth/observation_interpretations'] as $key => $code)
                                 <option value="{{ $key }}">{{ $code }}</option>
                             @endforeach
                         </select>
@@ -717,7 +717,7 @@
 
                         <select class="input-modal"
                                 x-model="modalObservation.components[0].interpretation.coding[0].code"
-                                @change="modalObservation.components[0].interpretation.coding[0].system = 'eHealth/ICF/qualifiers/performance'"
+                                @change="modalObservation.components[0].interpretation.coding[0].system = 'eHealth/observation_interpretations'"
                                 id="performanceInterpretationCode"
                                 type="text"
                                 required
@@ -739,9 +739,9 @@
                 <div class="form-row-modal">
                     <div x-init="
                         modalObservation.components[1] = {
-                            code: {
+                            valueCodeableConcept: {
                                 coding: [{
-                                    system: 'eHealth/ICF/qualifiers',
+                                    system: 'eHealth/observation_interpretations',
                                     code: 'capacity'
                                 }],
                                 text: ''
@@ -777,18 +777,18 @@
 
                     <div>
                         <label for="capacityInterpretationCode" class="label-modal">
-                            {{ __('atients.interpretation') }}
+                            {{ __('patients.interpretation') }}
                         </label>
 
                         <select class="input-modal"
                                 x-model="modalObservation.components[1].interpretation.coding[0].code"
-                                @change="modalObservation.components[1].interpretation.coding[0].system = 'eHealth/ICF/qualifiers/capacity'"
+                                @change="modalObservation.components[1].interpretation.coding[0].system = 'eHealth/observation_interpretations'"
                                 id="capacityInterpretationCode"
                                 type="text"
                                 required
                         >
                             <option selected>{{ __('forms.select') }}</option>
-                            @foreach($this->dictionaries['eHealth/ICF/qualifiers/capacity'] as $key => $code)
+                            @foreach($this->dictionaries['eHealth/observation_interpretations'] as $key => $code)
                                 <option value="{{ $key }}">{{ $code }}</option>
                             @endforeach
                         </select>
@@ -816,8 +816,8 @@
 
                         <select class="input-modal"
                                 x-init="
-                                    modalObservation.components[0].code.coding[0].code = 'barrier_or_facilitator';
-                                    modalObservation.components[0].code.coding[0].system = 'eHealth/ICF/qualifiers';
+                                    modalObservation.components[0].valueCodeableConcept.coding[0].code = 'barrier_or_facilitator';
+                                    modalObservation.components[0].valueCodeableConcept.coding[0].system = 'eHealth/observation_interpretations';
                                 "
                                 id="barrierCode"
                                 type="text"
@@ -840,19 +840,19 @@
 
                         <select class="input-modal"
                                 x-model="modalObservation.components[0].interpretation.coding[0].code"
-                                @change="modalObservation.components[0].interpretation.coding[0].system = 'eHealth/ICF/qualifiers/barrier_or_facilitator'"
+                                @change="modalObservation.components[0].interpretation.coding[0].system = 'eHealth/observation_interpretations'"
                                 id="barrierInterpretationCode"
                                 type="text"
                                 required
                         >
                             <option selected>{{ __('forms.select') }}</option>
-                            @foreach($this->dictionaries['eHealth/ICF/qualifiers/barrier_or_facilitator'] as $key => $code)
+                            @foreach($this->dictionaries['eHealth/observation_interpretations'] as $key => $code)
                                 <option value="{{ $key }}">{{ $code }}</option>
                             @endforeach
                         </select>
 
                         <p class="text-error text-xs"
-                           x-show="!Object.keys($wire.dictionaries['eHealth/ICF/qualifiers/barrier_or_facilitator']).includes(modalObservation.components[0].interpretation.coding[0].code)"
+                           x-show="!Object.keys($wire.dictionaries['eHealth/observation_interpretations']).includes(modalObservation.components[0].interpretation.coding[0].code)"
                         >
                             {{ __('forms.field_empty') }}
                         </p>

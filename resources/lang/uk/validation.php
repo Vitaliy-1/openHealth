@@ -498,7 +498,7 @@ return [
             'notGiven' => 'чи була проведена',
             'explanation.reasons' => 'причини проведення',
             'explanation.reasons.*.coding.*.code' => 'причини',
-            'explanation.reasonsNotGiven.coding.*.code' => 'причини',
+            'explanation.*.reasonsNotGiven.coding.*.code' => 'причини',
             'vaccineCode.coding.*.code' => 'код та назва',
             'manufacturer' => 'виробник',
             'lotNumber' => 'серія',
