@@ -774,7 +774,9 @@ class LegalEntity extends Component
 
         try{
             $user->save();
-        } catch (\Exception $e) {
+
+            $user->refresh();
+        } catch (Exception $e) {
             $this->dispatchErrorMessage(__('Сталася помилка під час обробки запиту'), ['error' => $e->getMessage()]);
 
             return null;
