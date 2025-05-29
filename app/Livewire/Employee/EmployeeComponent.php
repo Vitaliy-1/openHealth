@@ -5,7 +5,6 @@ namespace App\Livewire\Employee;
 use App\Models\LegalEntity;
 use App\Repositories\EmployeeRepository;
 use App\Traits\FormTrait;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use App\Livewire\Employee\Forms\EmployeeForm as Form;
 use App\Services\LegalEntityContext;
@@ -60,17 +59,15 @@ class EmployeeComponent extends Component
      */
     public array $employeeTypePosition = [];
 
-    public function boot(EmployeeRepository $employeeRepository): void
+    public function boot(EmployeeRepository $employeeRepository, LegalEntityContext $legalEntityContext): void
     {
         $this->employeeRepository = $employeeRepository;
+        $this->legalEntityContext = $legalEntityContext;
     }
 
-    public function mount(LegalEntityContext $legalEntityContext): void
+    public function mount(): void
     {
-        $this->legalEntityContext = $legalEntityContext;
-
         $this->legalEntity = $this->legalEntityContext->current();
-
         $this->getDictionary();
     }
 
@@ -80,11 +77,6 @@ class EmployeeComponent extends Component
     protected function getDictionary(): void
     {
         $this->traitGetDictionary();
-
-        if (! $this->legalEntity) {
-            Log::warning('Legal Entity not available in getDictionary method. Cannot filter dictionaries.');
-            return;
-        }
 
         $this->dictionaries['EMPLOYEE_TYPE'] = $this->getDictionariesFields(
             config('ehealth.legal_entity_type.' . $this->legalEntity->type .'.roles'),

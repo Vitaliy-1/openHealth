@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,6 +25,13 @@ class DatabaseSeeder extends Seeder
         if (app()->isLocal()) {
             // Populates following tables legal_entities, users and model has roles with test data
             $this->call(TestUserMigrate::class);
+        }
+
+        if (config('database.default') === 'pgsql') {
+            $maxId = DB::table('users')->max('id');
+            if ($maxId) {
+                DB::statement("SELECT setval('users_id_seq', $maxId)");
+            }
         }
     }
 }
