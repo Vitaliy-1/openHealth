@@ -32,6 +32,14 @@ class Education extends Model
         'updated_at'
     ];
 
+    protected $hidden = [
+        'id',
+        'educationable_id',
+        'educationable_type',
+        'created_at',
+        'updated_at'
+    ];
+
     protected $fillable = [
         'country',
         'city',
