@@ -8,7 +8,7 @@ class EmployeeEdit extends EmployeeComponent
 {
     protected Employee $employee;
 
-    public function mount(int $id = null): void
+    public function mount(int|\App\Services\LegalEntityContext $id = null): void
     {
         $this->employee = Employee::findOrFail($id);
 

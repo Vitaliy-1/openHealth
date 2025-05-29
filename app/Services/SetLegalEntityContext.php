@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\LegalEntity;
 
-class LegalEntityContext
+class SetLegalEntityContext
 {
     protected ?LegalEntity $legalEntity = null;
 
@@ -18,10 +18,6 @@ class LegalEntityContext
         return $this->legalEntity;
     }
 
-    /**
-     * return current LegalEntity.
-     * Alias for get() for readability.
-     */
     public function current(): ?LegalEntity
     {
         return $this->legalEntity;

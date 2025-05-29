@@ -8,9 +8,9 @@ use App\Models\Employee\EmployeeRequest;
 use App\Models\Person\Person;
 use App\Models\Relations\Party;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class EmployeeCreate extends EmployeeComponent
@@ -49,6 +49,8 @@ class EmployeeCreate extends EmployeeComponent
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error("Error saving employee: " . $e->getMessage(), ['exception' => $e]);
+            session()->flash('error', __('forms.something_went_wrong') . ' ' . $e->getMessage());
         }
     }
 
@@ -78,13 +80,19 @@ class EmployeeCreate extends EmployeeComponent
 
     protected function createEmployeeRequest(array $data): void
     {
+        $legalEntityId = $this->legalEntityContext->id();
+
+        if (is_null($legalEntityId)) {
+            throw new \Exception('Legal Entity ID not found in context.');
+        }
+
         EmployeeRequest::create([
             'party_id' => $data['party_id'],
             'employee_type' => $data['employee_type'],
             'position' => $data['position'],
             'start_date' => $data['start_date'],
             'status' => $data['status'],
-            'legal_entity_id' => Auth::user()->legal_entity_id,
+            'legal_entity_id' => $legalEntityId,
             'user_id' => $data['user_id'],
             'inserted_at' => now()
         ]);
@@ -105,12 +113,18 @@ class EmployeeCreate extends EmployeeComponent
 
     protected function createUser(Person $person): User
     {
+        $legalEntityId = $this->legalEntityContext->id();
+
+        if (is_null($legalEntityId)) {
+            throw new \Exception('Legal Entity ID not found in context when creating user.');
+        }
+
         DB::statement("SELECT setval('users_id_seq', (SELECT MAX(id) FROM users))");
 
         return User::create([
             'email' => $person->email,
             'password' => Hash::make(Str::random(12)),
-            'legal_entity_id' => Auth::user()->legal_entity_id,
+            'legal_entity_id' => $legalEntityId,
             'person_id' => $person->id,
         ]);
     }

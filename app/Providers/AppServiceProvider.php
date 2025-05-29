@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Livewire\LegalEntity\LegalEntity;
+use App\Models\LegalEntity as LegalEntityModel;
+use App\Services\LegalEntityContext;
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,12 +23,12 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(IdeHelperServiceProvider::class);
         }
 
-        $this->app->singletonIf(LegalEntity::class, function () {
-
-            return Auth::user()?->legalEntity;
+        $this->app->singleton(LegalEntityContext::class, function ($app) {
+            return new LegalEntityContext();
         });
 
-        $this->app->alias(LegalEntity::class, 'legalEntity');
+        $this->app->alias(LegalEntityModel::class, 'legalEntity');
+
     }
 
     /**
