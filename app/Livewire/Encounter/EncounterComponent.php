@@ -21,7 +21,7 @@ use App\Livewire\Encounter\Forms\Encounter as EncounterForm;
 use Livewire\WithFileUploads;
 use RuntimeException;
 
-class Encounter extends Component
+class EncounterComponent extends Component
 {
     use FormTrait;
     use Cipher;
