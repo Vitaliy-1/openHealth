@@ -30,7 +30,7 @@ class EmployeeComponent extends Component
     /**
      * @var LegalEntityContext
      */
-    protected LegalEntityContext $legalEntityContext;
+    public LegalEntityContext $legalEntityContext;
 
     /**
      * @var array|string[] Set dictionaries to load with the component
@@ -65,9 +65,9 @@ class EmployeeComponent extends Component
         $this->legalEntityContext = $legalEntityContext;
     }
 
-    public function mount(): void
+    public function mount(LegalEntityContext $legalEntityContext): void
     {
-        $this->legalEntity = $this->legalEntityContext->current();
+        $this->legalEntityContext = $legalEntityContext;
         $this->getDictionary();
     }
 
