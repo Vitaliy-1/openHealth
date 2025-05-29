@@ -8,7 +8,7 @@ class LegalEntityContext
 {
     protected ?LegalEntity $legalEntity = null;
 
-    public function set(LegalEntity $legalEntity): void
+    public function set(?LegalEntity $legalEntity): void
     {
         $this->legalEntity = $legalEntity;
     }
@@ -18,10 +18,6 @@ class LegalEntityContext
         return $this->legalEntity;
     }
 
-    /**
-     * return current LegalEntity.
-     * Alias for get() for readability.
-     */
     public function current(): ?LegalEntity
     {
         return $this->legalEntity;

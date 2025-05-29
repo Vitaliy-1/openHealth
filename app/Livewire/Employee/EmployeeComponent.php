@@ -5,8 +5,6 @@ namespace App\Livewire\Employee;
 use App\Models\LegalEntity;
 use App\Repositories\EmployeeRepository;
 use App\Traits\FormTrait;
-use App\Models\Employee\Employee;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use App\Livewire\Employee\Forms\EmployeeForm as Form;
@@ -33,7 +31,7 @@ class EmployeeComponent extends Component
     /**
      * @var LegalEntityContext
      */
-    public LegalEntityContext $legalEntityContext;
+    protected LegalEntityContext $legalEntityContext;
 
     /**
      * @var array|string[] Set dictionaries to load with the component
