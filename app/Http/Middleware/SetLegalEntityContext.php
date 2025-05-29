@@ -31,8 +31,8 @@ class SetLegalEntityContext
             $legalEntity = LegalEntity::where('uuid', $identifiedUuid)->first();
         }
 
-        if (is_null($legalEntity) && Auth::check()) {
-            $user = Auth::user();
+        if (is_null($legalEntity) && Auth::guard('ehealth')->check()) {
+            $user = Auth::guard('ehealth')->user();
 
             if ($user->legalEntity) {
                 $legalEntity = $user->legalEntity;

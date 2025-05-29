@@ -8,6 +8,7 @@ use App\Models\Employee\EmployeeRequest;
 use App\Models\Person\Person;
 use App\Models\Relations\Party;
 use App\Models\User;
+use App\Services\LegalEntityContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -113,7 +114,8 @@ class EmployeeCreate extends EmployeeComponent
 
     protected function createUser(Person $person): User
     {
-        $legalEntityId = $this->legalEntityContext->id();
+        $legalEntityContext = app(LegalEntityContext::class);
+        $legalEntityId = $legalEntityContext->id();
 
         if (is_null($legalEntityId)) {
             throw new \Exception('Legal Entity ID not found in context when creating user.');

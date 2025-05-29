@@ -31,7 +31,7 @@ class EmployeeComponent extends Component
     /**
      * @var LegalEntityContext
      */
-    public LegalEntityContext $legalEntityContext;
+    protected LegalEntityContext $legalEntityContext;
 
     /**
      * @var array|string[] Set dictionaries to load with the component
@@ -60,17 +60,15 @@ class EmployeeComponent extends Component
      */
     public array $employeeTypePosition = [];
 
-    public function boot(EmployeeRepository $employeeRepository): void
+    public function boot(EmployeeRepository $employeeRepository, LegalEntityContext $legalEntityContext): void
     {
         $this->employeeRepository = $employeeRepository;
+        $this->legalEntityContext = $legalEntityContext;
     }
 
-    public function mount(LegalEntityContext $legalEntityContext): void
+    public function mount(): void
     {
-        $this->legalEntityContext = $legalEntityContext;
-
         $this->legalEntity = $this->legalEntityContext->current();
-
         $this->getDictionary();
     }
 
