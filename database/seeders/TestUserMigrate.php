@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use Exception;
@@ -9,27 +11,19 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Repositories\EmployeeRepository;
 use App\Models\Employee\EmployeeRequest;
 
 class TestUserMigrate extends Seeder
 {
-    protected EmployeeRepository $employeeRepository;
-
-    public function __construct(EmployeeRepository $employeeRepository) {
-        $this->employeeRepository = $employeeRepository;
-    }
-
     public function run(): void
     {
         // Don't run seeder if data of the test instance isn't set
-        if (!(config()->has('ehealth.test.client_id') && config()->has('ehealth.test.client_secret'))) {
+        if (!(config()?->has('ehealth.test.client_id') && config()?->has('ehealth.test.client_secret'))) {
             return;
         }
 
         try {
-            DB::transaction(function() {
-
+            DB::transaction(function () {
                 $legalEntityId = DB::table('legal_entities')->insertGetId([
                     'uuid' => config('ehealth.test.client_id'),
                     'client_id' => config('ehealth.test.client_id'),
@@ -155,7 +149,7 @@ class TestUserMigrate extends Seeder
 
                 $this->command->info("\n\tINFO: A new LegalEntity entry has been successfully inserted into the database");
 
-                $addressId = DB::table('addresses')->insertGetId([
+                DB::table('addresses')->insertGetId([
                     'type' => 'RESIDENCE',
                     'country' => 'UA',
                     'area' => 'М.КИЇВ',
@@ -176,11 +170,11 @@ class TestUserMigrate extends Seeder
 
                 $this->command->info("\tINFO: A new Address entry has been successfully inserted into the database");
 
-                $licenseId = DB::table('licenses')->insertGetId([
+                DB::table('licenses')->insertGetId([
                     'uuid' => '869b92a2-5511-45c3-beca-b5c9e3ad099b',
                     'type' => 'MSP',
                     'legal_entity_id' => $legalEntityId,
-                    'issued_by' => 'Кваліфікацйна комісія',
+                    'issued_by' => 'Кваліфікаційна комісія',
                     'issued_date' => new Carbon('2017-02-28'),
                     'active_from_date' => new Carbon('2017-02-28'),
                     'order_no' => 'ВА43234',
@@ -239,7 +233,7 @@ class TestUserMigrate extends Seeder
 
                 $this->command->info("\tINFO: A new Party entry has been successfully inserted into the database");
 
-                $documentId = DB::table('documents')->insertGetId([
+                DB::table('documents')->insertGetId([
                     'type' => 'PASSPORT',
                     'number' => 'РО8927422',
                     'issued_by' => 'Рокитнянський РОВД',
@@ -251,14 +245,14 @@ class TestUserMigrate extends Seeder
 
                 $this->command->info("\tINFO: A new Document entry has been successfully inserted into the database");
 
-                $legalEntityPhoneId = DB::table('phones')->insertGetId([
+                DB::table('phones')->insertGetId([
                     'type' => 'MOBILE',
                     'number' => '+380506491244',
                     'phoneable_type' => 'App\Models\LegalEntity',
                     'phoneable_id' => $legalEntityId
                 ]);
 
-                $partyPhoneId = DB::table('phones')->insertGetId([
+                DB::table('phones')->insertGetId([
                     'type' => 'MOBILE',
                     'number' => '+380506491244',
                     'phoneable_type' => 'App\Models\Relations\Party',
@@ -287,7 +281,7 @@ class TestUserMigrate extends Seeder
 
                 $this->command->info("\tINFO: A new Employee entry has been successfully inserted into the database");
 
-                $employeeRequest = EmployeeRequest::create([
+                EmployeeRequest::create([
                     'uuid' => 'c68fa3a4-8b58-4753-a865-5b15314d7b03',
                     'division_uuid' => null,
                     'legal_entity_uuid' => config('ehealth.test.client_id'),
@@ -308,6 +302,33 @@ class TestUserMigrate extends Seeder
                 ]);
 
                 $this->command->info("\tINFO: A new EmployeeRequest entry has been successfully inserted into the database\n");
+
+                DB::table('persons')->insert([
+                    'uuid' => '60c00b7e-b12a-429c-a9cd-4138fd0132cc',
+                    'verification_status' => 'VERIFIED',
+                    'first_name' => 'Михайло',
+                    'last_name' => 'Грушевський',
+                    'second_name' => 'Сергійович',
+                    'birth_date' => new Carbon('1985-01-07'),
+                    'birth_country' => 'Україна',
+                    'birth_settlement' => 'Київ',
+                    'gender' => 'MALE',
+                    'email' => 'test99@gmail.com',
+                    'no_tax_id' => false,
+                    'tax_id' => '8888888888',
+                    'secret' => 'словоо',
+                    'emergency_contact' => json_encode([
+                        'phones' => [
+                            ['type' => 'MOBILE', 'number' => '+380981547813']
+                        ],
+                        'last_name' => 'Бабенко',
+                        'first_name' => 'Степан',
+                    ]),
+                    'patient_signed' => true,
+                    'process_disclosure_data_consent' => true,
+                    'created_at' => new Carbon(),
+                    'updated_at' => new Carbon()
+                ]);
             });
         } catch (Exception $err) {
             $this->command->error('ERROR: ' . $err->getMessage());

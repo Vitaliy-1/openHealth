@@ -539,7 +539,7 @@ class RolesPermissionsSeeder extends Seeder
         $permissionToInsert = [];
 
         // Get all specified guards from section 'guards' from file config/auth.php
-        $guards = array_filter(array_keys(config('auth.guards')), fn($value, $key) => $value !== 'sanctum', ARRAY_FILTER_USE_BOTH);
+        $guards = array_filter(array_keys(config('auth.guards')), fn ($value, $key) => $value !== 'sanctum', ARRAY_FILTER_USE_BOTH);
 
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
@@ -565,7 +565,8 @@ class RolesPermissionsSeeder extends Seeder
 
         // Assign permissions for specified roles depends on the guard
         foreach ($guards as $guard) {
-            $rolesByGuard = Role::with('permissions')->whereIn('name', array_keys($this->roles))
+            $rolesByGuard = Role::with('permissions')
+                ->whereIn('name', array_keys($this->roles))
                 ->where('guard_name', $guard)
                 ->get()
                 ->keyBy('name');
