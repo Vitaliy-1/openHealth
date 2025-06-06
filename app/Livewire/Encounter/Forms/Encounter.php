@@ -102,47 +102,47 @@ class Encounter extends Form
             'episode.period.start' => ['required', 'date', 'before_or_equal:now'],
 
             'conditions' => ['required', 'array'],
-            'conditions.*.primarySource' => ['required', 'boolean'],
-            'conditions.*.asserter' => ['required_if:conditions.*.primarySource,true', 'array'],
-            'conditions.*.reportOrigin' => ['required_if:conditions.*.primarySource,false', 'array'],
-            'conditions.*.reportOrigin.coding.*.code' => ['required', 'string'],
-            'conditions.*.code.coding.0.code' => ['required', 'string'],
-            'conditions.*.code.coding.1.code' => ['required_if:encounter.class.code,AMB, INPATIENT', 'string'],
-            'conditions.*.clinicalStatus' => ['required', 'string'],
-            'conditions.*.verificationStatus' => ['required', 'string'],
-            'conditions.*.severity.coding.*.code' => [
+            'conditions.primarySource' => ['required', 'boolean'],
+            'conditions.asserter' => ['required_if:conditions.primarySource,true', 'array'],
+            'conditions.reportOrigin' => ['required_if:conditions.primarySource,false', 'array'],
+            'conditions.reportOrigin.coding.*.code' => ['required', 'string'],
+            'conditions.code.coding.0.code' => ['required', 'string'],
+            'conditions.code.coding.1.code' => ['required_if:encounter.class.code,AMB, INPATIENT', 'string'],
+            'conditions.clinicalStatus' => ['required', 'string'],
+            'conditions.verificationStatus' => ['required', 'string'],
+            'conditions.severity.coding.*.code' => [
                 'nullable', 'string', new InDictionary('eHealth/condition_severities')
             ],
-            'conditions.*.onsetDate' => ['required', 'before:tomorrow', 'date'],
-            'conditions.*.assertedDate' => ['nullable', 'before:tomorrow', 'date'],
-            'conditions.*.evidences.codes.*.coding.*.code' => [
+            'conditions.onsetDate' => ['required', 'before:tomorrow', 'date'],
+            'conditions.assertedDate' => ['nullable', 'before:tomorrow', 'date'],
+            'conditions.evidences.codes.*.coding.*.code' => [
                 'nullable', 'string', new InDictionary('eHealth/ICPC2/reasons')
             ],
 
-            'immunizations.*.primarySource' => ['required', 'boolean'],
-            'immunizations.*.performer' => [
-                'required_if:immunizations.*.primarySource,true', 'prohibited_if:immunizations.*.primarySource,false', 'array'
+            'immunizations.primarySource' => ['required', 'boolean'],
+            'immunizations.performer' => [
+                'required_if:immunizations.primarySource,true', 'prohibited_if:immunizations.primarySource,false', 'array'
             ],
-            'immunizations.*.reportOrigin' => [
-                'required_if:immunizations.*.primarySource,false', 'prohibited_if:immunizations.*.primarySource,true', 'array'
+            'immunizations.reportOrigin' => [
+                'required_if:immunizations.primarySource,false', 'prohibited_if:immunizations.primarySource,true', 'array'
             ],
-            'immunizations.*.reportOrigin.coding.*.code' => [
+            'immunizations.reportOrigin.coding.*.code' => [
                 'string', new InDictionary('eHealth/immunization_report_origins')
             ],
-            'immunizations.*.notGiven' => ['required', 'boolean'],
-            'immunizations.*.explanation.*.reasonsNotGiven' => [
+            'immunizations.notGiven' => ['required', 'boolean'],
+            'immunizations.explanation.*.reasonsNotGiven' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
-                'prohibited_if:immunizations.*.notGiven,false',
+                'prohibited_if:immunizations.notGiven,false',
                 'array'
             ],
-            'immunizations.*.explanation.*.reasonsNotGiven.coding.*.code' => [
+            'immunizations.explanation.*.reasonsNotGiven.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/reason_not_given_explanations')
             ],
-            'immunizations.*.vaccineCode.coding.*.code' => [
+            'immunizations.vaccineCode.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/vaccine_codes')
             ],
-            'immunizations.*.date' => ['required', 'before:tomorrow', 'date'],
-            'immunizations.*.explanation.reasons' => [
+            'immunizations.date' => ['required', 'before:tomorrow', 'date'],
+            'immunizations.explanation.reasons' => [
                 'array',
                 $this->requiredIfPrimarySourceAndNotGiven(true, false), $this->requiredIfPrimarySourceAndNotGiven(false, false),
                 Rule::prohibitedIf(
@@ -151,132 +151,136 @@ class Encounter extends Form
                     )
                 )
             ],
-            'immunizations.*.explanation.reasons.*.coding.*.code' => [
+            'immunizations.explanation.reasons.*.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/reason_explanations')
             ],
-            'immunizations.*.manufacturer' => [
+            'immunizations.manufacturer' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'
             ],
-            'immunizations.*.lotNumber' => [
+            'immunizations.lotNumber' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'
             ],
-            'immunizations.*.expirationDate' => [
+            'immunizations.expirationDate' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false), 'string'
             ],
-            'immunizations.*.doseQuantity.value' => [
+            'immunizations.doseQuantity.value' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(false, false),
                 'integer'
             ],
-            'immunizations.*.doseQuantity.unit' => [
+            'immunizations.doseQuantity.unit' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(false, false),
                 new InDictionary('eHealth/immunization_dosage_units'),
                 'string'
             ],
-            'immunizations.*.doseQuantity.code' => [
+            'immunizations.doseQuantity.code' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 new InDictionary('eHealth/immunization_dosage_units'),
                 'string'
             ],
-            'immunizations.*.site' => [
+            'immunizations.site' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false), 'array'
             ],
-            'immunizations.*.site.coding.*.code' => [
+            'immunizations.site.coding.*.code' => [
                 'nullable', 'string', new InDictionary('eHealth/immunization_body_sites')
             ],
-            'immunizations.*.route' => [
+            'immunizations.route' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false), 'array'
             ],
-            'immunizations.*.route.coding.*.code' => [
+            'immunizations.route.coding.*.code' => [
                 'nullable', 'string', new InDictionary('eHealth/vaccination_routes')
             ],
-            'immunizations.*.vaccinationProtocols.*.doseSequence' => [
+            'immunizations.vaccinationProtocols.*.doseSequence' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
                 $this->requiredIfHasMoHAuthority(),
                 'integer',
             ],
-            'immunizations.*.vaccinationProtocols.*.description' => ['nullable', 'string', 'max:255'],
-            'immunizations.*.vaccinationProtocols.*.authority' => [
+            'immunizations.vaccinationProtocols.*.description' => ['nullable', 'string', 'max:255'],
+            'immunizations.vaccinationProtocols.*.authority' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
                 $this->requiredIfPrimarySourceAndNotGiven(false, false),
                 'array'
             ],
-            'immunizations.*.vaccinationProtocols.*.authority.coding.*.code' => [
+            'immunizations.vaccinationProtocols.*.authority.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/vaccination_authorities')
             ],
-            'immunizations.*.vaccinationProtocols.*.series' => [
+            'immunizations.vaccinationProtocols.*.series' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
                 $this->requiredIfHasMoHAuthority(),
                 'max:255',
                 'string',
             ],
-            'immunizations.*.vaccinationProtocols.*.seriesDoses' => [
+            'immunizations.vaccinationProtocols.*.seriesDoses' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
                 $this->requiredIfHasMoHAuthority(),
                 'integer'
             ],
-            'immunizations.*.vaccinationProtocols.*.targetDiseases' => [
+            'immunizations.vaccinationProtocols.*.targetDiseases' => [
                 $this->requiredIfPrimarySourceAndNotGiven(true, false),
                 $this->requiredIfPrimarySourceAndNotGiven(true, true),
                 $this->requiredIfPrimarySourceAndNotGiven(false, false),
                 'array'
             ],
-            'immunizations.*.vaccinationProtocols.*.targetDiseases.coding.*.code' => [
+            'immunizations.vaccinationProtocols.*.targetDiseases.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/vaccination_target_diseases')
             ],
 
-            'observations.*.primarySource' => ['required', 'boolean'],
-            'observations.*.performer' => [
-                'required_if:observations.*.primarySource,true', 'prohibited_if:observations.*.primarySource,false', 'array'
+            'observations.primarySource' => ['required', 'boolean'],
+            'observations.performer' => [
+                'required_if:observations.primarySource,true', 'prohibited_if:observations.primarySource,false', 'array'
             ],
-            'observations.*.reportOrigin' => [
-                'required_if:observations.*.primarySource,false', 'prohibited_if:observations.*.primarySource,true', 'array'
+            'observations.reportOrigin' => [
+                'required_if:observations.primarySource,false', 'prohibited_if:observations.primarySource,true', 'array'
             ],
-            'observations.*.categories' => ['required', 'array'],
-            'observations.*.categories.coding.*.code' => [
+            'observations.categories' => ['required', 'array'],
+            'observations.categories.coding.*.code' => [
                 'required', 'string', new InDictionary(['eHealth/observation_categories', 'eHealth/ICF/observation_categories'])
             ],
-            'observations.*.code' => ['required', 'array'],
-            'observations.*.code.coding.*.code' => [
+            'observations.code' => ['required', 'array'],
+            'observations.code.coding.*.code' => [
                 'required', 'string', new InDictionary(['eHealth/LOINC/observation_codes', 'eHealth/ICF/classifiers'])
             ],
-            'observations.*.valueQuantity' => ['sometimes', 'array'],
-            'observations.*.valueQuantity.value' => ['sometimes', 'numeric'],
-            'observations.*.valueQuantity.comparator' => ['sometimes', 'string'],
-            'observations.*.valueQuantity.unit' => ['sometimes', 'string'],
-            'observations.*.valueQuantity.system' => ['sometimes', 'string'],
-            'observations.*.valueQuantity.code' => ['sometimes', 'string'],
-            'observations.*.valueCodeableConcept' => ['sometimes', 'array'],
-            'observations.*.valueString' => ['sometimes', 'string'],
-            'observations.*.valueBoolean' => ['sometimes', 'boolean'],
-            'observations.*.valueDateTime' => ['sometimes', 'date'],
-            'observations.*.method.coding.*.code' => [
+            'observations.valueQuantity' => ['sometimes', 'array'],
+            'observations.valueQuantity.value' => ['sometimes', 'numeric'],
+            'observations.valueQuantity.comparator' => ['sometimes', 'string'],
+            'observations.valueQuantity.unit' => ['sometimes', 'string'],
+            'observations.valueQuantity.system' => ['sometimes', 'string'],
+            'observations.valueQuantity.code' => ['sometimes', 'string'],
+            'observations.valueCodeableConcept' => ['sometimes', 'array'],
+            'observations.valueString' => ['sometimes', 'string'],
+            'observations.valueBoolean' => ['sometimes', 'boolean'],
+            'observations.valueDateTime' => ['sometimes', 'date'],
+            'observations.method.coding.*.code' => [
                 'nullable', 'string', new InDictionary('eHealth/observation_methods')
             ],
-            'observations.*.interpretation.coding.*.code' => [
+            'observations.interpretation.coding.*.code' => [
                 'nullable', 'string', new InDictionary('eHealth/observation_interpretations')
             ],
-            'observations.*.issued' => ['required', 'date', 'before_or_equal:now'],
-            'observations.*.effectiveDateTime' => ['nullable', 'date', 'before_or_equal:now'],
+            'observations.issued' => ['required', 'date', 'before_or_equal:now'],
+            'observations.effectiveDateTime' => ['nullable', 'date', 'before_or_equal:now'],
 
-            'diagnosticReports.*.paperReferral.requisition' => ['nullable', 'string', 'max:255'],
-            'diagnosticReports.*.paperReferral.requesterEmployeeName' => ['nullable', 'string', 'max:255'],
-            'diagnosticReports.*.paperReferral.requesterLegalEntityEdrpou' => ['required', 'string', 'max:255'],
-            'diagnosticReports.*.paperReferral.requesterLegalEntityName' => ['required', 'string', 'max:255'],
-            'diagnosticReports.*.paperReferral.serviceRequestDate' => ['required', 'date'],
-            'diagnosticReports.*.paperReferral.note' => ['nullable', 'string', 'max:255'],
-            'diagnosticReports.*.category.*.coding.*.code' => [
+            'diagnosticReports.paperReferral.requisition' => ['nullable', 'string', 'max:255'],
+            'diagnosticReports.paperReferral.requesterEmployeeName' => ['nullable', 'string', 'max:255'],
+            'diagnosticReports.paperReferral.requesterLegalEntityEdrpou' => ['required', 'string', 'max:255'],
+            'diagnosticReports.paperReferral.requesterLegalEntityName' => ['required', 'string', 'max:255'],
+            'diagnosticReports.paperReferral.serviceRequestDate' => ['required', 'date'],
+            'diagnosticReports.paperReferral.note' => ['nullable', 'string', 'max:255'],
+            'diagnosticReports.category.*.coding.*.code' => [
                 'required', 'string', new InDictionary('eHealth/diagnostic_report_categories')
             ],
-            'diagnosticReports.*.conclusionCode.coding.*.code' => [
-                'nullable', 'string',  new InDictionary('eHealth/ICD10_AM/condition_codes')
+            'diagnosticReports.conclusionCode.coding.*.code' => [
+                'nullable', 'string', new InDictionary('eHealth/ICD10_AM/condition_codes')
             ],
-            'diagnosticReports.*.conclusion' => ['nullable', 'string'],
+            'diagnosticReports.conclusion' => ['nullable', 'string'],
+            'diagnosticReports.resultsInterpreter.text' => ['required', 'string', 'max:255'],
+            'diagnosticReports.issued' => ['required', 'date', 'before_or_equal:now'],
+            'diagnosticReports.effectivePeriod.start' => ['required', 'date', 'before_or_equal:now'],
+            'diagnosticReports.effectivePeriod.end' => ['required', 'date', 'after:encounter.period.start'],
         ];
     }
 
@@ -294,7 +298,7 @@ class Encounter extends Form
 
         $this->customizeRulesForModel($formName, $rules);
 
-        $validator = Validator::make($formData, $rules);
+        $validator = Validator::make([$formName => $formData], $rules);
 
         if ($validator->fails()) {
             throw new ValidationException($validator);

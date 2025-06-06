@@ -55,14 +55,14 @@
         <div>
             <div class="form-row-3">
                 <div class="form-group group">
-                    <input
-                        @click="modalDiagnosticReport.isReferralAvailable = !modalDiagnosticReport.isReferralAvailable"
-                        type="checkbox"
-                        name="modalDiagnosticReport.isReferralAvailable"
-                        id="modalDiagnosticReport.isReferralAvailable"
-                        class="default-checkbox mb-1"
+                    <input x-model="modalDiagnosticReport.isReferralAvailable"
+                           @click="modalDiagnosticReport.isReferralAvailable = !modalDiagnosticReport.isReferralAvailable"
+                           type="checkbox"
+                           name="isReferralAvailable"
+                           id="isReferralAvailable"
+                           class="default-checkbox mb-1"
                     />
-                    <label class="default-p" for="modalDiagnosticReport.isReferralAvailable">
+                    <label class="default-p" for="isReferralAvailable">
                         {{ __('patients.referral_available') }}
                     </label>
                 </div>
@@ -70,7 +70,7 @@
 
             {{-- When referral available --}}
             <template x-if="modalDiagnosticReport.isReferralAvailable">
-                <div x-data="{ referralType: '' }">
+                <div>
                     <div class="form-row-modal" x-cloak>
                         <div>
                             <label for="referralType" class="label-modal">
@@ -79,7 +79,7 @@
                             <select id="referralType"
                                     class="input-modal"
                                     type="text"
-                                    x-model="referralType"
+                                    x-model="modalDiagnosticReport.referralType"
                                     required
                             >
                                 <option selected value="">{{ __('forms.select') }}</option>
@@ -89,134 +89,138 @@
                         </div>
 
                         {{-- Electronic referral --}}
-                        <div x-show="referralType === 'electronic'" x-transition>
-                            <label for="eReferralNumber" class="label-modal">
-                                {{ __('forms.number') }}
-                            </label>
-                            <input wire:model="form.encounter.episode.identifier.value"
-                                   type="text"
-                                   name="eReferralNumber"
-                                   id="eReferralNumber"
-                                   class="input-modal"
-                                   placeholder=" "
-                                   required
-                                   autocomplete="off"
-                            />
-                        </div>
+                        <template x-if="modalDiagnosticReport.referralType === 'electronic'" x-transition>
+                            <div>
+                                <label for="eReferralNumber" class="label-modal">
+                                    {{ __('forms.number') }}
+                                </label>
+                                <input wire:model="form.encounter.episode.identifier.value"
+                                       type="text"
+                                       name="eReferralNumber"
+                                       id="eReferralNumber"
+                                       class="input-modal"
+                                       placeholder=" "
+                                       required
+                                       autocomplete="off"
+                                />
+                            </div>
+                        </template>
                     </div>
 
                     {{-- Paper referral --}}
-                    <div x-show="referralType === 'paper'" x-transition>
-                        <div class="form-row-modal">
-                            <div>
-                                <label for="requisition" class="label-modal">
-                                    {{ __('forms.number') }}
-                                </label>
-                                <input x-model="modalDiagnosticReport.paperReferral.requisition"
-                                       type="text"
-                                       name="requisition"
-                                       id="requisition"
-                                       class="input-modal"
-                                       autocomplete="off"
-                                >
-                            </div>
-
-                            <div>
-                                <label for="requesterEmployeeName" class="label-modal">
-                                    {{ __('patients.author') }}
-                                </label>
-                                <input x-model="modalDiagnosticReport.paperReferral.requesterEmployeeName"
-                                       type="text"
-                                       name="requesterEmployeeName"
-                                       id="requesterEmployeeName"
-                                       class="input-modal"
-                                       autocomplete="off"
-                                >
-                            </div>
-                        </div>
-
-                        <div class="form-row-modal">
-                            <div>
-                                <label for="requesterLegalEntityEdrpou" class="label-modal">
-                                    {{ __('patients.edrpou_of_the_issuing_institution') }}
-                                </label>
-                                <input x-model="modalDiagnosticReport.paperReferral.requesterLegalEntityEdrpou"
-                                       type="text"
-                                       name="requesterLegalEntityEdrpou"
-                                       id="requesterLegalEntityEdrpou"
-                                       class="input-modal"
-                                       autocomplete="off"
-                                       required
-                                >
-
-                                <p class="text-error text-xs"
-                                   x-show="(modalDiagnosticReport.paperReferral.requesterLegalEntityEdrpou?.trim() || '').length < 1"
-                                >
-                                    {{ __('forms.field_empty') }}
-                                </p>
-                            </div>
-
-                            <div>
-                                <label for="requesterLegalEntityName" class="label-modal">
-                                    {{ __('patients.name_of_the_institution_that_issued_it') }}
-                                </label>
-                                <input x-model="modalDiagnosticReport.paperReferral.requesterLegalEntityName"
-                                       type="text"
-                                       name="requesterLegalEntityName"
-                                       id="requesterLegalEntityName"
-                                       class="input-modal"
-                                       autocomplete="off"
-                                       required
-                                >
-
-                                <p class="text-error text-xs"
-                                   x-show="(modalDiagnosticReport.paperReferral.requesterLegalEntityName?.trim() || '').length < 1"
-                                >
-                                    {{ __('forms.field_empty') }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="form-row-modal">
-                            <div>
-                                <label for="serviceRequestDate" class="label-modal">
-                                    {{ __('patients.date') }}
-                                </label>
-                                <div class="relative flex items-center">
-                                    <svg width="20" height="20" class="svg-input absolute left-2.5 pointer-events-none">
-                                        <use xlink:href="#svg-calendar-week"></use>
-                                    </svg>
-                                    <input x-model="modalDiagnosticReport.paperReferral.serviceRequestDate"
+                    <template x-if="modalDiagnosticReport.referralType === 'paper'" x-transition>
+                        <div>
+                            <div class="form-row-modal">
+                                <div>
+                                    <label for="requisition" class="label-modal">
+                                        {{ __('forms.number') }}
+                                    </label>
+                                    <input x-model="modalDiagnosticReport.paperReferral.requisition"
                                            type="text"
-                                           name="serviceRequestDate"
-                                           id="serviceRequestDate"
-                                           class="datepicker-input input-modal !pl-10"
+                                           name="requisition"
+                                           id="requisition"
+                                           class="input-modal"
                                            autocomplete="off"
-                                           required
                                     >
                                 </div>
 
-                                <p class="text-error text-xs"
-                                   x-show="(modalDiagnosticReport.paperReferral.serviceRequestDate?.trim() || '').length < 1"
-                                >
-                                    {{ __('forms.field_empty') }}
-                                </p>
+                                <div>
+                                    <label for="requesterEmployeeName" class="label-modal">
+                                        {{ __('patients.author') }}
+                                    </label>
+                                    <input x-model="modalDiagnosticReport.paperReferral.requesterEmployeeName"
+                                           type="text"
+                                           name="requesterEmployeeName"
+                                           id="requesterEmployeeName"
+                                           class="input-modal"
+                                           autocomplete="off"
+                                    >
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="note" class="label-modal">
-                                    {{ __('patients.notes') }}
-                                </label>
-                                <input x-model="modalDiagnosticReport.paperReferral.note"
-                                       type="text"
-                                       name="note"
-                                       id="note"
-                                       class="input-modal"
-                                       autocomplete="off"
-                                >
+                            <div class="form-row-modal">
+                                <div>
+                                    <label for="requesterLegalEntityEdrpou" class="label-modal">
+                                        {{ __('patients.edrpou_of_the_issuing_institution') }}
+                                    </label>
+                                    <input x-model="modalDiagnosticReport.paperReferral.requesterLegalEntityEdrpou"
+                                           type="text"
+                                           name="requesterLegalEntityEdrpou"
+                                           id="requesterLegalEntityEdrpou"
+                                           class="input-modal"
+                                           autocomplete="off"
+                                           required
+                                    >
+
+                                    <p class="text-error text-xs"
+                                       x-show="(modalDiagnosticReport.paperReferral.requesterLegalEntityEdrpou?.trim() || '').length < 1"
+                                    >
+                                        {{ __('forms.field_empty') }}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label for="requesterLegalEntityName" class="label-modal">
+                                        {{ __('patients.name_of_the_institution_that_issued_it') }}
+                                    </label>
+                                    <input x-model="modalDiagnosticReport.paperReferral.requesterLegalEntityName"
+                                           type="text"
+                                           name="requesterLegalEntityName"
+                                           id="requesterLegalEntityName"
+                                           class="input-modal"
+                                           autocomplete="off"
+                                           required
+                                    >
+
+                                    <p class="text-error text-xs"
+                                       x-show="(modalDiagnosticReport.paperReferral.requesterLegalEntityName?.trim() || '').length < 1"
+                                    >
+                                        {{ __('forms.field_empty') }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="form-row-modal">
+                                <div>
+                                    <label for="serviceRequestDate" class="label-modal">
+                                        {{ __('patients.date') }}
+                                    </label>
+                                    <div class="relative flex items-center">
+                                        <svg width="20" height="20" class="svg-input absolute left-2.5 pointer-events-none">
+                                            <use xlink:href="#svg-calendar-week"></use>
+                                        </svg>
+                                        <input x-model="modalDiagnosticReport.paperReferral.serviceRequestDate"
+                                               type="text"
+                                               name="serviceRequestDate"
+                                               id="serviceRequestDate"
+                                               class="datepicker-input input-modal !pl-10"
+                                               autocomplete="off"
+                                               required
+                                        >
+                                    </div>
+
+                                    <p class="text-error text-xs"
+                                       x-show="(modalDiagnosticReport.paperReferral.serviceRequestDate?.trim() || '').length < 1"
+                                    >
+                                        {{ __('forms.field_empty') }}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label for="note" class="label-modal">
+                                        {{ __('patients.notes') }}
+                                    </label>
+                                    <input x-model="modalDiagnosticReport.paperReferral.note"
+                                           type="text"
+                                           name="note"
+                                           id="note"
+                                           class="input-modal"
+                                           autocomplete="off"
+                                    >
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
             </template>
         </div>

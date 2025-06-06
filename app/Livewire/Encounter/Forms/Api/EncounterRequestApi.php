@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Encounter\Forms\Api;
 
 use App\Classes\eHealth\Api\PersonApi;
+use Illuminate\Support\Str;
 
 class EncounterRequestApi extends PersonApi
 {
@@ -159,6 +160,27 @@ class EncounterRequestApi extends PersonApi
             'name' => $name,
             'page' => $page,
             'page_size' => $pageSize
+        ];
+    }
+
+    /**
+     * Build an array of parameters for submitting encounter package.
+     *
+     * @param  array  $formattedData
+     * @param  string  $signedData
+     * @return array
+     */
+    public static function buildSubmitEncounterPackage(array $formattedData, string $signedData): array
+    {
+        return [
+            'visit' => (object)[
+                'id' => Str::uuid()->toString(),
+                'period' => (object)[
+                    'start' => $formattedData['encounter']['period']['start'],
+                    'end' => $formattedData['encounter']['period']['end']
+                ]
+            ],
+            'signed_data' => $signedData
         ];
     }
 }

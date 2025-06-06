@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -7,10 +9,13 @@ use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @mixin IdeHelperRevision
+ */
 class Revision extends Model
 {
-    use HasCamelCasing,
-        SoftDeletes;
+    use HasCamelCasing;
+    use SoftDeletes;
 
     public const STATUS_APPLIED = 'APPLIED';
     public const STATUS_OUTDATED = 'OUTDATED';

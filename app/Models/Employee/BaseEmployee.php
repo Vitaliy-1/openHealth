@@ -15,6 +15,7 @@ use App\Models\Relations\Education;
 use App\Models\Relations\Speciality;
 use App\Models\Relations\Qualification;
 use App\Models\Relations\ScienceDegree;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
 use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Builder;
@@ -76,9 +77,9 @@ class BaseEmployee extends Model
     public function getFullNameAttribute(): string
     {
         return implode(' ', array_filter([
-            optional($this->party)->first_name ?? '',
             optional($this->party)->last_name ?? '',
-            optional($this->party)->second_name?? '',
+            optional($this->party)->first_name ?? '',
+            optional($this->party)->second_name ?? '',
         ]));
     }
 
@@ -147,7 +148,8 @@ class BaseEmployee extends Model
         return $this->morphOne(Revision::class, 'revisionable');
     }
 
-    public function scopeDoctor($query)
+    #[Scope]
+    public function doctor(Builder $query): Builder
     {
         return $query->where('employee_type', 'DOCTOR');
     }
@@ -178,11 +180,11 @@ class BaseEmployee extends Model
         $query->where('user_id', $userId)
             ->where('legal_entity_uuid', $legalEntityUUID);
 
-            if ($isInclude) {
-                $query->whereIn('employee_type', $roles);
-            } else {
-                $query->whereNotIn('employee_type', $roles);
-            }
+        if ($isInclude) {
+            $query->whereIn('employee_type', $roles);
+        } else {
+            $query->whereNotIn('employee_type', $roles);
+        }
     }
 
     /**

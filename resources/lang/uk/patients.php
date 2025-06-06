@@ -131,7 +131,6 @@ return [
     'new_episode' => 'Новий епізод',
     'episode_name' => 'Назва епізоду',
     'episode_type' => 'Тип епізоду',
-    'episode_number' => 'Номер епізоду',
 
     // Reasons
     'reason_for_visit' => 'Причина звернення',
@@ -192,6 +191,11 @@ return [
     'edrpou_of_the_issuing_institution' => 'ЄДРПОУ закладу, що виписав',
     'name_of_the_institution_that_issued_it' => 'Найменування закладу, що виписав',
     'notes' => 'Нотатки',
+    'the_doctor_who_interpreted_the_results' => 'Лікар, що інтерпретував результати',
+    'full_name_of_the_doctor_who_interpreted_the_results' => 'ПІБ лікаря, що інтерпретував результати',
+    'doctor_submitting_a_report_to_the_system' => 'Лікар, що передає в систему звіт',
+    'reception_start_date_and_time' => 'Дата та час початку прийому',
+    'reception_end_date_and_time' => 'Дата та час завершення прийому',
 
     // Observations
     'code' => 'Код',

@@ -70,7 +70,6 @@ class EncounterEdit extends EncounterComponent
 
         $createdEncounterId = Repository::encounter()->store(
             $formattedEncounter,
-            $this->form->episode,
             $this->patientId
         );
         Repository::condition()->store($this->form->conditions, $createdEncounterId);
@@ -83,8 +82,10 @@ class EncounterEdit extends EncounterComponent
      */
     private function setDefaultDate(): void
     {
-        $this->form->encounter['period']['date'] = CarbonImmutable::parse($this->form->encounter['period']['start'])->format('Y-m-d');
-        $this->form->encounter['period']['start'] = CarbonImmutable::parse($this->form->encounter['period']['start'])->format('H:i');
-        $this->form->encounter['period']['end'] = CarbonImmutable::parse($this->form->encounter['period']['end'])->format('H:i');
+        $this->form->encounter['period'] = [
+            'date' => CarbonImmutable::parse($this->form->encounter['period']['start'])->format('Y-m-d'),
+            'start' => CarbonImmutable::parse($this->form->encounter['period']['start'])->format('H:i'),
+            'end' => CarbonImmutable::parse($this->form->encounter['period']['end'])->format('H:i')
+        ];
     }
 }

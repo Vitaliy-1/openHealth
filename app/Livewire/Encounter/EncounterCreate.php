@@ -6,13 +6,11 @@ namespace App\Livewire\Encounter;
 
 use App\Classes\eHealth\Api\PatientApi;
 use App\Classes\eHealth\Exceptions\ApiException;
-use App\Models\Employee\Employee;
+use App\Livewire\Encounter\Forms\Api\EncounterRequestApi;
 use App\Repositories\MedicalEvents\Repository;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use Str;
 use Throwable;
 
 class EncounterCreate extends EncounterComponent
@@ -32,162 +30,36 @@ class EncounterCreate extends EncounterComponent
      */
     public function save(): void
     {
-        $encounterRepository = Repository::encounter();
+        $formattedData = $this->prepareFormattedData();
 
-        $formattedEncounter = $encounterRepository->formatEncounterRequest($this->form->encounter, $this->form->conditions);
-        $formattedEpisode = $encounterRepository->formatEpisodeRequest($this->form->episode, $this->form->encounter['period']);
-        $formattedConditions = $encounterRepository->formatConditionsRequest($this->form->conditions);
-        $formattedImmunizations = !empty($this->form->immunizations) ? $encounterRepository->formatImmunizationsRequest($this->form->immunizations) : null;
-        $formattedObservations = !empty($this->form->observations) ? $encounterRepository->formatObservationsRequest($this->form->observations) : null;
-        $formattedDiagnosticReports = !empty($this->form->diagnosticReports) ? $encounterRepository->formatDiagnosticReportsRequest($this->form->diagnosticReports) : null;
-
-        // Validate formatted data
-        try {
-            $this->form->validateForm('encounter', $formattedEncounter);
-            $this->form->validateForm('episode', $formattedEpisode);
-
-            foreach ($formattedConditions['conditions'] as $formattedCondition) {
-                $this->form->validateForm('conditions', ['conditions' => [$formattedCondition]]);
-            }
-
-            if (isset($formattedImmunizations)) {
-                foreach ($formattedImmunizations['immunizations'] as $formattedImmunization) {
-                    $this->form->validateForm('immunizations', ['immunizations' => [$formattedImmunization]]);
-                }
-            }
-
-            if (isset($formattedObservations)) {
-                foreach ($formattedObservations['observations'] as $formattedObservation) {
-                    $this->form->validateForm('observations', ['observations' => [$formattedObservation]]);
-                }
-            }
-
-            if (isset($formattedDiagnosticReports)) {
-                foreach ($formattedDiagnosticReports['diagnosticReports'] as $formattedDiagnosticReport) {
-                    $this->form->validateForm('diagnosticReports', ['diagnosticReports' => [$formattedDiagnosticReport]]);
-                }
-            }
-        } catch (ValidationException $e) {
-            $this->dispatch('flashMessage', [
-                'message' => $e->validator->errors()->first(),
-                'type' => 'error'
-            ]);
-
-            return;
-        }
-
-        DB::transaction(function () use ($formattedEncounter, $formattedEpisode, $formattedConditions, $formattedImmunizations, $formattedObservations) {
-            $createdEncounterId = Repository::encounter()->store(
-                $formattedEncounter['encounter'],
-                $formattedEpisode['episode'],
-                $this->patientId
-            );
-
-            Repository::condition()->store($formattedConditions['conditions'], $createdEncounterId);
-
-            if (isset($formattedImmunizations)) {
-                Repository::immunization()->store($formattedImmunizations['immunizations'], $createdEncounterId);
-            }
-
-            if (isset($formattedObservations)) {
-                Repository::observation()->store($formattedObservations['observations'], $createdEncounterId);
-            }
-        });
-
-        $encounter = PatientApi::getShortEncounterBySearchParams($this->patientUuid);
-        $job = PatientApi::getJobsDetailsById('683408acf712c70046293a6a');
+        $this->validateFormatted($formattedData);
+        $this->storeValidatedData($formattedData);
     }
 
     /**
      * Submit encrypted data about person encounter.
      *
      * @return void
-     * @throws ApiException
+     * @throws ApiException|Throwable
      */
     public function signPerson(): void
     {
-        // Note: No update operations are allowed. All IDs, submitted as PK, should be unique for eHealth.
-        // TODO: додати перевірку на унікальність uuid, трішки потім. uuid має бути унікальний для пацієнта а не унікальним в цілому?
-        $encounterRepository = Repository::encounter();
+        $formattedData = $this->prepareFormattedData();
 
-        $formattedEncounter = $encounterRepository->formatEncounterRequest($this->form->encounter, $this->form->conditions);
-        $formattedEpisode = $encounterRepository->formatEpisodeRequest($this->form->episode, $this->form->encounter['period']);
-        $formattedConditions = $encounterRepository->formatConditionsRequest($this->form->conditions);
-        $formattedImmunizations = !empty($this->form->immunizations) ? $encounterRepository->formatImmunizationsRequest($this->form->immunizations) : [];
-        $formattedObservations = !empty($this->form->observations) ? $encounterRepository->formatObservationsRequest($this->form->observations) : [];
+        $this->validateFormatted($formattedData);
+        $this->storeValidatedData($formattedData);
 
-        // Validate formatted data
-        try {
-            $this->form->validateForm('encounter', $formattedEncounter);
-            $this->form->validateForm('episode', $formattedEpisode);
-
-            foreach ($formattedConditions['conditions'] as $formattedCondition) {
-                $this->form->validateForm('conditions', ['conditions' => [$formattedCondition]]);
-            }
-
-            if (!empty($formattedImmunizations)) {
-                foreach ($formattedImmunizations['immunizations'] as $formattedImmunization) {
-                    $this->form->validateForm('immunizations', ['immunizations' => [$formattedImmunization]]);
-                }
-            }
-
-            if (!empty($formattedObservations)) {
-                foreach ($formattedObservations['observations'] as $formattedObservation) {
-                    $this->form->validateForm('observations', ['observations' => [$formattedObservation]]);
-                }
-            }
-        } catch (ValidationException $e) {
-            $this->dispatch('flashMessage', [
-                'message' => $e->validator->errors()->first(),
-                'type' => 'error'
-            ]);
-
-            return;
+        if ($this->episodeType === 'new') {
+            $this->createEpisode($formattedData['episode']);
         }
-
-        $this->createEpisode($formattedEpisode['episode']);
 
         $base64EncryptedData = $this->sendEncryptedData(
-            array_merge(
-                $formattedEncounter,
-                $this->convertArrayKeysToSnakeCase($formattedConditions),
-                $this->convertArrayKeysToSnakeCase($formattedImmunizations),
-                $this->convertArrayKeysToSnakeCase($formattedObservations)
-            ),
-            Auth::user()->tax_id
+            $this->convertArrayKeysToSnakeCase($formattedData),
+            $this->authUser->tax_id
         );
 
-        $prepareSubmitEncounter = [
-            'visit' => (object)[
-                'id' => Str::uuid()->toString(),
-                'period' => (object)[
-                    'start' => $formattedEncounter['encounter']['period']['start'],
-                    'end' => $formattedEncounter['encounter']['period']['end']
-                ]
-            ],
-            'signed_data' => $base64EncryptedData
-        ];
-
-        $submitEncounter = PatientApi::submitEncounter($this->patientUuid, $prepareSubmitEncounter);
-        dd($submitEncounter);
-    }
-
-    /**
-     * Create episode for patient.
-     *
-     * @param  array  $formattedEpisode
-     * @return void
-     */
-    private function createEpisode(array $formattedEpisode): void
-    {
-        try {
-            PatientApi::createEpisode($this->patientUuid, $this->convertArrayKeysToSnakeCase($formattedEpisode));
-        } catch (ApiException) {
-            $this->dispatch('flashMessage', [
-                'message' => __('Виникла помилка при створенні епізоду. Зверніться до адміністратора.'),
-                'type' => 'error'
-            ]);
-        }
+        $signedSubmitEncounter = EncounterRequestApi::buildSubmitEncounterPackage($formattedData, $base64EncryptedData);
+        PatientApi::submitEncounter($this->patientUuid, $signedSubmitEncounter);
     }
 
     /**
@@ -197,11 +69,10 @@ class EncounterCreate extends EncounterComponent
      */
     protected function setEmployeePartyData(): void
     {
-        // TODO: потім взяти employee авторизованого
-        $employee = Employee::find(1);
+        $employeeUuid = $this->authEmployee->uuid;
 
-        $this->form->encounter['performer']['identifier']['value'] = $employee?->uuid;
-        $this->form->episode['careManager']['identifier']['value'] = $employee?->uuid;
+        $this->form->encounter['performer']['identifier']['value'] = $employeeUuid;
+        $this->form->episode['careManager']['identifier']['value'] = $employeeUuid;
     }
 
     /**
@@ -212,7 +83,134 @@ class EncounterCreate extends EncounterComponent
     private function setDefaultDate(): void
     {
         $now = CarbonImmutable::now();
-        $this->form->encounter['period']['start'] = $now->format('H:i');
-        $this->form->encounter['period']['end'] = $now->addMinutes(15)->format('H:i');
+
+        $this->form->encounter['period'] = [
+            'start' => $now->format('H:i'),
+            'end' => $now->addMinutes(15)->format('H:i')
+        ];
+    }
+
+    /**
+     * Prepare formatted data.
+     *
+     * @return array
+     */
+    protected function prepareFormattedData(): array
+    {
+        $encounterRepository = Repository::encounter();
+
+        $data = [
+            'encounter' => $encounterRepository->formatEncounterRequest(
+                $this->form->encounter,
+                $this->form->conditions,
+                $this->episodeType === 'new'
+            ),
+            'episode' => $this->episodeType === 'new'
+                ? $encounterRepository->formatEpisodeRequest($this->form->episode, $this->form->encounter['period'])
+                : [],
+            'conditions' => $encounterRepository->formatConditionsRequest($this->form->conditions),
+            'immunizations' => !empty($this->form->immunizations)
+                ? $encounterRepository->formatImmunizationsRequest($this->form->immunizations)
+                : [],
+            'diagnosticReports' => !empty($this->form->diagnosticReports)
+                ? $encounterRepository->formatDiagnosticReportsRequest($this->form->diagnosticReports)
+                : [],
+            'observations' => !empty($this->form->observations)
+                ? $encounterRepository->formatObservationsRequest($this->form->observations)
+                : [],
+        ];
+
+        // Remove empty
+        return array_filter($data);
+    }
+
+    /**
+     * Validate formatted data.
+     *
+     * @param  array  $formattedData
+     * @return void
+     */
+    protected function validateFormatted(array $formattedData): void
+    {
+        try {
+            $this->form->validateForm('encounter', $formattedData['encounter']);
+
+            if (isset($formattedData['episode'])) {
+                $this->form->validateForm('episode', $formattedData['episode']);
+            }
+
+            foreach ($formattedData['conditions'] as $formattedCondition) {
+                $this->form->validateForm('conditions', $formattedCondition);
+            }
+
+            if (isset($formattedData['immunizations'])) {
+                foreach ($formattedData['immunizations'] as $formattedImmunization) {
+                    $this->form->validateForm('immunizations', $formattedImmunization);
+                }
+            }
+
+            if (isset($formattedData['diagnosticReports'])) {
+                foreach ($formattedData['diagnosticReports'] as $formattedDiagnosticReport) {
+                    $this->form->validateForm('diagnosticReports', $formattedDiagnosticReport);
+                }
+            }
+
+            if (isset($formattedData['observations'])) {
+                foreach ($formattedData['observations'] as $formattedObservation) {
+                    $this->form->validateForm('observations', $formattedObservation);
+                }
+            }
+        } catch (ValidationException $e) {
+            $this->dispatch('flashMessage', [
+                'message' => $e->validator->errors()->first(),
+                'type' => 'error'
+            ]);
+
+            return;
+        }
+    }
+
+    /**
+     * Store validated formatted data into DB.
+     *
+     * @param  array  $formattedData
+     * @return void
+     * @throws Throwable
+     */
+    protected function storeValidatedData(array $formattedData): void
+    {
+        DB::transaction(function () use ($formattedData) {
+            $createdEncounterId = Repository::encounter()->store($formattedData['encounter'], $this->patientId);
+
+            Repository::episode()->store($formattedData['episode'], $createdEncounterId);
+
+            Repository::condition()->store($formattedData['conditions'], $createdEncounterId);
+
+            if (isset($formattedData)) {
+                Repository::immunization()->store($formattedData['immunizations'], $createdEncounterId);
+            }
+
+            if (isset($formattedData)) {
+                Repository::observation()->store($formattedData['observations'], $createdEncounterId);
+            }
+        });
+    }
+
+    /**
+     * Create episode for patient.
+     *
+     * @param  array  $formattedEpisode
+     * @return void
+     */
+    protected function createEpisode(array $formattedEpisode): void
+    {
+        try {
+            PatientApi::createEpisode($this->patientUuid, $this->convertArrayKeysToSnakeCase($formattedEpisode));
+        } catch (ApiException) {
+            $this->dispatch('flashMessage', [
+                'message' => __('Виникла помилка при створенні епізоду. Зверніться до адміністратора.'),
+                'type' => 'error'
+            ]);
+        }
     }
 }

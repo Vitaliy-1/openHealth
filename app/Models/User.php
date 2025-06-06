@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Support\Str;
@@ -147,7 +149,8 @@ class User extends Authenticatable implements MustVerifyEmail
                 break;
         }
 
-        return $scopes->filter(fn(Permission $permission) =>
+        return $scopes->filter(
+            fn (Permission $permission) =>
             !Str::startsWith($permission->name, $exclude)
         );
     }
@@ -162,6 +165,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getScopes(): string
     {
         return $this->getAllPermissions()->unique()->pluck('name')->join(' ');
+    }
+
+    /**
+     * Get employee by priority with encounter:write permission.
+     *
+     * @return Employee|null
+     */
+    public function getEncounterWriterEmployee(): ?Employee
+    {
+        // Ordered role from most valuable to least with permission encounter:write
+        $priorityRoles = ['DOCTOR', 'SPECIALIST', 'ASSISTANT', 'MED_COORDINATOR'];
+
+        // Get first by roles priority
+        return collect($priorityRoles)
+            ->map(fn (string $type) => $this->employees->firstWhere('employee_type', $type))
+            ->first();
     }
 
     /**

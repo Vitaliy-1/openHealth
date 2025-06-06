@@ -30,7 +30,7 @@
                         x-text="Object.values(servicesDictionary).find(service => service.id === diagnosticReport.code.identifier.value).name"
                     ></td>
                     <td class="td-input" x-text="diagnosticReport.conclusion"></td>
-                    <td class="td-input"></td>
+                    <td class="td-input" x-text="diagnosticReport.issuedDate"></td>
                     <td class="td-input">
                         {{-- That all that is needed for the dropdown --}}
                         <div x-data="{
@@ -93,7 +93,6 @@
                                                 item = index; {{-- Identify the item we are corrently editing --}}
                                                 {{-- Replace the previous diagnosticReport with the current, don't assign object directly (modalDiagnosticReport = diagnosticReport) to avoid reactiveness --}}
                                                 modalDiagnosticReport = JSON.parse(JSON.stringify(diagnosticReports[index]));
-                                                console.log(modalDiagnosticReport);
                                                 newDiagnosticReport = false; {{-- This diagnosticReport is already created --}}
                                             "
                                             class="dropdown-button"
@@ -165,6 +164,7 @@
                             {{-- Content --}}
                             <form>
                                 @include('livewire.encounter.diagnostic-report-parts.main-information')
+                                @include('livewire.encounter.diagnostic-report-parts.additional-information')
 
                                 <div class="mt-6 flex justify-between space-x-2">
                                     <button type="button"
@@ -175,11 +175,13 @@
                                     </button>
 
                                     <button @click.prevent="
-                                                if (!modalDiagnosticReport.isReferralAvailable) {
+                                                if (modalDiagnosticReport.referralType === 'electronic' || modalDiagnosticReport.referralType === '') {
                                                     delete modalDiagnosticReport.paperReferral;
                                                 }
 
-                                                delete modalDiagnosticReport.isReferralAvailable;
+                                                if (modalDiagnosticReport.referralType === 'paper' || modalDiagnosticReport.referralType === '') {
+                                                    delete modalDiagnosticReport.basedOn;
+                                                }
 
                                                 newDiagnosticReport !== false
                                                 ? diagnosticReports.push(modalDiagnosticReport)
@@ -222,7 +224,18 @@
             }
         };
         isReferralAvailable = false;
+        referralType = '';
         query = '';
+        basedOn = {
+            identifier: {
+                type: {
+                    coding: [
+                        { system: 'eHealth/resources', code: 'service_request' }
+                    ],
+                    text: ''
+                }
+            }
+        };
         paperReferral = {
             requesterLegalEntityEdrpou: '',
             requesterLegalEntityName: '',
@@ -233,6 +246,45 @@
                 { system: 'eHealth/ICD10_AM/condition_codes', code: '' }
             ]
         };
+        primarySource = true;
+        performer = {
+            identifier: {
+                type: {
+                    coding: [
+                        { system: 'eHealth/resources', code: 'employee' }
+                    ],
+                    text: ''
+                }
+            }
+        };
+        reportOrigin = {
+            coding: [
+                { system: 'eHealth/immunization_report_origins', code: '' }
+            ],
+            text: ''
+        };
+        recordedBy = {
+            identifier: {
+                type: {
+                    coding: [
+                        { system: 'eHealth/resources', code: 'employee' }
+                    ],
+                    text: ''
+                }
+            }
+        };
+        resultsInterpreter = { text: '' };
+
+        // Create date
+        #now = new Date();
+        #endTime = new Date(this.#now.getTime() + 15 * 60 * 1000); // add 15 minutes
+
+        issuedDate = this.#now.toISOString().split('T')[0];
+        issuedTime = this.#now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', hour12: false });
+        effectivePeriodStartDate = this.#now.toISOString().split('T')[0];
+        effectivePeriodStartTime = this.#now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', hour12: false });
+        effectivePeriodEndDate = this.#endTime.toISOString().split('T')[0];
+        effectivePeriodEndTime = this.#endTime.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit', hour12: false });
 
         constructor(obj = null) {
             if (obj) {

@@ -183,8 +183,7 @@
         <div class="flex gap-20 md:mb-5 mb-4">
             <h2 class="default-p font-bold">{{ __('patients.information_source') }}</h2>
             <div class="flex items-center">
-                <input @change="modalImmunization.primarySource = true"
-                       x-model.boolean="modalImmunization.primarySource"
+                <input x-model.boolean="modalImmunization.primarySource"
                        id="performer"
                        type="radio"
                        value="true"
@@ -198,8 +197,7 @@
             </div>
 
             <div class="flex items-center">
-                <input @change="modalImmunization.primarySource = false"
-                       x-model.boolean="modalImmunization.primarySource"
+                <input x-model.boolean="modalImmunization.primarySource"
                        id="patient"
                        type="radio"
                        value="false"
@@ -213,7 +211,7 @@
             </div>
         </div>
 
-        <div x-show="modalImmunization.primarySource === false">
+        <div x-show="modalImmunization.primarySource === false" x-transition>
             <div class="form-row-modal">
                 <div>
                     <label for="reportOrigin" class="label-modal">

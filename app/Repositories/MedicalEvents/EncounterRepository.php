@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Repositories\MedicalEvents;
 
 use App\Classes\eHealth\Api\PatientApi;
-use App\Models\Employee\Employee;
 use App\Models\MedicalEvents\Sql\EncounterDiagnose;
 use Carbon\CarbonImmutable;
 use Exception;
@@ -22,6 +21,7 @@ class EncounterRepository extends BaseRepository
     protected array $diagnoseUuids;
     protected string $visitUuid;
     protected string $episodeUuid;
+    protected string $employeeUuid;
 
     public function __construct(Model $model)
     {
@@ -30,20 +30,20 @@ class EncounterRepository extends BaseRepository
         $this->encounterUuid = Str::uuid()->toString();
         $this->visitUuid = Str::uuid()->toString();
         $this->episodeUuid = Str::uuid()->toString();
+        $this->employeeUuid = Auth::user()?->getEncounterWriterEmployee()->uuid;
     }
 
     /**
      * Create encounter in DB for person with related data.
      *
      * @param  array  $encounterData
-     * @param  array  $episodeData
      * @param  int  $personId
      * @return false|int
      * @throws Throwable
      */
-    public function store(array $encounterData, array $episodeData, int $personId): false|int
+    public function store(array $encounterData, int $personId): false|int
     {
-        return DB::transaction(function () use ($encounterData, $episodeData, $personId) {
+        return DB::transaction(function () use ($encounterData, $personId) {
             try {
                 $visit = Repository::identifier()->store($encounterData['visit']['identifier']['value']);
                 Repository::codeableConcept()->attach($visit, $encounterData['visit']);
@@ -55,7 +55,7 @@ class EncounterRepository extends BaseRepository
 
                 $type = Repository::codeableConcept()->store($encounterData['type']);
 
-                if (isset($encounterData['priority'])) {
+                if (isset($encounterData['priority']['coding'][0]['code'])) {
                     $priority = Repository::codeableConcept()->store($encounterData['priority']);
                 }
 
@@ -82,8 +82,6 @@ class EncounterRepository extends BaseRepository
                     'start' => $encounterData['period']['start'],
                     'end' => $encounterData['period']['end']
                 ]);
-
-                Repository::episode()->store($episodeData, $encounter->id);
 
                 $reasonIds = [];
 
@@ -163,13 +161,17 @@ class EncounterRepository extends BaseRepository
      *
      * @param  array  $encounter
      * @param  array  $conditions
+     * @param  bool  $isEpisodeNew
      * @return array
      */
-    public function formatEncounterRequest(array $encounter, array $conditions): array
+    public function formatEncounterRequest(array $encounter, array $conditions, bool $isEpisodeNew): array
     {
         $encounter['id'] = $this->encounterUuid;
         $encounter['visit']['identifier']['value'] = $this->visitUuid;
-        $encounter['episode']['identifier']['value'] = $this->episodeUuid;
+
+        if ($isEpisodeNew) {
+            $encounter['episode']['identifier']['value'] = $this->episodeUuid;
+        }
 
         // add system if priority is provided or when it's required
         if ($encounter['class']['code'] === 'INPATIENT' || $encounter['class']['code']) {
@@ -202,6 +204,7 @@ class EncounterRepository extends BaseRepository
         return schemaService()
             ->setDataSchema(['encounter' => $encounterForm], app(PatientApi::class))
             ->requestSchemaNormalize()
+            ->extractFirst()
             ->getNormalizedData();
     }
 
@@ -218,13 +221,11 @@ class EncounterRepository extends BaseRepository
         $episode['managingOrganization']['identifier']['value'] = Auth::user()->legalEntity->uuid;
         $episode['period']['start'] = convertToISO8601($encounterPeriod['date'] . $encounterPeriod['start']);
 
-        $normalizedData = schemaService()
+        return schemaService()
             ->setDataSchema($episode, app(PatientApi::class))
             ->requestSchemaNormalize('schemaEpisodeRequest')
             ->camelCaseKeys()
             ->getNormalizedData();
-
-        return ['episode' => $normalizedData];
     }
 
     /**
@@ -259,9 +260,7 @@ class EncounterRepository extends BaseRepository
                 }
 
                 if ($condition['primarySource']) {
-                    // TODO: потім взяти employee авторизованого
-                    $employee = Employee::find(1);
-                    $condition['asserter']['identifier']['value'] = $employee?->uuid;
+                    $condition['asserter']['identifier']['value'] = $this->employeeUuid;
 
                     unset($condition['reportOrigin']);
                 } else {
@@ -289,6 +288,7 @@ class EncounterRepository extends BaseRepository
             ->setDataSchema(['conditions' => $conditionForm], app(PatientApi::class))
             ->requestSchemaNormalize()
             ->camelCaseKeys()
+            ->extractFirst()
             ->getNormalizedData();
     }
 
@@ -344,9 +344,7 @@ class EncounterRepository extends BaseRepository
             if ($immunization['primarySource']) {
                 unset($immunization['reportOrigin']);
 
-                // TODO: потім взяти employee авторизованого
-                $employee = Employee::findOrFail(1);
-                $immunization['performer']['identifier']['value'] = $employee->uuid;
+                $immunization['performer']['identifier']['value'] = $this->employeeUuid;
             } else {
                 unset($immunization['performer']);
             }
@@ -424,9 +422,7 @@ class EncounterRepository extends BaseRepository
             if ($observation['primarySource']) {
                 unset($observation['reportOrigin']);
 
-                // TODO: потім взяти employee авторизованого
-                $employee = Employee::findOrFail(1);
-                $observation['performer']['identifier']['value'] = $employee->uuid;
+                $observation['performer']['identifier']['value'] = $this->employeeUuid;
             } else {
                 unset($observation['performer']);
             }
@@ -492,14 +488,38 @@ class EncounterRepository extends BaseRepository
      */
     public function formatDiagnosticReportsRequest(array $diagnosticReports): array
     {
-        $diagnosticReportForm = array_map(static function (array $diagnosticReport) {
-            unset($diagnosticReport['query']);
+        $diagnosticReportForm = array_map(function (array $diagnosticReport) {
+            // delete frontend properties
+            unset($diagnosticReport['isReferralAvailable'], $diagnosticReport['referralType'], $diagnosticReport['query']);
 
             $diagnosticReport['id'] = Str::uuid()->toString();
             $diagnosticReport['status'] = 'final';
 
+            if ($diagnosticReport['primarySource']) {
+                unset($diagnosticReport['reportOrigin']);
+
+                $diagnosticReport['performer']['identifier']['value'] = $this->employeeUuid;
+            } else {
+                unset($diagnosticReport['performer']);
+            }
+
             if (empty($diagnosticReport['conclusionCode']['coding'][0]['code'])) {
                 unset($diagnosticReport['conclusionCode']);
+            }
+
+            $diagnosticReport['recordedBy']['identifier']['value'] = $this->employeeUuid;
+
+            $diagnosticReport['issued'] = convertToISO8601($diagnosticReport['issuedDate'] . $diagnosticReport['issuedTime']);
+            unset($diagnosticReport['issuedDate'], $diagnosticReport['issuedTime']);
+
+            $diagnosticReport['effectivePeriod']['start'] = convertToISO8601($diagnosticReport['effectivePeriodStartDate'] . $diagnosticReport['effectivePeriodStartTime']);
+            unset($diagnosticReport['effectivePeriodStartDate'], $diagnosticReport['effectivePeriodStartTime']);
+
+            $diagnosticReport['effectivePeriod']['end'] = convertToISO8601($diagnosticReport['effectivePeriodEndDate'] . $diagnosticReport['effectivePeriodEndTime']);
+            unset($diagnosticReport['effectivePeriodEndDate'], $diagnosticReport['effectivePeriodEndTime']);
+
+            if (empty($diagnosticReport['resultsInterpreter']['text'])) {
+                unset($diagnosticReport['resultsInterpreter']);
             }
 
             return $diagnosticReport;
@@ -520,8 +540,10 @@ class EncounterRepository extends BaseRepository
      */
     public function formatPeriod(array $encounterForm): array
     {
-        $encounterForm['period']['start'] = convertToISO8601($encounterForm['period']['date'] . $encounterForm['period']['start']);
-        $encounterForm['period']['end'] = convertToISO8601($encounterForm['period']['date'] . $encounterForm['period']['end']);
+        $encounterForm['period'] = [
+            'start' => convertToISO8601($encounterForm['period']['date'] . $encounterForm['period']['start']),
+            'end' => convertToISO8601($encounterForm['period']['date'] . $encounterForm['period']['end'])
+        ];
         unset($encounterForm['period']['date']);
 
         return $encounterForm;
