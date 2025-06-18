@@ -227,10 +227,7 @@ class PatientForm extends Component
     public function createPerson(): void
     {
         if (!Auth::user()?->can('createPerson', Person::class)) {
-            $this->dispatch('flashMessage', [
-                'message' => 'У вас немає дозволу на створення пацієнта.',
-                'type' => 'error'
-            ]);
+            $this->flashPolicyError();
 
             return;
         }

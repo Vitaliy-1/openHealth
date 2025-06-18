@@ -223,7 +223,20 @@ trait FormTrait
     {
         $this->dispatch('flashMessage', [
             'message' => __('Виникла помилка. Зверніться до адміністратора.'),
-            'type' => 'error',
+            'type' => 'error'
+        ]);
+    }
+
+    /**
+     * Flash general policy error message to the user.
+     *
+     * @return void
+     */
+    public function flashPolicyError(): void
+    {
+        $this->dispatch('flashMessage', [
+            'message' => __('У вас немає дозволу на створення.'),
+            'type' => 'error'
         ]);
     }
 }

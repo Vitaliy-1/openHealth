@@ -6,6 +6,7 @@ namespace App\Livewire\DiagnosticReport;
 
 use App\Classes\eHealth\Api\PatientApi;
 use App\Classes\eHealth\Exceptions\ApiException;
+use App\Models\MedicalEvents\Sql\DiagnosticReport;
 use App\Repositories\MedicalEvents\Repository;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -28,8 +29,13 @@ class DiagnosticReportCreate extends DiagnosticReportComponent
      */
     public function save(array $data): void
     {
-        $this->form->diagnosticReports = $this->pruneReferralData($data);
+        if (!Auth::user()?->can('store', DiagnosticReport::class)) {
+            $this->flashPolicyError();
 
+            return;
+        }
+
+        $this->form->diagnosticReports = $this->pruneReferralData($data);
         $formattedData = Repository::diagnosticReport()->formatRequest($this->form->diagnosticReports);
 
         if (!$this->validateFormatted($formattedData)) {
@@ -52,8 +58,13 @@ class DiagnosticReportCreate extends DiagnosticReportComponent
      */
     public function sign(array $data): void
     {
-        $this->form->diagnosticReports = $this->pruneReferralData($data);
+        if (!Auth::user()?->can('store', DiagnosticReport::class)) {
+            $this->flashPolicyError();
 
+            return;
+        }
+
+        $this->form->diagnosticReports = $this->pruneReferralData($data);
         $formattedData = Repository::diagnosticReport()->formatRequest($this->form->diagnosticReports);
 
         if (!$this->validateFormatted($formattedData)) {

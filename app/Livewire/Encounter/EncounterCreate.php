@@ -7,6 +7,7 @@ namespace App\Livewire\Encounter;
 use App\Classes\eHealth\Api\PatientApi;
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Livewire\Encounter\Forms\Api\EncounterRequestApi;
+use App\Models\MedicalEvents\Sql\Encounter;
 use App\Repositories\MedicalEvents\Repository;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
@@ -27,28 +28,49 @@ class EncounterCreate extends EncounterComponent
      * Validate and save data.
      *
      * @return void
-     * @throws Throwable
      */
     public function save(): void
     {
+        if (!Auth::user()?->can('store', Encounter::class)) {
+            $this->flashPolicyError();
+
+            return;
+        }
+
         $formattedData = $this->prepareFormattedData();
 
         $this->validateFormatted($formattedData);
-        $this->storeValidatedData($formattedData);
+
+        try {
+            $this->storeValidatedData($formattedData);
+        } catch (Throwable) {
+            $this->flashGeneralError();
+        }
     }
 
     /**
      * Submit encrypted data about person encounter.
      *
      * @return void
-     * @throws ApiException|Throwable
+     * @throws ApiException
      */
     public function signPerson(): void
     {
+        if (!Auth::user()?->can('store', Encounter::class)) {
+            $this->flashPolicyError();
+
+            return;
+        }
+
         $formattedData = $this->prepareFormattedData();
 
         $this->validateFormatted($formattedData);
-        $this->storeValidatedData($formattedData);
+
+        try {
+            $this->storeValidatedData($formattedData);
+        } catch (Throwable) {
+            $this->flashGeneralError();
+        }
 
         if ($this->episodeType === 'new') {
             $this->createEpisode($formattedData['episode']);
