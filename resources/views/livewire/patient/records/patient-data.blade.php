@@ -7,7 +7,7 @@
         {!! $svgSprite !!}
     </div>
 
-    <div class="breadcrumb-form p-4">
+    <div class="breadcrumb-form p-3">
         <div class="flex items-center gap-14 mb-10">
             <p class="default-p">
                 {{ __('patients.verification_in_eHealth') }}: {{ __('patients.' . $verificationStatus) }}
