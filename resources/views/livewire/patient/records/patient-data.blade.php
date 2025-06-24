@@ -2,7 +2,7 @@
 
 @php $svgSprite = file_get_contents(resource_path('images/sprite.svg')); @endphp
 
-<x-layouts.patient :id="$patientId" :firstName="$firstName" :lastName="$lastName" :secondName="$secondName">
+<x-layouts.patient :id="$this->patientId" :firstName="$firstName" :lastName="$lastName" :secondName="$secondName">
     <div aria-hidden="true" class="hidden">
         {!! $svgSprite !!}
     </div>
