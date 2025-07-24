@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\Employee\Employee;
 use Exception;
 use App\Models\User;
 use Illuminate\Support\Str;
@@ -189,24 +190,20 @@ class TestUserMigrate extends Seeder
                 $this->command->info("\tINFO: A new License entry has been successfully inserted into the database");
 
                 $ownerUser = User::create([
-                    'id' => 1,
-                    'uuid' => '82d1f518-23c9-4c6c-868b-6f7ab26c6da8',
+                    'uuid' => Str::uuid()->toString(),
                     'email' => 'vitaliybezsh@gmail.com',
-                    'password' => Hash::make(Str::random()),
-                    'email_verified_at' => new Carbon('2024-09-11T11:00:52.000000Z'),
-                    'current_team_id' => null,
-                    'profile_photo_path' => null,
-                    'settings' => null,
-                    'priv_settings' => null,
-                    'is_blocked' => null,
-                    'block_reason' => null,
-                    'person_id' => null,
-                    'created_at' => new Carbon('2024-09-11T10:00:52.000000Z'),
-                    'updated_at' => new Carbon('2024-09-11T10:03:10.000000Z'),
-                    'two_factor_confirmed_at' => null
+                    'email_verified_at' => now(),
+                    'password' => Hash::make(Str::random())
                 ]);
 
-                $this->command->info("\tINFO: A new User entry has been successfully inserted into the database");
+                $doctorUser = User::create([
+                    'uuid' => Str::uuid()->toString(),
+                    'email' => 'karbovskyi.volodymyr@gmail.com',
+                    'email_verified_at' => now(),
+                    'password' => Hash::make('secret')
+                ]);
+
+                $this->command->info("\tINFO: A new User entries has been successfully inserted into the database");
 
                 $ownerRoleIds = DB::table('roles')->where('name', 'OWNER')->pluck('id');
                 foreach ($ownerRoleIds as $ownerRoleId) {
@@ -215,6 +212,16 @@ class TestUserMigrate extends Seeder
                         'model_type' => 'App\Models\User',
                         'model_id' => $ownerUser->id,
                         'legal_entity_id' => $legalEntityId,
+                    ]);
+                }
+
+                $doctorRoleIds = DB::table('roles')->where('name', 'DOCTOR')->pluck('id');
+                foreach ($doctorRoleIds as $doctorRoleId) {
+                    DB::table('model_has_roles')->insert([
+                        'role_id' => $doctorRoleId,
+                        'model_type' => User::class,
+                        'model_id' => $doctorUser->id,
+                        'legal_entity_id' => $legalEntityId
                     ]);
                 }
 
@@ -233,7 +240,22 @@ class TestUserMigrate extends Seeder
                     'working_experience' => null
                 ]);
 
-                $this->command->info("\tINFO: A new Party entry has been successfully inserted into the database");
+                $doctorPartyId = DB::table('parties')->insertGetId([
+                    'uuid' => '2b50fa8d-e8bd-4a42-9f2c-f8e790494bce',
+                    'last_name' => 'Карбовский',
+                    'first_name' => 'Володимер',
+                    'second_name' => 'Михайлович',
+                    'email' => 'karbovskyi.volodymyr@gmail.com',
+                    'birth_date' => new Carbon('2006-02-01'),
+                    'gender' => 'MALE',
+                    'user_id' => $doctorUser->id,
+                    'tax_id' => '2690710542',
+                    'no_tax_id' => false,
+                    'about_myself' => '1',
+                    'working_experience' => 1
+                ]);
+
+                $this->command->info("\tINFO: A new Party entries has been successfully inserted into the database");
 
                 DB::table('documents')->insertGetId([
                     'type' => 'PASSPORT',
@@ -281,7 +303,19 @@ class TestUserMigrate extends Seeder
                     'updated_at' => new Carbon('2024-11-14T10:37:35.000000Z'),
                 ]);
 
-                $this->command->info("\tINFO: A new Employee entry has been successfully inserted into the database");
+                Employee::create([
+                    'uuid' => '9743bdf7-015e-48a4-a3c1-6612d381ff90',
+                    'legal_entity_uuid' => config('ehealth.test.client_id'),
+                    'position' => 'P3',
+                    'start_date' => new Carbon('2024-11-28'),
+                    'employee_type' => 'DOCTOR',
+                    'status' => 'APPROVED',
+                    'legal_entity_id' => $legalEntityId,
+                    'user_id' => $doctorUser->id,
+                    'party_id' => $doctorPartyId
+                ]);
+
+                $this->command->info("\tINFO: A new Employee entries has been successfully inserted into the database");
 
                 EmployeeRequest::create([
                     'uuid' => 'c68fa3a4-8b58-4753-a865-5b15314d7b03',
@@ -303,7 +337,7 @@ class TestUserMigrate extends Seeder
                     'updated_at' => new Carbon('2024-11-14T10:37:35.000000Z'),
                 ]);
 
-                $this->command->info("\tINFO: A new EmployeeRequest entry has been successfully inserted into the database\n");
+                $this->command->info("\tINFO: A new EmployeeRequest entries has been successfully inserted into the database\n");
 
                 DB::table('persons')->insert([
                     'uuid' => '60c00b7e-b12a-429c-a9cd-4138fd0132cc',
