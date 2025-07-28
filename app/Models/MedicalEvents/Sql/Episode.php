@@ -24,8 +24,7 @@ class Episode extends Model
         'episode_type_id',
         'managing_organization_id',
         'care_manager_id',
-        'created_at',
-        'updated_at',
+        'updated_at'
     ];
 
     public function period(): MorphOne

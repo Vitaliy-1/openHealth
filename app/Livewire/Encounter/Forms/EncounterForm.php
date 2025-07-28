@@ -82,22 +82,39 @@ class EncounterForm extends Form
     {
         return [
             'encounter.period.start' => ['required', 'date', 'before_or_equal:now'],
-            'encounter.period.end' => ['required', 'date', 'after:encounter.period.start'],
+            'encounter.period.end' => ['required', 'date', 'before_or_equal:now', 'after:encounter.period.start'],
             'encounter.class.code' => ['required', 'string', new InDictionary('eHealth/encounter_classes')],
             'encounter.type.coding.*.code' => ['required', 'string', new InDictionary('eHealth/encounter_types')],
             'encounter.priority' => ['required_if:encounter.class.code,INPATIENT', 'array'],
-            'encounter.priority.coding.*.code' => ['required', 'string', new InDictionary('eHealth/encounter_priority')],
+            'encounter.priority.coding.*.code' => [
+                'required',
+                'string',
+                new InDictionary('eHealth/encounter_priority')
+            ],
             'encounter.reasons' => ['required_if:encounter.class.code,PHC', 'array'],
             'encounter.reasons.*.coding.*.code' => ['required', 'string', new InDictionary('eHealth/ICPC2/reasons')],
             'encounter.reasons.*.text' => ['nullable', 'string', new Cyrillic()],
-            'encounter.diagnoses.*.role.coding.*.code' => ['required', 'string', new InDictionary('eHealth/diagnosis_roles')],
-            'encounter.diagnoses' => ['required_unless:encounter.type.coding.0.code,intervention', new OnlyOnePrimaryDiagnosis(), 'array'],
+            'encounter.diagnoses.*.role.coding.*.code' => [
+                'required',
+                'string',
+                new InDictionary('eHealth/diagnosis_roles')
+            ],
+            'encounter.diagnoses' => [
+                'required_unless:encounter.type.coding.0.code,intervention',
+                new OnlyOnePrimaryDiagnosis(),
+                'array'
+            ],
             'encounter.diagnoses.*.rank' => ['nullable', 'integer', 'min:1', 'max:10'],
             'encounter.actions' => [
-                'required_if:encounter.class.code,PHC', 'prohibited_unless:encounter.class.code,PHC', 'array'
+                'required_if:encounter.class.code,PHC',
+                'prohibited_unless:encounter.class.code,PHC',
+                'array'
             ],
             'encounter.actions.*.coding.*.code' => ['required', 'string', new InDictionary('eHealth/ICPC2/actions')],
             'encounter.actions.*.text' => ['nullable', 'string', new Cyrillic()],
+            'encounter.division' => [
+                Rule::prohibitedIf(in_array(data_get($this->encounter, 'division'), ['field', 'home']))
+            ],
             'encounter.division.identifier.value' => ['required', 'uuid'],
 
             'episode.type.code' => ['required', 'string', new InDictionary('eHealth/episode_types')],
@@ -328,6 +345,13 @@ class EncounterForm extends Form
                 new InDictionary('eHealth/clinical_impression_patient_categories')
             ],
             'clinicalImpressions.description' => ['nullable', 'string', 'max:1000'],
+            'clinicalImpressions.effectivePeriod.start' => ['required', 'date', 'before_or_equal:now'],
+            'clinicalImpressions.effectivePeriod.end' => [
+                'required',
+                'date',
+                'before_or_equal:now',
+                'after:procedures.effectivePeriod.start'
+            ]
         ];
     }
 

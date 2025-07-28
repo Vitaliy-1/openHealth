@@ -368,21 +368,26 @@ class EncounterComponent extends Component
         );
 
         try {
-            $conditions = PatientApi::getConditionsInEpisodeContext(
+            $conditions = collect(PatientApi::getConditionsInEpisodeContext(
                 $this->patientUuid,
                 $episodeId,
                 $buildGetConditions
-            )['data'];
-            $observations = PatientApi::getObservationsInEpisodeContext(
+            )['data'])->map(static function (array $item) {
+                return array_merge($item, ['type' => 'condition']);
+            });
+
+            $observations = collect(PatientApi::getObservationsInEpisodeContext(
                 $this->patientUuid,
                 $episodeId,
                 $buildGetObservations
-            )['data'];
+            )['data'])->map(static function (array $item) {
+                return array_merge($item, ['type' => 'observation']);
+            });
 
-            $this->conditionsAndObservations = array_merge($conditions, $observations);
+            $this->conditionsAndObservations = $conditions->merge($observations)->values()->all();
         } catch (eHealthApiException) {
             Log::channel('e_health_errors')
-                ->error('Error while searching for procedure reasons in Encounter Component');
+                ->error('Error while searching for conditions and observations in Encounter Component');
 
             $this->flashGeneralError();
         }

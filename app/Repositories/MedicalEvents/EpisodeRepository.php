@@ -16,11 +16,11 @@ class EpisodeRepository extends BaseRepository
      * Create episode for encounter in DB.
      *
      * @param  array  $data
-     * @param  int  $encounterId
+     * @param  int|null  $encounterId
      * @return void
      * @throws Throwable
      */
-    public function store(array $data, int $encounterId): void
+    public function store(array $data, ?int $encounterId = null): void
     {
         DB::transaction(function () use ($data, $encounterId) {
             try {
@@ -73,6 +73,20 @@ class EpisodeRepository extends BaseRepository
             'careManager'
         ])
             ->where('encounter_id', $encounterId)
+            ->first()
+            ?->toArray();
+    }
+
+    /**
+     * Get the episode for the clinical impression based on the provided UUID to display the selected supporting info.
+     *
+     * @param  string  $uuid
+     * @return array|null
+     */
+    public function getForClinicalImpression(string $uuid): ?array
+    {
+        return Episode::whereUuid($uuid)
+            ->select(['name', 'created_at'])
             ->first()
             ?->toArray();
     }

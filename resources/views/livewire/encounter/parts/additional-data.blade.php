@@ -86,7 +86,9 @@
                     id="divisionNames"
                     class="input-select peer @error('form.encounter.division.identifier.value') input-error @enderror"
             >
-                <option selected>{{ __('forms.select') }} {{ mb_strtolower(__('patients.division_name')) }}</option>
+                <option selected value="">
+                    {{ __('forms.select') }} {{ mb_strtolower(__('patients.division_name')) }}
+                </option>
                 @foreach($divisions as $key => $division)
                     <option value="{{ $division['uuid'] }}" wire:key="{{ $key }}">{{ $division['name'] }}</option>
                 @endforeach

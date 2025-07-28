@@ -28,7 +28,7 @@ class Encounter extends Model
         'performer_id',
         'division_id',
         'created_at',
-        'updated_at',
+        'updated_at'
     ];
 
     public function period(): MorphOne

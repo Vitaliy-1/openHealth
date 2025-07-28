@@ -257,6 +257,21 @@ class DiagnosticReportRepository extends BaseRepository
     }
 
     /**
+     * Get the diagnostic report for the clinical impression based on the provided UUID to display the selected supporting info.
+     *
+     * @param  string  $uuid
+     * @return array|null
+     */
+    public function getForClinicalImpression(string $uuid): ?array
+    {
+        return DiagnosticReport::whereUuid($uuid)
+            ->select(['id', 'issued', 'code_id'])
+            ->with(['code.coding'])
+            ->first()
+            ?->toArray();
+    }
+
+    /**
      * Formatting to show on the frontend.
      *
      * @param  array  $diagnosticReports

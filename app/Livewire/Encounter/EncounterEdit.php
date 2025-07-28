@@ -51,6 +51,8 @@ class EncounterEdit extends EncounterComponent
         $this->form->procedures = Repository::procedure()->get($this->encounterId);
         $this->form->procedures = Repository::procedure()->formatForView($this->form->procedures);
 
+        $this->form->clinicalImpressions = Repository::clinicalImpression()->get($this->encounterId);
+
         $this->setDefaultDate();
     }
 

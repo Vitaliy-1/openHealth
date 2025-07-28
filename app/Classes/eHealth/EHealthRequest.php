@@ -13,6 +13,13 @@ abstract class EHealthRequest extends PendingRequest
 {
     public const string QUERY_PARAM_PAGE_SIZE = 'page_size';
 
+    /**
+     * The HTTP request timeout in seconds.
+     * This is specifically needed to load dictionaries
+     * TODO load dictionaries during first-run or similar installation process
+     */
+    public const int TIMEOUT = 100;
+
     protected ?Closure $validator = null;
 
     public function __construct(?Factory $factory = null, $middleware = [])

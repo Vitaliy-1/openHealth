@@ -32,29 +32,27 @@
         />
     </div>
 
-    <template x-if="!noTaxId">
-        <div class="form-row-4">
-            <div class="form-group group">
-                <input wire:model="form.patient.taxId"
-                       type="text"
-                       name="taxId"
-                       id="taxId"
-                       class="input peer @error('form.patient.taxId') input-error @enderror"
-                       placeholder=" "
-                       required
-                       maxlength="10"
-                       autocomplete="off"
-                />
-                <label for="taxId" class="label">
-                    {{ __('forms.tax_id') }}
-                </label>
+    <div x-show="!noTaxId" class="form-row-3" x-transition x-cloak>
+        <div class="form-group group">
+            <input wire:model="form.patient.taxId"
+                   type="text"
+                   name="taxId"
+                   id="taxId"
+                   class="input peer @error('form.patient.taxId') input-error @enderror"
+                   placeholder=" "
+                   required
+                   maxlength="10"
+                   autocomplete="off"
+            />
+            <label for="taxId" class="label">
+                {{ __('forms.tax_id') }}
+            </label>
 
-                @error('form.patient.taxId')
-                <p class="text-error">
-                    {{ $message }}
-                </p>
-                @enderror
-            </div>
+            @error('form.patient.taxId')
+            <p class="text-error">
+                {{ $message }}
+            </p>
+            @enderror
         </div>
-    </template>
+    </div>
 </fieldset>

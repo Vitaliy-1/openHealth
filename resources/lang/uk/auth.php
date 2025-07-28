@@ -58,6 +58,7 @@ return [
             'legal_entity_identity' => 'AUTH: Помилка ідентифікації закладу',
             'user_authentication' => 'AUTH: Помилка аутентифікації користувача',
             'user_employee_update' => 'AUTH: Помилка під час оновлення даних співробітника',
+            'user_test_email' => 'AUTH: тестовий імейл користувача, введений під час входу, відрізняється від такого в eHealth',
             'data_saving' => 'AUTH: Сталася помилка під час збереження автентифікаційних даних',
             'employee_instance' => 'Не знайдено даних співробітника для автентифікованого користувача',
             'get_employee_instance' => 'Неможливо отримати екземпляр Employee чи EmployeeRequest',

@@ -60,4 +60,9 @@ final class Repository
     {
         return app(ProcedureRepository::class);
     }
+
+    public static function clinicalImpression(): ClinicalImpressionRepository
+    {
+        return app(ClinicalImpressionRepository::class);
+    }
 }

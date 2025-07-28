@@ -38,11 +38,11 @@
                                              $wire.dictionaries['eHealth/ICPC2/condition_codes'][supporting.code];
 
                             if (dictName) {
-                                return `${supporting.type} : ${supporting.code} - ${dictName}`;
+                                return `${ supporting.type } : ${ supporting.code } - ${ dictName }`;
                             }
 
                             const service = Object.values($wire.dictionaries['custom/services']).find(service => service.id === supporting.code);
-                            return service ? `${supporting.type} : ${service.code} / ${service.name}` : `${supporting.type} : ${supporting.code}`;
+                            return service ? `${ supporting.type } : ${ service.code } / ${ service.name }` : `${ supporting.type } : ${ supporting.code }`;
                         })()"
                     ></td>
                     <td class="td-input">
@@ -416,7 +416,7 @@
                                                             id: encounter.id,
                                                             inserted_at: encounter.inserted_at,
                                                             code: primaryDiagnosis.code.coding[0].code,
-                                                            type: 'Взаємодія',
+                                                            type: 'encounter',
                                                             ...modalSupportingInfo
                                                         };
                                                     })
@@ -429,7 +429,7 @@
                                                         id: procedure.id,
                                                         inserted_at: procedure.inserted_at,
                                                         code: procedure.code.identifier.value,
-                                                        type: 'Процедура',
+                                                        type: 'procedure',
                                                         ...modalSupportingInfo
                                                     }))
                                                     .forEach(item => modalClinicalImpression.supportingInfo.push(item));
@@ -441,7 +441,7 @@
                                                         id: diagnosticReport.id,
                                                         inserted_at: diagnosticReport.inserted_at,
                                                         code: diagnosticReport.code.identifier.value,
-                                                        type: 'Діагностичний звіт',
+                                                        type: 'diagnostic_report',
                                                         ...modalSupportingInfo
                                                     }))
                                                     .forEach(item => modalClinicalImpression.supportingInfo.push(item));

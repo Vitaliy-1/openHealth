@@ -6,13 +6,18 @@ namespace App\Livewire\Encounter;
 
 use App\Classes\eHealth\Api\PatientApi;
 use App\Classes\eHealth\Exceptions\ApiException;
+use App\Core\Arr as CoreArr;
 use App\Livewire\Encounter\Forms\Api\EncounterRequestApi;
 use App\Models\LegalEntity;
+use App\Models\MedicalEvents\Sql\DiagnosticReport;
+use App\Models\MedicalEvents\Sql\Episode;
+use App\Models\MedicalEvents\Sql\Procedure;
 use App\Repositories\MedicalEvents\Repository;
 use App\Traits\HandlesReasonReferences;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -60,7 +65,7 @@ class EncounterCreate extends EncounterComponent
 
         $base64EncryptedData = $this->sendEncryptedData(
             $this->convertArrayKeysToSnakeCase($formattedData),
-            Auth::user()->tax_id
+            Auth::user()->party->taxId
         );
 
         $signedSubmitEncounter = EncounterRequestApi::buildSubmitEncounterPackage(
@@ -131,6 +136,9 @@ class EncounterCreate extends EncounterComponent
                 : [],
             'procedures' => !empty($this->form->procedures)
                 ? $encounterRepository->formatProceduresRequest($this->form->procedures)
+                : [],
+            'clinicalImpressions' => !empty($this->form->clinicalImpressions)
+                ? $encounterRepository->formatClinicalImpressionsRequest($this->form->clinicalImpressions)
                 : []
         ];
 
@@ -178,6 +186,12 @@ class EncounterCreate extends EncounterComponent
             if (isset($formattedData['procedures'])) {
                 foreach ($formattedData['procedures'] as $formattedProcedure) {
                     $this->form->validateForm('procedures', $formattedProcedure);
+                }
+            }
+
+            if (isset($formattedData['clinicalImpressions'])) {
+                foreach ($formattedData['clinicalImpressions'] as $formattedClinicalImpression) {
+                    $this->form->validateForm('clinicalImpressions', $formattedClinicalImpression);
                 }
             }
         } catch (ValidationException $e) {
@@ -229,6 +243,15 @@ class EncounterCreate extends EncounterComponent
                     $this->processComplicationDetails($procedure);
                 }
             }
+
+            if (isset($formattedData['clinicalImpressions'])) {
+                Repository::clinicalImpression()->store($formattedData['clinicalImpressions'], $createdEncounterId);
+
+                // Save the selected episode_of_care, procedure, diagnostic_report, encounter locally if they don't exist in our database.
+                foreach ($formattedData['clinicalImpressions'] as $clinicalImpression) {
+                    $this->processSupportingInfo($clinicalImpression);
+                }
+            }
         });
     }
 
@@ -264,6 +287,124 @@ class EncounterCreate extends EncounterComponent
 
         foreach ($procedure['complicationDetails'] as $complicationDetail) {
             $this->ensureConditionExists($complicationDetail['identifier']['value']);
+        }
+    }
+
+    /**
+     * Process supporting info of clinical impression.
+     *
+     * @param  array  $clinicalImpression
+     * @return void
+     */
+    private function processSupportingInfo(array $clinicalImpression): void
+    {
+        if (!isset($clinicalImpression['supportingInfo'])) {
+            return;
+        }
+
+        foreach ($clinicalImpression['supportingInfo'] as $supportingInfo) {
+            if ($supportingInfo['identifier']['type']['coding'][0]['code'] === 'episode_of_care') {
+                $this->ensureEpisodeExists($supportingInfo['identifier']['value']);
+            }
+
+            if ($supportingInfo['identifier']['type']['coding'][0]['code'] === 'procedure') {
+                $this->ensureProcedureExists($supportingInfo['identifier']['value']);
+            }
+
+            if ($supportingInfo['identifier']['type']['coding'][0]['code'] === 'diagnostic_report') {
+                $this->ensureDiagnosticReportExists($supportingInfo['identifier']['value']);
+            }
+
+            if ($supportingInfo['identifier']['type']['coding'][0]['code'] === 'encounter') {
+                $this->ensureEncounterExist($supportingInfo['identifier']['value']);
+            }
+        }
+    }
+
+    /**
+     * Search for episode and save if not founded in our DB.
+     *
+     * @param  string  $uuid
+     * @return void
+     */
+    private function ensureEpisodeExists(string $uuid): void
+    {
+        if (Episode::whereUuid($uuid)->exists()) {
+            return;
+        }
+
+        try {
+            $episodeData = PatientApi::getEpisodeById($this->patientUuid, $uuid);
+
+            if ($episodeData) {
+                Repository::episode()->store(CoreArr::toCamelCase($episodeData));
+            }
+        } catch (ApiException|Throwable $e) {
+            $this->flashGeneralError();
+
+            Log::error('Failed while ensuring episode existence', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+        }
+    }
+
+    /**
+     * Search for procedure and save if not founded in our DB.
+     *
+     * @param  string  $uuid
+     * @return void
+     */
+    private function ensureProcedureExists(string $uuid): void
+    {
+        if (Procedure::whereUuid($uuid)->exists()) {
+            return;
+        }
+
+        try {
+            $procedureData = PatientApi::getProcedureById($this->patientUuid, $uuid);
+
+            if ($procedureData) {
+                Repository::procedure()->store([CoreArr::toCamelCase($procedureData)]);
+            }
+        } catch (ApiException|Throwable $e) {
+            $this->flashGeneralError();
+
+            Log::error('Failed while ensuring procedure existence', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+        }
+    }
+
+    /**
+     * Search for diagnostic report and save if not founded in our DB.
+     *
+     * @param  string  $uuid
+     * @return void
+     */
+    private function ensureDiagnosticReportExists(string $uuid): void
+    {
+        if (DiagnosticReport::whereUuid($uuid)->exists()) {
+            return;
+        }
+
+        try {
+            $diagnosticReportData = PatientApi::getDiagnosticReportById($this->patientUuid, $uuid);
+
+            if ($diagnosticReportData) {
+                Repository::diagnosticReport()->store([CoreArr::toCamelCase($diagnosticReportData)]);
+            }
+        } catch (ApiException|Throwable $e) {
+            $this->flashGeneralError();
+
+            Log::error('Failed while ensuring diagnostic report existence', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
         }
     }
 }

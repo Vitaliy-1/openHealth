@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Repositories\MedicalEvents\ClinicalImpressionRepository;
 use App\Repositories\MedicalEvents\CodeableConceptRepository;
 use App\Repositories\MedicalEvents\CodingRepository;
 use App\Repositories\MedicalEvents\ConditionRepository;
@@ -39,6 +40,7 @@ class MedicalEventsDBServiceProvider extends ServiceProvider implements Deferrab
         $this->bindRepository(ObservationRepository::class);
         $this->bindRepository(ProcedureRepository::class);
         $this->bindRepository(PaperReferralRepository::class);
+        $this->bindRepository(ClinicalImpressionRepository::class);
     }
 
     /**
@@ -83,7 +85,8 @@ class MedicalEventsDBServiceProvider extends ServiceProvider implements Deferrab
             DiagnosticReportRepository::class,
             ObservationRepository::class,
             ProcedureRepository::class,
-            PaperReferralRepository::class
+            PaperReferralRepository::class,
+            ClinicalImpressionRepository::class
         ];
     }
 }

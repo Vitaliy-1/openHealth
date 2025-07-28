@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('episodes', static function (Blueprint $table) {
             $table->id();
             $table->uuid();
-            $table->foreignId('encounter_id')->constrained('encounters');
+            $table->foreignId('encounter_id')->nullable()->constrained('encounters');
             $table->foreignId('episode_type_id')->constrained('codings');
             $table->enum('status', ['active', 'closed', 'entered_in_error']);
             $table->string('name');

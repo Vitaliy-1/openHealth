@@ -86,6 +86,7 @@ class Request
             ];
 
             $response = Http::acceptJson()
+                ->timeout(EHealthRequest::TIMEOUT)
                 ->post('https://openhealths.com/api/v1/send-request', $data);
         } else {
             $response = Http::acceptJson()

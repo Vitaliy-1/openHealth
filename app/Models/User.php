@@ -127,10 +127,9 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get ALL Legal Entities IDs available for this user
-     *
-     * @return Collection
      * Get the party associated with the user.
+     *
+     * @return HasOne
      */
     public function party(): HasOne
     {
@@ -138,7 +137,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get ALL Legal Entites IDs available for this user
+     * Get ALL Legal Entities IDs available for this user
      *
      * @return Collection<int|string, mixed>
      */

@@ -9,10 +9,8 @@
         {{ __('patients.incapacitated') }}
     </legend>
 
-    <template x-if="isIncapacitated">
-        <div>
-            @include('livewire.patient.parts.search-confidant-person')
-            @include('livewire.patient.parts.confidant-person')
-        </div>
-    </template>
+    <div x-show="isIncapacitated" x-cloak x-transition>
+        @include('livewire.patient.parts.search-confidant-person')
+        @include('livewire.patient.parts.confidant-person')
+    </div>
 </fieldset>

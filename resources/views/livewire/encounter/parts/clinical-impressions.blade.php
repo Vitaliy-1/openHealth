@@ -122,6 +122,8 @@
             <button @click.prevent="
                         newClinicalImpression = true; {{-- We are adding a new clinicalImpression --}}
                         modalClinicalImpression = new ClinicalImpression(); {{-- Replace the data of the previous clinicalImpression with a new one--}}
+                        $wire.problems = [];
+                        $wire.findings = [];
 
                         $nextTick(() => {
                             const drawer = document.getElementById('clinical-impression-drawer-right');
@@ -194,6 +196,15 @@
             coding: [{ system: 'eHealth/clinical_impression_patient_categories', code: '' }],
             text: ''
         };
+        assessor = {
+            identifier: {
+                type: {
+                    coding: [{ system: 'eHealth/resources', code: 'employee' }],
+                    text: ''
+                }
+            }
+        };
+        previousList = [];
         problems = [];
         findings = [];
         supportingInfo = [];

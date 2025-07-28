@@ -55,6 +55,7 @@ return [
             'unexistent_legal_entity' => 'AUTH: Unexistent Legal Entity',
             'user_authentication' => 'AUTH: User authentication error',
             'user_employee_update' => 'AUTH: User employee data fail update',
+            'user_test_email' => 'AUTH: User test email entered during login is different from eHealth',
             'data_saving' => 'AUTH: An error occurred while saving authentication data',
             'employee_instance' => 'Not found any employee data for authenticated user',
             'get_employee_instance' => 'Cannot get any Employee or EmployeeRequest Instance',

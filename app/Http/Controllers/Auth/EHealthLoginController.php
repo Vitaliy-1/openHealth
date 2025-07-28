@@ -31,8 +31,16 @@ class EHealthLoginController extends Controller
      */
     public function __invoke(Request $request): ?RedirectResponse
     {
+        // get the email entered by the user in the login form
+        $sessionEmail = session()->pull('selected_email');
+        $testUser = $sessionEmail && in_array($sessionEmail, config('ehealth.test.emails'));
+
         /* exchange code to token */
-        if (config('ehealth.api.callback_prod') === false) {
+        if (
+            (config('ehealth.api.callback_prod') === false) &&
+            // Pass certain emails anyway for testing purposes
+            !$testUser
+        ) {
             $code = $request->input('code');
             $url = 'http://localhost/ehealth/oauth?code=' . $code;
 
@@ -92,8 +100,13 @@ class EHealthLoginController extends Controller
 
         if (!$user) {
             Log::error(__('auth.login.error.user_authentication', [], 'en'));
-
             return $this->breakAuth('auth.login.error.user_authentication');
+        }
+
+        // We must ensure that the user entered test email in the login form corresponds to the user's eHealth email
+        if ($testUser && ($sessionEmail !== $user->email)) {
+            Log::error(__('auth.login.error.test_user_email', [], 'en'));
+            return $this->breakAuth('auth.login.error.test_user_email');
         }
 
         auth('ehealth')->login($user);

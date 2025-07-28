@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Auth;
 
 use App\Models\User;
+use Illuminate\Support\Facades\App;
 use Livewire\Component;
 use App\Models\LegalEntity;
 use Illuminate\Support\Str;
@@ -98,6 +99,11 @@ class Login extends Component
         if (!$user) {
             $this->addError('email', __('auth.login.error.validation.auths'));
             return back();
+        }
+
+        // Save user's email into the session, required to check whether we can allow access on the test server
+        if (App::isLocal()) {
+            session()->put('selected_email', $this->email);
         }
 
         if (!$user->hasVerifiedEmail()) {

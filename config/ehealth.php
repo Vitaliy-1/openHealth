@@ -408,7 +408,8 @@ return [
     // Set the test environment
     'test' => [
         'client_id' => env('TEST_CLIENT_ID'),
-        'client_secret' => env('TEST_CLIENT_SECRET')
+        'client_secret' => env('TEST_CLIENT_SECRET'),
+        'emails' => env('TEST_CLIENT_EMAILS') ? explode(',', env('TEST_CLIENT_EMAILS')) : [],
     ],
 
     'roles' => [
@@ -933,5 +934,5 @@ return [
             'person_verification:details',
             'person_verification:write',
         ]
-    ]
+    ],
 ];

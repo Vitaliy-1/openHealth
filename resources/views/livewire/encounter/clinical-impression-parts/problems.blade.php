@@ -8,7 +8,9 @@
                   openModal: false,
                   modalProblem: new Problem(),
                   newProblem: false,
-                  item: 0
+                  item: 0,
+                  searchResults: [],
+                  selectedProblemIds: []
               }"
     >
         <legend class="legend">
@@ -92,6 +94,7 @@
                                                 {{-- Replace the previous problem with the current, don't assign object directly (modalProblem = problem) to avoid reactiveness --}}
                                                 modalProblem = new Problem(problem);
                                                 newProblem = false; {{-- This problem is already created --}}
+                                                searchResults = modalClinicalImpression.problems;
                                             "
                                             @click.prevent
                                             class="dropdown-button"
@@ -99,8 +102,8 @@
                                         {{ __('forms.edit') }}
                                     </button>
 
-                                    <button @click.prevent="modalClinicalImpression.problems.splice(index, 1); close($refs.button);"
-                                            class="dropdown-button dropdown-delete"
+                                    <button class="dropdown-button dropdown-delete"
+                                            @click.prevent="modalClinicalImpression.problems.splice(index, 1); close($refs.button);"
                                     >
                                         {{ __('forms.delete') }}
                                     </button>
@@ -119,6 +122,8 @@
                         openModal = true; {{-- Open the Modal --}}
                         newProblem = true; {{-- We are adding a new problem --}}
                         modalProblem = new Problem(); {{-- Replace the data of the previous problem with a new one--}}
+                        searchResults = [];  {{-- Clear the search results --}}
+                        selectedProblemIds = []; {{-- Clear the selected problem IDs --}}
                     "
                     class="item-add my-5"
             >
@@ -154,11 +159,14 @@
                             <h3 class="modal-header" :id="$id('modal-title')">{{ __('forms.add') }}</h3>
 
                             {{-- Content --}}
-                            <form x-data="{ selectedProblemIds: [] }">
+                            <form>
                                 {{-- Episode info in which the search happens --}}
-                                <div class="form-row-modal" x-data="{ selectedEpisodeId: '' }">
+                                <div class="form-row-modal">
                                     <div class="form-group group">
-                                        <select id="episodeId" class="input-modal peer" x-model="selectedEpisodeId">
+                                        <select id="episodeId"
+                                                class="input-modal peer"
+                                                x-model="modalProblem.selectedEpisodeId"
+                                        >
                                             <option value="" selected>
                                                 {{ __('forms.select') }} {{ mb_strtolower(__('patients.episode')) }}
                                             </option>
@@ -173,9 +181,14 @@
 
                                     {{-- Search button --}}
                                     <div>
-                                        <button @click.prevent="$wire.searchProblems(selectedEpisodeId)"
+                                        <button @click.prevent="
+                                                    $wire.searchProblems(modalProblem.selectedEpisodeId).then(() => {
+                                                        searchResults = JSON.parse(JSON.stringify($wire.problems));
+                                                        selectedProblemIds = [];
+                                                    })
+                                                "
                                                 class="flex items-center gap-2 button-primary"
-                                                :disabled="!selectedEpisodeId"
+                                                :disabled="!modalProblem.selectedEpisodeId"
                                         >
                                             <svg width="16" height="16">
                                                 <use xlink:href="#svg-search"></use>
@@ -188,7 +201,7 @@
                                 </div>
 
                                 {{-- A table that shows the results of the found data --}}
-                                <template x-if="$wire.problems.length > 0">
+                                <template x-if="searchResults.length > 0">
                                     <div class="table-container">
                                         <div class="overflow-visible">
                                             <table class="table-base">
@@ -201,7 +214,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <template x-for="problem in $wire.problems"
+                                                <template x-for="problem in searchResults"
                                                           :key="problem.id"
                                                 >
                                                     <tr class="border-b dark:border-gray-700">
@@ -239,7 +252,7 @@
                                     </div>
                                 </template>
 
-                                <template x-if="$wire.problems.length <= 0">
+                                <template x-if="searchResults.length <= 0">
                                     <p class="default-p">{{ __('forms.nothing_found') }}</p>
                                 </template>
 
@@ -255,16 +268,23 @@
 
                                     <button @click.prevent
                                             @click="
-                                                {{-- Return only the needed data --}}
-                                                modalClinicalImpression.problems = $wire.problems
-                                                    .filter(problem => selectedProblemIds.includes(problem.id))
+                                                const existingIds = modalClinicalImpression.problems.map(problem => problem.id);
+
+                                                {{-- Get only the new problems that are not already in the array --}}
+                                                const newProblems = searchResults
+                                                    .filter(problem => selectedProblemIds.includes(problem.id) && !existingIds.includes(problem.id))
                                                     .map(problem => ({
                                                         id: problem.id,
                                                         inserted_at: problem.inserted_at,
-                                                        code: problem.code
+                                                        code: problem.code,
+                                                        selectedEpisodeId: modalProblem.selectedEpisodeId
                                                     }));
 
+                                                {{-- Add them to the array --}}
+                                                modalClinicalImpression.problems = modalClinicalImpression.problems.concat(newProblems);
+
                                                 openModal = false;
+                                                searchResults = [];
                                             "
                                             class="button-primary"
                                     >
@@ -285,6 +305,8 @@
      * Representation of the user's personal Problems
      */
     class Problem {
+        selectedEpisodeId = '';
+
         constructor(obj = null) {
             if (obj) {
                 Object.assign(this, JSON.parse(JSON.stringify(obj)));
