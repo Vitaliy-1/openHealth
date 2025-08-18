@@ -160,9 +160,7 @@
                                 <div class="form-row-modal">
                                     {{-- Type --}}
                                     <div>
-                                        <label for="documentType" class="label-modal">
-                                            {{ __('forms.type') }}
-                                        </label>
+                                        <label for="documentType" class="label-modal">{{ __('forms.type') }}<span class="text-red-600"> *</span></label>
                                         <select x-model="modalDocument.type"
                                                 id="documentType"
                                                 class="input-modal"
@@ -175,19 +173,11 @@
                                             @endforeach
                                         </select>
 
-                                        {{-- Check if the picked value is the one from the dictionary --}}
-                                        <p class="text-error text-xs"
-                                           x-show="!Object.keys(dictionary).includes(modalDocument.type)"
-                                        >
-                                            {{ __('forms.field_empty') }}
-                                        </p>
                                     </div>
 
                                     {{-- Issue number --}}
                                     <div>
-                                        <label for="documentNumber" class="label-modal">
-                                            {{ __('forms.document_number') }}
-                                        </label>
+                                        <label for="documentNumber" class="label-modal">{{ __('forms.document_number') }}<span class="text-red-600"> *</span></label>
                                         <input x-model="modalDocument.number"
                                                type="text"
                                                name="documentNumber"
@@ -197,16 +187,11 @@
                                                required
                                         >
 
-                                        <p class="text-error text-xs" x-show="!modalDocument.number.trim()">
-                                            {{ __('forms.field_empty') }}
-                                        </p>
                                     </div>
 
                                     {{-- Authority which issued --}}
                                     <div>
-                                        <label for="documentIssuedBy" class="label-modal">
-                                            {{ __('forms.document_issued_by') }}
-                                        </label>
+                                        <label for="documentIssuedBy" class="label-modal">{{ __('forms.document_issued_by') }}<span class="text-red-600"> *</span></label>
                                         <input x-model="modalDocument.issuedBy"
                                                type="text"
                                                name="documentIssuedBy"
@@ -215,22 +200,17 @@
                                                autocomplete="off"
                                         >
 
-                                        <p class="text-error text-xs" x-show="!modalDocument.issuedBy.trim()">
-                                            {{ __('forms.field_empty') }}
-                                        </p>
                                     </div>
 
                                     {{-- The date when was issued --}}
                                     <div class="relative">
                                         <svg width="20" height="20"
-                                             class="svg-input absolute left-1 !top-1/2 transform -translate-y-1/2 pointer-events-none"
+                                             class="svg-input absolute left-1 !top-2/3 transform -translate-y-1/2 pointer-events-none"
                                         >
                                             <use xlink:href="#svg-calendar-week"></use>
                                         </svg>
 
-                                        <label for="documentIssuedAt" class="label-modal">
-                                            {{ __('forms.document_issued_at') }}
-                                        </label>
+                                        <label for="documentIssuedAt" class="label-modal">{{ __('forms.document_issued_at') }}<span class="text-red-600"> *</span></label>
                                         <input x-model="modalDocument.issuedAt"
                                                datepicker-max-date="{{ now()->format('Y-m-d') }}"
                                                type="text"
@@ -240,9 +220,6 @@
                                                autocomplete="off"
                                         >
 
-                                        <p class="text-error text-xs" x-show="!modalDocument.issuedAt.trim()">
-                                            {{ __('forms.field_empty') }}
-                                        </p>
                                     </div>
 
                                     {{-- The date when expired --}}
@@ -253,9 +230,7 @@
                                             <use xlink:href="#svg-calendar-week"></use>
                                         </svg>
 
-                                        <label for="documentExpirationDate" class="label-modal">
-                                            {{ __('forms.valid_until') }}
-                                        </label>
+                                        <label for="documentExpirationDate" class="label-modal">{{ __('forms.valid_until') }}<span class="text-red-600"> *</span></label>
                                         <input x-model="modalDocument.expirationDate"
                                                datepicker-min-date="{{ now()->format('Y-m-d') }}"
                                                type="text"
@@ -266,7 +241,7 @@
                                         >
                                     </div>
                                 </div>
-
+                                <p class="text-sm text-gray-400 mb-2">{{ __('forms.form_required_note') }}</p>
                                 {{-- Action buttons --}}
                                 <div class="mt-6 flex justify-between space-x-2">
                                     <button type="button"
