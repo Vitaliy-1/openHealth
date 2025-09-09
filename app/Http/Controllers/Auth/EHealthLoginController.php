@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Auth\EHealth\Services\TokenStorage;
+use App\Classes\eHealth\EHealth;
 use App\Classes\eHealth\Exceptions\ApiException;
 use App\Events\EHealthUserLogin;
 use App\Http\Controllers\Controller;
+use App\Models\Relations\Party;
 use App\Models\User;
 use App\Models\LegalEntity;
 use Closure;
@@ -93,14 +95,15 @@ class EHealthLoginController extends Controller
 
         $legalEntity = LegalEntity::byUuid($authLegalEntityUUID)->firstOrFail();
 
-        $isFirstLogin = !User::where('uuid', $authUserUUID)->first()?->uuid;
-
         auth()->shouldUse('ehealth');
+
         $user = $this->findOrCreateUser($legalEntity, $authUserUUID);
 
-        if (!$user) {
-            Log::error(__('auth.login.error.user_authentication', [], 'en'));
-            return $this->breakAuth('auth.login.error.user_authentication');
+        // Finally give up and create a new user based on the received data
+        // Створити нового користувача
+        // Редірект на сторінку підтвердження особи чеерез КЕП
+        if ($user->verifiedByEHealthButNotByUs) {
+            return Redirect::route('verify');
         }
 
         if ($testUser && ($sessionEmail !== $user->email)) {
@@ -111,6 +114,8 @@ class EHealthLoginController extends Controller
         EHealthUserLogin::dispatch($user, $legalEntity, $authUserUUID);
 
         auth('ehealth')->login($user);
+
+        EHealthUserLoged::dispatch($user, $legalEntity);
 
         if ($legalEntity) {
             Log::info(__('auth.login.success.user_auth', [], 'en'), ['User ID' => $user->id]);
@@ -131,42 +136,33 @@ class EHealthLoginController extends Controller
      * @return User|null
      * @throws ApiException
      */
-    protected function findOrCreateUser(LegalEntity $legalEntity, string $authUserUUID): ?User
+    protected function findOrCreateUser(LegalEntity $legalEntity, string $authUserUUID): User
     {
         $user = User::where('uuid', $authUserUUID)->first();
-        if ($user) {
-            setPermissionsTeamId($legalEntity->id);
-            $user->unsetRelation('roles')->unsetRelation('permissions');
 
-            if (!$user->hasAccessToLegalEntityByUuid($legalEntity->uuid)) {
-                Log::error(__('auth.login.error.user_authentication', [], 'en') . __(" User {$user->uuid} does not have required access to LegalEntity {$legalEntity->uuid} after sync."));
-                return null;
+        /**
+         * Створити новий запис в базі даних, який буде зберігати дані про те, чи користувач вперше увійшов в систему
+         * В даному випадку ми перевіряємо чи існує в системі користувач із цим імейлом
+         */
+        if (!$user) {
+            $user->isFirstLogin = true;
+
+            $userDetailsResponse = EHealth::employee()->getUserDetails();
+            [$ehealthEMail] = $userDetailsResponse->validate();
+
+            $user = User::where('email', $ehealthEMail)->first();
+            // Update the user
+            if ($user) {
+                $user->update(['email' => $ehealthEMail]);
             }
 
-            return $user;
+            if (!$user) {
+                // Випадок, коли HR нового співробітника, якого ще немає в системі.
+                $party = Party::where('email', $ehealthEMail)->first();
+            }
+
+            $user->VerifiedByEHealthButNotByUs = true;
         }
-
-        $userDetailsValidator = $this->validateUserDetailsResponse(EmployeeApi::getUserDetails());
-        if ($userDetailsValidator->fails()) {
-            Log::error(__('auth.login.error.validation.user_details', [], 'en'), ['errors' => $userDetailsValidator->errors()]);
-            return null;
-        }
-
-        $userData = $userDetailsValidator->validated();
-
-        if ($userData['id'] !== $authUserUUID) {
-            Log::error(__('auth.login.error.user_identity', [], 'en'));
-            return null;
-        }
-
-        $user = User::where('email', $userData['email'])->first();
-        if (!$user) {
-            Log::error(__('auth.login.error.user_not_found_by_email', [], 'en') . ": {$userData['email']}");
-            return null;
-        }
-
-        setPermissionsTeamId($legalEntity->id);
-        $user->unsetRelation('roles')->unsetRelation('permissions');
 
         return $user;
     }
