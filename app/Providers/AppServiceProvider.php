@@ -34,7 +34,14 @@ class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands($this->app->isProduction());
 
         RateLimiter::for('ehealth-employee-get', function (object $job) {
-            return Limit::perMinute(30)->by($job->user->id);
+            return Limit::perMinute(config('ehealth.rate_limit.employee_request'))->by($job->user->id);
         });
+
+        RateLimiter::for('ehealth-division-get', function (object $job) {
+            echo "Rate limiter set for user: " . $job->user->id . PHP_EOL;
+            return Limit::perMinute(config('ehealth.rate_limit.division_request'))->by($job->user->id);
+        });
+
+        // RateLimiter::for('ehealth-division-get', fn (object $job) => Limit::perMinute(50)->by($job->user->id));
     }
 }

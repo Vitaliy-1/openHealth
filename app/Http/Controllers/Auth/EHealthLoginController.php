@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Auth;
 use App\Auth\EHealth\Services\TokenStorage;
 use App\Classes\eHealth\Api\Employee;
 use App\Classes\eHealth\Exceptions\ApiException;
+use App\Events\EhealthUserLoggedIn;
 use App\Events\EHealthUserLogin;
 use App\Http\Controllers\Controller;
 use App\Mail\UserCredentialsMail;
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use App\Classes\eHealth\Api\EmployeeApi;
-use App\Models\Employee\EmployeeRequest;
+
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use App\Classes\eHealth\Request as EHealthRequest;
@@ -125,6 +126,9 @@ class EHealthLoginController extends Controller
         EHealthUserLogin::dispatch($user, $legalEntity, $authUserUUID, $this->isFirstLogin);
 
         auth('ehealth')->login($user);
+
+        // Dispatch event after successful login (at first do FirstLogin Synchronization here)
+        EhealthUserLoggedIn::dispatch($legalEntity, $this->isFirstLogin);
 
         if ($legalEntity) {
             Log::info(__('auth.login.success.user_auth', [], 'en'), ['User ID' => $user->id]);

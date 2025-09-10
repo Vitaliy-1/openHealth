@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace App\Classes\eHealth\Api;
 
 use Exception;
+use App\Models\LegalEntity;
 use App\Traits\WorkTimeUtilities;
+use  Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Promise\PromiseInterface;
 use App\Classes\eHealth\EHealthResponse;
+use App\Models\Division as DivisionModel;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Client\ConnectionException;
 use App\Classes\eHealth\EHealthRequest as Request;
-use App\Models\Division as DivisionModel;
-use  Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 
 class Division extends Request
 {
@@ -213,14 +214,14 @@ class Division extends Request
      *
      * @return array Normalized array ready for database upsert operation
      */
-    public static function normalizeResponseDataForUpsert(array $divisionsList): array
+    public static function normalizeResponseDataForUpsert(array $divisionsList, LegalEntity $legalEntity): array
     {
         foreach ($divisionsList as $index => $division) {
             unset($divisionsList[$index]['legal_entity_uuid']);
             unset($divisionsList[$index]['addresses']);
             unset($divisionsList[$index]['phones']);
 
-            $divisionsList[$index]['legal_entity_id'] = legalEntity()->id;
+            $divisionsList[$index]['legal_entity_id'] = $legalEntity->id;
 
             $divisionsList[$index]['location'] = empty($division['location'])
                 ? null

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\JobStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -33,6 +34,12 @@ return new class extends Migration
             $table->string('client_id')->nullable();
             $table->string('client_secret')->nullable();
             $table->string('website')->nullable();
+            $table->enum('sync_status', JobStatus::values())->nullable();
+            $table->enum('division_sync_status', JobStatus::values())->nullable();
+            $table->enum('hcs_sync_status', JobStatus::values())->nullable();
+            $table->enum('employee_sync_status', JobStatus::values())->nullable();
+            $table->enum('license_sync_status', JobStatus::values())->nullable();
+            $table->enum('document_sync_status', JobStatus::values())->nullable();
             $table->timestamp('inserted_at')->nullable();
             $table->timestamps();
         });

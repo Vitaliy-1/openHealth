@@ -60,7 +60,8 @@ return [
         ],
     ],
     'rate_limit' => [
-        'employee_request' => 20
+        'employee_request' => 30,
+        'division_request' => 50
     ],
     'employee_type' => [
         'OWNER' => [
