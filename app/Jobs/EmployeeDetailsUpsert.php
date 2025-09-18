@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Jobs;
 
 use App\Models\Employee\Employee;
@@ -11,19 +9,14 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\SerializesModels;
 use App\Classes\eHealth\EHealth;
-use Throwable;
 
 class EmployeeDetailsUpsert implements ShouldQueue
 {
-    use Batchable;
-    use Dispatchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 3;
     public int $backoff = 60;
@@ -32,31 +25,31 @@ class EmployeeDetailsUpsert implements ShouldQueue
         public Employee $employee,
         public User $user,
         protected string $token
-    ) {
+    ) {}
+
+    public function middleware(): array
+    {
+        return [new RateLimited('ehealth-employee-get')];
     }
 
-    /**
-     * @throws Throwable
-     * @throws ConnectionException
-     */
     public function handle(): void
     {
         if ($this->batch() && $this->batch()->cancelled()) {
             return;
         }
 
-            $response = EHealth::employee()->withToken($this->token)->getDetails($this->employee->uuid, groupByEntities: true);
-            $validatedData = $response->validate();
+        $response = EHealth::employee()->withToken($this->token)->getDetails($this->employee->uuid, groupByEntities: true);
 
-            Repository::employee()->updateDetails(
-                $this->employee,
-                $validatedData['party'],
-                $validatedData['documents'],
-                $validatedData['phones'],
-                $validatedData['educations'] ?? null,
-                $validatedData['specialities'] ?? null,
-                $validatedData['qualifications'] ?? null,
-                $validatedData['scienceDegree'] ?? null
-            );
+        [
+            'party' => $party,
+            'documents' => $documents,
+            'phones' => $phones,
+            'educations' => $educations,
+            'specialities' => $specialities,
+            'qualifications' => $qualifications,
+            'scienceDegrees' => $scienceDegrees,
+        ] = $response->validate();
+
+        Repository::employee()->updateDetails($this->employee, $party, $documents, $phones, $educations, $specialities, $qualifications, $scienceDegrees);
     }
 }

@@ -98,6 +98,8 @@ class Employee extends EHealthRequest
             Log::channel('e_health_errors')->error(
                 'EHealth Employee validation failed: ' . implode(', ', $validator->errors()->all())
             );
+            // Ви можете тут кинути виняток, щоб зупинити процес
+            // throw new \Illuminate\Validation\ValidationException($validator);
         }
 
         return $validator->validated();
@@ -107,30 +109,13 @@ class Employee extends EHealthRequest
      * Validates the response for a single employee.
      *
      * @param EHealthResponse $response The response from the eHealth API.
-     *
      * @return array The validated and transformed data.
      */
     protected function validateDetails(EHealthResponse $response): array
     {
         $transformedData = self::replaceEHealthPropNames($response->getData());
 
-        $employeeTypeKey = strtolower($transformedData['employee_type'] ?? '');
-        $doctorTypes = implode(',', config('ehealth.doctors_type', []));
-
-        // =================================================================================
-        //  COMMENT REGARDING DATA VALIDATION FROM E-HEALTH
-        // =================================================================================
-        //  The validation logic below has been relaxed compared to the original implementation.
-        //  Reason: The E-Health API sometimes returns incomplete or logically incorrect data.
-        //  For example, for documents, the issue date (issued_at) may be missing,
-        //  and for qualifications, the expiration date (valid_to) may be earlier than the issue date.
-        //
-        //  To avoid synchronization failures due to such data issues on the E-Health side,
-        //  we accept this data but leave this comment as a warning.
-        //  In an ideal world, these rules should be stricter (e.g., 'required' instead of 'nullable').
-        // =================================================================================
-
-        $rules = [
+        $validator = Validator::make($transformedData, [
             'uuid' => 'required|uuid',
             'status' => 'required|string',
             'position' => 'required|string',
@@ -142,7 +127,7 @@ class Employee extends EHealthRequest
             'party' => 'required|array',
             'party.uuid' => 'required|uuid',
             'party.no_tax_id' => 'required|boolean',
-            'party.tax_id' => 'required|string',
+            'party.tax_id' => 'required|string', // might be passport data if no_tax_id is true
             'party.first_name' => 'required|string',
             'party.last_name' => 'required|string',
             'party.second_name' => 'nullable|string',
@@ -151,61 +136,33 @@ class Employee extends EHealthRequest
             'party.declaration_count' => 'required|integer',
             'party.declaration_limit' => 'required|integer',
 
-            'party.phones' => 'required|array|min:1',
+            'party.phones' => 'required|array',
             'party.phones.*.type' => 'required|string',
             'party.phones.*.number' => 'required|string',
 
-            'party.documents' => 'required|array|min:1',
+            'party.documents' => 'required|array',
             'party.documents.*.type' => 'required|string',
             'party.documents.*.number' => 'required|string',
-//            'party.documents.*.issued_by' => 'sometimes|string',
-            'party.documents.*.issued_by' => 'sometimes|nullable|string',
-            //            'party.documents.*.issued_at' => 'required|date_format:Y-m-d',
-            'party.documents.*.issued_at' => 'nullable|date_format:Y-m-d',
-        ];
+            'party.document.*.issued_at' => 'required|date_format:Y-m-d',
+            'party.document.*.issued_by' => 'sometimes|string',
 
-        if (!empty($employeeTypeKey)) {
-            $rules[$employeeTypeKey] = 'required_if:employee_type,' . $doctorTypes . '|array';
+            'doctor' => 'sometimes|array',
+            'doctor.specialities' => 'required_with:*.doctor|array',
+            'doctor.specialities.*.speciality' => 'required_with:*.doctor|string',
+            'doctor.specialities.*.speciality_officio' => 'required_with:*.doctor|boolean',
+            'doctor.specialities.*.attestation_date' => 'required_with:*.doctor|date_format:Y-m-d',
+            'doctor.specialities.*.attestation_name' => 'required_with:*.doctor|string',
+            'doctor.specialities.*.certificate_number' => 'required_with:*.doctor|string',
+            'doctor.specialities.*.level' => 'string',
 
-            $rules["{$employeeTypeKey}.specialities"] = "required_with:{$employeeTypeKey}|array|min:1";
-            $rules["{$employeeTypeKey}.specialities.*.speciality"] = "required|string";
-            $rules["{$employeeTypeKey}.specialities.*.speciality_officio"] = "required|boolean";
-            $rules["{$employeeTypeKey}.specialities.*.attestation_date"] = "required|date_format:Y-m-d";
-            $rules["{$employeeTypeKey}.specialities.*.attestation_name"] = "required|string";
-            $rules["{$employeeTypeKey}.specialities.*.certificate_number"] = "required|string";
-            $rules["{$employeeTypeKey}.specialities.*.level"] = "required|string";
-            $rules["{$employeeTypeKey}.specialities.*.qualification_type"] = "required|string";
-
-            $rules["{$employeeTypeKey}.educations"] = "required_with:{$employeeTypeKey}|array|min:1";
-            $rules["{$employeeTypeKey}.educations.*.city"] = "required|string";
-            $rules["{$employeeTypeKey}.educations.*.country"] = "required|string";
-            $rules["{$employeeTypeKey}.educations.*.degree"] = "required|string";
-            $rules["{$employeeTypeKey}.educations.*.diploma_number"] = "required|string";
-            $rules["{$employeeTypeKey}.educations.*.institution_name"] = "required|string";
-            $rules["{$employeeTypeKey}.educations.*.speciality"] = "required|string";
-            $rules["{$employeeTypeKey}.educations.*.issued_date"] = "nullable|date_format:Y-m-d";
-
-            $rules["{$employeeTypeKey}.science_degree"] = 'sometimes|nullable|array';
-            $rules["{$employeeTypeKey}.science_degree.country"] = "required_with:{$employeeTypeKey}.science_degree|string";
-            $rules["{$employeeTypeKey}.science_degree.city"] = "required_with:{$employeeTypeKey}.science_degree|string";
-            $rules["{$employeeTypeKey}.science_degree.degree"] = "required_with:{$employeeTypeKey}.science_degree|string";
-            $rules["{$employeeTypeKey}.science_degree.institution_name"] = "required_with:{$employeeTypeKey}.science_degree|string";
-            $rules["{$employeeTypeKey}.science_degree.diploma_number"] = "required_with:{$employeeTypeKey}.science_degree|string";
-            $rules["{$employeeTypeKey}.science_degree.speciality"] = "required_with:{$employeeTypeKey}.science_degree|string";
-            $rules["{$employeeTypeKey}.science_degree.issued_date"] = 'nullable|date_format:Y-m-d';
-
-            $rules["{$employeeTypeKey}.qualifications"] = 'sometimes|array';
-            $rules["{$employeeTypeKey}.qualifications.*.type"] = "required_with:{$employeeTypeKey}.qualifications|string";
-            $rules["{$employeeTypeKey}.qualifications.*.institution_name"] = "required_with:{$employeeTypeKey}.qualifications|string";
-            $rules["{$employeeTypeKey}.qualifications.*.speciality"] = "required_with:{$employeeTypeKey}.qualifications|string";
-            $rules["{$employeeTypeKey}.qualifications.*.issued_date"] = "required_with:{$employeeTypeKey}.qualifications|date_format:Y-m-d";
-            $rules["{$employeeTypeKey}.qualifications.*.certificate_number"] = "required_with:{$employeeTypeKey}.qualifications|string";
-            //            $rules["{$employeeTypeKey}.qualifications.*.valid_to"] = "nullable|date_format:Y-m-d|after_or_equal:{$employeeTypeKey}.qualifications.*.issued_date";
-            $rules["{$employeeTypeKey}.qualifications.*.valid_to"] = "nullable|date_format:Y-m-d";
-            $rules["{$employeeTypeKey}.qualifications.*.additional_info"] = 'nullable|string';
-        }
-
-        $validator = Validator::make($transformedData, $rules);
+            'doctor.educations' => 'required_with:*.doctor|array',
+            'doctor.educations.*.city' => 'required_with:*.doctor|string',
+            'doctor.educations.*.country' => 'required_with:*.doctor|string',
+            'doctor.educations.*.degree' => 'required_with:*.doctor|string',
+            'doctor.educations.*.diploma_number' => 'required_with:*.doctor|string',
+            'doctor.educations.*.institution_name' => 'required_with:*.doctor|string',
+            'doctor.educations.*.speciality' => 'required_with:*.doctor|string',
+        ]);
 
         if ($validator->fails()) {
             Log::channel('e_health_errors')->error(
@@ -219,21 +176,27 @@ class Employee extends EHealthRequest
             return $validated;
         }
 
-        $party = Arr::pull($validated, 'party', []);
+        // Party related data
+        $party = Arr::pull($validated, 'party');
         $documents = Arr::pull($party, 'documents', []);
         $phones = Arr::pull($party, 'phones', []);
 
-        $doctorData = Arr::pull($validated, $employeeTypeKey, []);
+        // Doctor related data
+        $doctor = Arr::pull($validated, 'doctor', []);
+        $educations = Arr::pull($doctor, 'educations', []);
+        $specialities = Arr::pull($doctor, 'specialties', []);
+        $qualifications = Arr::pull($doctor, 'qualifications', []);
+        $scienceDegrees = Arr::pull($doctor, 'scienceDegrees', []);
 
         return [
             'employee' => $validated,
             'party' => $party,
             'documents' => $documents,
             'phones' => $phones,
-            'educations' => $doctorData['educations'] ?? [],
-            'specialities' => $doctorData['specialities'] ?? [],
-            'qualifications' => $doctorData['qualifications'] ?? [],
-            'scienceDegree' => $doctorData['science_degree'] ?? [],
+            'educations' => $educations,
+            'specialities' => $specialities,
+            'qualifications' => $qualifications,
+            'scienceDegrees' => $scienceDegrees,
         ];
     }
 

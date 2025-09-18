@@ -17,17 +17,44 @@ use App\Enums\Employee\RequestStatus;
 use App\Enums\Employee\RevisionStatus;
 use App\Models\Employee\EmployeeRequest;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
+use App\Classes\eHealth\Api\Employee as ApiEmployee;
 use Throwable;
 
-readonly class EmployeeRepository
+class EmployeeRepository
 {
-    public function __construct(
-        private UserRepository     $userRepository,
-        private PartyRepository    $partyRepository,
-        private RevisionRepository $revisionRepository
-    ) {
+    protected ?UserRepository          $userRepository;
+    protected ?PartyRepository         $partyRepository;
+    protected ?PhoneRepository         $phoneRepository;
+    protected ?DocumentRepository      $documentRepository;
+    protected ?EducationRepository     $educationRepository;
+    protected ?ScienceDegreeRepository $scienceDegreeRepository;
+    protected ?QualificationRepository $qualificationRepository;
+    protected ?SpecialityRepository    $specialityRepository;
+    protected ?RevisionRepository      $revisionRepository;
 
+    public function __construct(
+        UserRepository               $userRepository,
+        PartyRepository              $partyRepository,
+        PhoneRepository              $phoneRepository,
+        DocumentRepository           $documentRepository,
+        EducationRepository          $educationRepository,
+        ScienceDegreeRepository      $scienceDegreeRepository,
+        QualificationRepository      $qualificationRepository,
+        SpecialityRepository         $specialityRepository,
+        RevisionRepository           $revisionRepository,
+        private readonly ApiEmployee $employeeApi,
+    ) {
+        $this->userRepository = $userRepository;
+        $this->partyRepository = $partyRepository;
+        $this->phoneRepository = $phoneRepository;
+        $this->documentRepository = $documentRepository;
+        $this->educationRepository = $educationRepository;
+        $this->scienceDegreeRepository = $scienceDegreeRepository;
+        $this->qualificationRepository = $qualificationRepository;
+        $this->specialityRepository = $specialityRepository;
+        $this->revisionRepository = $revisionRepository;
     }
 
     /**
@@ -74,14 +101,28 @@ readonly class EmployeeRepository
     ): BaseEmployee {
         try {
             $partyData = $response['party'] ?? [];
-            $doctorData = $response['doctor'] ?? [];
+            unset($response['party']);
 
-            $user = null;
-            if (!empty($partyData['email'])) {
-                $user = $this->userRepository->createIfNotExist($partyData, $response['employee_type']);
+            if (!empty($partyData['phones'])) {
+                $phonesData = $partyData['phones'];
+                unset($partyData['phones']);
+            }
+            if (!empty($partyData['documents'])) {
+                $documentsData = $partyData['documents'];
+                unset($partyData['documents']);
+            }
+            if (!empty($response['doctor'])) {
+                $doctorData = $response['doctor'];
+                unset($response['doctor']);
             }
 
-            unset($response['party'], $response['doctor'], $response['updated_at']);
+            unset($response['updated_at']);
+
+            $user = null;
+
+            if (!empty($partyData['email'])) {
+                $this->userRepository->createIfNotExist($partyData, $response['employee_type']);
+            }
 
             $employee = $this->createOrUpdate($response, $employeeModel, $legalEntity);
             $isEmployeeRequest = $employee instanceof EmployeeRequest;
@@ -93,21 +134,34 @@ readonly class EmployeeRepository
                 optional($employeeInstance, fn ($instance) => $employee->employee()->associate($instance));
             }
 
+            /**
+             * If $alreadyExistParty == null it only means that EmployeeRequest expects to create through creation of the LegalEntity
+             * Because if $employee is EmployeeRequest the data below mustn't be changed until a valid user approves these changes.
+             * And therefore, if $employee is Employee, the data should be updated or created.
+             */
             if (!$isEmployeeRequest || !$alreadyExistParty) {
-                $this->updateDetails(
-                    $employee,
-                    $partyData,
-                    $partyData['documents'] ?? [],
-                    $partyData['phones'] ?? [],
-                    $doctorData['educations'] ?? null,
-                    $doctorData['specialities'] ?? null,
-                    $doctorData['qualifications'] ?? null,
-                    $doctorData['science_degree'] ?? null
-                );
+                // Add documents for Party
+                $this->documentRepository->syncDocuments($party, $documentsData ?? []);
+
+                // Add phones for Party
+                $this->phoneRepository->syncPhones($party, $phonesData ?? []);
+
+                // Add educations
+                $this->educationRepository->syncEducations($employee, $doctorData['educations'] ?? []);
+
+                // Add science degrees
+                $this->scienceDegreeRepository->syncScienceDegrees($employee, $doctorData['science_degree'] ?? []);
+
+                // Add qualifications
+                $this->qualificationRepository->syncQualifications($employee, $doctorData['qualifications'] ?? []);
+
+                // Add specialities
+                $this->specialityRepository->syncSpecialities($employee, $doctorData['specialities'] ?? []);
             }
 
             $party->employees()->save($employee);
 
+            // Assign party to the user if $user is a new one
             if (!$alreadyExistParty && $user) {
                 $user->party()->save($party);
             }
@@ -116,8 +170,8 @@ readonly class EmployeeRepository
                 $responseData = [
                     'response' => $response,
                     'party' => $partyData,
-                    'documents' => $partyData['documents'] ?? [],
-                    'phones' => $partyData['phones'] ?? [],
+                    'documents' => $documentsData,
+                    'phones' => $phonesData,
                     'doctor' => $doctorData ?? []
                 ];
 
@@ -132,27 +186,30 @@ readonly class EmployeeRepository
         } catch (Exception $err) {
             Log::error('Create Employee Error: ' . $err->getMessage(), ['exception' => $err]);
             throw new Exception(__('Create Employee Error') . ' : ' . $err->getMessage());
-        }
+       }
     }
 
     /**
      * Creates a new EmployeeRequest draft from prepared data.
      * This is a universal method that only handles database persistence.
      *
-     * @param array       $employeeRequestData The prepared data for the request itself.
-     * @param Party       $party               The associated Party model.
-     * @param LegalEntity $legalEntity         The associated LegalEntity model.
-     *
+     * @param array $employeeRequestData The prepared data for the request itself.
+     * @param Party $party The associated Party model.
+     * @param LegalEntity $legalEntity The associated LegalEntity model.
+     * @param User|null $user The associated User model, if found.
      * @return EmployeeRequest
      */
-    public function createEmployeeRequestDraft(array $employeeRequestData, Party $party, LegalEntity $legalEntity): EmployeeRequest
+    public function createEmployeeRequestDraft(array $employeeRequestData, Party $party, LegalEntity $legalEntity, ?User $user): EmployeeRequest
     {
         $employeeRequest = new EmployeeRequest();
         $employeeRequest->fill($employeeRequestData);
         $employeeRequest->status = 'NEW';
         $employeeRequest->legalEntity()->associate($legalEntity);
         $employeeRequest->party()->associate($party);
-        $employeeRequest->user()->associate($party->user);
+
+        if ($user) {
+            $employeeRequest->user()->associate($user);
+        }
 
         $employeeRequest->save();
 
@@ -184,49 +241,86 @@ readonly class EmployeeRepository
     }
 
     /**
-     * @param Employee|EmployeeRequest $employee the model or identifier (ID or UUID) of the employee to update
-     * @param array                    $party
-     * @param array                    $documents
-     * @param array                    $phones
-     * @param array|null               $educations
-     * @param array|null               $specialities
-     * @param array|null               $qualifications
-     * @param array|null               $scienceDegree
-     *
-     * @return Employee|EmployeeRequest Updated employee
+     * @param Employee|int|string $employee the model or identifier (ID or UUID) of the employee to update
+     * @param array $party
+     * @param array $documents
+     * @param array $phones
+     * @param array|null $educations
+     * @param array|null $specialties
+     * @param array|null $qualifications
+     * @param array|null $scienceDegrees
+     * @return Employee Updated employee
      * @throws Throwable
      */
     public function updateDetails(
-        Employee|EmployeeRequest $employee,
-        array        $party,
-        array        $documents,
-        array        $phones,
-        ?array       $educations = null,
-        ?array       $specialities = null,
-        ?array       $qualifications = null,
-        ?array       $scienceDegree = null,
-    ): Employee|EmployeeRequest {
-        $model = $employee;
+        Employee|int|string $employee,
+        array $party,
+        array $documents,
+        array $phones,
+        ?array $educations = null,
+        ?array $specialities = null,
+        ?array $qualifications = null,
+        ?array $scienceDegrees = null,
 
-        DB::transaction(function () use ($model, $party, $documents, $phones, $educations, $specialities, $qualifications, $scienceDegree) {
-            $partyAttributes = array_diff_key($party, array_flip(['documents', 'phones']));
+    ): Employee
+    {
+        $model = $this->getEmployeeByIdentifier($employee);
 
-            $this->updatePartyByUuid($model, $partyAttributes);
+        if (is_null($model)) {
+            throw new InvalidArgumentException('Employee model or valid Employee identifier must be provided');
+        }
+        DB::transaction(function () use ($model, $party, $documents, $phones, $educations, $specialities, $qualifications, $scienceDegrees) {
+            $this->updatePartyByUuid($model, $party);
 
-            $model->party->syncMany('documents', $documents);
-            $model->party->syncMany('phones', $phones);
-            $model->syncMany('educations', $educations);
-            $model->syncMany('specialities', $specialities);
-            $model->syncMany('qualifications', $qualifications);
+            $model->party->documents()->delete();
+            $model->party->documents()->createMany($documents);
 
-            if (!empty($scienceDegree)) {
-                $model->scienceDegree()->updateOrCreate([], $scienceDegree);
-            } else {
-                $model->scienceDegree()->delete();
+            $model->party->phones()->delete();
+            $model->party->phones()->createMany($phones);
+
+            if (!is_null($educations)) {
+                $model->educations()->delete();
+                $model->educations()->createMany($educations);
+            }
+
+            if (!is_null($specialities)) {
+                $model->specialities()->delete();
+                $model->specialities()->createMany($specialities);
+            }
+
+            if (!is_null($qualifications)) {
+                $model->qualifications()->delete();
+                $model->qualifications()->createMany($qualifications);
+            }
+
+            if (!is_null($scienceDegrees)) {
+                $model->scienceDegrees()->delete();
+                $model->scienceDegrees()->createMany($scienceDegrees);
             }
         });
 
         return $model;
+    }
+
+    /**
+     * @param Employee|string|int $employee Employee Model, ID or UUID of the employee
+     * @return ?Employee
+     */
+    public function getEmployeeByIdentifier(Employee|string|int $employee): ?Employee
+    {
+        if (is_a($employee, Employee::class)) {
+            return $employee;
+        }
+
+        if (is_int($employee)) {
+            return Employee::with('party')->find($employee);
+        }
+
+        if (Str::isUuid($employee)) {
+            return Employee::with('party')->where('uuid', $employee)->first();
+        }
+
+        return null;
     }
 
     /**
@@ -236,7 +330,7 @@ readonly class EmployeeRepository
      * 3. If user does not have a party, but there is a party with the same UUID, update it and establish the relation.
      * 4. If neither of the above, create a new party and establish the relation.
      */
-    protected function updatePartyByUuid(Employee|EmployeeRequest $model, array $party): void
+    protected function updatePartyByUuid(Employee $model, array $party): void
     {
         $partyUuid = Arr::get($party, 'uuid');
         $partyByUuid = Party::where('uuid', $partyUuid)->first();
@@ -248,17 +342,17 @@ readonly class EmployeeRepository
             $model->party()->associate($newParty)->save();
 
             // If the model doesn't have a related party but the party already exists, update it and relate - the scenario of a new employee with already created person/party
-        } elseif ($partyByUuid && !$model->party) {
+        } else if ($partyByUuid && !$model->party) {
             $model->party()->associate($partyByUuid)->save();
 
             // The model already has a related party, update it and change the UUID - the case when eHealth creates another party, probably merge scenario
-        } elseif (!$partyByUuid && $model->party) {
+        } else if (!$partyByUuid && $model->party) {
             $model->party()->update($party);
             // Both the model and the party exist, check if they are the same
-        } elseif ($partyByUuid && $model->party) {
+        } else if ($partyByUuid && $model->party) {
 
             // uuid is the same, just update
-            if ($partyByUuid->uuid === $model->party->uuid) {
+            if ($partyByUuid->uuid == $model->party->uuid) {
                 $model->party()->update($party);
             } else {
 

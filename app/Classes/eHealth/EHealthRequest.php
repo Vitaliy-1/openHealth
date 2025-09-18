@@ -12,7 +12,7 @@ use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Http\Client\Response;
-use GuzzleHttp\Promise\PromiseInterface;
+use Log;
 
 abstract class EHealthRequest extends PendingRequest
 {

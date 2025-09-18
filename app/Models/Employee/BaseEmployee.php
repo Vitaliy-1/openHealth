@@ -7,7 +7,6 @@ namespace App\Models\Employee;
 use App\Models\User;
 use App\Models\LegalEntity;
 use App\Models\Relations\Party;
-use App\Traits\SyncsMorphManyRelations;
 use Eloquence\Behaviours\HasCamelCasing;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -18,12 +17,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * It contains only the common logic, properties, and relationships.
  *
  * @mixin IdeHelperBaseEmployee
- * @mixin SyncsMorphManyRelations
  */
 abstract class BaseEmployee extends Model
 {
     use HasCamelCasing;
-    use SyncsMorphManyRelations;
 
     /**
      * Common fillable attributes for both employees and requests.
