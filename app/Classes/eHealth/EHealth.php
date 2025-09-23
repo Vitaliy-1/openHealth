@@ -7,6 +7,7 @@ namespace App\Classes\eHealth;
 use App\Classes\eHealth\Api\Declaration;
 use App\Classes\eHealth\Api\DeclarationRequest;
 use App\Classes\eHealth\Api\Employee;
+use App\Classes\eHealth\Api\EmployeeRequest;
 use App\Classes\eHealth\Api\License;
 use App\Classes\eHealth\Api\Job;
 use App\Classes\eHealth\Api\Division;
@@ -65,5 +66,10 @@ final class EHealth
     public static function employee(): Employee
     {
         return app(Employee::class);
+    }
+
+    public static function employeeRequest(): EmployeeRequest
+    {
+        return app(EmployeeRequest::class);
     }
 }

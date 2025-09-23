@@ -37,6 +37,62 @@ class EmployeeRequest extends EHealthRequest
         ];
     }
 
+    /**
+     * Prepares a complete data structure for creating a new Employee
+     * by combining data from the signed Revision and the approved API response.
+     *
+     * @param array $employeeCreateResponse The structure of EHealth Request(and Response) for the create employee request v2, see:
+     * https://uaehealthapi.docs.apiary.io/#reference/public.-medical-service-provider-integration-layer/employee-requests/create-employee-request-v2?console=1
+     *
+     * @return array{'employee': array, 'party': array, 'phones': array, 'documents': array, 'qualifications': array, 'educations': array, 'science_degree': array, 'specialities': array}
+     */
+    public static function mapCreate(array $employeeCreateResponse): array
+    {
+        $data = [];
+        foreach ($employeeCreateResponse as $key => $value) {
+            switch ($key) {
+                case 'party':
+                    foreach ($value as $partyKey => $partyValue) {
+                        switch ($partyKey) {
+                            case 'documents':
+                                $data['documents'] = $partyValue;
+                                break;
+                            case 'phones':
+                                $data['phones'] = $partyValue;
+                                break;
+                            default:
+                                $data['party'] = $partyValue;
+                        }
+                    }
+                    break;
+                case 'doctor':
+                    foreach ($value as $doctorKey => $doctorValue) {
+                        switch ($doctorKey) {
+                            case 'educations':
+                                $data['educations'] = $doctorValue;
+                                break;
+                            case 'specialities':
+                                $data['specialities'] = $doctorValue;
+                                break;
+                            case 'qualifications':
+                                $data['qualifications'] = $doctorValue;
+                                break;
+                            case 'science_degree':
+                                $data['science_degree'] = $doctorValue;
+                                break;
+                        }
+                    }
+                    break;
+                default:
+                    $data['employee'][$key] = $value;
+                    break;
+
+            }
+        }
+
+        return $data;
+    }
+
     public function schemaRequest(): array
     {
         $phoneDefinition = [

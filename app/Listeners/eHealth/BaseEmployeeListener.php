@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners\eHealth;
 
 use App\Classes\eHealth\Api\Employee as EmployeeApi;
+use App\Classes\eHealth\EHealth;
 use App\Enums\Employee\RevisionStatus;
 use App\Enums\Status;
 use App\Events\EHealthUserLogin;
@@ -127,30 +128,36 @@ abstract class BaseEmployeeListener
      */
     protected function createEmployeeFromRequest(EmployeeRequest $employeeRequest, array $approvedData): void
     {
-        // NEW: Get all prepared data from the mapper method
-        $mappedData = EmployeeApi::mapCreate($employeeRequest, $approvedData);
+        // Map response from EHealth employee request create endpoint according to our data structure, it should be already validated, skipping this step
+        $newEmployee = EHealth::employeeRequest()->mapCreate($employeeRequest->revision->data);
 
-        $employeeData = $mappedData['employee'];
-        $partyData = $mappedData['party'];
-        $doctorData = $mappedData['doctor'];
-        $documentsData = $mappedData['documents'];
-        $phonesData = $mappedData['phones'];
+        $newEmployee = array_merge(
+            $newEmployee,
+            [
+                // Сonfirmed data from the live E-Health response
+                'uuid' => $approvedData['uuid'],
+                'status' => $approvedData['status'],
+                'is_active' => $approvedData['is_active'] ?? true,
+                'legal_entity_id' => $employeeRequest->legal_entity_id,
+                'legal_entity_uuid' => $employeeRequest->legal_entity_uuid,
+            ]);
 
-        DB::transaction(function () use ($employeeData, $partyData, $doctorData, $documentsData, $phonesData, $employeeRequest) {
-            $employeeModel = Employee::updateOrCreate(
-                ['uuid' => $employeeData['uuid']],
-                $employeeData
+        $newEmployee['party']['id'] = $employeeRequest->party_id;
+
+        DB::transaction(function () use ($newEmployee, $employeeRequest) {
+            $employeeModel = Employee::create(
+                $newEmployee['employee']
             );
 
             Repository::employee()->updateDetails(
                 $employeeModel,
-                $partyData,
-                $documentsData,
-                $phonesData,
-                $doctorData['educations'] ?? null,
-                $doctorData['specialities'] ?? null,
-                $doctorData['qualifications'] ?? null,
-                $doctorData['scienceDegree'] ?? null
+                $newEmployee['party'],
+                $newEmployee['documents'],
+                $newEmployee['phones'],
+                $newEmployee['educations'] ?? null,
+                $newEmployee['specialities'] ?? null,
+                $newEmployee['qualifications'] ?? null,
+                $newEmployee['science_degree'] ?? null
             );
 
             $this->assignRoleToUser($employeeModel);
