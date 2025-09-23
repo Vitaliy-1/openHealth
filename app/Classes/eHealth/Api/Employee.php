@@ -7,6 +7,7 @@ namespace App\Classes\eHealth\Api;
 use App\Classes\eHealth\EHealthRequest;
 use App\Classes\eHealth\EHealthResponse;
 use App\Core\Arr;
+use App\Models\Employee\EmployeeRequest;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Log;
@@ -280,26 +281,6 @@ class Employee extends EHealthRequest
     }
 
     /**
-     * Prepares data for the Employee model from an API response.
-     */
-    public static function mapEmployeeData(array $apiData, EmployeeRequest $employeeRequest): array
-    {
-        $employeeApiKeys = ['id', 'status', 'position', 'employee_type', 'start_date', 'end_date', 'is_active'];
-        $employeeData = array_intersect_key($apiData, array_flip($employeeApiKeys));
-
-        $employeeData['uuid'] = $employeeData['id'];
-        unset($employeeData['id']);
-
-        return array_merge($employeeData, [
-            'legal_entity_uuid' => $apiData['legal_entity']['id'] ?? null,
-            'legal_entity_id' => $employeeRequest->legal_entity_id,
-            'party_id' => $employeeRequest->party_id,
-            'user_id' => $employeeRequest->party->user_id,
-            'division_id' => $employeeRequest->division_id,
-        ]);
-    }
-
-    /**
      * Prepares data for the Party model from an API response.
      */
     public static function mapPartyData(array $apiPartyData): array
@@ -316,13 +297,54 @@ class Employee extends EHealthRequest
     }
 
     /**
-     * Prepares doctor-specific data from an API response.
+     * Prepares a complete data structure for creating a new Employee
+     * by combining data from the signed Revision and the approved API response.
+     *
+     * @param EmployeeRequest $employeeRequest The local request containing the revision.
+     * @param array           $approvedData    The final, confirmed data from the E-Health API.
+     *
+     * @return array A structured array with data for employee, party, doctor, etc.
      */
-    public static function mapDoctorData(array $apiData): array
+    public static function mapCreate(EmployeeRequest $employeeRequest, array $approvedData): array
     {
-        $doctorDataKey = strtolower($apiData['employee_type'] ?? '');
+        // THE SOURCE OF TRUTH: Data from the revision, which the user signed.
+        $revisionData = $employeeRequest->revision->data;
 
-        return $apiData[$doctorDataKey] ?? [];
+        // 1. Prepare Employee data
+        $employeeData = [
+            // Data from the Revision (what user signed)
+            'position' => $revisionData['employee_request_data']['position'],
+            'employee_type' => $revisionData['employee_request_data']['employee_type'],
+            'start_date' => $revisionData['employee_request_data']['start_date'],
+            'end_date' => $revisionData['employee_request_data']['end_date'],
+            'division_id' => $revisionData['employee_request_data']['division_id'],
+
+            // Data from existing relationships
+            'legal_entity_id' => $employeeRequest->legal_entity_id,
+            'legal_entity_uuid' => $employeeRequest->legal_entity_uuid,
+            'inserted_at' => now(),
+            'party_id' => $employeeRequest->party_id,
+            'user_id' => $employeeRequest->party->user_id,
+
+            // Final, confirmed data from the live E-Health response
+            'uuid' => $approvedData['uuid'],
+            'status' => $approvedData['status'],
+            'is_active' => $approvedData['is_active'] ?? true,
+        ];
+
+        // 2. Prepare related data using existing mappers
+        $partyData = self::mapPartyData($revisionData['party'] ?? []);
+        $doctorData = $revisionData['doctor'] ?? []; // This already contains nested structure
+
+        // 3. Return a structured payload
+        return [
+            'employee' => $employeeData,
+            'party' => $partyData,
+            'doctor' => $doctorData,
+            // We can also return documents and phones directly from revision
+            'documents' => $revisionData['documents'] ?? [],
+            'phones' => $revisionData['phones'] ?? [],
+        ];
     }
 
     /**

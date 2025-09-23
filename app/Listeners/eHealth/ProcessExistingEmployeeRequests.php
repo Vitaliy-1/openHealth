@@ -7,6 +7,7 @@ namespace App\Listeners\eHealth;
 use App\Classes\eHealth\EHealth;
 use App\Enums\Status;
 use App\Events\EHealthUserLogin;
+use Illuminate\Http\Client\ConnectionException;
 
 class ProcessExistingEmployeeRequests extends BaseEmployeeListener
 {
@@ -20,6 +21,8 @@ class ProcessExistingEmployeeRequests extends BaseEmployeeListener
 
     /**
      * Fetches employee data using the party's UUID.
+     *
+     * @throws ConnectionException
      */
     protected function fetchEmployeesFromApi(EHealthUserLogin $event): array
     {

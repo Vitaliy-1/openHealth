@@ -62,7 +62,27 @@ class ProcessNewEmployeeRequests extends BaseEmployeeListener
             }
         }
 
-        // Now, return the full, validated response for the main logic to process.
         return $response->validate();
+    }
+
+    protected function afterFetchingEmployees(EHealthUserLogin $event, array &$ehealthEmployees): void
+    {
+        if (empty($ehealthEmployees)) {
+            return;
+        }
+
+        $verifiedPartyData = null;
+        foreach ($ehealthEmployees as $employee) {
+            if (($employee['party']['verification_status'] ?? null) === 'VERIFIED') {
+                $verifiedPartyData = $employee['party'];
+                break;
+            }
+        }
+
+        $partyDataToUse = $verifiedPartyData ?? ($ehealthEmployees[0]['party'] ?? null);
+
+        if ($partyDataToUse && isset($partyDataToUse['uuid'])) {
+            $event->user->party->update(['uuid' => $partyDataToUse['uuid']]);
+        }
     }
 }
