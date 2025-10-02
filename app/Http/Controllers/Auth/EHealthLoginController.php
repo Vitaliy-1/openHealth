@@ -123,10 +123,17 @@ class EHealthLoginController extends Controller
             trim(data_get($validatedEHealthTokenData, 'details.scope'))
         );
 
+        if (empty($user->party)) {
+            $this->isPartiallyVerified = true;
+        }
+
         if ($this->isPartiallyVerified) {
             Session::put('selected_legal_entity_uuid', $legalEntity->uuid);
-            // Respect EHealth scopes
-            $user->syncPermissions($ehealthScopes);
+
+            if ($roleName = Session::pull('first_login_role')) {
+                setPermissionsTeamId($legalEntity->id);
+                $user->assignRole($roleName);
+            }
 
             return Redirect::route('party.verify');
         }

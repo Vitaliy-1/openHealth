@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Listeners\eHealth;
 
 use App\Classes\eHealth\EHealth;
+use App\Enums\Employee\RequestStatus;
 use App\Enums\Status;
 use App\Events\EHealthUserLogin;
 use Illuminate\Http\Client\ConnectionException;
@@ -12,11 +13,19 @@ use Illuminate\Http\Client\ConnectionException;
 class ProcessExistingEmployeeRequests extends BaseEmployeeListener
 {
     /**
-     * This listener should only process if the user's party is already synced with E-Health (has a UUID).
+     * This listener should only process if the user's party is synced
+     * AND if there are any actual employee requests in a syncable status.
      */
     protected function shouldProcess(EHealthUserLogin $event): bool
     {
-        return isset($event->user->party->uuid);
+        if (!isset($event->user->party->uuid)) {
+            return false;
+        }
+
+        return $event->user->employeeRequests()
+            ->whereIn('status', RequestStatus::getStatusesForSync())
+            ->exists();
+
     }
 
     /**
