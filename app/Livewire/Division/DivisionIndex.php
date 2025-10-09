@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Division;
 
+use App\Classes\eHealth\Api\Job;
+use App\Enums\JobStatus;
 use App\Jobs\EmployeeSync;
 use App\Notifications\EmployeeSyncCompleted;
 use App\Notifications\SyncNotification;
@@ -20,6 +22,7 @@ use Illuminate\Http\Client\ConnectionException;
 use App\Exceptions\EHealth\EHealthResponseException;
 use App\Exceptions\EHealth\EHealthValidationException;
 use App\Jobs\DivisionSync;
+use App\Models\LegalEntity;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
@@ -70,9 +73,17 @@ class DivisionIndex extends DivisionComponent
      */
     public function sync(): void
     {
+        if (! $this->isDivisionCanSync()) {
+            session()->flash('error', __('divisions.request.sync.errors.cannot_sync'));
+
+            return;
+        }
+
         $response = null;
 
         try {
+            session()->flash('success', __('Синхронізація запущена. Будь ласка, зачекайте...'));
+
             $response = EHealth::division()->getMany();
 
             $divisions = $response->validate();
@@ -129,6 +140,24 @@ class DivisionIndex extends DivisionComponent
         } else {
             session()->flash('success', __(__('Інформацію успішно оновлено')));
         }
+    }
+
+    /**
+     * Checks if division synchronization is allowed for the current legal entity.
+     *
+     * Synchronization is allowed if the division sync status is not COMPLETED, PAUSED, or FAILED.
+     *
+     * @return bool
+     */
+    protected function isDivisionCanSync(): bool
+    {
+        $syncStatus = legalEntity()?->getEntityStatus(LegalEntity::ENTITY_DIVISION);
+
+        // If $syncStatus is null it means that sync was never run for this entity (so can be synced)
+        return !$syncStatus ||
+            $syncStatus === JobStatus::COMPLETED->value ||
+            $syncStatus === JobStatus::PAUSED->value ||
+            $syncStatus === JobStatus::FAILED->value;
     }
 
     /**

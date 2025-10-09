@@ -1018,5 +1018,11 @@ return [
     'emailers' => [
         'credentialsQueueTimeout' => 60,
         'failCredentialsTries' => 3
+    ],
+
+    'ui' => [
+        'notifications' => [
+            'refresh_interval' => env('NOTIFICATIONS_REFRESH_INTERVAL', 60000), // Auto-refresh interval in milliseconds (default: 60 seconds)
+        ]
     ]
 ];

@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use Throwable;
+use App\Models\User;
 use App\Enums\JobStatus;
 use App\Events\EHealthUserLogin;
 use Illuminate\Support\Facades\Log;
@@ -10,6 +11,8 @@ use App\Notifications\SyncNotification;
 use App\Traits\BatchLegalEntityQueries;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Notification;
+
 
 class OnRegularLoginSyncronization implements ShouldQueue
 {
@@ -60,7 +63,8 @@ class OnRegularLoginSyncronization implements ShouldQueue
         }
 
         $event->legalEntity->setEntityStatus(JobStatus::PROCESSING);
-        $event->user->notify(new SyncNotification('legal_entity', 'resumed'));
+
+        Notification::send(User::all(), new SyncNotification('legal_entity', 'resumed'));
     }
 
     /**

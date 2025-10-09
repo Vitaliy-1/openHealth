@@ -2,18 +2,18 @@
 
 namespace App\Listeners;
 
-use App\Jobs\EmployeeSync;
 use Throwable;
+use App\Models\User;
+use App\Jobs\EmployeeSync;
 use App\Enums\JobStatus;
-use App\Jobs\CompleteSync;
 use App\Jobs\DivisionSync;
 use App\Events\EHealthUserLogin;
-use App\Jobs\HealthcareServiceSync;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Bus;
 use App\Notifications\SyncNotification;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Notification;
 
 class FirstLoginOwnerSyncronization implements ShouldQueue
 {
@@ -62,7 +62,7 @@ class FirstLoginOwnerSyncronization implements ShouldQueue
 
         $event->legalEntity->setEntityStatus(JobStatus::PROCESSING);
 
-        $event->user->notify(new SyncNotification('legal_entity', 'started'));
+        Notification::send(User::all(), new SyncNotification('legal_entity', 'started'));
     }
 
     /**
