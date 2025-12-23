@@ -201,7 +201,7 @@
                                     </div>
 
                                     <div class="relative">
-                                        @icon('calendar-month', 'w-5 h-5 svg-input absolute left-1 !top-2/3 transform -translate-y-1/2 pointer-events-none')
+                                        @icon('calendar-week', 'w-5 h-5 svg-input absolute left-1 !top-2/3 transform -translate-y-1/2 pointer-events-none')
 
                                         <label for="confDocumentIssuedAt" class="label-modal">
                                             {{ __('forms.document_issued_at') }}
@@ -219,7 +219,7 @@
                                     </div>
 
                                     <div class="relative">
-                                        @icon('calendar-month', 'w-5 h-5 svg-input absolute left-1 !top-2/3 transform -translate-y-1/2 pointer-events-none')
+                                        @icon('calendar-week', 'w-5 h-5 svg-input absolute left-1 !top-2/3 transform -translate-y-1/2 pointer-events-none')
 
                                         <label for="confDocumentExpirationDate" class="label-modal">
                                             {{ __('forms.valid_until') }}
