@@ -179,6 +179,26 @@ class LegalEntity extends Model
     }
 
     /**
+     * Magic accessory. Allows you to contact $legalEntity->name
+     * EDR Name -> Beneficiary -> EDRPOU
+     */
+    public function getNameAttribute(): string
+    {
+        // 1. Let's try to take the official name from EDR (JSON array)
+        if (!empty($this->edr['name'])) {
+            return $this->edr['name'];
+        }
+
+        // 2.If the EDR is empty, we take the beneficiary
+        if (!empty($this->beneficiary)) {
+            return $this->beneficiary;
+        }
+
+        // 3. If everything is bad, we return the EDRPOU as a backup option
+        return (string) $this->edrpou;
+    }
+
+    /**
      * Scope a query to get an Legal Entity depends on it's UUID
      */
     #[Scope]

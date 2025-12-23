@@ -36,6 +36,7 @@ use Spatie\Permission\PermissionRegistrar;
 use Str;
 use Throwable;
 use Illuminate\Support\Facades\Crypt;
+use Livewire\Attributes\Url;
 
 #[AllowDynamicProperties]
 class EmployeeIndex extends EmployeeComponent
@@ -44,8 +45,16 @@ class EmployeeIndex extends EmployeeComponent
     use BatchLegalEntityQueries;
 
     // --- Component State for Filters ---
+
+    #[Url(except: '')] // Allows you to pass ?search=Ivan
     public string $search = '';
+
+    // Allows passing ?status[0]=NEW.
+    // keep: true allows you to save your browser history if you need to
+    #[Url]
     public array $status = ['APPROVED', 'NEW', 'SIGNED'];
+
+    #[Url]
     public array $filter = [
         'phone' => '',
         'email' => '',

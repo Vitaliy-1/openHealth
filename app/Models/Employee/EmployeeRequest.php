@@ -105,4 +105,12 @@ class EmployeeRequest extends BaseEmployee
                 fn ($q) => $q->whereNotIn('employee_type', $roles)
             );
     }
+
+    /**
+     * Scope a query to only include pending (NEW) requests.
+     */
+    public function scopePending(Builder $query): void
+    {
+        $query->where('status', RequestStatus::NEW);
+    }
 }
