@@ -173,7 +173,7 @@ class Employee extends EHealthRequest
         if (!empty($employeeTypeKey)) {
             $rules[$employeeTypeKey] = 'required_if:employee_type,' . $doctorTypes . '|array';
 
-            $rules["{$employeeTypeKey}.specialities"] = "required_with:{$employeeTypeKey}|array|min:1";
+            $rules["{$employeeTypeKey}.specialities"] = "nullable|array"; // TODO temporary change to fix eHealth sync - check validation of employee 6fcd44dc-6332-49c6-ae17-a9a44dfb2687
             $rules["{$employeeTypeKey}.specialities.*.speciality"] = "required|string";
             $rules["{$employeeTypeKey}.specialities.*.speciality_officio"] = "required|boolean";
             $rules["{$employeeTypeKey}.specialities.*.attestation_date"] = "required|date_format:Y-m-d";
