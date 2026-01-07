@@ -175,7 +175,11 @@ class Equipment extends Request
         // Add rule 'in' to avoid N+1 queries
         $rules['*.division_id'] = ['nullable', 'uuid', Rule::in($divisionUuids)];
         $rules['*.legal_entity_id'] = ['required', 'uuid', Rule::in($legalEntityUuids)];
-        $rules['*.recorder'] = ['required', 'uuid', Rule::in($employeeUuids)];
+        $rules['*.recorder'] = [
+            'required',
+            'uuid',
+            // Rule::in($employeeUuids) TODO - uncomment after fixing equipment sync on the eHealth side
+        ];
         $rules['*.parent_id'] = ['nullable', 'uuid'];
 
         $validator = Validator::make($replaced, $rules);
