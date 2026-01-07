@@ -173,7 +173,7 @@ class Employee extends EHealthRequest
         if (!empty($employeeTypeKey)) {
             $rules[$employeeTypeKey] = 'required_if:employee_type,' . $doctorTypes . '|array';
 
-            $rules["{$employeeTypeKey}.specialities"] = "required_with:{$employeeTypeKey}|array|min:1";
+            $rules["{$employeeTypeKey}.specialities"] = "nullable|array";
             $rules["{$employeeTypeKey}.specialities.*.speciality"] = "required|string";
             $rules["{$employeeTypeKey}.specialities.*.speciality_officio"] = "required|boolean";
             $rules["{$employeeTypeKey}.specialities.*.attestation_date"] = "required|date_format:Y-m-d";
@@ -200,13 +200,14 @@ class Employee extends EHealthRequest
             $rules["{$employeeTypeKey}.science_degree.speciality"] = "required_with:{$employeeTypeKey}.science_degree|string";
             $rules["{$employeeTypeKey}.science_degree.issued_date"] = 'nullable|date_format:Y-m-d';
 
-            $rules["{$employeeTypeKey}.qualifications"] = 'sometimes|array';
-            $rules["{$employeeTypeKey}.qualifications.*.type"] = "required_with:{$employeeTypeKey}.qualifications|string";
-            $rules["{$employeeTypeKey}.qualifications.*.institution_name"] = "required_with:{$employeeTypeKey}.qualifications|string";
-            $rules["{$employeeTypeKey}.qualifications.*.speciality"] = "required_with:{$employeeTypeKey}.qualifications|string";
-            $rules["{$employeeTypeKey}.qualifications.*.issued_date"] = "nullable|date_format:Y-m-d"; // optional because of the sync with test eHealth instance
-            $rules["{$employeeTypeKey}.qualifications.*.certificate_number"] = "nullable|string"; // optional because of the sync with test instance
-            //            $rules["{$employeeTypeKey}.qualifications.*.valid_to"] = "nullable|date_format:Y-m-d|after_or_equal:{$employeeTypeKey}.qualifications.*.issued_date";
+            $rules["{$employeeTypeKey}.qualifications"] = 'nullable|array';
+            $rules["{$employeeTypeKey}.qualifications.*.type"] = "nullable|string";
+            $rules["{$employeeTypeKey}.qualifications.*.institution_name"] = "nullable|string";
+            $rules["{$employeeTypeKey}.qualifications.*.speciality"] = "nullable|string";
+
+            // Fields that are NOT in JSON (we make nullable so that it does not fall)
+            $rules["{$employeeTypeKey}.qualifications.*.issued_date"] = "nullable|date_format:Y-m-d";
+            $rules["{$employeeTypeKey}.qualifications.*.certificate_number"] = "nullable|string";
             $rules["{$employeeTypeKey}.qualifications.*.valid_to"] = "nullable|date_format:Y-m-d";
             $rules["{$employeeTypeKey}.qualifications.*.additional_info"] = 'nullable|string';
         }

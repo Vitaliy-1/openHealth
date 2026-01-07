@@ -36,10 +36,13 @@ class EmployeeSync extends EHealthJob
     {
         $employees = $response->validate();
 
-        data_forget($employees, '*.party');
-        data_forget($employees, '*.doctor');
-        data_fill($employees, '*.legal_entity_id', $this->legalEntity->id);
-        data_fill($employees, '*.sync_status', JobStatus::PARTIAL->value);
+        foreach ($employees as &$item) {
+            unset($item['party'], $item['doctor'], $item['med_admin'], $item['pharmacist'], $item['specialist'], $item['legal_entity'], $item['division']);
+
+            $item['legal_entity_id'] = $this->legalEntity->id;
+            $item['sync_status'] = JobStatus::PARTIAL->value;
+        }
+        unset($item);
 
         Employee::upsert($employees, uniqueBy: ['uuid']);
 
