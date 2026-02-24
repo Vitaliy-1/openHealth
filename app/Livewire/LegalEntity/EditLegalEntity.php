@@ -158,6 +158,7 @@ class EditLegalEntity extends LegalEntity
         $ownerData['employee_uuid'] = $owner->uuid;
         $ownerData['employee_id'] = $owner->id;
         $ownerData['email'] = $owner->user->email;
+        $ownerData['party_id'] = $owner->partyId;
 
         // TODO: remove it when all other entity will use the same date format
         $ownerData['birthDate'] = convertToAppDateFormat($ownerData['birthDate']);
@@ -192,6 +193,7 @@ class EditLegalEntity extends LegalEntity
         }
 
         $this->legalEntityForm->allFieldsValidate();
+        $ownerPartyId = Arr::pull($this->legalEntityForm->owner, 'party_id') ?? null;
 
         if ($this->getErrorBag()->isNotEmpty()) {
             $this->dispatchBrowserEvent('scroll-to-error');
@@ -203,6 +205,11 @@ class EditLegalEntity extends LegalEntity
         }
 
         $data = $result['request'];
+
+        $data['owner']['working_experience'] = $this->legalEntityForm->owner['workingExperience'] ?? null;
+        $data['owner']['about_myself'] = $this->legalEntityForm->owner['aboutMyself'] ?? null;
+        $data['owner']['party_id'] = $ownerPartyId;
+
         $response = $this->filterUnprovidedFields($result['response'], $data);
 
         try {

@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\License;
 use Livewire\Component;
+use App\Enums\JobStatus;
 use App\Traits\FormTrait;
 use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
@@ -685,6 +686,9 @@ abstract class LegalEntity extends Component
      */
     private function mapEmployeRequestData(array $requestData): array
     {
+        // Check if the current user is an already logined and all changes is for edit legal entity, if so - set $isEdit to true, otherwise - it's create legal entity
+        // $isEdit = Auth::getDefaultDriver() === 'ohealths';
+
         $employeeId = Arr::pull($requestData, 'owner.employee_id', null);
 
         $arr = [
@@ -703,8 +707,9 @@ abstract class LegalEntity extends Component
             "tax_id" => $requestData['owner']['tax_id'],
             "no_tax_id" => $requestData['owner']['no_tax_id'],
             "email" => $requestData['owner']['email'],
-            "working_experience" => null,
-            "about_myself" => null,
+            "working_experience" => Arr::pull($requestData['owner'], 'working_experience', null),
+            "about_myself" => Arr::pull($requestData['owner'], 'about_myself', null),
+            "party_id" => Arr::pull($requestData['owner'], 'party_id', null),
             "doctor" => [
                 "specialities" => [],
                 "science_degree" => [],
@@ -774,6 +779,9 @@ abstract class LegalEntity extends Component
      */
     protected function createEmployeeRequest(LegalEntityModel $legalEntity, array $requestData, string $employeeRequestId): void
     {
+        // Check if the current user is an already logined and all changes is for edit legal entity, if so - set $isEdit to true, otherwise - it's create legal entity
+        $isEdit = Auth::getDefaultDriver() === 'ehealth';
+
         $preparedData = $this->mapEmployeRequestData($requestData);
 
         // Here get the anonymous instanse of the AbstractEmployeeFormManager class
@@ -781,6 +789,9 @@ abstract class LegalEntity extends Component
 
         // Get the draft EmployeeRequest record (create a new one)
         $employeeRequest = $employeeRequestHelper->handleDraftPersistence();
+
+        // COMPLETED status set only when legalentity is created, for edit legal entity - status will be always PENDING, because we need to wait for approvement of the changes
+        $employeeRequest->syncStatus = $isEdit ? JobStatus::PARTIAL->value : JobStatus::COMPLETED->value;
 
         // This method just create a draft record in the local DB and set the $this->employeeRequestId property)
         $employeeRequestEmulatedData = $this->mapEmployeeRequestResponse($preparedData, $legalEntity->uuid, $employeeRequestId);
@@ -808,7 +819,6 @@ abstract class LegalEntity extends Component
                     "inserted_at" => Carbon::now()->format('Y-m-d'),
                     "legal_entity_id" => $legalEntityUUID,
                     "party" => [
-                        "about_myself" => null,
                         "birth_date" => $employeeData['birth_date'],
                         "documents" => $employeeData['documents'],
                         "email" => $employeeData['email'],
@@ -819,7 +829,8 @@ abstract class LegalEntity extends Component
                         "phones" => $employeeData['phones'],
                         "second_name" => $employeeData['second_name'],
                         "tax_id" => $employeeData['tax_id'],
-                        "working_experience" => null
+                        "working_experience" => $employeeData['working_experience'],
+                        "about_myself" => $employeeData['about_myself']
                     ],
                     "position" => $employeeData['position'],
                     "start_date" => $employeeData['start_date'],
@@ -1043,7 +1054,7 @@ abstract class LegalEntity extends Component
 
                 // Prepare the data for the request model itself
                 $employeeRequestData = Arr::only($this->preparedData, [
-                    'position', 'start_date', 'end_date', 'employee_type', 'division_id', 'email'
+                    'position', 'start_date', 'end_date', 'employee_type', 'division_id', 'email', 'party_id'
                 ]);
 
                 if (!empty($this->preparedData['employee_id'])) {
@@ -1052,6 +1063,7 @@ abstract class LegalEntity extends Component
 
                 // If no draft exists, create a new one.
                 $newRequest = Repository::employee()->createEmployeeRequestDraft($employeeRequestData, $this->legalEntity);
+
                 $this->saveRevisionForRequest($newRequest, $nestedDataForRevision);
 
                 return $newRequest;

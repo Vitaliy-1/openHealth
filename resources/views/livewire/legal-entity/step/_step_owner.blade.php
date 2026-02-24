@@ -66,8 +66,7 @@
                 wire:model="legalEntityForm.owner.firstName"
                 aria-describedby="{{ $hasOwnerFirstName ? 'ownerFirstNameErrorHelp' : '' }}"
                 class="input {{ $hasOwnerFirstName ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
-                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
-                :disabled="isDisabled"
+                :class='text-gray-900 border-gray-300'
             />
 
             @if($hasOwnerFirstName)
@@ -90,8 +89,7 @@
                 wire:model="legalEntityForm.owner.secondName"
                 aria-describedby="{{ $hasOwnerSecondName ? 'ownerSecondNameErrorHelp' : '' }}"
                 class="input {{ $hasOwnerSecondName ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
-                :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
-                :disabled="isDisabled"
+                :class='text-gray-900 border-gray-300'
             />
 
             @if($hasOwnerSecondName)
@@ -159,8 +157,7 @@
                                     class="steps-owner_radio"
                                     id="owner_gender_{{ $k }}"
                                     wire:model="legalEntityForm.owner.gender"
-                                    :class="isDisabled ? 'text-gray-400 border-gray-200 dark:text-gray-500' : 'text-gray-900 border-gray-300'"
-                                    :disabled="isDisabled"
+                                    :class='text-gray-900 border-gray-300'
                                 >
                                 <label
                                     name="label"
@@ -365,7 +362,7 @@
                 aria-describedby="{{ $hasOwnerTaxId ? 'ownerTaxIdErrorHelp' : '' }}"
                 class="input {{ $hasOwnerTaxId ? 'input-error border-red-500 focus:border-red-500' : ''}} peer"
                 :class="{ 'border-gray-200 dark:border-gray-700': showNoTaxId }"
-                :disabled="showNoTaxId"
+                :disabled="showNoTaxId || isDisabled"
                 x-ref="taxIdInput"
                 x-effect="updateTaxIdInput()"
             />
@@ -392,6 +389,7 @@
                     class="default-checkbox text-blue-500 focus:ring-blue-300"
                     x-model="showNoTaxId"
                     :checked="showNoTaxId"
+                    :disabled="isDisabled"
                 >
 
                 <label for="noTaxId" class="ms-2 text-sm font-medium text-gray-500 dark:text-gray-300">{{ __('forms.no_tax_id') }}</label>
