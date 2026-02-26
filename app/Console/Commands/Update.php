@@ -15,7 +15,12 @@ class Update extends MigrationsCommand
      *
      * @var string
      */
-    protected $signature = 'update {--clear : Clear the cache before installation} {--rollback : Rollback the last batch of migrations} {--step=0 : The number of migration batches to rollback} {--ver= : Specify the target version to update to}';
+    protected $signature = 'update 
+        {--clear : Clear the cache before installation} 
+        {--rollback : Rollback the last batch of migrations} 
+        {--step=0 : The number of migration batches to rollback} 
+        {--ver= : Specify the target version to update to} 
+        {--scopes : Update the scopes (depends on config)} ';
 
     /**
      * The console command description.

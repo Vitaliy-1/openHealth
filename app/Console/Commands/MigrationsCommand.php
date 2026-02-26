@@ -41,6 +41,12 @@ abstract class MigrationsCommand extends Command
      */
     public function handle(Migrator $migrator): void
     {
+        if ($this->option('scopes')) {
+            $this->updateScopes();
+
+            return;
+        }
+
         $this->cacheClear();
 
         $this->beforeMigrations();
@@ -168,5 +174,16 @@ abstract class MigrationsCommand extends Command
         foreach ($pendingFiles as $file) {
             $this->line("<comment>   Proceeded: </comment>{$file}");
         }
+    }
+
+    /**
+     * Update permissions dependencies for all concerns tables if scopes has been updated in the config file
+     *
+     * @return void
+     */
+    protected function updateScopes(): void
+    {
+        $this->info('Updating scopes...');
+
     }
 }
