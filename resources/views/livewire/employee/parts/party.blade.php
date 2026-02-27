@@ -129,10 +129,15 @@
 
                     {{-- Phone Type Select --}}
                     <div class="form-group">
-                        <select x-model="phone.type" class="input-select @error('form.party.phones.*.type') input-error @enderror" required>
+                        <select x-model="phones[index].type" class="input-select @error('form.party.phones.*.type') input-error @enderror" required>
                             <option value="" disabled>{{__('forms.type_mobile')}} *</option>
                             @foreach($this->dictionaries['PHONE_TYPE'] as $key => $phoneType)
-                                <option value="{{$key}}">{{$phoneType}}</option>
+                                <option
+                                    value="{{$key}}"
+                                    :disabled="phones.some((p, i) => i !== index && p.type === '{{$key}}')">
+                                    {{$phoneType}}
+                                </option>
+
                             @endforeach
                         </select>
                         <label class="label">{{ __('forms.phone_type') }}</label>
@@ -160,7 +165,7 @@
                             </button>
                         </template>
 
-                        <template x-if="index === phones.length - 1">
+                        <template x-if="index === phones.length - 1 && phones.length < 2">
                             <button type="button" @click="phones.push({ type: 'MOBILE', number: '' })" class="item-add">
                                 <span>{{__('forms.add_phone')}}</span>
                             </button>
